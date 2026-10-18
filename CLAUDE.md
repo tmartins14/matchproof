@@ -53,4 +53,13 @@ prompts/            build prompts, one per task
 
 ## Commands
 
-Filled in by the scaffold task (`prompts/01-scaffold-and-ci.md`).
+```
+make setup            # uv sync --all-packages; npm ci in apps/web
+make gen              # regenerate Pydantic models and TS types from schemas/
+make check-contracts  # meta-validate schemas, validate examples
+make lint typecheck test
+make web-dev          # Next.js on :3000
+make api-dev          # FastAPI on :8000
+```
+
+Never hand-edit `packages/contracts/src/contracts/models.py` or `apps/web/src/contracts/types.ts`; run `make gen`.

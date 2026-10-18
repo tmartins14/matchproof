@@ -12,7 +12,7 @@ The three bets that win points:
 2. **Synthetic data as a scored feature, not a chore.** A Composer agent turns a brief into a calibrated full match. Creativity in synthetic data creation is written into the Technological Implementation criterion.
 3. **Microsoft hero stack used where it earns its place.** Microsoft Foundry for models and agents, Microsoft Agent Framework for orchestration, an MCP server for match data, Azure AI Translator, Container Apps, Static Web Apps, Blob Storage and Application Insights, all deployed with azd and Bicep.
 
-Capacity is about 57 focused hours, with Oct 26 and 27 taken off. Feature freeze is end of day Sun Oct 25. Anything not done by then moves to the cut list.
+Capacity is about 57 focused hours, with Oct 26 and 27 taken off. Feature freeze is 8 PM Mon Oct 26. Anything not done by then moves to the cut list.
 
 ## Compliance gates
 

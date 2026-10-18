@@ -17,3 +17,12 @@ Stage One judging checks that entries "reasonably apply the required technologie
 
 - All agent calls go through one thin client module so the model and SDK can change without touching agent logic.
 - Every prompt is a versioned file; a change re-runs the evals.
+
+## Decision log
+
+### 2026-10-18: model and region for the walking skeleton
+
+- **Region:** `eastus2`. The Foundry model catalog for this subscription lists Claude there, and in `swedencentral`, `eastus` and `westus3`. `canadacentral` and `canadaeast` list OpenAI models only.
+- **Claude is blocked on quota.** The first `azd up` failed with `InsufficientQuota`: the limit for "Tokens Per Minute (thousands) - Claude Sonnet 5.5" is 0 in `eastus2`. A read of `az cognitiveservices usage list` for `eastus2`, `eastus`, `swedencentral`, `westus3`, `canadaeast` and `canadacentral` shows a limit of 0 for every Claude model and for every GPT chat model except `gpt-5-mini`.
+- **Model used for now:** `gpt-5-mini`, version `2025-08-07`, `GlobalStandard`, deployment name `gpt-5-mini`. It is the only chat model with quota on this subscription (limit 500 thousand tokens per minute in `eastus2`, `eastus`, `swedencentral`, `westus3` and `canadaeast`). Requested capacity is 50. This is not the "strongest available" model in the abstract; it is the only deployable one.
+- **To switch back to Claude:** request quota for Sonnet 5.5 (catalog default version `2`, `GlobalStandard`) in the Azure portal, then change `llm_client.py` to the Anthropic Foundry client, set `modelProviderData` in `infra/modules/foundry.bicep` (it needs the real organization name, country and industry, and accepts Anthropic's Marketplace terms), and swap the role to Cognitive Services User. Callers do not change.

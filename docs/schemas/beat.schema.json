@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/beat.schema.json",
+  "title": "Beat",
+  "description": "One key moment worth explaining, either planted by the brief or found by the detector.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "origin", "t_detect", "t_from", "t_to", "label", "anchor_event_id", "fact_ids", "salience"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/beatId" },
+    "kind": {
+      "type": "string",
+      "enum": ["high_turnover_chance", "counter_goal", "set_piece_goal", "open_play_goal", "territorial_spell", "momentum_swing", "big_chance", "card", "substitution"]
+    },
+    "origin": { "type": "string", "enum": ["planted", "detected"] },
+    "planted_beat_id": { "type": "string", "pattern": "^pb-[0-9]{2}$" },
+    "side": { "$ref": "common.schema.json#/$defs/side" },
+    "t_detect": { "$ref": "common.schema.json#/$defs/matchClock" },
+    "t_from": { "$ref": "common.schema.json#/$defs/matchClock" },
+    "t_to": { "$ref": "common.schema.json#/$defs/matchClock" },
+    "label": { "type": "string", "description": "Clock label shown in the feed, e.g. 41′ or 55–70′." },
+    "anchor_event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+    "fact_ids": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/factId" } },
+    "salience": { "type": "number", "minimum": 0, "maximum": 1 },
+    "rank": { "type": "integer", "minimum": 1, "description": "Set by the Producer. Absent means not selected for the feed." }
+  }
+}

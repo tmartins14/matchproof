@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/claim.schema.json",
+  "title": "Claim",
+  "description": "One sentence about a beat, with the facts it rests on and the Checker's verdict.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "beat_id", "lang", "text", "fact_ids", "numbers", "verdict"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/claimId" },
+    "beat_id": { "$ref": "common.schema.json#/$defs/beatId" },
+    "lang": { "$ref": "common.schema.json#/$defs/lang" },
+    "text": { "type": "string", "maxLength": 280, "description": "The published wording. For blocked claims, the draft wording kept for audit." },
+    "draft_text": { "type": "string", "maxLength": 280, "description": "The Narrator's wording, when the Checker changed or blocked it." },
+    "fact_ids": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/factId" } },
+    "numbers": {
+      "description": "Every number in the text, each tied to the fact it came from. The deterministic reconciler fills and checks this.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["as_written", "fact_id"],
+        "properties": {
+          "as_written": { "type": "string" },
+          "fact_id": { "$ref": "common.schema.json#/$defs/factId" }
+        }
+      }
+    },
+    "verdict": { "type": "string", "enum": ["checking", "verified", "rephrased", "blocked", "delayed"] },
+    "reason": { "type": "string", "maxLength": 400, "description": "Required when the verdict is rephrased or blocked." },
+    "checker": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reconciled": { "type": "boolean", "description": "Every number matched a fact display rendering." },
+        "judge_supported": { "type": "boolean", "description": "The LLM judge found the wording within what the facts say." },
+        "retries": { "type": "integer", "minimum": 0, "maximum": 1 },
+        "model": { "type": "string" },
+        "latency_ms": { "type": "integer", "minimum": 0 },
+        "trace_id": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "verdict": { "enum": ["rephrased", "blocked"] } } },
+      "then": { "required": ["reason", "draft_text"] }
+    },
+    {
+      "if": { "properties": { "verdict": { "enum": ["verified", "rephrased"] } } },
+      "then": { "properties": { "fact_ids": { "minItems": 1 } } }
+    }
+  ]
+}

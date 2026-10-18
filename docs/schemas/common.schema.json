@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/common.schema.json",
+  "title": "Common definitions",
+  "$defs": {
+    "point": {
+      "description": "Absolute pitch coordinates on a 120 x 80 pitch, origin top-left. Home attacks toward x = 120 in both halves (ADR 0007).",
+      "type": "array",
+      "prefixItems": [
+        { "type": "number", "minimum": 0, "maximum": 120 },
+        { "type": "number", "minimum": 0, "maximum": 80 }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "side": { "type": "string", "enum": ["home", "away"] },
+    "matchClock": {
+      "description": "Seconds since kickoff on the match clock, stoppage time included.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 6600
+    },
+    "eventId": { "type": "string", "pattern": "^ev-[0-9]{6}$" },
+    "sourceId": {
+      "description": "An event, a time window or a named aggregate that a fact draws on.",
+      "type": "string",
+      "pattern": "^(ev-[0-9]{6}|win-[0-9]{2}|agg-[a-z0-9_]+|ff-[0-9]{6})$"
+    },
+    "factId": { "type": "string", "pattern": "^fx-[a-z0-9_-]+$" },
+    "beatId": { "type": "string", "pattern": "^bt-[0-9]{3}$" },
+    "claimId": { "type": "string", "pattern": "^cl-[0-9]{3}-[0-9]{2}$" },
+    "playerId": { "type": "string", "pattern": "^(home|away)-[0-9]{2}$" },
+    "lang": { "type": "string", "enum": ["en", "es", "fr", "pt"] },
+    "formation": { "type": "string", "enum": ["4-3-3", "4-2-3-1", "4-4-2", "3-5-2", "5-3-2"] },
+    "unitInterval": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}

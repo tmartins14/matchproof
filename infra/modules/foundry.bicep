@@ -7,12 +7,9 @@ param modelDeploymentName string
 param modelName string
 param modelVersion string
 param modelCapacity int
-param claudeOrganizationName string
-param claudeCountryCode string
-param claudeIndustry string
 
-// Cognitive Services User: call models with Entra ID, no management access.
-var cognitiveServicesUserRoleId = 'a97b65f3-24c7-4388-baec-2e87135dc908'
+// Cognitive Services OpenAI User: call OpenAI-format models with Entra ID, no management access.
+var openAiUserRoleId = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
 
 var accountName = 'ais-${token}'
 
@@ -49,14 +46,9 @@ resource deployment 'Microsoft.CognitiveServices/accounts/deployments@2025-10-01
   }
   properties: {
     model: {
-      format: 'Anthropic'
+      format: 'OpenAI'
       name: modelName
       version: modelVersion
-    }
-    modelProviderData: {
-      organizationName: claudeOrganizationName
-      countryCode: claudeCountryCode
-      industry: claudeIndustry
     }
     versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
     raiPolicyName: 'Microsoft.DefaultV2'
@@ -67,14 +59,14 @@ resource deployment 'Microsoft.CognitiveServices/accounts/deployments@2025-10-01
 }
 
 resource invoke 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(account.id, principalId, cognitiveServicesUserRoleId)
+  name: guid(account.id, principalId, openAiUserRoleId)
   scope: account
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', cognitiveServicesUserRoleId)
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', openAiUserRoleId)
     principalId: principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-output modelBaseUrl string = 'https://${account.name}.services.ai.azure.com/anthropic'
+output modelBaseUrl string = 'https://${account.name}.services.ai.azure.com/openai/v1/'
 output deploymentName string = deployment.name

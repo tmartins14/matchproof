@@ -1,11 +1,11 @@
 # Deploying Matchproof to Azure
 
-The walking skeleton is one Container App (`api`) that calls a Claude deployment in a Microsoft Foundry project with a user-assigned managed identity. Everything is created by `azd up` from `infra/`.
+The walking skeleton is one Container App (`api`) that calls a `gpt-5-mini` deployment in a Microsoft Foundry project with a user-assigned managed identity. Everything is created by `azd up` from `infra/`.
 
 ## Prerequisites
 
 - Azure CLI (`az`), Azure Developer CLI (`azd` 1.36 or later) and Docker.
-- An Azure subscription where you can create resources and role assignments (Owner, or Contributor plus User Access Administrator), and that is eligible for Claude in Foundry.
+- An Azure subscription where you can create resources and role assignments (Owner, or Contributor plus User Access Administrator), and has quota for the model you deploy (see `docs/adr/0002-foundry-and-agent-framework.md`, Decision log).
 - Resource providers registered once per subscription: `Microsoft.App`, `Microsoft.CognitiveServices`, `Microsoft.ContainerRegistry`, `Microsoft.OperationalInsights`, `Microsoft.Insights`, `Microsoft.Storage`, `Microsoft.Consumption`.
 
 ## Deploy
@@ -17,14 +17,10 @@ azd env new matchproof-dev
 azd env set AZURE_SUBSCRIPTION_ID <subscription-id>
 azd env set AZURE_LOCATION eastus2
 azd env set BUDGET_EMAIL <you@example.com>
-# Anthropic attestation. Must describe the real organization using Claude.
-azd env set CLAUDE_ORGANIZATION_NAME "<legal name>"
-azd env set CLAUDE_COUNTRY_CODE <two-letter code>
-azd env set CLAUDE_INDUSTRY technology
 azd up
 ```
 
-Optional overrides: `MODEL_DEPLOYMENT_NAME` (default `claude-sonnet`), `MODEL_NAME` (`claude-sonnet-5-5`), `MODEL_VERSION` (`2`), `MODEL_CAPACITY` (`10`, thousands of tokens per minute), `BUDGET_AMOUNT` (`50`, in the subscription currency).
+Optional overrides: `MODEL_DEPLOYMENT_NAME` (default `gpt-5-mini`), `MODEL_NAME` (`gpt-5-mini`), `MODEL_VERSION` (`2025-08-07`), `MODEL_CAPACITY` (`50`, thousands of tokens per minute), `BUDGET_AMOUNT` (`50`, in the subscription currency).
 
 `azd up` builds the image in Azure Container Registry (`remoteBuild`), so no local architecture match is needed.
 
@@ -47,7 +43,7 @@ export MODEL_DEPLOYMENT_NAME="$(azd env get-value MODEL_DEPLOYMENT_NAME)"
 make api-dev
 ```
 
-Your own user needs the `Cognitive Services User` role on the Foundry account to call the model locally.
+Your own user needs the `Cognitive Services OpenAI User` role on the Foundry account to call the model locally.
 
 ## Tear down
 

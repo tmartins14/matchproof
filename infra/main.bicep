@@ -10,41 +10,16 @@ param location string
 
 // --- Model (Microsoft Foundry) ------------------------------------------------
 @description('Name of the Foundry deployment the API calls.')
-param modelDeploymentName string = 'claude-sonnet'
+param modelDeploymentName string = 'gpt-5-mini'
 
 @description('Model name from the Foundry catalog.')
-param modelName string = 'claude-sonnet-5-5'
+param modelName string = 'gpt-5-mini'
 
 @description('Model version from the Foundry catalog.')
-param modelVersion string = '2'
+param modelVersion string = '2025-08-07'
 
 @description('Deployment capacity in thousands of tokens per minute.')
-param modelCapacity int = 10
-
-// --- Anthropic model-provider attestation ---------------------------------------
-// Deploying a Claude model accepts Anthropic's Marketplace terms on your behalf.
-// These must describe the real organization using the model. No defaults on purpose.
-@description('Legal entity or individual name using Claude.')
-param claudeOrganizationName string
-
-@description('Two-letter ISO country code of that organization.')
-@minLength(2)
-@maxLength(2)
-param claudeCountryCode string
-
-@description('Lowercase industry value accepted by Foundry.')
-@allowed([
-  'technology'
-  'finance'
-  'healthcare'
-  'education'
-  'retail'
-  'manufacturing'
-  'government'
-  'media'
-  'other'
-])
-param claudeIndustry string = 'technology'
+param modelCapacity int = 50
 
 // --- Budget -------------------------------------------------------------------
 @description('Monthly budget in the subscription billing currency.')
@@ -116,9 +91,6 @@ module foundry 'modules/foundry.bicep' = {
     modelName: modelName
     modelVersion: modelVersion
     modelCapacity: modelCapacity
-    claudeOrganizationName: claudeOrganizationName
-    claudeCountryCode: claudeCountryCode
-    claudeIndustry: claudeIndustry
   }
 }
 

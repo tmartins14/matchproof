@@ -10,10 +10,10 @@ import time
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
-from anthropic import AnthropicError, AnthropicFoundry
 from azure.core.credentials import TokenCredential
 from azure.core.exceptions import AzureError
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from openai import OpenAI, OpenAIError
 from opentelemetry import trace
 from opentelemetry.trace import SpanKind, Status, StatusCode
 
@@ -46,7 +46,7 @@ class LlmClient:
         *,
         credential: TokenCredential | None = None,
         timeout_s: float = DEFAULT_TIMEOUT_S,
-        client: AnthropicFoundry | None = None,
+        client: OpenAI | None = None,
     ) -> None:
         self.deployment = deployment
         self._server = urlparse(base_url).hostname or ""
@@ -54,41 +54,48 @@ class LlmClient:
             provider = get_bearer_token_provider(
                 credential or DefaultAzureCredential(), TOKEN_SCOPE
             )
-            client = AnthropicFoundry(
+            client = OpenAI(
                 base_url=base_url,
-                azure_ad_token_provider=provider,
+                api_key=provider,
                 timeout=timeout_s,
                 max_retries=0,
             )
         self._client = client
 
-    def complete(self, prompt: str, *, max_tokens: int = 64) -> LlmReply:
+    def complete(self, prompt: str, *, max_tokens: int = 256) -> LlmReply:
         started = time.perf_counter()
         with _tracer.start_as_current_span(
             f"chat {self.deployment}",
             kind=SpanKind.CLIENT,
             attributes={
-                "gen_ai.system": "anthropic",
+                "gen_ai.system": "az.ai.openai",
                 "gen_ai.operation.name": "chat",
                 "gen_ai.request.model": self.deployment,
                 "server.address": self._server,
             },
         ) as span:
             try:
-                message = self._client.messages.create(
+                completion = self._client.chat.completions.create(
                     model=self.deployment,
-                    max_tokens=max_tokens,
+                    # Reasoning models spend part of this budget on hidden reasoning tokens.
+                    max_completion_tokens=max_tokens,
+                    reasoning_effort="minimal",
                     messages=[{"role": "user", "content": prompt}],
                 )
-            except (AnthropicError, AzureError) as exc:
+            except (OpenAIError, AzureError) as exc:
                 span.set_status(Status(StatusCode.ERROR, type(exc).__name__))
                 span.set_attribute("error.type", type(exc).__name__)
                 raise LlmError(type(exc).__name__) from exc
-            span.set_attribute("gen_ai.usage.input_tokens", message.usage.input_tokens)
-            span.set_attribute(
-                "gen_ai.usage.output_tokens", message.usage.output_tokens
-            )
-        text = "".join(block.text for block in message.content if block.type == "text")
+            if completion.usage:
+                span.set_attribute(
+                    "gen_ai.usage.input_tokens", completion.usage.prompt_tokens
+                )
+                span.set_attribute(
+                    "gen_ai.usage.output_tokens", completion.usage.completion_tokens
+                )
+        text = (
+            (completion.choices[0].message.content or "") if completion.choices else ""
+        )
         return LlmReply(
             text=text,
             model=self.deployment,

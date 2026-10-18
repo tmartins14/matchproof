@@ -32,4 +32,4 @@ Built for the Microsoft × Premier League *Inside the Game* Developer Hackathon 
 
 ## Status
 
-Day 1 of 10. See `PROGRESS.md`.
+Day 1 of 10. Monorepo scaffold, schema codegen and CI in place. See `PROGRESS.md`.

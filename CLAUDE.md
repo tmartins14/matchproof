@@ -9,6 +9,7 @@ Matchproof: an agent system that composes a synthetic football match, streams it
 3. **The browser renders.** The web app draws JSON it is given. It never computes football statistics.
 4. **Every published claim maps to fact IDs, and every fact maps to source IDs.** A claim without that chain is blocked, not shipped.
 5. **Schemas are the contract.** `schemas/*.schema.json` is the source of truth. Change a schema, then regenerate Pydantic models and TypeScript types in the same PR.
+6. **Update README.md daily** After each day's worth of work, update `README.md` under ## Status
 
 ## Repo layout
 
@@ -25,6 +26,12 @@ infra/              azure.yaml + Bicep
 docs/               SPEC, ARCHITECTURE, adr/, prototype/, compliance/
 prompts/            build prompts, one per task
 ```
+
+## Docs map
+
+- What and why: `docs/SPEC.md`. How: `docs/ARCHITECTURE.md`. Why a decision: `docs/adr/`. When: `docs/PLAN.md`.
+- If they disagree, ADRs and ARCHITECTURE win on design and PLAN wins on schedule. Flag the conflict in the PR.
+- UI tasks only: open `docs/prototype/prototype.html` in a browser to see the behaviour; read `docs/prototype/Main.dc.html` for logic, copy and theme tokens.
 
 ## Conventions
 

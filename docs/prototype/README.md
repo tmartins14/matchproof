@@ -1,6 +1,9 @@
 # UI prototype
 
-`Main.dc.html` is the clickable prototype the web app is built from. It is a Design Component file: HTML markup with `{{holes}}` and a logic class at the bottom. It does not run standalone; read it as a specification.
+Two files, one prototype:
+
+- `prototype.html` runs on its own. Open it in a browser to see and click through the behaviour.
+- `Main.dc.html` is the readable source: HTML markup with `{{holes}}` and a logic class at the bottom. It does not run standalone; read it as the specification for logic, copy and theme tokens.
 
 ## What to take from it
 

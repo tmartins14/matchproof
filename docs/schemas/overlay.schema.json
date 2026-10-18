@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/overlay.schema.json",
+  "title": "Overlay",
+  "description": "Timed drawing instructions for one beat, readable by the desk and by a graphics operator's overlay route.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["beat_id", "t_in", "t_out", "freeze_frame_event_id", "layers"],
+  "properties": {
+    "beat_id": { "$ref": "common.schema.json#/$defs/beatId" },
+    "t_in": { "$ref": "common.schema.json#/$defs/matchClock" },
+    "t_out": { "$ref": "common.schema.json#/$defs/matchClock" },
+    "freeze_frame_event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+    "layers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "side"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["pressure", "turnover", "pass", "carry", "shot", "goal", "zone", "player_highlight", "label"] },
+          "side": { "$ref": "common.schema.json#/$defs/side" },
+          "event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+          "player_id": { "$ref": "common.schema.json#/$defs/playerId" },
+          "from": { "$ref": "common.schema.json#/$defs/point" },
+          "to": { "$ref": "common.schema.json#/$defs/point" },
+          "x_from": { "type": "number", "minimum": 0, "maximum": 120, "description": "Zones only." },
+          "x_to": { "type": "number", "minimum": 0, "maximum": 120, "description": "Zones only." },
+          "xg": { "type": "number", "minimum": 0, "maximum": 1 },
+          "text": { "type": "string", "maxLength": 60 },
+          "claim_ids": {
+            "description": "Claims this layer supports, so selecting a claim can highlight its layers.",
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/claimId" }
+          }
+        }
+      }
+    }
+  }
+}

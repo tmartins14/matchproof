@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/match_brief.schema.json",
+  "title": "MatchBrief",
+  "description": "The canonical generator input (ADR 0004). Same tactics and seed produce the same match.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["match_id", "seed", "home", "away", "storyline", "planted_beats"],
+  "properties": {
+    "match_id": { "type": "string", "pattern": "^m-[a-z0-9-]+$" },
+    "seed": { "type": "integer", "minimum": 0 },
+    "brief_text": {
+      "description": "The human-readable brief shown to the user. Derived from tactics by template, or written by the user.",
+      "type": "string",
+      "maxLength": 1000
+    },
+    "home": { "$ref": "#/$defs/team" },
+    "away": { "$ref": "#/$defs/team" },
+    "storyline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text"],
+      "properties": {
+        "id": { "type": "string", "enum": ["late_comeback", "red_card_flip", "smash_and_grab", "end_to_end"] },
+        "text": { "type": "string" }
+      }
+    },
+    "planted_beats": {
+      "description": "Moments the generator must produce. Detected beats are found later by the beat detector.",
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "side", "minute_from", "minute_to"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^pb-[0-9]{2}$" },
+          "kind": { "type": "string", "enum": ["counter_goal", "set_piece_goal", "high_turnover_goal", "open_play_goal", "red_card", "penalty"] },
+          "side": { "$ref": "common.schema.json#/$defs/side" },
+          "minute_from": { "type": "integer", "minimum": 0, "maximum": 95 },
+          "minute_to": { "type": "integer", "minimum": 0, "maximum": 96 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "team": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "short", "formation", "press", "directness", "line_height", "players"],
+      "properties": {
+        "name": { "type": "string", "description": "Fictional club name." },
+        "short": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "formation": { "$ref": "common.schema.json#/$defs/formation" },
+        "press": { "$ref": "common.schema.json#/$defs/unitInterval", "description": "0 = drop off, 1 = press high." },
+        "directness": { "$ref": "common.schema.json#/$defs/unitInterval", "description": "0 = patient possession, 1 = direct." },
+        "line_height": { "$ref": "common.schema.json#/$defs/unitInterval", "description": "0 = deep block, 1 = high line." },
+        "players": {
+          "type": "array",
+          "minItems": 11,
+          "maxItems": 18,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "number", "slot", "pace"],
+            "properties": {
+              "id": { "$ref": "common.schema.json#/$defs/playerId" },
+              "name": { "type": "string" },
+              "number": { "type": "integer", "minimum": 1, "maximum": 99 },
+              "slot": { "type": "integer", "minimum": 0, "maximum": 10, "description": "Index into the formation's slots; 0 is the goalkeeper. Substitutes inherit the slot they replace." },
+              "pace": { "type": "number", "minimum": 6.5, "maximum": 10.5, "description": "Top speed in m/s." }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/position_frame.schema.json",
+  "title": "PositionFrame",
+  "description": "All 22 players and the ball at one instant. Streamed at 5 Hz; one frame is also attached to every event as its freeze frame (ADR 0005).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["match_id", "t", "ball", "players"],
+  "properties": {
+    "match_id": { "type": "string" },
+    "t": { "$ref": "common.schema.json#/$defs/matchClock" },
+    "freeze_frame_of": {
+      "description": "Present only on freeze frames: the event this frame belongs to.",
+      "$ref": "common.schema.json#/$defs/eventId"
+    },
+    "ball": { "$ref": "common.schema.json#/$defs/point" },
+    "possession": { "$ref": "common.schema.json#/$defs/side" },
+    "players": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 22,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "side", "at"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/playerId" },
+          "side": { "$ref": "common.schema.json#/$defs/side" },
+          "at": { "$ref": "common.schema.json#/$defs/point" },
+          "speed_ms": { "type": "number", "minimum": 0, "maximum": 11 },
+          "role": {
+            "description": "The movement behaviour active this tick. Version 1 always reports hold_slot.",
+            "type": "string",
+            "enum": ["hold_slot", "press", "run", "track", "carry", "receive", "keep"]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/claim_graph.schema.json",
+  "title": "ClaimGraph",
+  "description": "Everything the desk needs for one match. Served whole for cached replays; assembled from SSE messages for live runs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "match_id", "brief", "generated_at", "facts", "beats", "claims", "overlays"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "match_id": { "type": "string" },
+    "brief": { "$ref": "match_brief.schema.json" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "final_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["home", "away"],
+      "properties": {
+        "home": { "type": "integer", "minimum": 0 },
+        "away": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "facts": { "type": "array", "items": { "$ref": "fact.schema.json" } },
+    "beats": { "type": "array", "items": { "$ref": "beat.schema.json" } },
+    "claims": { "type": "array", "items": { "$ref": "claim.schema.json" } },
+    "overlays": { "type": "array", "items": { "$ref": "overlay.schema.json" } },
+    "renderings": {
+      "description": "Mode-specific prose per beat, after verification and translation.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fan": { "$ref": "#/$defs/byLang" },
+        "analyst": { "$ref": "#/$defs/byLang" }
+      }
+    },
+    "trace_url": { "type": "string", "format": "uri" }
+  },
+  "$defs": {
+    "byLang": {
+      "type": "object",
+      "propertyNames": { "$ref": "common.schema.json#/$defs/lang" },
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": { "$ref": "common.schema.json#/$defs/beatId" },
+        "additionalProperties": { "type": "string" }
+      }
+    }
+  }
+}

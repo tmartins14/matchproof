@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Matchproof live desk</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Fraunces:opsz,wght@9..144,600;9..144,900&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+button,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.45}
+.pulse{animation:mrPulse 1.1s ease-in-out infinite}
+@keyframes mrPulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion: reduce){.pulse{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: {{c.bg}}; color: {{c.text}}; font-family: {{c.body}}; font-size: 15px; line-height: 1.45; transition: background .25s ease, color .25s ease">
+<style>{{focusCss}}</style>
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 12px 20px; border-bottom: 1px solid {{c.line}}">
+<div style="font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 26px; line-height: 1">Matchproof</div>
+<div role="group" aria-label="{{t.scoreAria}}" style="display: flex; align-items: stretch; border-radius: 6px; overflow: hidden; background: {{c.surface}}; border: 1px solid {{c.line}}; font-family: {{c.display}}; font-variant-numeric: tabular-nums">
+<span style="display: flex; align-items: center; padding: 0 10px; background: {{c.riv}}; color: {{c.rivChip}}; font-weight: 700; font-size: 17px">RIV</span>
+<span style="display: flex; align-items: center; padding: 4px 12px; font-weight: {{c.dw}}; font-size: 24px; gap: 8px">{{scoreHome}}<span style="color: {{c.muted}}; font-weight: 500">–</span>{{scoreAway}}</span>
+<span style="display: flex; align-items: center; padding: 0 10px; background: {{c.ash}}; color: {{c.ashChip}}; font-weight: 700; font-size: 17px">ASH</span>
+<span style="display: flex; align-items: center; padding: 0 12px; font-weight: 600; font-size: 19px; border-left: 1px solid {{c.line}}">{{clock}}</span>
+<sc-if value="{{isLive}}" hint-placeholder-val="{{false}}">
+<span style="display: flex; align-items: center; gap: 6px; padding: 0 12px; background: {{c.liveBg}}; color: {{c.liveText}}; font-weight: 600; font-size: 15px"><span class="pulse" style="width: 8px; height: 8px; border-radius: 50%; background: {{c.liveDot}}"></span>{{t.live}}</span>
+</sc-if>
+<sc-if value="{{isReplay}}" hint-placeholder-val="{{false}}">
+<span style="display: flex; align-items: center; padding: 0 12px; background: {{c.raised}}; color: {{c.text2}}; font-weight: 600; font-size: 15px">{{t.replay}}</span>
+</sc-if>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto">
+<div role="group" aria-label="{{t.themeAria}}" style="display: flex; gap: 2px; padding: 3px; border: 1px solid {{c.line}}; border-radius: 8px">
+<sc-for list="{{themes}}" as="th" hint-placeholder-count="2"><button type="button" onClick="{{th.pick}}" aria-pressed="{{th.pressed}}" style="{{th.style}}">{{th.label}}</button></sc-for>
+</div>
+<div role="group" aria-label="{{t.modeAria}}" style="display: flex; gap: 2px; padding: 3px; border: 1px solid {{c.line}}; border-radius: 8px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="3"><button type="button" onClick="{{m.pick}}" aria-pressed="{{m.pressed}}" style="{{m.style}}">{{m.label}}</button></sc-for>
+</div>
+<div role="group" aria-label="{{t.langAria}}" style="display: flex; gap: 2px; padding: 3px; border: 1px solid {{c.line}}; border-radius: 8px">
+<sc-for list="{{langs}}" as="g" hint-placeholder-count="2"><button type="button" onClick="{{g.pick}}" aria-pressed="{{g.pressed}}" style="{{g.style}}">{{g.label}}</button></sc-for>
+</div>
+<div role="group" aria-label="{{t.viewAria}}" style="display: flex; gap: 2px; padding: 3px; border: 1px solid {{c.line}}; border-radius: 8px">
+<sc-for list="{{views}}" as="w" hint-placeholder-count="2"><button type="button" onClick="{{w.pick}}" aria-pressed="{{w.pressed}}" style="{{w.style}}">{{w.label}}</button></sc-for>
+</div>
+</div>
+</header>
+
+<sc-if value="{{isMatchView}}" hint-placeholder-val="{{true}}">
+<section aria-label="{{t.briefLabel}}" style="display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 16px 20px; background: {{c.surface}}; border-bottom: 1px solid {{c.line}}">
+<div style="flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+<label for="mr-brief" style="font-weight: 600; font-size: 15px">{{t.briefLabel}}</label>
+<textarea id="mr-brief" rows="2" value="{{brief}}" onChange="{{onBrief}}" disabled="{{locked}}" style="width: 100%; box-sizing: border-box; resize: vertical; padding: 10px 12px; background: {{c.input}}; color: {{c.text}}; border: 1px solid {{c.line}}; border-radius: 6px; font-size: 16px; line-height: 1.4"></textarea>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" onClick="{{randomize}}" disabled="{{locked}}" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.2"></circle><circle cx="15.5" cy="15.5" r="1.2"></circle><circle cx="15.5" cy="8.5" r="1.2"></circle><circle cx="8.5" cy="15.5" r="1.2"></circle></svg>{{t.randomize}}</button>
+<button type="button" onClick="{{readBrief}}" disabled="{{locked}}" style="min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">{{t.readBrief}}</button>
+<sc-if value="{{notLive}}" hint-placeholder-val="{{true}}">
+<button type="button" onClick="{{kickOff}}" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; background: {{c.primaryBg}}; color: {{c.primaryText}}; border: 0; border-radius: 6px; font-weight: 600"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{c.liveDot}}"></span>{{t.kickoff}}</button>
+<button type="button" onClick="{{loadReplay}}" style="min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">{{t.cached}}</button>
+</sc-if>
+<sc-if value="{{isLive}}" hint-placeholder-val="{{false}}">
+<div role="group" aria-label="{{t.speedAria}}" style="display: flex; gap: 2px; padding: 3px; border: 1px solid {{c.line}}; border-radius: 8px">
+<sc-for list="{{speeds}}" as="sp" hint-placeholder-count="3"><button type="button" onClick="{{sp.pick}}" aria-pressed="{{sp.pressed}}" style="{{sp.style}}">{{sp.label}}</button></sc-for>
+</div>
+<button type="button" onClick="{{newMatch}}" style="min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">{{t.newMatch}}</button>
+</sc-if>
+</div>
+<sc-if value="{{showReadNote}}" hint-placeholder-val="{{false}}"><p role="status" style="margin: 0; font-size: 14px; color: {{c.text2}}">{{readNote}}</p></sc-if>
+<p style="margin: 0; font-size: 13px; color: {{c.muted}}">{{t.protoNote}}</p>
+</div>
+<fieldset disabled="{{locked}}" style="flex: 1 1 380px; min-width: 0; margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 12px">
+<legend style="padding: 0; margin-bottom: 6px; font-weight: 600; font-size: 15px">{{t.tactics}}</legend>
+<sc-for list="{{teams}}" as="d" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
+<span style="{{d.teamStyle}}">{{d.team}}</span>
+<label for="{{d.formId}}" style="font-size: 13px; color: {{c.muted}}">{{t.formation}}</label>
+<select id="{{d.formId}}" value="{{d.form}}" onChange="{{d.onForm}}" style="min-height: 36px; padding: 0 8px; background: {{c.input}}; color: {{c.text}}; border: 1px solid {{c.line}}; border-radius: 6px; font-size: 14px">
+<sc-for list="{{formations}}" as="fo" hint-placeholder-count="5"><option value="{{fo.v}}">{{fo.v}}</option></sc-for>
+</select>
+</div>
+<sc-for list="{{d.items}}" as="it" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 64px; align-items: center; gap: 10px; font-size: 13px">
+<label for="{{it.id}}" style="color: {{c.muted}}">{{it.name}}</label>
+<input id="{{it.id}}" type="range" min="0" max="1" step="0.01" value="{{it.v}}" onChange="{{it.onChange}}" style="{{it.style}}">
+<span style="text-align: right">{{it.word}}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
+<label for="mr-story" style="font-size: 13px; color: {{c.muted}}">{{t.storyline}}</label>
+<select id="mr-story" value="{{storyIdx}}" onChange="{{onStory}}" style="flex: 1 1 220px; min-width: 0; min-height: 36px; padding: 0 8px; background: {{c.input}}; color: {{c.text}}; border: 1px solid {{c.line}}; border-radius: 6px; font-size: 14px">
+<sc-for list="{{storyOpts}}" as="so" hint-placeholder-count="4"><option value="{{so.v}}">{{so.label}}</option></sc-for>
+</select>
+</div>
+</fieldset>
+</section>
+
+<section aria-label="{{t.pipelineAria}}" style="display: flex; flex-wrap: wrap; border-bottom: 1px solid {{c.line}}">
+<sc-for list="{{stages}}" as="sg" hint-placeholder-count="5">
+<div style="{{sg.style}}">
+<span style="font-size: 13px; color: {{c.muted}}">{{sg.name}}</span>
+<span style="font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums">{{sg.value}}</span>
+<span style="font-size: 13px; color: {{c.text2}}">{{sg.detail}}</span>
+</div>
+</sc-for>
+</section>
+
+<main style="display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; align-items: flex-start">
+
+<section aria-label="{{t.pitchAria}}" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; min-height: 40px">
+<h1 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 34px; line-height: 1.05">{{pitchTitle}}</h1>
+<sc-if value="{{showFollow}}" hint-placeholder-val="{{false}}">
+<button type="button" onClick="{{follow}}" style="min-height: 40px; padding: 0 14px; background: transparent; color: {{c.liveText}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">{{t.follow}}</button>
+</sc-if>
+</div>
+<div role="img" aria-label="{{pitchAria}}" style="position: relative; width: 100%; aspect-ratio: 3 / 2; background: {{c.pitch}}; border: 1px solid {{c.pitchBorder}}; border-radius: 10px; overflow: hidden; box-sizing: border-box">
+<svg viewBox="0 0 120 80" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
+<g fill="none" stroke="{{c.pitchLine}}" stroke-opacity="{{c.pitchOp}}" stroke-width="0.35">
+<rect x="0.5" y="0.5" width="119" height="79"></rect>
+<line x1="60" y1="0.5" x2="60" y2="79.5"></line>
+<circle cx="60" cy="40" r="10"></circle>
+<rect x="0.5" y="18" width="17.5" height="44"></rect>
+<rect x="0.5" y="30" width="5.5" height="20"></rect>
+<rect x="102" y="18" width="17.5" height="44"></rect>
+<rect x="114" y="30" width="5.5" height="20"></rect>
+<path d="M18 32 A10 10 0 0 1 18 48"></path>
+<path d="M102 32 A10 10 0 0 0 102 48"></path>
+</g>
+<g fill="{{c.pitchLine}}" fill-opacity="{{c.pitchOp}}"><circle cx="60" cy="40" r="0.6"></circle><circle cx="12" cy="40" r="0.6"></circle><circle cx="108" cy="40" r="0.6"></circle></g>
+</svg>
+<sc-if value="{{hasZone}}" hint-placeholder-val="{{false}}"><div style="{{zoneStyle}}"></div></sc-if>
+<sc-for list="{{players}}" as="pl" hint-placeholder-count="22"><div style="{{pl.style}}"></div></sc-for>
+<sc-for list="{{lines}}" as="l" hint-placeholder-count="2"><div style="{{l.style}}"></div></sc-for>
+<sc-for list="{{marks}}" as="k" hint-placeholder-count="3"><div style="{{k.style}}"></div></sc-for>
+<sc-if value="{{showBall}}" hint-placeholder-val="{{false}}"><div style="{{ballStyle}}"></div></sc-if>
+<sc-if value="{{pitchEmpty}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(520px, 90%); box-sizing: border-box; padding: 10px 14px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 8px; text-align: center; color: {{c.text}}; font-size: 15px">{{t.pitchEmpty}}</div>
+</sc-if>
+<span style="{{pitchChipStyle}}">{{pitchChip}}</span>
+<span style="position: absolute; right: 12px; top: 10px; font-size: 13px; color: {{c.attack}}">{{t.attack}}</span>
+</div>
+
+<div aria-hidden="true" style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: {{c.muted}}">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 50%; border: 2px solid {{c.muted}}; box-sizing: border-box"></span>{{t.lgPressure}}</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; background: {{c.muted}}; transform: rotate(45deg)"></span>{{t.lgWon}}</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 2px; background: {{c.muted}}"></span>{{t.lgPass}}</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; border-top: 2px dashed {{c.muted}}"></span>{{t.lgCarry}}</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{c.muted}}"></span>{{t.lgShot}}</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{c.muted}}; opacity: 0.6"></span>{{t.lgPlayer}}</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{c.muted}}; opacity: 0.6"></span>{{t.lgGk}}</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: {{c.riv}}"></span>Rivermouth</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: {{c.ash}}"></span>Ashford Vale</span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 10px">
+<sc-for list="{{stats}}" as="st" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 5px">
+<div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: baseline; font-variant-numeric: tabular-nums">
+<span style="font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 24px; color: {{c.rivText}}">{{st.home}}</span>
+<span style="text-align: center; font-size: 14px; color: {{c.text2}}">{{st.label}}</span>
+<span style="font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 24px; color: {{c.ashText}}; text-align: right">{{st.away}}</span>
+</div>
+<div aria-hidden="true" style="display: flex; gap: 2px; height: 4px"><span style="{{st.barHome}}"></span><span style="{{st.barAway}}"></span></div>
+</div>
+</sc-for>
+</div>
+<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 10px">
+<span style="font-weight: 600">{{t.ticker}}</span>
+<sc-if value="{{tickerEmpty}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; color: {{c.muted}}">{{t.tickerEmpty}}</span></sc-if>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{ticker}}" as="tk" hint-placeholder-count="4">
+<li style="{{tk.style}}"><span style="font-variant-numeric: tabular-nums; color: {{c.muted}}">{{tk.time}}</span><span><span style="{{tk.dot}}"></span>{{tk.type}}, {{tk.who}}</span><span style="font-family: {{c.mono}}; font-size: 12px; color: {{c.muted}}; text-align: right">{{tk.id}}</span></li>
+</sc-for>
+</ol>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 10px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 10px">
+<span style="font-weight: 600">{{t.momentum}}</span>
+<div aria-hidden="true" style="position: relative; display: flex; gap: 3px; height: 60px">
+<div style="position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid {{c.line}}"></div>
+<sc-for list="{{bars}}" as="r" hint-placeholder-count="19"><div style="flex: 1; position: relative; height: 100%"><div style="{{r.style}}"></div></div></sc-for>
+</div>
+<div style="position: relative; height: 44px">
+<sc-for list="{{pins}}" as="pn" hint-placeholder-count="3"><button type="button" onClick="{{pn.pick}}" aria-pressed="{{pn.pressed}}" aria-label="{{pn.aria}}" style="{{pn.style}}">{{pn.label}}</button></sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: {{c.muted}}; font-variant-numeric: tabular-nums"><span>0′</span><span>45′</span><span>90′</span></div>
+</div>
+</section>
+
+<section aria-label="{{t.feed}}" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 24px">{{t.feed}}</h2>
+<sc-if value="{{feedEmpty}}" hint-placeholder-val="{{false}}"><p style="margin: 0; color: {{c.muted}}">{{feedEmptyText}}</p></sc-if>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{feed}}" as="b" hint-placeholder-count="3">
+<li style="{{b.cardStyle}}">
+<button type="button" onClick="{{b.pick}}" aria-expanded="{{b.active}}" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; width: 100%; min-height: 48px; padding: 12px 14px; border: 0; background: transparent; color: inherit; text-align: left">
+<span style="font-family: {{c.display}}; font-weight: 600; font-size: 17px; color: {{c.muted}}; min-width: 52px; font-variant-numeric: tabular-nums">{{b.label}}</span>
+<span style="flex: 1 1 140px; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 21px; line-height: 1.15">{{b.headline}}</span>
+<span class="{{b.stampClass}}" style="{{b.stampStyle}}">{{b.stampText}}</span>
+</button>
+<sc-if value="{{b.active}}" hint-placeholder-val="{{false}}">
+<div style="padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px">
+<sc-if value="{{b.isFan}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; font-size: 17px; line-height: 1.5">{{b.fanText}}</p>
+</sc-if>
+<sc-if value="{{b.notFan}}" hint-placeholder-val="{{true}}">
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{b.claims}}" as="cl" hint-placeholder-count="3">
+<li><button type="button" onClick="{{cl.pick}}" aria-pressed="{{cl.active}}" style="{{cl.style}}">
+<span style="{{cl.textStyle}}">{{cl.text}}</span>
+<span style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px"><span style="font-family: {{c.mono}}; font-size: 12px; color: {{c.muted}}">{{cl.fact}}</span><span class="{{cl.stampClass}}" style="{{cl.stampStyle}}">{{cl.stampText}}</span></span>
+</button></li>
+</sc-for>
+</ul>
+<sc-if value="{{b.showRemoved}}" hint-placeholder-val="{{false}}"><p style="margin: 0; font-size: 13px; color: {{c.muted}}">{{b.removedText}}</p></sc-if>
+</sc-if>
+</div>
+</sc-if>
+</li>
+</sc-for>
+</ol>
+</section>
+
+<sc-if value="{{showRail}}" hint-placeholder-val="{{true}}">
+<aside aria-label="{{t.receipts}}" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 18px; background: {{c.surface}}; border: 1px solid {{c.strong}}; border-radius: 10px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<h2 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 24px">{{t.receipts}}</h2>
+<span style="font-family: {{c.mono}}; font-size: 12px; color: {{c.muted}}">{{railId}}</span>
+</div>
+<sc-if value="{{railEmpty}}" hint-placeholder-val="{{false}}"><p style="margin: 0; color: {{c.muted}}">{{t.railEmpty}}</p></sc-if>
+<sc-if value="{{railHas}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; color: {{c.muted}}">{{t.stepClaim}}</span>
+<span style="{{railClaimStyle}}">{{railClaim}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: {{c.muted}}">{{t.stepFact}}</span>
+<code style="display: block; padding: 10px 12px; background: {{c.code}}; border-radius: 6px; font-family: {{c.mono}}; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; color: {{c.text}}">{{railFact}}</code>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: {{c.muted}}">{{t.stepEvents}}</span>
+<sc-if value="{{railNoEvents}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; color: {{c.blocked}}">{{t.noEvents}}</span></sc-if>
+<div style="display: flex; flex-direction: column; border: 1px solid {{c.line}}; border-radius: 6px; overflow: hidden">
+<sc-for list="{{railEvents}}" as="e" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 70px minmax(0, 1fr) 50px; gap: 8px; align-items: center; padding: 7px 10px; border-bottom: 1px solid {{c.line2}}; font-size: 13px">
+<span style="font-family: {{c.mono}}; font-size: 12px">{{e.id}}</span>
+<span><span style="{{e.dot}}"></span>{{e.type}}, {{e.who}}</span>
+<span style="color: {{c.muted}}; text-align: right; font-variant-numeric: tabular-nums">{{e.time}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start">
+<span style="font-size: 13px; color: {{c.muted}}">{{t.stepVerdict}}</span>
+<span class="{{railStampClass}}" style="{{railStampStyle}}">{{railStampText}}</span>
+<span style="font-size: 14px; color: {{c.text2}}">{{railReason}}</span>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{isProducer}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid {{c.line}}">
+<span style="font-weight: 600">{{t.log}}</span>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{agentLog}}" as="a" hint-placeholder-count="4">
+<li style="display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 10px; font-size: 13px"><span style="font-weight: 600">{{a.agent}}</span><span style="{{a.style}}">{{a.detail}}</span></li>
+</sc-for>
+</ol>
+</div>
+</sc-if>
+</aside>
+</sc-if>
+</main>
+</sc-if>
+
+<sc-if value="{{isCalib}}" hint-placeholder-val="{{false}}">
+<main style="display: flex; flex-direction: column; gap: 20px; padding: 32px 20px 48px; max-width: 1040px">
+<h1 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 38px; line-height: 1.05">{{t.calTitle}}</h1>
+<p style="margin: 0; font-size: 16px; max-width: 680px; color: {{c.text2}}">{{t.calIntro}}</p>
+<p style="margin: 0; padding: 10px 14px; background: {{c.warnBg}}; color: {{c.warnText}}; border-radius: 6px; font-size: 14px; max-width: 680px">{{t.calPlaceholder}}</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: {{c.muted}}">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 22px; height: 12px; background: {{c.realBand}}; border-radius: 3px"></span>{{t.calReal}}</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 22px; height: 6px; background: {{c.riv}}; border-radius: 3px"></span>{{t.calGen}}</span>
+</div>
+<sc-for list="{{calib}}" as="cr" hint-placeholder-count="4">
+<div style="display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 8px 24px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{cr.label}}</span><span style="font-size: 13px; color: {{c.muted}}; font-variant-numeric: tabular-nums">{{cr.summary}}</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="position: relative; height: 28px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 4px"><div style="{{cr.realStyle}}"></div><div style="{{cr.genStyle}}"></div></div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: {{c.muted}}; font-variant-numeric: tabular-nums"><span>{{cr.min}}</span><span>{{cr.max}}</span></div>
+</div>
+</div>
+</sc-for>
+</main>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var light = false;
+    try { light = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches; } catch (e) { light = false; }
+    this.state = { theme: light ? "editorial" : "broadcast", phase: "pre", minute: 0, speed: 3, revealed: {}, now: Date.now(), sel: null, claim: null, mode: "analyst", lang: "en", view: "match", tac: { home: { form: "4-3-3", d: [0.82, 0.35, 0.74] }, away: { form: "4-4-2", d: [0.28, 0.66, 0.31] }, story: 0 }, brief: null, readNote: null };
+  }
+
+  componentWillUnmount() { this.stop(); }
+  stop() { if (this.timer) { clearInterval(this.timer); this.timer = null; } }
+  start() { var self = this; this.stop(); this.timer = setInterval(function () { self.tick(); }, 200); }
+
+  tick() {
+    var s = this.state, D = this.data(), now = Date.now();
+    var m = Math.min(96, s.minute + s.speed * 0.2);
+    var rev = Object.assign({}, s.revealed);
+    D.beats.forEach(function (b, i) { if (rev[i] === undefined && m >= b.detect) rev[i] = now; });
+    var last = 0;
+    Object.keys(rev).forEach(function (k) { last = Math.max(last, rev[k]); });
+    if (m >= 96 && now - last > D.CHECK + 1500) this.stop();
+    this.setState({ minute: m, revealed: rev, now: now });
+  }
+
+  tokens(theme) {
+    if (theme === "editorial") return {
+      bg: "#FAF7F0", surface: "#FFFDF8", raised: "#F3EEE3", input: "#FFFDF8", code: "#F3EEE3",
+      line: "#E5E1D6", line2: "#ECE8DF", strong: "#CFC8B8", track: "#E5DFD2",
+      text: "#171717", text2: "#404040", muted: "#5C5C5C",
+      riv: "#9F1239", ash: "#1E3A5F", rivText: "#9F1239", ashText: "#1E3A5F", rivChip: "#FFFDF8", ashChip: "#FFFDF8",
+      pitch: "#FFFDF8", pitchBorder: "#E5E1D6", pitchLine: "#1E3A5F", pitchOp: "0.38", pitchText: "#404040", goalRing: "#FFFDF8", attack: "#9F1239",
+      liveBg: "#FBE7EC", liveText: "#7A0E2C", liveDot: "#B42318",
+      primaryBg: "#171717", primaryText: "#FAF7F0", segOnBg: "#171717", segOnText: "#FAF7F0", segOff: "#5C5C5C",
+      selBg: "#FBEFF2", selBorder: "#9F1239", cardActive: "#FFFDF8", cardBorderActive: "#CFC8B8", cardBorder: "#E5E1D6", claimBg: "#FAF7F0", claimBorder: "#E5E1D6",
+      checking: "#5C5C5C", checkingBorder: "#8A8578", verified: "#1E6B52", rephrased: "#8A5A00", blocked: "#B42318",
+      stageOn: "#B42318", hot: "#9F1239", zone: "rgba(159,18,57,0.09)",
+      warnBg: "#FBE7EC", warnText: "#7A0E2C", realBand: "#DCE4EE", focus: "#9F1239", ball: "#171717",
+      display: "'Fraunces', Georgia, serif", dw: 900, body: "'Geist', system-ui, sans-serif", mono: "'Geist Mono', ui-monospace, monospace"
+    };
+    return {
+      bg: "#0E1620", surface: "#16212D", raised: "#1F2C3A", input: "#0E1620", code: "#0E1620",
+      line: "#2A3A4C", line2: "#22303F", strong: "#3A4D63", track: "#24313F",
+      text: "#EEF2F6", text2: "#C9D3DE", muted: "#9DAABB",
+      riv: "#F0506E", ash: "#6FB4FF", rivText: "#F7A3B4", ashText: "#A9D2FF", rivChip: "#1A0710", ashChip: "#071526",
+      pitch: "#10261A", pitchBorder: "#10261A", pitchLine: "#FFFFFF", pitchOp: "0.24", pitchText: "#C9D3DE", goalRing: "#10261A", attack: "#FFC2CD",
+      liveBg: "#3A1218", liveText: "#FFB3B3", liveDot: "#FF3B3B",
+      primaryBg: "#EEF2F6", primaryText: "#0E1620", segOnBg: "#EEF2F6", segOnText: "#0E1620", segOff: "#9DAABB",
+      selBg: "#1F2C3A", selBorder: "#6FB4FF", cardActive: "#16212D", cardBorderActive: "#3A4D63", cardBorder: "#22303F", claimBg: "#0E1620", claimBorder: "#22303F",
+      checking: "#C9D3DE", checkingBorder: "#6C7A8C", verified: "#3FD6A6", rephrased: "#F6C445", blocked: "#FF6B4A",
+      stageOn: "#FF3B3B", hot: "#FFB3B3", zone: "rgba(240,80,110,0.12)",
+      warnBg: "#3A2A10", warnText: "#F6D58A", realBand: "#24405E", focus: "#6FB4FF", ball: "#FFFFFF",
+      display: "'Barlow Condensed', 'Arial Narrow', sans-serif", dw: 700, body: "'Barlow', system-ui, sans-serif", mono: "'IBM Plex Mono', ui-monospace, monospace"
+    };
+  }
+
+  data() {
+    if (this._d) return this._d;
+    var ev = {
+      "ev-0412": ["pressure", "22:51", "Okafor", "RIV"], "ev-0413": ["pressure", "22:52", "Silva", "RIV"],
+      "ev-0414": ["interception", "22:55", "Okafor", "RIV"], "ev-0415": ["pass", "22:56", "Okafor", "RIV"],
+      "ev-0416": ["shot, saved", "22:58", "Adeyemi", "RIV"], "ev-0596": ["pressure", "40:41", "Okafor", "RIV"],
+      "ev-0597": ["interception", "40:43", "Brandt", "ASH"], "ev-0598": ["carry", "40:45", "Brandt", "ASH"],
+      "ev-0599": ["pass", "40:50", "Lindqvist", "ASH"], "ev-0600": ["shot, goal", "40:54", "Okoye", "ASH"],
+      "win-11": ["window", "55–60′", "tilt 0.68", "RIV"], "win-12": ["window", "60–65′", "tilt 0.74", "RIV"],
+      "win-13": ["window", "65–70′", "tilt 0.71", "RIV"], "ev-0801": ["shot, blocked", "56:12", "Adeyemi", "RIV"],
+      "ev-0812": ["shot, wide", "58:40", "Silva", "RIV"], "ev-0830": ["shot, saved", "61:05", "Mensah", "RIV"],
+      "ev-0844": ["shot, saved", "63:30", "Adeyemi", "RIV"], "ev-0857": ["shot, wide", "66:02", "Okafor", "RIV"],
+      "ev-0871": ["shot, saved", "67:48", "Adeyemi", "RIV"], "ev-0889": ["shot, post", "69:21", "Silva", "RIV"],
+      "ev-1021": ["corner", "78:44", "Silva", "RIV"], "ev-1022": ["header, goal", "78:46", "Mensah", "RIV"],
+      "ev-1188": ["pressure", "91:30", "Silva", "RIV"], "ev-1189": ["interception", "91:32", "Okafor", "RIV"],
+      "ev-1190": ["carry", "91:34", "Okafor", "RIV"], "ev-1191": ["pass", "91:38", "Silva", "RIV"],
+      "ev-1192": ["shot, goal", "91:40", "Adeyemi", "RIV"], "agg-P2": ["aggregate", "45–95′", "all shots", "—"]
+    };
+    var VER = { en: "Every number traces to a computed field, and the wording stays inside the fact.", es: "Cada número remite a un campo calculado y la redacción no va más allá del dato." };
+    var beats = [
+      { label: "23′", detect: 23.2, goal: null, goalMin: null, anchor: { x: 99, y: 70, at: "22:55", t: "RIV" },
+        headline: { en: "The press springs", es: "Salta la presión" },
+        fan: { en: "Rivermouth hunted in pairs and stole the ball 21 m from goal. The shot that followed was saved, but it showed the plan: win it high, finish fast.", es: "Rivermouth presionó en parejas y robó el balón a 21 m de la portería. El disparo fue atajado, pero mostró el plan: recuperar arriba y finalizar rápido." },
+        claims: [
+          { en: "Won the ball back 21 m from goal, 3.8 s after the press began", es: "Recuperó el balón a 21 m de la portería, 3,8 s después de iniciar la presión", fact: "ev-0414.x = 99 → 21 m from goal\nΔt(ev-0412 → ev-0414) = 3.8 s", events: ["ev-0412", "ev-0413", "ev-0414"], v: "verified" },
+          { en: "Their 6th high turnover of the half", es: "Su sexta recuperación alta de la primera parte", fact: "count(high_turnover, RIV, P1, ≤23′) = 6", events: ["ev-0414"], v: "verified" },
+          { en: "A chance worth 0.14 xG", es: "Una ocasión de 0,14 xG", fact: "ev-0416.xg = 0.14, outcome = saved", events: ["ev-0415", "ev-0416"], v: "verified" }
+        ],
+        marks: [{ id: "ev-0412", k: "pressure", t: "RIV", x: 96, y: 66 }, { id: "ev-0413", k: "pressure", t: "RIV", x: 101, y: 73 }, { id: "ev-0414", k: "turnover", t: "RIV", x: 99, y: 70 }, { id: "ev-0416", k: "shot", t: "RIV", x: 108, y: 46, xg: 0.14 }],
+        lines: [{ id: "ev-0415", k: "pass", t: "RIV", x1: 99, y1: 70, x2: 108, y2: 46 }, { id: "ev-0416", k: "shot", t: "RIV", x1: 108, y1: 46, x2: 120, y2: 41 }] },
+      { label: "41′", detect: 41.2, goal: "ASH", goalMin: 40.9, anchor: { x: 80, y: 32, at: "40:43", t: "ASH" },
+        headline: { en: "Punished on the break", es: "Castigados a la contra" },
+        fan: { en: "Ashford broke the press and went the length of the pitch in 11 seconds. Okoye finished low, their first shot on target all game.", es: "Ashford superó la presión y recorrió todo el campo en 11 segundos. Okoye definió raso: su primer tiro a puerta del partido." },
+        claims: [
+          { en: "Scored 11.2 s after winning the ball", es: "Marcó 11,2 s después de recuperar el balón", fact: "t(ev-0600) − t(ev-0597) = 11.2 s", events: ["ev-0597", "ev-0598", "ev-0599", "ev-0600"], v: "verified" },
+          { en: "Ashford's first shot on target", es: "El primer tiro a puerta de Ashford", fact: "shots_on_target(ASH, ≤41′) = 1", events: ["ev-0600"], v: "verified" },
+          { en: "Rivermouth were caught with 3 players ahead of the ball when the press broke", es: "Rivermouth tenía 3 jugadores por delante del balón cuando se rompió la presión", fact: "freeze_frame(ev-0597).riv_ahead_of_ball = 3", dyn: "ahead", events: ["ev-0596", "ev-0597"], v: "rephrased",
+            reason: { en: "Draft said 4 players were caught upfield. The freeze frame at ev-0597 shows 3, so the checker corrected the number before publishing.", es: "El borrador decía que 4 jugadores quedaron descolgados. La imagen congelada en ev-0597 muestra 3, así que el verificador corrigió el número antes de publicar." } }
+        ],
+        marks: [{ id: "ev-0596", k: "pressure", t: "RIV", x: 82, y: 30 }, { id: "ev-0597", k: "turnover", t: "ASH", x: 80, y: 32 }, { id: "ev-0600", k: "shot", t: "ASH", x: 22, y: 38, xg: 0.31, goal: true }],
+        lines: [{ id: "ev-0598", k: "carry", t: "ASH", x1: 80, y1: 32, x2: 52, y2: 26 }, { id: "ev-0599", k: "pass", t: "ASH", x1: 52, y1: 26, x2: 22, y2: 38 }, { id: "ev-0600", k: "shot", t: "ASH", x1: 22, y1: 38, x2: 0, y2: 41 }] },
+      { label: "55–70′", detect: 70.2, goal: null, goalMin: null, zone: { x1: 80, x2: 120 }, anchor: { x: 100, y: 40, at: "63:30", t: "RIV" },
+        headline: { en: "Pinned back", es: "Encerrados" },
+        fan: { en: "For a quarter of an hour Ashford barely left their own half. Rivermouth fired seven shots and still could not find the equaliser.", es: "Durante un cuarto de hora Ashford apenas salió de su campo. Rivermouth disparó siete veces y aun así no encontró el empate." },
+        claims: [
+          { en: "71% of final-third touches between 55′ and 70′", es: "El 71 % de los toques en el último tercio entre el 55′ y el 70′", fact: "field_tilt(RIV, 55–70′) = 0.71", events: ["win-11", "win-12", "win-13"], v: "verified" },
+          { en: "Seven shots, 1.2 xG, no goal", es: "Siete tiros, 1,2 xG, ningún gol", fact: "shots(RIV, 55–70′) = 7\nΣ xg = 1.18 → shown as 1.2", events: ["ev-0801", "ev-0812", "ev-0830", "ev-0844", "ev-0857", "ev-0871", "ev-0889"], v: "verified" },
+          { en: "Ashford haven't conceded from a corner all season", es: "Ashford no ha encajado de córner en toda la temporada", fact: "no source field", events: [], v: "blocked",
+            reason: { en: "Refers to season data that does not exist in this match. Nothing can support it, so the checker removed it before publishing.", es: "Hace referencia a datos de temporada que no existen en este partido. Nada lo respalda, así que el verificador lo eliminó antes de publicar." } }
+        ],
+        marks: [{ id: "ev-0801", k: "shot", t: "RIV", x: 104, y: 34, xg: 0.21 }, { id: "ev-0812", k: "shot", t: "RIV", x: 95, y: 30, xg: 0.09 }, { id: "ev-0830", k: "shot", t: "RIV", x: 110, y: 44, xg: 0.24 }, { id: "ev-0844", k: "shot", t: "RIV", x: 101, y: 40, xg: 0.18 }, { id: "ev-0857", k: "shot", t: "RIV", x: 98, y: 52, xg: 0.06 }, { id: "ev-0871", k: "shot", t: "RIV", x: 112, y: 38, xg: 0.27 }, { id: "ev-0889", k: "shot", t: "RIV", x: 107, y: 50, xg: 0.13 }],
+        lines: [] },
+      { label: "79′", detect: 79.1, goal: "RIV", goalMin: 78.8, anchor: { x: 117, y: 77, at: "78:44", t: "RIV" },
+        headline: { en: "The equaliser comes from a corner", es: "El empate llega de córner" },
+        fan: { en: "All that pressure finally told. Mensah rose at the near post and headed in Rivermouth's seventh corner.", es: "Toda esa presión por fin dio frutos. Mensah se elevó en el primer palo y cabeceó el séptimo córner de Rivermouth." },
+        claims: [
+          { en: "From Rivermouth's 7th corner", es: "Del séptimo córner de Rivermouth", fact: "count(corner, RIV, ≤79′) = 7", events: ["ev-1021"], v: "verified" },
+          { en: "A header from 8 m, worth 0.19 xG", es: "Un cabezazo desde 8 m, de 0,19 xG", fact: "ev-1022.body_part = head\nev-1022.distance_m = 8.1, xg = 0.19", events: ["ev-1022"], v: "verified" }
+        ],
+        marks: [{ id: "ev-1022", k: "shot", t: "RIV", x: 112, y: 38, xg: 0.19, goal: true }],
+        lines: [{ id: "ev-1021", k: "pass", t: "RIV", x1: 119.5, y1: 79.5, x2: 112, y2: 38 }, { id: "ev-1022", k: "shot", t: "RIV", x1: 112, y1: 38, x2: 120, y2: 39 }] },
+      { label: "90+2′", detect: 92.0, goal: "RIV", goalMin: 91.7, anchor: { x: 86, y: 22, at: "91:32", t: "RIV" },
+        headline: { en: "Same trap, other end", es: "La misma trampa, al otro lado" },
+        fan: { en: "The press that cost them at 41′ won it at 92′. Rivermouth stole the ball high, worked it into the box and Adeyemi finished. 2–1.", es: "La presión que les costó el gol en el 41′ les dio la victoria en el 92′. Rivermouth robó arriba, la llevó al área y Adeyemi definió. 2–1." },
+        claims: [
+          { en: "The winner came from a high turnover, 34 m from goal", es: "El gol de la victoria nació de una recuperación alta, a 34 m de la portería", fact: "ev-1189.type = interception\nev-1189.x = 86 → 34 m from goal", events: ["ev-1188", "ev-1189", "ev-1190", "ev-1191", "ev-1192"], v: "verified" },
+          { en: "Rivermouth out-created Ashford 2.04 to 0.31 xG after the break", es: "Rivermouth generó 2,04 xG contra 0,31 de Ashford tras el descanso", fact: "xg(RIV, P2) = 2.04\nxg(ASH, P2) = 0.31", events: ["agg-P2"], v: "verified" }
+        ],
+        marks: [{ id: "ev-1188", k: "pressure", t: "RIV", x: 88, y: 20 }, { id: "ev-1189", k: "turnover", t: "RIV", x: 86, y: 22 }, { id: "ev-1192", k: "shot", t: "RIV", x: 106, y: 44, xg: 0.27, goal: true }],
+        lines: [{ id: "ev-1190", k: "carry", t: "RIV", x1: 86, y1: 22, x2: 100, y2: 30 }, { id: "ev-1191", k: "pass", t: "RIV", x1: 100, y1: 30, x2: 106, y2: 44 }, { id: "ev-1192", k: "shot", t: "RIV", x1: 106, y1: 44, x2: 120, y2: 42 }] }
+    ];
+    beats.forEach(function (b, i) { b.claims.forEach(function (c, j) { c.id = "b" + i + "c" + j; }); });
+    var momentum = [0.2, 0.35, 0.5, 0.45, 0.55, -0.25, -0.1, -0.5, -0.3, 0.05, 0.2, 0.65, 0.8, 0.72, 0.4, 0.55, 0.35, 0.6, 0.7];
+    var homeStyles = [
+      { en: "high press", es: "presión alta", d: [0.82, 0.35, 0.74] },
+      { en: "patient possession", es: "posesión paciente", d: [0.55, 0.2, 0.62] },
+      { en: "direct, long balls", es: "juego directo", d: [0.45, 0.8, 0.5] },
+      { en: "wide overloads", es: "superioridad por bandas", d: [0.6, 0.4, 0.66] }
+    ];
+    var awayStyles = [
+      { en: "low block", es: "bloque bajo", d: [0.28, 0.66, 0.31] },
+      { en: "counter-attack", es: "contragolpe", d: [0.35, 0.78, 0.38] },
+      { en: "mid-block press", es: "presión en bloque medio", d: [0.58, 0.5, 0.52] },
+      { en: "man-marking", es: "marcaje individual", d: [0.7, 0.45, 0.6] }
+    ];
+    var stories = [
+      { en: "Ashford score first on the break; Rivermouth equalise from a set piece and win it late.", es: "Ashford marca primero a la contra; Rivermouth empata a balón parado y gana al final." },
+      { en: "A goalless first half, then a red card on the hour flips the game.", es: "Primera parte sin goles; una roja en el 60′ le da la vuelta al partido." },
+      { en: "Rivermouth dominate the ball but lose 1–0 to a single counter.", es: "Rivermouth domina el balón pero pierde 1–0 por una sola contra." },
+      { en: "End to end, 3–3, with an equaliser in stoppage time.", es: "Ida y vuelta, 3–3, con un empate en el descuento." }
+    ];
+    var calib = [
+      { en: "Pass completion", es: "Acierto en el pase", unit: "%", min: 60, max: 95, real: [75, 86], gen: [74, 79] },
+      { en: "Shots per team", es: "Tiros por equipo", unit: "", min: 0, max: 30, real: [8, 18], gen: [9, 17] },
+      { en: "xG per shot", es: "xG por tiro", unit: "", min: 0, max: 0.25, real: [0.08, 0.14], gen: [0.09, 0.13] },
+      { en: "Passes per possession", es: "Pases por posesión", unit: "", min: 0, max: 10, real: [3, 6], gen: [3.2, 5.4] }
+    ];
+    var roster = { RIV: ["Okafor", "Silva", "Adeyemi", "Mensah", "Doyle", "Varga"], ASH: ["Brandt", "Lindqvist", "Okoye", "Reyes", "Tanaka", "Moreau"] };
+    var types = { en: ["pass", "pass", "pass", "pass", "carry", "carry", "pressure", "pressure", "duel", "interception", "clearance"], es: ["pase", "pase", "pase", "pase", "conducción", "conducción", "presión", "presión", "duelo", "intercepción", "despeje"] };
+    var forms = {
+      "4-3-3": [[6, 40], [26, 12], [24, 30], [24, 50], [26, 68], [45, 40], [52, 24], [52, 56], [76, 14], [80, 40], [76, 66]],
+      "4-2-3-1": [[6, 40], [26, 12], [24, 30], [24, 50], [26, 68], [42, 32], [42, 48], [60, 40], [66, 16], [66, 64], [80, 40]],
+      "4-4-2": [[6, 40], [26, 12], [24, 30], [24, 50], [26, 68], [46, 14], [44, 32], [44, 48], [46, 66], [70, 34], [70, 46]],
+      "3-5-2": [[6, 40], [24, 22], [22, 40], [24, 58], [48, 8], [44, 30], [40, 40], [44, 50], [48, 72], [72, 34], [72, 46]],
+      "5-3-2": [[6, 40], [30, 8], [22, 24], [20, 40], [22, 56], [30, 72], [44, 26], [42, 40], [44, 54], [68, 34], [68, 46]]
+    };
+    this._d = { forms: forms, formNames: ["4-3-3", "4-2-3-1", "4-4-2", "3-5-2", "5-3-2"], ev: ev, VER: VER, beats: beats, momentum: momentum, homeStyles: homeStyles, awayStyles: awayStyles, stories: stories, calib: calib, roster: roster, types: types, CHECK: 2600, TOTAL_EVENTS: 2480 };
+    return this._d;
+  }
+
+  pct(v, of) { return (v / of * 100).toFixed(2) + "%"; }
+  rnd(n) { var x = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }
+  mmss(m) { var mm = Math.floor(m), ss = Math.floor((m - mm) * 60); return (mm < 10 ? "0" : "") + mm + ":" + (ss < 10 ? "0" : "") + ss; }
+
+  renderVals() {
+    var self = this, D = this.data(), s = this.state, es = s.lang === "es", C = this.tokens(s.theme);
+    function L(o) { return es ? o.es : o.en; }
+    function col(tm) { return tm === "RIV" ? C.riv : (tm === "ASH" ? C.ash : C.muted); }
+    function seg(active) { return "border:0;border-radius:6px;padding:0 14px;min-height:40px;font-size:15px;font-weight:500;" + (active ? "background:" + C.segOnBg + ";color:" + C.segOnText + ";" : "background:transparent;color:" + C.segOff + ";"); }
+    var t = es ? {
+      scoreAria: "Marcador", themeAria: "Estilo", modeAria: "Modo de visualización", langAria: "Idioma", viewAria: "Vista", speedAria: "Velocidad", pipelineAria: "Estado del pipeline", pitchAria: "Campo",
+      live: "En directo", replay: "Repetición",
+      briefLabel: "Guion del partido", randomize: "Aleatorio", kickoff: "Empezar en directo", cached: "Ver repetición guardada", newMatch: "Nuevo partido",
+      protoNote: "Prototipo: la forma en el campo sigue tu táctica, pero los eventos vienen siempre de un mismo partido de ejemplo. En la versión real, el agente compositor lee el guion y el generador crea un partido nuevo con esta táctica.",
+      follow: "Seguir en directo", pitchEmpty: "Empieza un partido en directo para ver llegar los eventos, o abre la repetición guardada.", waiting: "Esperando el primer momento clave",
+      attack: "Rivermouth ataca hacia la derecha",
+      lgPressure: "Presión", lgWon: "Recuperación", lgPass: "Pase", lgCarry: "Conducción", lgShot: "Tiro, tamaño según xG",
+      ticker: "Últimos eventos", tickerEmpty: "Los eventos aparecen aquí al empezar el partido.",
+      momentum: "Dinámica, cuota de acciones ofensivas cada 5 minutos",
+      feed: "Momentos clave", feedPre: "Los momentos clave aparecen aquí en cuanto el detector los encuentra.", feedWait: "Analizando el partido. Aún no hay momentos clave.",
+      receipts: "Pruebas", railEmpty: "Selecciona una afirmación para ver los datos y eventos que la respaldan.",
+      stepClaim: "Afirmación", stepFact: "Dato calculado", stepEvents: "Eventos de origen", stepVerdict: "Veredicto",
+      noEvents: "Ningún evento respalda esta afirmación.", log: "Registro de agentes", checkingReason: "Cotejando cada número con el registro de datos.",
+      fanWait: "Verificando antes de publicar.", removed1: "El verificador eliminó 1 afirmación. Cambia a Productor para ver por qué.", removedN: " afirmaciones eliminadas por el verificador. Cambia a Productor para ver por qué.",
+      stIngest: "Eventos recibidos", stFacts: "Datos calculados", stBeats: "Momentos clave", stClaims: "Afirmaciones redactadas", stChecker: "Verificador",
+      stIngestD: "flujo del generador", stFactsD: "con ID de evento", stBeatsD: "detectados", stClaimsD: "solo a partir de datos", idle: "en espera", done: "terminado",
+      calTitle: "¿Es realista el partido sintético?", calIntro: "Distribuciones del generador en 4 semillas frente a rangos de partidos reales. Si las barras del generador caen dentro de las bandas reales, el partido pasa la prueba.",
+      calPlaceholder: "Valores de ejemplo: solo muestran el diseño. Los números reales saldrán de la ejecución de calibración.", calReal: "Rango real", calGen: "Generador, 4 semillas",
+      dialNames: ["Presión", "Verticalidad", "Altura de línea"], dialNamesAway: ["Presión", "Verticalidad", "Profundidad"],
+      verdict: { checking: "Verificando", verified: "Verificada", rephrased: "Reformulada", blocked: "Bloqueada", corrected: "Corregida" },
+      stats: ["Posesión", "Tiros", "xG"],
+      lgPlayer: "Jugador", lgGk: "Portero", livePlay: "Juego en directo", kickoffShape: "Formación inicial",
+      tactics: "Táctica", formation: "Sistema", storyline: "Argumento", readBrief: "Leer guion", rewritten: "Guion reescrito a partir de la táctica."
+    } : {
+      scoreAria: "Score", themeAria: "Style", modeAria: "Viewer mode", langAria: "Language", viewAria: "View", speedAria: "Playback speed", pipelineAria: "Pipeline status", pitchAria: "Pitch",
+      live: "Live", replay: "Replay",
+      briefLabel: "Match brief", randomize: "Randomize", kickoff: "Kick off live", cached: "Watch cached replay", newMatch: "New match",
+      protoNote: "Prototype: the shape on the pitch follows your tactics, but the events always come from one sample match. In the real build, the Composer agent reads the brief and the generator builds a new match from these tactics.",
+      follow: "Follow live", pitchEmpty: "Kick off a live match to watch events stream in, or open the cached replay.", waiting: "Waiting for the first key moment",
+      attack: "Rivermouth attack to the right",
+      lgPressure: "Pressure", lgWon: "Ball won", lgPass: "Pass", lgCarry: "Carry", lgShot: "Shot, sized by xG",
+      ticker: "Latest events", tickerEmpty: "Events appear here once the match kicks off.",
+      momentum: "Momentum, share of attacking actions per 5 minutes",
+      feed: "Key moments", feedPre: "Key moments appear here as soon as the detector finds them.", feedWait: "Reading the match. No key moments yet.",
+      receipts: "Receipts", railEmpty: "Select a claim to see the facts and events behind it.",
+      stepClaim: "Claim", stepFact: "Computed fact", stepEvents: "Source events", stepVerdict: "Verdict",
+      noEvents: "No event supports this claim.", log: "Agent log", checkingReason: "Matching every number against the fact registry.",
+      fanWait: "Checking before it goes out.", removed1: "The checker removed 1 claim. Switch to Producer to see why.", removedN: " claims removed by the checker. Switch to Producer to see why.",
+      stIngest: "Events in", stFacts: "Facts computed", stBeats: "Key moments", stClaims: "Claims drafted", stChecker: "Checker",
+      stIngestD: "from the generator stream", stFactsD: "each with event IDs", stBeatsD: "detected", stClaimsD: "from facts only", idle: "idle", done: "finished",
+      calTitle: "Is the synthetic match football-realistic?", calIntro: "Generator distributions across 4 seeds against real-match ranges. If the generator bars sit inside the real-match bands, the match passes.",
+      calPlaceholder: "Placeholder values: these show the layout only. Real numbers come from the calibration run.", calReal: "Real-match range", calGen: "Generator, 4 seeds",
+      dialNames: ["Press intensity", "Directness", "Line height"], dialNamesAway: ["Press intensity", "Directness", "Block depth"],
+      verdict: { checking: "Checking", verified: "Verified", rephrased: "Rephrased", blocked: "Blocked", corrected: "Corrected" },
+      stats: ["Possession", "Shots", "xG"],
+      lgPlayer: "Player", lgGk: "Goalkeeper", livePlay: "Live play", kickoffShape: "Starting shape",
+      tactics: "Tactics", formation: "Formation", storyline: "Storyline", readBrief: "Read brief", rewritten: "Brief rewritten from the tactics."
+    };
+
+    function stamp(v) {
+      var base = "display:inline-flex;align-items:center;gap:5px;font-family:" + C.display + ";font-weight:600;font-size:15px;letter-spacing:.02em;padding:1px 8px;border-radius:3px;white-space:nowrap;";
+      if (v === "checking") return { text: t.verdict.checking, cls: "pulse", style: base + "color:" + C.checking + ";border:1.5px dashed " + C.checkingBorder + ";" };
+      if (v === "verified") return { text: "✓ " + t.verdict.verified, cls: "", style: base + "color:" + C.verified + ";border:1.5px solid " + C.verified + ";transform:rotate(-2deg);" };
+      if (v === "rephrased" || v === "corrected") return { text: "≈ " + t.verdict[v], cls: "", style: base + "color:" + C.rephrased + ";border:1.5px solid " + C.rephrased + ";transform:rotate(-2deg);" };
+      return { text: "✕ " + t.verdict.blocked, cls: "", style: base + "color:" + C.blocked + ";border:1.5px solid " + C.blocked + ";transform:rotate(-2deg);" };
+    }
+    function markStyle(mk, o) {
+      var cc = col(mk.t);
+      var st = "position:absolute;left:" + self.pct(mk.x, 120) + ";top:" + self.pct(mk.y, 80) + ";transform:translate(-50%,-50%);opacity:" + o + ";transition:opacity .2s ease;box-sizing:border-box;";
+      if (mk.k === "pressure") st += "width:20px;height:20px;border-radius:50%;border:2px solid " + cc + ";";
+      else if (mk.k === "turnover") st += "width:12px;height:12px;background:" + cc + ";transform:translate(-50%,-50%) rotate(45deg);";
+      else {
+        var d = Math.round(10 + (mk.xg || 0) * 44);
+        st += "width:" + d + "px;height:" + d + "px;border-radius:50%;background:" + cc + ";border:1.5px solid " + C.text + ";";
+        if (mk.goal) st += "box-shadow:0 0 0 3px " + C.goalRing + ",0 0 0 5px " + cc + ";";
+      }
+      return st;
+    }
+    function lineStyle(l, o) {
+      var cc = col(l.t), dx = l.x2 - l.x1, dy = l.y2 - l.y1;
+      var len = Math.sqrt(dx * dx + dy * dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
+      var st = "position:absolute;left:" + self.pct(l.x1, 120) + ";top:" + self.pct(l.y1, 80) + ";width:" + self.pct(len, 120) + ";transform-origin:0 50%;transform:rotate(" + ang.toFixed(2) + "deg);opacity:" + o + ";transition:opacity .2s ease;";
+      if (l.k === "carry") st += "height:0;border-top:2px dashed " + cc + ";";
+      else if (l.k === "shot") st += "height:3px;margin-top:-1.5px;background:" + cc + ";";
+      else st += "height:2px;margin-top:-1px;background:" + cc + ";";
+      return st;
+    }
+
+    var phase = s.phase, isLive = phase === "live", m = s.minute, f = Math.min(1, m / 96), pre = phase === "pre";
+    var isFan = s.mode === "fan", isProducer = s.mode === "producer";
+    function band(v, hi, lo) { return v >= hi ? 0 : (v >= lo ? 1 : 2); }
+    var PH = es ? {
+      press: ["presionan arriba", "presionan en zona media", "esperan replegados"],
+      direct: ["juegan directo", "combinan juego corto y largo", "tienen el balón con paciencia"],
+      lineH: ["defienden con la línea alta", "defienden con la línea media", "defienden atrás"],
+      lineA: ["defienden en bloque alto", "se colocan en bloque medio", "se colocan en bloque bajo"],
+      wPress: ["alta", "media", "baja"], wDirect: ["directo", "mixto", "paciente"], wLine: ["alta", "media", "baja"]
+    } : {
+      press: ["press high", "press from a mid shape", "drop off and wait"],
+      direct: ["play direct", "mix short and long", "keep the ball patiently"],
+      lineH: ["hold a high line", "hold a mid line", "defend deep"],
+      lineA: ["defend in a high block", "sit in a mid shape", "sit in a low block"],
+      wPress: ["high", "mid", "low"], wDirect: ["direct", "mixed", "patient"], wLine: ["high", "mid", "deep"]
+    };
+    function dialWord(k, v) { return k === 0 ? PH.wPress[band(v, 0.7, 0.45)] : (k === 1 ? PH.wDirect[band(v, 0.65, 0.35)] : PH.wLine[band(v, 0.65, 0.4)]); }
+    function teamLine(name, side, isHome) {
+      var d = side.d;
+      return name + " (" + side.form + ") " + PH.press[band(d[0], 0.7, 0.45)] + ", " + PH.direct[band(d[1], 0.65, 0.35)] + (es ? " y " : " and ") + (isHome ? PH.lineH : PH.lineA)[band(d[2], 0.65, 0.4)] + ".";
+    }
+    var composed = teamLine("Rivermouth", s.tac.home, true) + " " + teamLine("Ashford Vale", s.tac.away, false) + " " + L(D.stories[s.tac.story]);
+    var briefText = s.brief !== null ? s.brief : composed;
+
+    function readBriefText(text) {
+      var nt = JSON.parse(JSON.stringify(s.tac)), found = 0, lower = text.toLowerCase();
+      D.stories.forEach(function (st, i) {
+        [st.en, st.es].forEach(function (x) { var lx = x.toLowerCase(); if (lower.indexOf(lx) >= 0) { nt.story = i; found++; lower = lower.replace(lx, " "); } });
+      });
+      var fm = lower.match(/\b[345]-[1-5]-[1-5](?:-[1-5])?\b/g) || [];
+      if (fm[0] && D.formNames.indexOf(fm[0]) >= 0) { nt.home.form = fm[0]; found++; }
+      if (fm[1] && D.formNames.indexOf(fm[1]) >= 0) { nt.away.form = fm[1]; found++; }
+      var cut = lower.indexOf("ashford");
+      var parts = cut > 0 ? [lower.slice(0, cut), lower.slice(cut)] : [lower, ""];
+      var rules = [
+        [[/(press high|high press|presionan arriba|presión alta|gegenpress)/, 0.85], [/(press from a mid|mid-block press|presionan en zona media|presión media)/, 0.58], [/(drop off|sit off|esperan replegados|no presionan)/, 0.3]],
+        [[/(mix short and long|combinan)/, 0.5], [/(play direct|direct|long ball|juegan directo|juego directo|counter-attack|contragolpe)/, 0.75], [/(patient|possession|paciencia|posesión)/, 0.22]],
+        [[/(high line|high block|línea alta|bloque alto)/, 0.75], [/(mid line|mid shape|línea media|bloque medio)/, 0.5], [/(low block|defend deep|deep line|bloque bajo|defienden atrás)/, 0.28]]
+      ];
+      ["home", "away"].forEach(function (side, pi) {
+        rules.forEach(function (cat, k) {
+          for (var r = 0; r < cat.length; r++) { if (cat[r][0].test(parts[pi])) { nt[side].d[k] = cat[r][1]; found++; break; } }
+        });
+      });
+      var note = found ? (es ? "El compositor leyó " + found + " ajustes del guion. Revisa la táctica." : "The Composer read " + found + " settings from the brief. Check the tactics.")
+        : (es ? "No encontré ajustes. Prueba con un sistema como 4-4-2 o frases como presión alta o bloque bajo." : "No settings found. Try a formation like 4-4-2, or phrases like high press or low block.");
+      self.setState({ tac: nt, readNote: note });
+    }
+
+    function slot(tm, i) { var sl = D.forms[(tm === "RIV" ? s.tac.home : s.tac.away).form][i]; return tm === "RIV" ? sl : [120 - sl[0], sl[1]]; }
+    function posOf(tm, i, bx, by, pm, still) {
+      var a = slot(tm, i), gk = i === 0, side = tm === "RIV" ? s.tac.home : s.tac.away;
+      var lineShift = gk ? 0 : (tm === "RIV" ? 1 : -1) * (side.d[2] - 0.5) * 16;
+      var kx = gk ? 0.08 : 0.45, ky = gk ? 0.12 : 0.3, jit = still ? 0 : (gk ? 0.4 : 1.8), off = tm === "ASH" ? 3 : 0;
+      var px = a[0] + lineShift + (still ? 0 : (bx - 60) * kx) + jit * Math.sin(pm * 1.1 + i * 1.7 + off);
+      var py = a[1] + (still ? 0 : (by - 40) * ky) + jit * Math.cos(pm * 0.9 + i * 2.3 + off);
+      return [Math.max(gk ? 1.5 : 3, Math.min(gk ? 118.5 : 117, px)), Math.max(3, Math.min(77, py))];
+    }
+    var b1 = D.beats[1], ahead = 0;
+    for (var q = 1; q < 11; q++) { if (posOf("RIV", q, b1.anchor.x, b1.anchor.y, b1.detect, false)[0] > b1.anchor.x) ahead++; }
+    function cText(cl) {
+      if (cl.dyn !== "ahead") return L(cl);
+      if (es) return ahead === 0 ? "Rivermouth no tenía jugadores por delante del balón cuando se rompió la presión" : "Rivermouth tenía " + ahead + (ahead === 1 ? " jugador" : " jugadores") + " por delante del balón cuando se rompió la presión";
+      return ahead === 0 ? "Rivermouth had no players ahead of the ball when the press broke" : "Rivermouth were caught with " + ahead + (ahead === 1 ? " player" : " players") + " ahead of the ball when the press broke";
+    }
+    function cFact(cl) { return cl.dyn === "ahead" ? "freeze_frame(ev-0597).riv_ahead_of_ball = " + ahead : cl.fact; }
+    function cReason(cl) {
+      if (cl.dyn === "ahead") return es ? "El borrador decía que " + (ahead + 1) + " jugadores quedaron descolgados. La imagen congelada en ev-0597 muestra " + ahead + ", así que el verificador corrigió el número antes de publicar."
+        : "Draft said " + (ahead + 1) + " players were caught upfield. The freeze frame at ev-0597 shows " + ahead + ", so the checker corrected the number before publishing.";
+      return L(cl.reason || D.VER);
+    }
+
+    function statusOf(i, j, cl) {
+      var t0 = s.revealed[i];
+      if (t0 === undefined) return null;
+      return (s.now - t0 < D.CHECK + j * 450) ? "checking" : cl.v;
+    }
+    var revIdx = [];
+    D.beats.forEach(function (b, i) { if (s.revealed[i] !== undefined) revIdx.push(i); });
+    var latest = revIdx.length ? revIdx[revIdx.length - 1] : null;
+    var shown = (s.sel !== null && s.revealed[s.sel] !== undefined) ? s.sel : latest;
+    var beat = shown !== null ? D.beats[shown] : null;
+
+    function visibleClaims(i) {
+      return D.beats[i].claims.map(function (cl, j) { return { c: cl, st: statusOf(i, j, cl) }; }).filter(function (x) { return isProducer || x.st !== "blocked"; });
+    }
+    var sel = null;
+    if (beat && !isFan) {
+      var vis = visibleClaims(shown);
+      sel = vis.filter(function (x) { return x.c.id === s.claim; })[0] || vis[0] || null;
+    }
+    var selSet = {};
+    if (sel) sel.c.events.forEach(function (id) { selSet[id] = true; });
+    function op(id) { return sel ? (selSet[id] ? 1 : 0.18) : 1; }
+    var zoneHL = sel ? sel.c.events.some(function (id) { return id.indexOf("win-") === 0; }) : true;
+
+    var home = 0, away = 0;
+    D.beats.forEach(function (b) { if (b.goal && m >= b.goalMin) { if (b.goal === "RIV") home++; else away++; } });
+
+    function segs(defs, cur, key) {
+      return defs.map(function (d) { return { label: L(d[1]), pressed: cur === d[0], style: seg(cur === d[0]), pick: function () { var o = {}; o[key] = d[0]; self.setState(o); } }; });
+    }
+    var themes = segs([["broadcast", { en: "Broadcast", es: "Retransmisión" }], ["editorial", { en: "Editorial", es: "Editorial" }]], s.theme, "theme");
+    var modes = segs([["fan", { en: "Fan", es: "Aficionado" }], ["analyst", { en: "Analyst", es: "Analista" }], ["producer", { en: "Producer", es: "Productor" }]], s.mode, "mode");
+    var langs = segs([["en", { en: "EN", es: "EN" }], ["es", { en: "ES", es: "ES" }]], s.lang, "lang");
+    var views = segs([["match", { en: "Match", es: "Partido" }], ["calib", { en: "Calibration", es: "Calibración" }]], s.view, "view");
+    var speeds = segs([[1, { en: "1×", es: "1×" }], [3, { en: "3×", es: "3×" }], [6, { en: "6×", es: "6×" }]], s.speed, "speed");
+
+    function setTac(side, patch) {
+      var nt = JSON.parse(JSON.stringify(self.state.tac));
+      Object.assign(nt[side], patch);
+      self.setState({ tac: nt, brief: null, readNote: t.rewritten });
+    }
+    var teams = [["home", "Rivermouth", "RIV", t.dialNames], ["away", "Ashford Vale", "ASH", t.dialNamesAway]].map(function (x) {
+      var side = s.tac[x[0]];
+      return { team: x[1], form: side.form, formId: "mr-form-" + x[0],
+        teamStyle: "font-weight:600;font-size:14px;min-width:100px;color:" + (x[2] === "RIV" ? C.rivText : C.ashText) + ";",
+        onForm: function (e) { setTac(x[0], { form: e.target.value }); },
+        items: side.d.map(function (v, k) {
+          return { id: "mr-" + x[0] + "-" + k, name: x[3][k], v: v, word: dialWord(k, v),
+            style: "width:100%;min-width:0;min-height:28px;accent-color:" + col(x[2]) + ";",
+            onChange: function (e) { var nd = self.state.tac[x[0]].d.slice(); nd[k] = parseFloat(e.target.value); setTac(x[0], { d: nd }); } };
+        }) };
+    });
+
+    var drafted = 0, nv = 0, nr = 0, nb = 0, nc = 0;
+    revIdx.forEach(function (i) { D.beats[i].claims.forEach(function (cl, j) { drafted++; var st = statusOf(i, j, cl); if (st === "checking") nc++; else if (st === "verified") nv++; else if (st === "rephrased") nr++; else nb++; }); });
+    var running = isLive && m < 96;
+    function stage(name, value, detail, active) {
+      return { name: name, value: value, detail: detail, style: "flex:1 1 170px;display:flex;flex-direction:column;gap:2px;padding:10px 20px;border-right:1px solid " + C.line + ";border-top:3px solid " + (active ? C.stageOn : "transparent") + ";" };
+    }
+    var stages = [
+      stage(t.stIngest, Math.round(f * D.TOTAL_EVENTS).toLocaleString("en-US"), pre ? t.idle : (running ? t.stIngestD : t.done), running),
+      stage(t.stFacts, String(Math.round(f * 346)), t.stFactsD, running),
+      stage(t.stBeats, String(revIdx.length), t.stBeatsD, running),
+      stage(t.stClaims, String(drafted), t.stClaimsD, nc > 0),
+      stage(t.stChecker, String(nv + nr + nb), (es ? nv + " verificadas, " + nr + " reformuladas, " + nb + " bloqueadas" : nv + " verified, " + nr + " rephrased, " + nb + " blocked") + (nc ? (es ? ", " + nc + " en curso" : ", " + nc + " checking") : ""), nc > 0)
+    ];
+
+    function pickBeat(i) { return function () { self.setState({ sel: i, claim: "b" + i + "c0" }); }; }
+
+    var feed = revIdx.slice().reverse().map(function (i) {
+      var b = D.beats[i], active = i === shown;
+      var sts = b.claims.map(function (cl, j) { return statusOf(i, j, cl); });
+      var checking = sts.indexOf("checking") >= 0;
+      var allOk = sts.every(function (x) { return x === "verified"; });
+      var head = stamp(checking ? "checking" : (allOk ? "verified" : "corrected"));
+      var removed = sts.filter(function (x) { return x === "blocked"; }).length;
+      return {
+        label: b.label, headline: L(b.headline), active: active, pick: pickBeat(i),
+        stampText: head.text, stampStyle: head.style, stampClass: head.cls,
+        isFan: isFan, notFan: !isFan,
+        fanText: checking ? t.fanWait : L(b.fan),
+        showRemoved: !isProducer && removed > 0 && !checking,
+        removedText: removed === 1 ? t.removed1 : removed + t.removedN,
+        cardStyle: "border-radius:10px;" + (active ? "background:" + C.cardActive + ";border:1px solid " + C.cardBorderActive + ";" : "background:transparent;border:1px solid " + C.cardBorder + ";"),
+        claims: visibleClaims(i).map(function (x) {
+          var on = sel && sel.c.id === x.c.id, blocked = x.st === "blocked", sp = stamp(x.st);
+          return {
+            text: cText(x.c), fact: cFact(x.c).replace(/\n/g, "; "), active: !!on,
+            stampText: sp.text, stampStyle: sp.style, stampClass: sp.cls,
+            pick: function () { self.setState({ sel: i, claim: x.c.id }); },
+            textStyle: "font-size:15px;font-weight:500;line-height:1.35;" + (blocked ? "text-decoration:line-through;color:" + C.muted + ";" : "color:" + C.text + ";"),
+            style: "display:flex;flex-direction:column;gap:6px;width:100%;min-height:44px;padding:10px 12px;text-align:left;border-radius:6px;color:inherit;" + (on ? "background:" + C.selBg + ";border:1px solid " + C.selBorder + ";" : "background:" + C.claimBg + ";border:1px solid " + C.claimBorder + ";")
+          };
+        })
+      };
+    });
+
+    var frozen = null;
+    if (beat && phase === "replay") frozen = beat;
+    else if (beat && isLive && (s.sel !== null || m >= 96 || (shown === latest && s.now - s.revealed[latest] < 6000))) frozen = beat;
+    var marks = frozen ? frozen.marks.map(function (k) { return { style: markStyle(k, op(k.id)) }; }) : [];
+    var lines = frozen ? frozen.lines.map(function (l) { return { style: lineStyle(l, op(l.id)) }; }) : [];
+    var hasZone = !!(frozen && frozen.zone);
+    var zoneStyle = hasZone ? "position:absolute;top:0;bottom:0;left:" + self.pct(beat.zone.x1, 120) + ";width:" + self.pct(beat.zone.x2 - beat.zone.x1, 120) + ";background:" + C.zone + ";border-left:1px dashed " + C.riv + ";opacity:" + (zoneHL ? 1 : 0.35) + ";" : "";
+
+    function winVal(mm) { var w = Math.min(18, Math.max(0, Math.floor(mm / 5))); return D.momentum[w]; }
+    var bx = 60 + 38 * Math.sin(m * 0.9) + 14 * Math.sin(m * 2.3), by = 40 + 22 * Math.sin(m * 1.3 + 1) + 8 * Math.sin(m * 3.1);
+    var ballTeam = winVal(m) + 0.6 * Math.sin(m * 1.7) >= 0 ? "RIV" : "ASH";
+    var pm = m, still = pre || (!frozen && m >= 96);
+    if (frozen) { bx = frozen.anchor.x; by = frozen.anchor.y; ballTeam = frozen.anchor.t; pm = frozen.detect; }
+    else if (still) { bx = 60; by = 40; pm = 0; }
+    var players = [];
+    ["RIV", "ASH"].forEach(function (tm) {
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].forEach(function (i) {
+        var gk = i === 0, pp = posOf(tm, i, bx, by, pm, still), px = pp[0], py = pp[1];
+        players.push({ style: "position:absolute;left:" + self.pct(px, 120) + ";top:" + self.pct(py, 80) + ";width:11px;height:11px;transform:translate(-50%,-50%);background:" + col(tm) + ";border-radius:" + (gk ? "3px" : "50%") + ";opacity:" + (frozen ? 0.45 : 0.95) + ";transition:left .2s linear,top .2s linear,opacity .2s ease;" });
+      });
+    });
+    var ballStyle = "position:absolute;left:" + self.pct(bx, 120) + ";top:" + self.pct(by, 80) + ";width:11px;height:11px;border-radius:50%;background:" + C.ball + ";box-shadow:0 0 0 3px " + col(ballTeam) + ";transform:translate(-50%,-50%);transition:left .2s linear,top .2s linear;";
+
+    var ticker = [];
+    if (!pre) {
+      var step = Math.floor(m * 30), count = Math.round(f * D.TOTAL_EVENTS);
+      for (var k = 0; k < 5; k++) {
+        var sx = step - k; if (sx < 0) break;
+        var mm = sx / 30, p = 0.5 + 0.35 * winVal(mm), team = self.rnd(sx + 7) < p ? "RIV" : "ASH";
+        var tl = D.types[s.lang], ty = tl[Math.floor(self.rnd(sx + 3) * tl.length)];
+        var who = D.roster[team][Math.floor(self.rnd(sx + 11) * 6)];
+        ticker.push({ time: self.mmss(mm), type: ty, who: who, id: "ev-" + ("000" + Math.max(0, count - k)).slice(-4),
+          dot: "display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;background:" + col(team) + ";",
+          style: "display:grid;grid-template-columns:50px minmax(0,1fr) 64px;gap:8px;font-size:14px;color:" + (k === 0 && running ? C.text : C.text2) + ";" });
+      }
+    }
+
+    var elapsed = D.momentum.filter(function (v, w) { return w * 5 < m; });
+    var avg = elapsed.length ? elapsed.reduce(function (a, b) { return a + b; }, 0) / elapsed.length : 0;
+    var poss = Math.round(50 + 18 * avg);
+    function statRow(label, hv, av, hn, an) {
+      var tot = hn + an || 1;
+      return { label: label, home: hv, away: av,
+        barHome: "flex:" + (hn / tot).toFixed(3) + " 1 0;background:" + C.riv + ";border-radius:2px;", barAway: "flex:" + (an / tot).toFixed(3) + " 1 0;background:" + C.ash + ";border-radius:2px;" };
+    }
+    var stats = [
+      statRow(t.stats[0], pre ? "–" : poss + "%", pre ? "–" : (100 - poss) + "%", pre ? 1 : poss, pre ? 1 : 100 - poss),
+      statRow(t.stats[1], pre ? "–" : String(Math.floor(21 * f)), pre ? "–" : String(Math.floor(6 * f)), pre ? 1 : Math.floor(21 * f), pre ? 1 : Math.floor(6 * f)),
+      statRow(t.stats[2], pre ? "–" : (2.65 * f).toFixed(2), pre ? "–" : (0.78 * f).toFixed(2), pre ? 1 : 2.65 * f, pre ? 1 : 0.78 * f)
+    ];
+
+    var bars = D.momentum.map(function (v, w) {
+      if (w * 5 >= m) return { style: "display:none;" };
+      var h = (Math.abs(v) * 50).toFixed(1) + "%";
+      return { style: v >= 0 ? "position:absolute;left:0;right:0;bottom:50%;height:" + h + ";background:" + C.riv + ";border-radius:2px 2px 0 0;" : "position:absolute;left:0;right:0;top:50%;height:" + h + ";background:" + C.ash + ";border-radius:0 0 2px 2px;" };
+    });
+    var pins = revIdx.map(function (i) {
+      var b = D.beats[i], on = i === shown, shift = b.detect > 85 ? "-88%" : "-50%";
+      return { label: b.label, pressed: on, aria: L(b.headline) + ", " + b.label, pick: pickBeat(i),
+        style: "position:absolute;top:0;left:" + (b.detect / 96 * 100).toFixed(1) + "%;transform:translateX(" + shift + ");min-height:40px;min-width:44px;padding:0 10px;border-radius:6px;font-family:" + C.display + ";font-weight:600;font-size:16px;white-space:nowrap;" + (on ? "background:" + C.segOnBg + ";color:" + C.segOnText + ";border:1px solid " + C.segOnBg + ";" : "background:" + C.bg + ";color:" + C.text + ";border:1px solid " + C.strong + ";") };
+    });
+
+    var railEvents = sel ? sel.c.events.map(function (id) {
+      var e = D.ev[id];
+      return { id: id, type: e[0], time: e[1], who: e[2], dot: "display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;background:" + col(e[3]) + ";" };
+    }) : [];
+    var railStamp = sel ? stamp(sel.st) : { text: "", style: "", cls: "" };
+
+    var agentLog = [];
+    if (beat) {
+      var sts = beat.claims.map(function (cl, j) { return statusOf(shown, j, cl); });
+      var bc = sts.filter(function (x) { return x === "checking"; }).length;
+      var bv = sts.filter(function (x) { return x === "verified"; }).length, br = sts.filter(function (x) { return x === "rephrased"; }).length, bb = sts.filter(function (x) { return x === "blocked"; }).length;
+      var evIds = {};
+      beat.claims.forEach(function (cl) { cl.events.forEach(function (id) { evIds[id] = true; }); });
+      var quiet = "font-size:13px;color:" + C.text2 + ";", hot = "font-size:13px;color:" + C.hot + ";";
+      agentLog = [
+        { agent: "Detector", detail: (es ? "momento detectado en el " : "beat detected at ") + self.mmss(beat.detect), style: quiet },
+        { agent: "Extractor", detail: (es ? "datos de " : "facts from ") + Object.keys(evIds).length + (es ? " eventos, sin LLM" : " events, no LLM"), style: quiet },
+        { agent: "Narrator", detail: (es ? "redactó " : "drafted ") + beat.claims.length + (es ? " afirmaciones solo a partir de datos" : " claims from facts only"), style: quiet },
+        { agent: "Checker", detail: bc ? (es ? "en curso, " + bc + " pendientes" : "running, " + bc + " pending") : (es ? bv + " verificadas, " + br + " reformuladas, " + bb + " bloqueadas" : bv + " verified, " + br + " rephrased, " + bb + " blocked"), style: bc ? hot : quiet },
+        { agent: "Renderer", detail: (es ? "JSON de overlay, " : "overlay JSON, ") + (beat.marks.length + beat.lines.length + (beat.zone ? 1 : 0)) + (es ? " capas" : " layers"), style: quiet }
+      ];
+    }
+
+    var calib = D.calib.map(function (r) {
+      var span = r.max - r.min;
+      function x(v) { return ((v - r.min) / span * 100).toFixed(2) + "%"; }
+      function w(a, b) { return ((b - a) / span * 100).toFixed(2) + "%"; }
+      return { label: L(r), min: r.min + r.unit, max: r.max + r.unit,
+        summary: "real " + r.real[0] + "–" + r.real[1] + r.unit + ", gen " + r.gen[0] + "–" + r.gen[1] + r.unit,
+        realStyle: "position:absolute;top:0;bottom:0;left:" + x(r.real[0]) + ";width:" + w(r.real[0], r.real[1]) + ";background:" + C.realBand + ";border-radius:4px;",
+        genStyle: "position:absolute;top:50%;height:8px;margin-top:-4px;left:" + x(r.gen[0]) + ";width:" + w(r.gen[0], r.gen[1]) + ";background:" + C.riv + ";border-radius:4px;" };
+    });
+
+    return {
+      c: C, t: t,
+      focusCss: "button:focus-visible,textarea:focus-visible{outline:2px solid " + C.focus + ";outline-offset:2px}",
+      scoreHome: String(home), scoreAway: String(away), clock: self.mmss(m),
+      isLive: isLive, isReplay: phase === "replay", notLive: !isLive, locked: isLive,
+      themes: themes, modes: modes, langs: langs, views: views, speeds: speeds,
+      isMatchView: s.view === "match", isCalib: s.view === "calib",
+      brief: briefText,
+      onBrief: function (e) { self.setState({ brief: e.target.value, readNote: null }); },
+      randomize: function () {
+        var fn = D.formNames;
+        function r2() { return Math.round((0.15 + Math.random() * 0.75) * 20) / 20; }
+        function pickForm() { return fn[Math.floor(Math.random() * fn.length)]; }
+        self.setState({ tac: { home: { form: pickForm(), d: [r2(), r2(), r2()] }, away: { form: pickForm(), d: [r2(), r2(), r2()] }, story: Math.floor(Math.random() * D.stories.length) }, brief: null, readNote: t.rewritten });
+      },
+      kickOff: function () { self.setState({ phase: "live", minute: 0, revealed: {}, sel: null, claim: null, now: Date.now() }); self.start(); },
+      loadReplay: function () {
+        self.stop();
+        var rev = {}; D.beats.forEach(function (b, i) { rev[i] = 0; });
+        self.setState({ phase: "replay", minute: 96, revealed: rev, sel: 0, claim: "b0c0", now: Date.now() });
+      },
+      newMatch: function () { self.stop(); self.setState({ phase: "pre", minute: 0, revealed: {}, sel: null, claim: null }); },
+      follow: function () { self.setState({ sel: null, claim: null }); },
+      showFollow: isLive && s.sel !== null,
+      players: players,
+      pitchChip: frozen ? (es ? "Imagen congelada, " : "Freeze frame, ") + frozen.anchor.at : (running ? t.live : (pre ? t.kickoffShape : t.replay)),
+      pitchChipStyle: "position:absolute;left:12px;top:10px;padding:2px 8px;border-radius:4px;font-size:13px;font-weight:600;background:" + (running && !frozen ? C.liveBg : C.surface) + ";color:" + (running && !frozen ? C.liveText : C.text) + ";",
+      teams: teams, stages: stages,
+      formations: D.formNames.map(function (f) { return { v: f }; }),
+      storyIdx: String(s.tac.story),
+      storyOpts: D.stories.map(function (st, i) { return { v: String(i), label: L(st) }; }),
+      onStory: function (e) { var nt = JSON.parse(JSON.stringify(self.state.tac)); nt.story = parseInt(e.target.value, 10); self.setState({ tac: nt, brief: null, readNote: t.rewritten }); },
+      readBrief: function () { readBriefText(briefText); },
+      readNote: s.readNote || "", showReadNote: !!s.readNote,
+      pitchTitle: frozen ? L(frozen.headline) : (pre ? t.kickoffShape : (revIdx.length ? t.livePlay : t.waiting)),
+      pitchAria: beat ? L(beat.headline) + ", " + (beat.marks.length + beat.lines.length) + (es ? " eventos en el campo" : " events drawn on the pitch") : t.pitchAria,
+      pitchEmpty: pre,
+      hasZone: hasZone, zoneStyle: zoneStyle, marks: marks, lines: lines,
+      showBall: running || pre || !!frozen, ballStyle: ballStyle,
+      stats: stats, ticker: ticker, tickerEmpty: ticker.length === 0,
+      bars: bars, pins: pins,
+      feed: feed, feedEmpty: feed.length === 0, feedEmptyText: pre ? t.feedPre : t.feedWait,
+      showRail: !isFan, isProducer: isProducer,
+      railEmpty: !sel, railHas: !!sel,
+      railId: sel ? sel.c.id : "",
+      railClaim: sel ? cText(sel.c) : "",
+      railClaimStyle: "font-family:" + C.display + ";font-size:22px;font-weight:" + (s.theme === "editorial" ? 600 : 600) + ";line-height:1.25;" + (sel && sel.st === "blocked" ? "text-decoration:line-through;color:" + C.muted + ";" : "color:" + C.text + ";"),
+      railFact: sel ? cFact(sel.c) : "",
+      railEvents: railEvents, railNoEvents: !!sel && sel.c.events.length === 0,
+      railStampText: railStamp.text, railStampStyle: railStamp.style, railStampClass: railStamp.cls,
+      railReason: sel ? (sel.st === "checking" ? t.checkingReason : cReason(sel.c)) : "",
+      agentLog: agentLog,
+      calib: calib
+    };
+  }
+}
+</script>
+</body>
+</html>

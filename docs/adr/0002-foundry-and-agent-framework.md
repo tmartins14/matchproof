@@ -17,3 +17,13 @@ Stage One judging checks that entries "reasonably apply the required technologie
 
 - All agent calls go through one thin client module so the model and SDK can change without touching agent logic.
 - Every prompt is a versioned file; a change re-runs the evals.
+
+## Decision log
+
+### 2026-10-18: model and region for the walking skeleton
+
+- **Region:** `eastus2`. The Foundry model catalog for this subscription lists Claude there, and in `swedencentral`, `eastus` and `westus3`. `canadacentral` and `canadaeast` list OpenAI models only.
+- **Model:** `claude-sonnet-5-5`, version `2` (the catalog default, generally available, `GlobalStandard`), deployed as `claude-sonnet`. Claude is preferred by this ADR; Sonnet over Haiku because the ADR asks for the strongest available model, and the deployment name and model are Bicep parameters.
+- **Fallback:** `gpt-5.5` (`GlobalStandard`) is listed in `canadacentral` and `canadaeast` if Claude cannot be deployed to this subscription.
+- **Quota:** the catalog shows a default capacity of 10 (thousand tokens per minute). Per-subscription quota was not readable before deployment (`az cognitiveservices usage list` returned nothing while `Microsoft.CognitiveServices` was unregistered). Requested capacity is 10. Actual quota seen at deploy time is recorded below.
+- **Eligibility:** deploying a Claude model sends an attestation (`modelProviderData`: organization name, country, industry) that accepts Anthropic's Marketplace terms on the deployer's behalf. The Bicep has no defaults for these.

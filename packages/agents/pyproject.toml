@@ -2,7 +2,12 @@
 name = "matchproof-agents"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["matchproof-contracts"]
+dependencies = [
+    "anthropic>=1.15.0",
+    "azure-identity>=1.26.0",
+    "matchproof-contracts",
+    "opentelemetry-api>=1.45.1",
+]
 
 [build-system]
 requires = ["hatchling"]

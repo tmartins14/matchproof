@@ -34,7 +34,8 @@
         "length_m": { "type": "number", "minimum": 0 },
         "progressive": { "type": "boolean" },
         "height": { "type": "string", "enum": ["ground", "low", "high"] },
-        "difficulty": { "$ref": "common.schema.json#/$defs/unitInterval" }
+        "difficulty": { "$ref": "common.schema.json#/$defs/unitInterval" },
+        "speed_ms": { "type": "number", "minimum": 0, "maximum": 40, "description": "Ball speed in metres per second." }
       }
     },
     "shot": {

@@ -292,6 +292,10 @@ length_m?: number
 progressive?: boolean
 height?: ("ground" | "low" | "high")
 difficulty?: number
+/**
+ * Ball speed in metres per second.
+ */
+speed_ms?: number
 }
 shot?: {
 xg: number

@@ -39,7 +39,7 @@ All agents read and write one match store through the `match-data` MCP server. T
 | Beat detector | Python | Facts, events | Candidate `Beat[]`, marked planted or detected |
 | Producer | Agent | Candidate beats | Ranked feed of 6 to 10 beats |
 | Narrator | Agent | One beat's fact bundle | Draft `Claim[]` with `fact_ids` |
-| Checker | Python reconciler + LLM judge | Draft claims, facts | Verdict per claim; one retry to Narrator with reasons |
+| Checker | Python reconciler + LLM judge (Claude Sonnet 5.5; the Narrator runs on gpt-5-mini, so the judge is a different model from a different vendor) | Draft claims, facts | Verdict per claim; one retry to Narrator with reasons |
 | Localizer | Agent + Azure AI Translator | Verified claims | Fan, analyst and producer renderings; EN and ES; number invariance check |
 | Renderer | Python | Beat, events, frames | `Overlay` JSON, timed to the match clock |
 | match-data MCP | MCP server | Tool calls | `get_fact`, `get_events`, `get_frame`, `list_beats`, `put_claims` |

@@ -10,3 +10,7 @@
 | Range | Source | Licence | Notes |
 | --- | --- | --- | --- |
 | TBD | TBD | TBD | Pending organiser clarification requested Oct 17 |
+
+## Narrator examples
+
+`voice/examples.yaml` holds 15 example commentary lines used as few-shot examples. Each is written for this project with fictional clubs and players. Lines borrow only the structure of real sources (length, what they lead with, whether a claim comes with evidence); no source text is copied. The source list names real clubs and players, so it is kept outside this repository; entries refer to it by ID (`S01` to `S13`).

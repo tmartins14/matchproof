@@ -1,6 +1,6 @@
 # Matchproof — Product Spec
 
-**One line:** AI match intelligence a broadcaster could air, because every sentence comes with its receipts.
+**One line:** Set the tactics, watch the match, and see every claim checked against the evidence before it airs.
 
 ## Problem
 
@@ -14,6 +14,7 @@ AI can already write match commentary, recaps and "why it mattered" explanations
 | Analyst | The numbers behind each moment, and where they came from | Analyst |
 | Studio producer | Confidence before anything airs; what was changed or blocked, and why | Producer |
 | Graphics operator | Timed, machine-readable overlays to key over the feed | Overlay route |
+| AI product owner | Proof the narration system is safe to deploy: controlled scenarios with known ground truth, and a measured catch rate | Tactics panel as a scenario harness; eval report |
 
 ## What it does
 
@@ -21,7 +22,7 @@ AI can already write match commentary, recaps and "why it mattered" explanations
 2. Generates a full synthetic match: events plus positions for all 22 players, calibrated against real-match distributions.
 3. Streams it live at 1×, 3× or 6× speed, or plays a cached run.
 4. Detects key moments, narrates them from computed facts, and checks every claim before it is shown.
-5. Shows the pitch with live players, freeze frames and overlays; a narrative feed; and a receipts rail tracing claim → fact → events → verdict.
+5. Shows the pitch with live players, freeze frames and overlays; a narrative feed; and an evidence rail tracing claim → fact → events → verdict. While a claim is checking, the pitch highlights the players or zone it is about.
 6. Personalises by mode (fan, analyst, producer), language (EN, ES, more if time), club and player focus, and theme (Broadcast, Editorial).
 
 ## Success criteria (measured, not asserted)
@@ -51,5 +52,5 @@ AI can already write match commentary, recaps and "why it mattered" explanations
 | Technological Implementation | Calibrated generator with 22-player positions; schema-first contracts; tests and CI; IaC; managed identity |
 | Agentic Design & Innovation | Five agents with distinct roles over one shared match store via MCP; Checker → Narrator retry; live verification |
 | Real-World Impact | Overlay JSON a graphics operator can key; claims a producer can trust on air |
-| UX & Presentation | Live desk with receipts rail, three modes, two themes, two languages |
+| UX & Presentation | Live desk with evidence rail and on-screen review states, three modes, two themes, two languages; product text follows `docs/VOICE.md` |
 | Category Adherence (Best Enterprise Solution) | Transparency, controls, audit trail, graceful degradation, cost guards |

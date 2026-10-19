@@ -4,7 +4,7 @@
 
 ## Context
 
-Read `CLAUDE.md`, `docs/ARCHITECTURE.md` (Pipeline, Tactics and the brief), `docs/adr/0004-tactics-canonical-input.md`, `docs/adr/0007-absolute-pitch-coordinates.md`, and `schemas/match_brief.schema.json` and `schemas/event.schema.json`. The Pydantic models you will use are already generated in `packages/contracts/src/contracts/models.py`: `MatchBrief`, `Team`, `Player1` (a roster entry), `Storyline`, `PlantedBeat`, `Event`, `Pass`, `Shot`, `Pressure`. Do not edit that file; if a schema must change, change the schema and run `make gen` in the same PR, and say why in the PR.
+Read `CLAUDE.md`, `docs/VOICE.md` (for any printed text, such as the CLI summary), `docs/ARCHITECTURE.md` (Pipeline, Tactics and the brief), `docs/adr/0004-tactics-canonical-input.md`, `docs/adr/0007-absolute-pitch-coordinates.md`, and `schemas/match_brief.schema.json` and `schemas/event.schema.json`. The Pydantic models you will use are already generated in `packages/contracts/src/contracts/models.py`: `MatchBrief`, `Team`, `Player1` (a roster entry), `Storyline`, `PlantedBeat`, `Event`, `Pass`, `Shot`, `Pressure`. Do not edit that file; if a schema must change, change the schema and run `make gen` in the same PR, and say why in the PR.
 
 This task builds the first version of the synthetic match generator in `packages/sim`: tactics in, a full match of events out, deterministic per seed, with the brief's planted beats guaranteed to happen. No player positions yet (that is Tuesday), no calibration against real data yet (also Tuesday), no API.
 
@@ -15,10 +15,13 @@ Before writing: restate the task back in eight lines or fewer, including how you
 - This is pure, deterministic Python. Use `random.Random(seed)` only; no global random state, no `numpy`, no wall-clock time.
 - The generator emits events only. It computes no statistics for display; tests may compute summary numbers to check plausibility.
 
-## Part 0 — Housekeeping (separate commit, first)
+## Part 0 — Housekeeping
 
-- `git rm --cached .DS_Store` (it is still committed at the root).
-- In `docs/adr/0002-foundry-and-agent-framework.md`, append to the Decision log: on 2026-10-18 a quota request was filed for **Claude Sonnet 4.6, Global Standard, Hosted on Anthropic infrastructure, 80K TPM**; if approved, the Checker's judge moves to Claude so the Narrator and judge are different models; the existing line about Sonnet 5.5 stays as the alternative.
+If `.DS_Store` is still tracked (prompt 02.1 should have removed it), `git rm --cached .DS_Store` in a separate first commit. Otherwise skip. The ADR 0002 model note is already on `main`.
+
+## Schema change (do this before Part 4)
+
+Add `speed_ms` (number, minimum 0, maximum 40, metres per second) to the `pass` object in `schemas/event.schema.json`, then run `make gen` in the same PR. Analyst mode and the speed tags on Mon Oct 26 need pass speed; shots already have it.
 
 ## Parts
 
@@ -48,6 +51,8 @@ Before writing: restate the task back in eight lines or fewer, including how you
    - Clock: period 1 runs 0 to 45 minutes plus 1–4 minutes of stoppage; period 2 runs 45 to 90 minutes plus 2–6, both drawn from the seed. Emit `period_start`, a `kick_off`, and `period_end` markers. `t` is seconds and never decreases. Each event type advances the clock by a type-specific random interval, tuned so a match lands around 2,500 events.
    - Each step picks an actor from the team in possession (weighted by role and by where the ball is relative to that player's slot anchor) and an action: pass, carry, shot; the defending team may insert pressure, then tackle, interception, duel or foul.
    - **Dials drive behaviour.** `directness` raises pass length and forward angle and lowers completion. The opponent's `press` raises pressure frequency and the chance of a turnover high up the pitch. `line_height` moves where a team wins the ball back. Keep each effect a short, named, commented formula.
+   - **Pass quality:** every pass event fills `length_m` (from start and end location), `progressive` (moves the ball at least 10 m closer to the opponent's goal, or into the box), `height` (ground, low or high; long and direct passes are more often high), `difficulty` (0 to 1, rising with length and with pressure on the passer) and `speed_ms` (ground passes 8 to 20, high passes 14 to 28, scaled by length). Completion probability falls as `difficulty` rises.
+   - **Shot speed:** every shot fills `speed_ms` (18 to 34; headers 10 to 20).
    - Shots happen mostly in the final third. Shot `xg` comes from a simple logistic on distance and angle to the goal centre (headers lower); clamp 0.01–0.9.
    - **Scoring rule for v1:** only planted beats score. Organic shots that would score are recorded as saved, wide, blocked or post, so the final score always matches the storyline. Note this in a module docstring as a v1 simplification.
    - **Planted beats.** At a random time inside each window, inject a short scripted sequence and tag every event in it with `planted_beat_id`:
@@ -70,6 +75,7 @@ Before writing: restate the task back in eight lines or fewer, including how you
 - **Storylines:** for all four storylines on seeds 1–4, every planted beat produces its event inside its window, its events carry `planted_beat_id`, and the final score matches the table.
 - **Plausibility (loose; calibration comes Tuesday):** events per match 1,800–3,200; passes per team 250–700; pass completion 65–92%; shots per team 3–30; total xG per match 0.5–6; `t` non-decreasing; all locations on the pitch; both periods present.
 - **Dial effects:** with everything else fixed, a team with `press` 0.85 produces more pressure events and more turnovers in the opponent's half than the same team with `press` 0.25; a team with `directness` 0.85 has a longer mean pass length than with 0.2.
+- **Pass quality:** every pass has all five quality fields; `progressive` matches its definition when recomputed from locations; mean `difficulty` of incomplete passes is higher than of completed ones; high passes have a higher mean `speed_ms` than ground passes; every shot has `speed_ms` inside its range.
 - **Speed:** one full match generates in under 2 seconds on a laptop.
 
 ## Conventions

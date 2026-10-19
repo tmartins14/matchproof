@@ -15,6 +15,7 @@ dev = [
     "datamodel-code-generator",
     "httpx",
     "uvicorn>=0.54.0",
+    "types-pyyaml",
     "types-jsonschema>=4.26.0.20261006",
 ]
 

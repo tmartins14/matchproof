@@ -1,0 +1,147 @@
+# Banned patterns for product text. Enforced by intel.voice_lint (CI and evals).
+# pattern: regex, case-insensitive. applies_to: narration and/or ui.
+# The emoji class lists Unicode blocks by hand because Python's re has no Extended_Pictographic.
+
+- id: em-dash
+  pattern: '—'
+  severity: error
+  applies_to: [narration, ui]
+  why: Em dashes read as generated text.
+
+- id: double-hyphen
+  pattern: ' -- '
+  severity: error
+  applies_to: [narration, ui]
+  why: A typed em dash.
+
+- id: not-just-but
+  pattern: 'not just .{1,40} but'
+  severity: error
+  applies_to: [narration, ui]
+  why: Negative parallelism, a stock chatbot construction.
+
+- id: showcase
+  pattern: '\bshowcas\w*'
+  severity: error
+  applies_to: [narration, ui]
+  why: Promotional filler.
+
+- id: testament
+  pattern: '\btestament\b'
+  severity: error
+  applies_to: [narration, ui]
+  why: Inflated symbolism.
+
+- id: delve
+  pattern: '\bdelv\w*'
+  severity: error
+  applies_to: [narration, ui]
+  why: Stock chatbot vocabulary.
+
+- id: seamless
+  pattern: '\bseamless\w*'
+  severity: error
+  applies_to: [narration, ui]
+  why: Stock chatbot vocabulary.
+
+- id: leverage
+  pattern: '\bleverag\w*'
+  severity: error
+  applies_to: [narration, ui]
+  why: Business filler.
+
+- id: unlock
+  pattern: '\bunlock\w*'
+  severity: error
+  applies_to: [narration, ui]
+  why: Product-marketing verb.
+
+- id: game-changer
+  pattern: 'game.?changer'
+  severity: error
+  applies_to: [narration, ui]
+  why: Cliche with no fact behind it.
+
+- id: dramatic-turn
+  pattern: 'dramatic turn'
+  severity: error
+  applies_to: [narration, ui]
+  why: Cliche with no fact behind it.
+
+- id: worth-noting
+  pattern: "it'?s worth noting"
+  severity: error
+  applies_to: [narration, ui]
+  why: Filler lead-in.
+
+- id: masterclass
+  pattern: 'a masterclass in'
+  severity: error
+  applies_to: [narration, ui]
+  why: Inflated praise with no fact behind it.
+
+- id: tapestry
+  pattern: '\btapestry\b'
+  severity: error
+  applies_to: [narration, ui]
+  why: Stock chatbot vocabulary.
+
+- id: pivotal
+  pattern: '\bpivotal\b'
+  severity: error
+  applies_to: [narration, ui]
+  why: Inflated significance.
+
+- id: in-todays
+  pattern: "in today'?s"
+  severity: error
+  applies_to: [narration, ui]
+  why: Essay opener.
+
+- id: emoji
+  pattern: '[\U0001F300-\U0001FAFF☀-➿⭐⭕⌚⌛⏩-⏳️]'
+  severity: error
+  applies_to: [narration, ui]
+  why: No emoji in product text.
+
+- id: exclamation
+  pattern: '!'
+  severity: error
+  applies_to: [narration]
+  why: Live text states what happened; it does not shout.
+
+- id: hedging
+  pattern: '\b(?:seems? to|appears? to)\b'
+  severity: warn
+  applies_to: [narration, ui]
+  why: Hedging means the claim has no fact behind it.
+
+- id: long-sentence
+  pattern: '(?:[^\s.!?;]+\s+){30,}[^\s.!?;]+'
+  severity: warn
+  applies_to: [narration]
+  why: Over 30 words in one sentence.
+
+- id: ui-ai
+  pattern: '\bAI\b'
+  severity: error
+  applies_to: [ui]
+  why: The live desk never says AI.
+
+- id: ui-agent
+  pattern: '\bagent\b'
+  severity: error
+  applies_to: [ui]
+  why: The live desk never says agent.
+
+- id: ui-generated
+  pattern: '\bgenerated\b'
+  severity: error
+  applies_to: [ui]
+  why: The live desk never says generated.
+
+- id: ui-sparkle
+  pattern: '✨'
+  severity: error
+  applies_to: [ui]
+  why: No sparkle icons.

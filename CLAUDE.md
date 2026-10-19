@@ -25,6 +25,7 @@ evals/              golden matches, adversarial claims, runner
 infra/              azure.yaml + Bicep
 docs/               SPEC, ARCHITECTURE, adr/, prototype/, compliance/
 prompts/            build prompts, one per task
+voice/              voice rules and Narrator examples
 ```
 
 ## Docs map
@@ -39,6 +40,7 @@ prompts/            build prompts, one per task
 - TypeScript strict. JavaScript and TypeScript method names in camelCase (e.g. `setPieceCornerKick`), never snake_case.
 - Pitch coordinates: 120 × 80, absolute. The home team attacks toward x = 120 in both halves. See ADR 0007.
 - IDs: events `ev-000123`, windows `win-NN`, aggregates `agg-<name>`, facts `fx-…`, beats `bt-…`, claims `cl-…`.
+- Product text (narration and UI copy) follows `docs/VOICE.md`; `voice/banned.yaml` is enforced in CI.
 - Fictional clubs and players only. No real Premier League names, crests, marks or data in code, fixtures or UI.
 - No secrets in code or config. Azure access uses managed identity; local development uses `az login`.
 - Model deployments and prompts are config files under version control. A prompt change re-runs the evals.

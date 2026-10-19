@@ -1,0 +1,9 @@
+{
+  "verdict": {
+    "checking": "CHECKING",
+    "verified": "STANDS",
+    "rephrased": "AMENDED",
+    "blocked": "OVERTURNED",
+    "delayed": "HELD"
+  }
+}

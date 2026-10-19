@@ -7,6 +7,23 @@
 # facts (id + display text), line (<= 30 words; every digit must appear in a fact display),
 # amended_from / reason (AMENDED examples only), source (original | adapted), source_ref.
 
+# ex-00 is format only and is deliberately flawed: "41 metres" and "both full-backs high" have
+# no fact behind them, and "Eleven" is a number word. The numbers-from-facts test must catch
+# "41" (strict xfail), which proves the test works. Number words are out of scope for v1.
+- id: ex-00
+  format_only: true
+  beat_kind: counter_goal
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0001, display: "41′" }
+    - { id: fx-0002, display: "11 seconds" }
+    - { id: fx-0003, display: "4 passes" }
+  line: "Ashford go 41 metres the other way and score. Eleven seconds, four passes, Rivermouth caught with both full-backs high."
+  amended_from: null   # for AMENDED examples: the bad draft
+  reason: null         # for AMENDED examples: why it was changed
+  source: original     # original | adapted
+
 # ---------- fan ----------
 - id: ex-01
   beat_kind: counter_goal

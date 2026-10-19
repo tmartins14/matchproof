@@ -1,18 +1,39 @@
 # Matchproof — 10-Day Build Plan
 
-Oct 17, 2026 · @Tyler
+Oct 17, 2026 · @Tyler · updated Oct 19 (positioning, judge model, voice)
 
 ## TL;DR
 
-We ship **Matchproof** ("Match intelligence that shows its work") by Tue Oct 27, 9 PM ET: an agent system that composes a synthetic, football-realistic match from a tactical brief, explains it beat by beat, and proves every sentence against the event log. The official deadline is Oct 27, 11:59 PM PT (Oct 28, 2:59 AM ET), so the internal target leaves a 6-hour buffer.
+We ship **Matchproof** ("Set the tactics. Watch the match. Every claim proven.") by Tue Oct 27, 9 PM ET: an agent system that composes a synthetic, football-realistic match from a tactical brief, explains it beat by beat, and proves every sentence against the event log. The official deadline is Oct 27, 11:59 PM PT (Oct 28, 2:59 AM ET), so the internal target leaves a 6-hour buffer.
 
 The three bets that win points:
 
-1. **Receipts as the product.** Every published claim links to a computed fact and its event IDs, and a Checker agent blocks what it can't prove. That is the transparency-and-controls language of the Best Enterprise Solution category, and it gives the demo its one memorable moment.
-2. **Synthetic data as a scored feature, not a chore.** A Composer agent turns a brief into a calibrated full match. Creativity in synthetic data creation is written into the Technological Implementation criterion.
+1. **A match you control, as a scenario harness.** Tactics in, a different match out, the same one every time for the same seed. For fans it's a sandbox; for an enterprise buyer it's how you certify a narration system: controlled inputs, known ground truth, a measured catch rate. Few entries simulate or track positions; this is the opening shot of the video.
+2. **Verification you can watch.** Every claim links to a computed fact and its event IDs. On screen it shows CHECKING while the pitch highlights the evidence, then STANDS, AMENDED or OVERTURNED. The judge is a different model from a different vendor (Claude Sonnet 5.5 judges gpt-5-mini). About 50 entries promise verification; few show it happening, and fewer check positional claims against freeze frames.
 3. **Microsoft hero stack used where it earns its place.** Microsoft Foundry for models and agents, Microsoft Agent Framework for orchestration, an MCP server for match data, Azure AI Translator, Container Apps, Static Web Apps, Blob Storage and Application Insights, all deployed with azd and Bicep.
 
+See **Positioning** below for why the order of these bets changed on Oct 19.
+
 Capacity is about 57 focused hours, with Oct 26 and 27 taken off. Feature freeze is 8 PM Mon Oct 26. Anything not done by then moves to the cut list.
+
+## Positioning (Oct 19)
+
+A review of the 303 entries on the Innovation Studio projects page (titles and short descriptions only, so counts are rough) changed the pitch, not the build:
+
+| Theme | Entries |
+| --- | --- |
+| Verified or evidence-backed narration | ~51 |
+| Broadcast or overlays | ~53 |
+| Multi-agent "studio crew" | ~48 |
+| Recaps | ~23 |
+| Tracking or positional data | 4 |
+| Simulation or what-if | 4 |
+
+- **"Receipts" is taken.** Several entries use near-identical taglines ("commentary with receipts", "prove every word"). We drop the word from product copy and the pitch; the rail is the **evidence rail**.
+- **The rubric pays for execution.** Roughly 10% of the weight is idea novelty; the rest is code quality, deployment readiness, a balanced build and a clear demo. Judges need not watch past 2:00, so the video is designed shot by shot, not recorded at the end.
+- **Weakness to fix:** the Checker → Narrator loop is the one genuinely agentic pattern, so it is shown on screen (AMENDED with the old wording struck through), not left in a log.
+- **Nothing should look, sound or feel generated.** `docs/VOICE.md` sets the register, `voice/banned.yaml` is enforced in CI and in the evals, and `voice/examples.yaml` holds 15 Narrator examples adapted from real live text and published metric definitions (sources kept outside the repo because they name real clubs). No sparkle icons, gradients, typing animation or chat bubbles; no synthetic voiceover or stock music in the video.
+- **Name kept.** Matchproof is fine; the "Match-" prefix is crowded, so the tagline carries the difference.
 
 ## Compliance gates
 
@@ -40,12 +61,12 @@ The five criteria are equally weighted, and ties break in criterion order, so Te
 | Criterion (20% each) | What we build for it | Evidence the judge sees |
 | --- | --- | --- |
 | Technological Implementation | Calibrated generator; schema-first contracts; typed Python, tests, CI; IaC with azd + Bicep; managed identity; hero tech in every stage | Calibration page; green CI badge; ARCHITECTURE.md service table; ADRs |
-| Agentic Design & Innovation | Five agents with distinct roles sharing one match store; Checker-to-Narrator retry handoff; MCP server for match data; planted vs detected beats | Agent graph in README; Producer-mode agent log; a blocked and a rephrased claim on screen |
+| Agentic Design & Innovation | Five agents with distinct roles sharing one match store; Checker-to-Narrator retry handoff; MCP server for match data; planted vs detected beats | Agent graph in README; an AMENDED and an OVERTURNED claim on screen with reasons; writer and judge on different models |
 | Real-World Impact | Broadcast-ready timed overlay JSON; fact-checked narration a studio can air; fan, analyst and producer outputs from one graph | Overlay JSON schema; one-paragraph "who uses this Saturday" story in the pitch |
-| UX & Presentation | The prototype screen, built for real: pitch overlays, receipts rail, mode and language toggles, mobile layout | 1:50 video; live URL that opens straight into a replay |
+| UX & Presentation | The prototype screen, built for real: pitch overlays, evidence rail with review states, mode and language toggles, mobile layout; product text linted against VOICE.md | 1:50 video; live URL that opens straight into a replay |
 | Category Adherence | Declared category: Best Enterprise Solution (reliability, transparency, controls) | Eval report, trace links, cost and rate limits, failure fallbacks documented |
 
-**Category choice.** Declare Best Enterprise Solution. Receipts is literally its "transparency and controls" language, and fewer entrants will chase it than Multi-Agent. The design still meets every Multi-Agent test (distinct roles, shared state, handoffs, failure recovery) so judges can reassign us if they prefer, which rule 4.3 allows.
+**Category choice.** Declare Best Enterprise Solution. Verified claims are literally its "transparency and controls" language, and the scenario-harness framing answers its "clear path to enterprise adoption". Verification is crowded overall, but fewer entrants will chase this category than Multi-Agent. The design still meets every Multi-Agent test (distinct roles, shared state, handoffs, failure recovery) so judges can reassign us if they prefer, which rule 4.3 allows.
 
 **Grand Prize angle.** Its description asks for the most complete solution with innovative use of the Microsoft AI stack. Completeness beats cleverness: a thin, finished, deployed pipeline outranks a deep, half-built one.
 
@@ -66,7 +87,7 @@ The only loop is Checker back to Narrator, once per beat; after that a claim is 
 | Extractors + beat detector | Python tools | Compute facts with provenance; detect candidate beats (high turnovers to shots, momentum swings, territorial spells, set-piece goals) | Producer |
 | Producer | Agent (Foundry) | Ranks candidates into a 6 to 10 beat feed; marks each beat planted or detected | Narrator |
 | Narrator | Agent (Foundry) | Writes claims per beat from a fact bundle only, never raw events; structured output with fact references | Checker |
-| Checker | Deterministic reconciler + LLM judge | Verifies numbers in code, then judges support; verdict verified, rephrased or blocked; sends a beat back to Narrator once with reasons | Localizer |
+| Checker | Deterministic reconciler + LLM judge (Claude Sonnet 5.5) | Verifies numbers in code, then judges support and runs the voice lint; verdict verified, rephrased or blocked (shown as STANDS, AMENDED, OVERTURNED); sends a beat back to Narrator once with reasons | Localizer |
 | Localizer | Agent + Azure AI Translator | Builds fan, analyst and producer renderings; translates verified text; re-checks that every number survived translation | Claim graph store |
 | match-data MCP server | MCP | Exposes get\_fact, get\_events and list\_beats to every agent; the only door to match data | All agents |
 
@@ -79,8 +100,8 @@ Live is the default path; the cached replay is the fallback. The brief asks for 
 - **Brief entry.** Two linked inputs. The Tactics panel (formation per team, three dials per team, storyline) is the canonical input to the generator: same tactics and seed, same match. The brief is the human-readable form of it. Changing tactics rewrites the brief deterministically from a template; editing the brief and pressing Read brief sends it to the Composer agent, which returns structured tactics the user can check and adjust. Randomize sets random tactics and rewrites the brief.
 - **Streaming.** The generator emits a timed event stream; the API sends it to the browser over Server-Sent Events at a chosen speed (1×, 3×, 6× match minutes per second). SSE is simpler than WebSockets and runs on Container Apps without extra services.
 - **Incremental compute.** Extractors update running stats per event. The beat detector fires when a pattern completes (a shot after a high turnover, a goal, a 15-minute territorial spell closing).
-- **Verification in the open.** Each detected beat goes to Narrator then Checker asynchronously. Claims appear on screen as Checking and flip to Verified, Rephrased or Blocked. Latency budget: 8 s per beat at the 90th percentile, measured in the eval run.
-- **Degrade, don't fail.** If a model call times out or the daily token cap trips, the run continues with code-only stats and the beat shows "verification delayed". If the API is unreachable, the site offers the cached replay. Judges can always see something working.
+- **Verification in the open.** Each detected beat goes to Narrator then Checker asynchronously. Claims appear on screen as CHECKING, with the pitch highlighting the evidence, and resolve to STANDS, AMENDED or OVERTURNED. Latency budget: 8 s per beat at the 90th percentile, measured in the eval run.
+- **Degrade, don't fail.** If a model call times out or the daily token cap trips, the run continues with code-only stats and the claim shows HELD. If the API is unreachable, the site offers the cached replay. Judges can always see something working.
 - **Cost guard.** One live run is about 8 beats × 2 agent calls; a per-IP limit and a daily cap keep judging traffic predictable.
 
 ### Azure services
@@ -174,13 +195,13 @@ Oct 26 and 27 are off at about 10 hours each: 57 hours in total. Weekdays before
 | --- | --- | --- | --- |
 | Sat Oct 17 | 1 | This plan; repo created and protected; clarification email to organisers | Plan approved; repo exists with branch protection |
 | Sun Oct 18 | 7 | SPEC, ARCHITECTURE, first ADRs; all JSON Schemas; scaffold; CI; azd + Bicep for Foundry, Container Apps, Blob, App Insights; hello-world deployed | **M1 walking skeleton**: CI green; a Container App calls a Foundry model with managed identity |
-| Mon Oct 19 | 3 | Generator: possession chains, team dials, seeded output, planted goals, timed event stream | 4 seeds schema-valid and deterministic |
-| Tue Oct 20 | 3 | Calibration tests; 22-player position layer (formation shape shifted by ball and team dials, 5 Hz, freeze frame per event); extractors with provenance, batch and incremental. Confirm registration before 12 PM PT (3 PM ET) | **Generator done**: every calibration metric inside its band |
+| Mon Oct 19 | 3 | Voice guide, banned-pattern lint and sourced Narrator examples (prompt 02.1); generator: possession chains, team dials, pass quality and speeds, seeded output, planted goals, timed event stream (prompt 03) | Voice lint in CI; 4 seeds schema-valid and deterministic |
+| Tue Oct 20 | 3 | Calibration tests; 22-player position layer (formation shape shifted by ball and team dials, 5 Hz, freeze frame per event); extractors with provenance, batch and incremental, including positional facts (line height, compactness, distance between lines) for the hero claim. Confirm registration before 12 PM PT (3 PM ET) | **Generator done**: every calibration metric inside its band |
 | Wed Oct 21 | 3 | Beat detector (live and batch); MCP server; SSE endpoint that streams a match at a chosen speed | A curl of the stream shows events, facts and beats arriving on time |
-| Thu Oct 22 | 3 | Narrator and Checker on Foundry; number reconciler; retry loop; eval runner + adversarial set | Checker catches 28 of 30 adversarial claims; one beat verified in under 8 s |
+| Thu Oct 22 | 3 | Narrator (gpt-5-mini) and Checker with Claude Sonnet 5.5 judge on Foundry; number reconciler; voice lint in the Checker; retry loop; eval runner + adversarial set. First draft of the video beat sheet (train) | Checker catches 28 of 30 adversarial claims; one beat verified in under 8 s |
 | Fri Oct 23 | 3 | Composer with randomize; Producer; full workflow; claim graph to Blob; tracing. Collect 5 to 10 design references on the train | **M2 pipeline complete**: brief in, live claims out, one trace per run |
 | Sat Oct 24 | 7 | Design system: hallmark study on references, hand-edited DESIGN.md, tokens. Chart primitives from scratch, including the 22-player layer and freeze frames. Live desk wired to SSE; deployed to Static Web Apps | **M3 live end to end on Azure**: kick off a match on the live URL and watch claims get checked |
-| Sun Oct 25 | 7 | Receipts rail with live checking states; fan, analyst and producer modes; Localizer (EN, ES); cached replay as the fallback path; 3 pre-generated matches | Live and cached paths both work on the live URL |
+| Sun Oct 25 | 7 | Evidence rail with CHECKING, STANDS, AMENDED and OVERTURNED states and the evidence highlight on the pitch; fan, analyst and producer modes; Localizer (EN, ES); cached replay as the fallback path; 3 pre-generated matches | Live and cached paths both work on the live URL |
 | Mon Oct 26 (off) | 10 | Realistic movement first (committed); add-backs below; evals in CI; impeccable critique and detect on every screen; bug bash on phone and laptop; accessibility pass | **M4 feature freeze** at 8 PM: nothing new after this |
 | Tue Oct 27 (off) | 10 | Fresh-eyes review by a separate agent; fixes only; README, DEMO.md, testing instructions; record and cut the video; pitch; submission form; tag v1.0; uptime check to Nov 10 | **M5 submitted by 9 PM ET** |
 
@@ -191,7 +212,7 @@ Weekday hours assume both train anchor hours plus 30 minutes of evening review. 
 1. **Broadcast overlay route (2 h).** A transparent 1920×1080 page that plays only the timed overlays, ready to key over a feed in OBS or vMix.
 2. **Favourite-club, player-focus and single-metric modes (2.5 h).** All three are named in the brief.
 3. **French and Portuguese (1 h).** Nearly free once Spanish works, because the invariance check is language-agnostic.
-4. **Azure AI Speech on goal beats (2 h).** A spoken call of the verified line for the video.
+4. **Audio-described mode with Azure AI Speech (3 to 4 h).** Reads only claims that STAND, for viewers who can't check the screen. Verification matters most when the audience can't see the evidence. Only if the core is on schedule.
 5. **Realistic movement (4 to 6 h**, committed, never cut). First block on Monday. Swap the shape model for role-based movement (hold slot, press when nearest, make runs, track runners), with the passer and shooter pinned to each event location and with speed and acceleration limits, behind the same 5 Hz position format so nothing downstream changes.
 6. **Fabric audit sink (stretch, 3 h).** Every claim and verdict lands in a Fabric lakehouse. Cut it first: Fabric setup is the least predictable task in the plan.
 
@@ -199,7 +220,7 @@ The risk in this shape is that the core lands late, on thin weekdays. If M2 slip
 
 ## Cut list, risks and mitigations
 
-If a gate slips, cut from the top of this list down. Never cut the receipts rail, the Checker, the evals, or deployment: those are the entry.
+If a gate slips, cut from the top of this list down. Never cut the evidence rail and its review states, the Checker, the evals, or deployment: those are the entry.
 
 1. Azure AI Speech narration (never in scope unless everything else is done)
 2. Live Compose button: ship cached matches only
@@ -213,7 +234,9 @@ If a gate slips, cut from the top of this list down. Never cut the receipts rail
 | Innovation Studio invite never arrives | Medium | Cannot submit | Check spam; email organisers Monday Oct 19; screenshot registration confirmation |
 | Chart components built from scratch take longer than planned | Medium | Replay desk slips into Saturday | Build only four primitives (pitch, marker, line, strip); review them on the fixture page Tuesday before any wiring |
 | StatsBomb terms forbid deriving calibration targets | Low | Weaker calibration story | Ship only aggregate ranges with attribution; fallback to published public ranges |
-| Foundry model quota or region gap | Medium | Pipeline blocked on day 1 | Provision Sunday Oct 18 first thing; keep a second region in Bicep params |
+| Foundry model quota or region gap | Low (was Medium) | Judge stays on gpt-5-mini | Claude quota approved Oct 19 (80K TPM shared); smoke-test `checker-judge` before Thursday; gpt-5-mini judge remains the fallback |
+| Output reads as AI-generated | High | Presentation and trust scores drop | VOICE.md, banned-pattern lint in CI and evals, sourced few-shot examples, no AI-coded UI |
+| Crowded verification field | High | Entry blends in | Lead with the controllable match and positional claims; video opens on an OVERTURNED claim |
 | Agent Framework learning curve | Medium | Thursday slips | Timebox 2 hours; fallback to the Foundry Agent Service SDK with the same roles |
 | Generator rabbit hole | High | Eats Wednesday | Hard stop at the Tuesday calibration gate |
 | Visual bugs pass CI | High | Judge sees a broken screen | Playwright screenshot per PR; Monday bug bash on a real phone |
@@ -227,17 +250,19 @@ Judges may score on the video and text alone (rule 4.8), so the video carries th
 
 | Time | Shot | What it proves |
 | --- | --- | --- |
-| 0:00–0:12 | Problem: "AI commentary can't be aired if nobody can prove it's true" | Real-world impact |
-| 0:12–0:30 | A brief typed into Compose; the agent graph lights up; a full match appears | Agentic design, synthetic data |
-| 0:30–0:55 | Replay: the 41′ goal beat fires with its overlay; click a sentence, the rail shows fact and events, the pitch dims everything else | The core idea, UX |
-| 0:55–1:10 | Producer mode: a blocked claim and a rephrased one, with reasons; the trace link | Enterprise controls |
-| 1:10–1:25 | Fan mode in Spanish; player focus | Personalisation, multi-language |
-| 1:25–1:40 | Calibration page; planted vs detected beats | Data innovation |
-| 1:40–1:50 | Architecture slide naming the Azure services; repo and live URL | Tech implementation |
+| 0:00–0:08 | Cold open, no title card: a positional claim goes CHECKING, the pitch highlights the back line, the claim is OVERTURNED and an AMENDED version appears | The core idea, in the first seconds |
+| 0:08–0:20 | One line on the problem: one wrong stat on air and the tool gets switched off | Real-world impact |
+| 0:20–0:45 | Same seed, two press settings: two visibly different matches, both narrated and checked live | Controllable match, synthetic data, UX |
+| 0:45–1:05 | The scenario harness: the eval report (claims caught out of 30), the trace link, writer and judge on different models | Enterprise controls, agentic design |
+| 1:05–1:20 | Fan mode in Spanish; analyst mode on the same beat | Personalisation, multi-language |
+| 1:20–1:40 | Calibration page; planted vs detected beats | Data innovation |
+| 1:40–1:50 | Architecture: the Azure services in use; repo and live URL | Tech implementation |
+
+Recorded in your own voice, in one sitting, from the deployed URL; real speed except one labelled 6× section; cursor visible; no music. You write the spoken lines from this beat sheet.
 
 Alongside the video:
 
-- [ ] **Pitch** (docs/PITCH.md): what we built, Microsoft technologies used, what it does, the problem it solves, in about 150 words
+- [ ] **Pitch** (docs/PITCH.md): what we built, Microsoft technologies used, what it does, the problem it solves, in about 150 words. You write the first draft; Claude tightens it and runs a humanizer pass; you read it aloud and cut anything you wouldn't say. Concrete numbers, no superlatives, first person
 - [ ] **README**: one-line pitch, live URL, video link, agent graph, service table, "how to run locally", eval results, honest notes on where Copilot and Claude Code were used
 - [ ] **DEMO.md testing instructions**: open the URL, press Replay, click any sentence, switch to Producer, switch to Spanish; no login needed
 - [ ] **Compliance folder**: clarification replies, data statement, licence notes
@@ -245,10 +270,11 @@ Alongside the video:
 
 ## Next actions
 
-- [ ] Approve or redline this plan (the GATE in your Plan step)
-- [ ] Create github.com/tmartins14/matchproof: public, MIT, main protected with required checks and enforce admins
-- [ ] Confirm Monday and Tuesday off by tonight; the schedule assumes Plan A until you say otherwise
-- [ ] Send the organisers a written clarification: is deriving aggregate calibration ranges from public open data allowed
-- [ ] Check Azure: subscription active, credits or budget, Foundry available in your chosen region
-- [ ] Search spam for the Innovation Studio invite
-- [ ] Tomorrow morning, start Sunday's SPEC.md from this doc in a fresh Claude Code session
+- [x] Plan approved; repo created and protected; M1 walking skeleton deployed (Oct 18)
+- [x] Innovation Studio access; field review done (Oct 19)
+- [x] Claude quota approved (Oct 19)
+- [ ] Merge this docs update, then run prompt 02.1 (voice), then prompt 03 (generator)
+- [ ] Smoke-test a `checker-judge` deployment of Claude Sonnet 5.5 (US Data Zone if offered) and check the budget alert
+- [ ] Read the 15 Narrator examples on the train; rewrite or delete any you wouldn't say aloud
+- [ ] Delete `rg-matchproof-sandbox` if it still exists
+- [ ] Still open: organiser reply on deriving calibration ranges from public open data

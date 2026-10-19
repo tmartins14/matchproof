@@ -7,7 +7,7 @@ Two files, one prototype:
 
 ## What to take from it
 
-- **Layout and behaviour:** header with scorebug and toggles; brief box with Randomize and Read brief; Tactics panel (formation, three dials per team, storyline); five-stage pipeline strip; pitch with 22 players, ball, freeze frames and overlays; stats, event ticker, momentum strip with clickable moment pins; key-moment feed with verdict stamps; receipts rail; Producer agent log; Calibration view.
+- **Layout and behaviour:** header with scorebug and toggles; brief box with Randomize and Read brief; Tactics panel (formation, three dials per team, storyline); five-stage pipeline strip; pitch with 22 players, ball, freeze frames and overlays; stats, event ticker, momentum strip with clickable moment pins; key-moment feed with verdict stamps; evidence rail (called the receipts rail in the prototype); Producer agent log; Calibration view.
 - **Theme tokens:** the `tokens()` method holds both themes, Broadcast and Editorial. `apps/web/src/theme/tokens.ts` starts as a copy.
 - **Copy:** English and Spanish strings in the `t` objects.
 - **State machine:** pre-match → live (1×, 3×, 6×) → full time; cached replay; a 6-second freeze frame when a moment is detected; pinning a moment until Follow live.
@@ -21,3 +21,9 @@ Two files, one prototype:
 - Checker latency is a fixed 2.6 s delay.
 - Calibration numbers are placeholders.
 - Broadcast theme colours and type are placeholders until the design pass on Sat Oct 24.
+
+## Changed since the prototype (Oct 19)
+
+- **Verdict labels:** the build uses CHECKING, STANDS, AMENDED, OVERTURNED and HELD (`docs/VOICE.md`), not Verified, Rephrased and Blocked. AMENDED shows the old wording struck through above the new.
+- **Checking state:** the pitch highlights the players or zone the claim is about. No spinner.
+- **No AI-coded UI:** no sparkle icons, gradients, glow, typing animation or chat bubbles; the words "AI" and "agent" stay out of the live desk (the Producer agent log stays in the dev panel).

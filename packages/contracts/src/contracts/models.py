@@ -200,6 +200,10 @@ class Pass(BaseModel):
     progressive: bool | None = None
     height: Height | None = None
     difficulty: UnitInterval | None = None
+    speed_ms: Annotated[
+        float | None,
+        Field(description='Ball speed in metres per second.', ge=0.0, le=40.0),
+    ] = None
 
 
 class BodyPart(StrEnum):

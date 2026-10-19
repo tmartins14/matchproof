@@ -1,0 +1,9 @@
+{
+  "verdict": {
+    "checking": "COMPROBANDO",
+    "verified": "VÁLIDO",
+    "rephrased": "CORREGIDO",
+    "blocked": "ANULADO",
+    "delayed": "EN ESPERA"
+  }
+}

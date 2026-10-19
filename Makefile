@@ -14,6 +14,7 @@ check-contracts:
 lint:
 	uv run ruff check .
 	uv run ruff format --check .
+	uv run python -m intel.voice_lint apps/web/src/copy/*.json
 	cd apps/web && npm run lint
 
 typecheck:

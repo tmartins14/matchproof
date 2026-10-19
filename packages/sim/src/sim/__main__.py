@@ -12,7 +12,7 @@ from .tactics import FORMATIONS
 
 
 def summarize(brief: MatchBrief, events: list[Event]) -> str:
-    """Plain summary table. Possession share is the share of on-ball events (pass, carry, shot)."""
+    """Plain summary table. Possession share follows Opta: a side's completed passes over both sides'."""
     rows: dict[str, dict[str, float]] = {s: Counter() for s in ("home", "away")}  # type: ignore[misc]
     for e in events:
         r = rows[e.side.value]
@@ -24,9 +24,7 @@ def summarize(brief: MatchBrief, events: list[Event]) -> str:
             r["shots"] += 1
             r["xg"] += e.shot.xg
             r["goals"] += e.outcome is not None and e.outcome.value == "goal"
-        if t in ("pass", "carry", "shot"):
-            r["on_ball"] += 1
-    total_on_ball = rows["home"]["on_ball"] + rows["away"]["on_ball"]
+    total_complete = rows["home"]["complete"] + rows["away"]["complete"]
     hit = sorted({e.planted_beat_id for e in events if e.planted_beat_id})
     lines = [
         f"{brief.match_id}: {len(events)} events",
@@ -41,7 +39,9 @@ def summarize(brief: MatchBrief, events: list[Event]) -> str:
     ]
     lines.append(f"{'pass completion':14}{comp[0]:>7.0f}%{comp[1]:>7.0f}%")
     lines.append(f"{'xG':14}{rows['home']['xg']:>8.2f}{rows['away']['xg']:>8.2f}")
-    share = [100 * rows[s]["on_ball"] / max(total_on_ball, 1) for s in ("home", "away")]
+    share = [
+        100 * rows[s]["complete"] / max(total_complete, 1) for s in ("home", "away")
+    ]
     lines.append(f"{'possession':14}{share[0]:>7.0f}%{share[1]:>7.0f}%")
     lines.append(
         f"final score: {int(rows['home']['goals'])}-{int(rows['away']['goals'])}"

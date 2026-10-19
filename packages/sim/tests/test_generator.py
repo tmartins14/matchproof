@@ -377,3 +377,23 @@ def test_generation_is_fast() -> None:
     start = time.perf_counter()
     generate(brief)
     assert time.perf_counter() - start < 2.0
+
+
+def test_summary_possession_is_completed_pass_share() -> None:
+    from sim.__main__ import summarize
+
+    brief = make_brief(seed=1)
+    ev = generate(brief)
+    done = {
+        s: sum(
+            1
+            for e in ev
+            if sv(e) == s
+            and e.type.value == "pass"
+            and e.outcome is not None
+            and e.outcome.value == "complete"
+        )
+        for s in ("home", "away")
+    }
+    expected = round(100 * done["home"] / (done["home"] + done["away"]))
+    assert f"possession{expected:>11}%" in summarize(brief, ev)

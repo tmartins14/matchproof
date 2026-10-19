@@ -3,6 +3,11 @@
 v1 simplification: only planted beats score. Organic shots that would score are recorded as
 saved, wide, blocked or post, so the final score always matches the storyline.
 
+Demonstration setting: goal-scoring propensity is deliberately high. Organic shot volume and xG run
+at about 2.6 xG per match on average (up to about 4), above the roughly 1.3 to 1.5 per team seen in
+real play, so that matches produce enough goals to narrate. Open task: bring this down (see
+docs/PLAN.md risks) once calibration targets are in.
+
 Internally each team reasons in its own attacking frame (u, v): u is metres toward the goal it
 attacks, v is the lateral coordinate. Events are stored in absolute coordinates (ADR 0007): the home
 side's frame is the absolute one, the away side's mirrors x to 120 - u and keeps y.
@@ -130,7 +135,7 @@ CLEAR_LOSS = 0.5  # chance the opponent regains a clearance
 UNDER_PRESSURE_MAX = 3  # most defenders committed to one pressure event
 
 # ---- Shooting ---------------------------------------------------------------------------------
-SHOT_W = 0.38  # weight of shooting at the goal line, falls with distance
+SHOT_W = 0.38  # weight of shooting at the goal line; raised on purpose for demonstration (see module docstring)
 SHOT_DECAY = 15.0  # distance scale of the shot weight
 SHOT_RANGE = 32.0  # no organic shot from further out than this
 GOAL_WIDTH = 8.0  # goal width in pitch units

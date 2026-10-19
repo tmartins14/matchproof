@@ -1,0 +1,207 @@
+# Narrator few-shot examples. Each line is adapted from the structure of a real source
+# (sentence shape, length, what it leads with), rewritten with fictional clubs and players.
+# No source text is copied. source_ref points to the source list kept outside the repo
+# (Football Analytics project doc "matchproof-voice-sources.md").
+#
+# Fields: id, beat_kind (beat schema enum), mode (fan | analyst | producer), lang,
+# facts (id + display text), line (<= 30 words; every digit must appear in a fact display),
+# amended_from / reason (AMENDED examples only), source (original | adapted), source_ref.
+
+# ---------- fan ----------
+- id: ex-01
+  beat_kind: counter_goal
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0101, display: "8 Rivermouth players ahead of the ball" }
+    - { id: fx-0102, display: "3 v 1" }
+    - { id: fx-0103, display: "11 seconds" }
+  line: "Rivermouth have 8 players ahead of the ball and Ashford break 3 v 1. Quain finishes it, 11 seconds after the interception."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S01
+
+- id: ex-02
+  beat_kind: territorial_spell
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0201, display: "71% territory, last 10 minutes" }
+    - { id: fx-0202, display: "0 shots, last 10 minutes" }
+  line: "Rivermouth have camped in Ashford's half for 71% of the last 10 minutes, and have 0 shots to show for it."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S02
+
+- id: ex-03
+  beat_kind: momentum_swing
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0301, display: "64% possession since the goal" }
+  line: "Ashford are running the clock with the ball. 64% possession since they scored."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S03
+
+- id: ex-04
+  beat_kind: big_chance
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0401, display: "drew 2 defenders" }
+    - { id: fx-0402, display: "0.41 xG" }
+  line: "Rivermouth's best chance yet. Okoro draws 2 and slips Varga in, the cut-back finds Haldane, and he puts it over. 0.41 xG."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S04
+
+- id: ex-05
+  beat_kind: card
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0501, display: "second yellow" }
+    - { id: fx-0502, display: "10 players" }
+  line: "Dunmore goes, a second yellow. Ashford are down to 10."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S05
+
+- id: ex-06
+  beat_kind: momentum_swing
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0601, display: "68% possession since half-time" }
+    - { id: fx-0602, display: "4 touches in Rivermouth's half since half-time" }
+  line: "Rivermouth have had 68% of the ball since half-time. Ashford have had 4 touches in the Rivermouth half in that time."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S06
+
+- id: ex-07
+  beat_kind: set_piece_goal
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0701, display: "corner" }
+    - { id: fx-0702, display: "nearest defender 2 m at contact" }
+  line: "Rivermouth level from a corner. Byrne has 2 m of space at the near post and glances it in."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S07
+
+- id: ex-08
+  beat_kind: high_turnover_chance
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-0801, display: "ball won 31 m from goal" }
+  line: "Kemp robs Asante 31 m from goal and Rivermouth are in. Varga's shot is blocked on the line."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S08
+
+# ---------- analyst ----------
+- id: ex-09
+  beat_kind: momentum_swing
+  mode: analyst
+  lang: en
+  facts:
+    - { id: fx-0901, display: "back line 34 m from goal line before the red card" }
+    - { id: fx-0902, display: "back line 26 m since" }
+    - { id: fx-0903, display: "8 m" }
+  line: "Since the red card, Ashford's back line sits 26 m from their goal line, down from 34 m. 8 m less space in behind."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S10
+
+- id: ex-10
+  beat_kind: momentum_swing
+  mode: analyst
+  lang: en
+  facts:
+    - { id: fx-1001, display: "outfield area 540 m² since the red card" }
+    - { id: fx-1002, display: "820 m² before" }
+    - { id: fx-1003, display: "3 passes through the lines since the red card" }
+  line: "Ashford defend in 540 m² since the red card, from 820 m² before. Rivermouth have played 3 passes through them since."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S11
+
+- id: ex-11
+  beat_kind: high_turnover_chance
+  mode: analyst
+  lang: en
+  facts:
+    - { id: fx-1101, display: "pressed 41% of Ashford build-ups since half-time" }
+    - { id: fx-1102, display: "18% before half-time" }
+    - { id: fx-1103, display: "6 turnovers in Ashford's third" }
+  line: "Rivermouth have pressed 41% of Ashford's build-ups since half-time, up from 18%. 6 turnovers in Ashford's third so far."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S11
+
+# ---------- producer ----------
+- id: ex-12
+  beat_kind: counter_goal
+  mode: producer
+  lang: en
+  facts:
+    - { id: fx-1201, display: "40:12" }
+    - { id: fx-1202, display: "40:23" }
+  line: "Clip 40:12 to 40:23, counter goal. Wide on the interception, follow the run, freeze at the finish. Into the half-time package."
+  amended_from: null
+  reason: null
+  source: adapted
+  source_ref: S12
+
+# ---------- AMENDED pairs ----------
+- id: ex-13
+  beat_kind: momentum_swing
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-1301, display: "back line 8 m deeper since the red card" }
+  line: "Ashford are defending 8 m deeper than before the red card."
+  amended_from: "Ashford look tired and are dropping deeper."
+  reason: "No fact supports 'tired'. The drop is measured from the red card."
+  source: adapted
+  source_ref: S08
+
+- id: ex-14
+  beat_kind: momentum_swing
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-1401, display: "68% possession since half-time" }
+  line: "Rivermouth have had 68% of the ball since half-time."
+  amended_from: "Ashford look rattled as Rivermouth take control."
+  reason: "'Rattled' and 'take control' aren't measured. Possession is."
+  source: adapted
+  source_ref: S09
+
+- id: ex-15
+  beat_kind: open_play_goal
+  mode: fan
+  lang: en
+  facts:
+    - { id: fx-1501, display: "shot by Varga, on target" }
+    - { id: fx-1502, display: "deflected off Asante" }
+  line: "Varga's shot, deflected in off Asante, puts Rivermouth ahead."
+  amended_from: "Asante's own goal puts Rivermouth ahead."
+  reason: "The shot was on target before the deflection, so the goal is Varga's."
+  source: adapted
+  source_ref: S13

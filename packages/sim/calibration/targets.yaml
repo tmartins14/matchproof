@@ -1,0 +1,16 @@
+# Calibration bands for the generator. All provisional: none has a cited source yet.
+# per: team (one value per team per match) or match (one value per match).
+# unit: count, ratio (0 to 1), m, or xg.
+
+- { id: passes, per: team, band: [380, 650], unit: count, source: TBD, status: provisional }
+- { id: pass_completion, per: team, band: [0.74, 0.89], unit: ratio, source: TBD, status: provisional }
+- { id: mean_pass_length, per: team, band: [16, 23], unit: m, source: TBD, status: provisional }
+- { id: progressive_pass_share, per: team, band: [0.07, 0.16], unit: ratio, source: TBD, status: provisional }
+- { id: shots, per: team, band: [7, 20], unit: count, source: TBD, status: provisional }
+- { id: xg_per_team, per: team, band: [0.4, 2.8], unit: xg, source: TBD, status: provisional }
+- { id: xg_per_match, per: match, band: [1.5, 3.8], unit: xg, source: TBD, status: provisional }
+- { id: xg_per_shot, per: team, band: [0.07, 0.16], unit: xg, source: TBD, status: provisional }
+- { id: possession_share, per: team, band: [0.35, 0.65], unit: ratio, source: TBD, status: provisional }  # default tactics, both teams equal; share of completed passes
+- { id: fouls, per: team, band: [6, 16], unit: count, source: TBD, status: provisional }
+- { id: yellow_cards, per: team, band: [0, 5], unit: count, source: TBD, status: provisional }
+- { id: corners, per: team, band: [2, 10], unit: count, source: TBD, status: provisional }

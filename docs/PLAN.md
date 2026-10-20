@@ -235,7 +235,6 @@ If a gate slips, cut from the top of this list down. Never cut the evidence rail
 | Chart components built from scratch take longer than planned | Medium | Replay desk slips into Saturday | Build only four primitives (pitch, marker, line, strip); review them on the fixture page Tuesday before any wiring |
 | StatsBomb terms forbid deriving calibration targets | Low | Weaker calibration story | Ship only aggregate ranges with attribution; fallback to published public ranges |
 | Foundry model quota or region gap | Low (was Medium) | Judge stays on gpt-5-mini | Claude quota approved Oct 19 (80K TPM shared); smoke-test `checker-judge` before Thursday; gpt-5-mini judge remains the fallback |
-| Generator scores more than real football (about 2.6 xG per match, up to 4, against 1.3 to 1.5 per team); raised on purpose for demonstration | High | Calibration story and realism | Open task: lower `SHOT_W` and the shot mix once calibration targets exist (Tuesday); keep the call-out in the PR and the engine docstring |
 | Output reads as AI-generated | High | Presentation and trust scores drop | VOICE.md, banned-pattern lint in CI and evals, sourced few-shot examples, no AI-coded UI |
 | Crowded verification field | High | Entry blends in | Lead with the controllable match and positional claims; video opens on an OVERTURNED claim |
 | Agent Framework learning curve | Medium | Thursday slips | Timebox 2 hours; fallback to the Foundry Agent Service SDK with the same roles |

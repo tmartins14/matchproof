@@ -2,7 +2,7 @@
 name = "matchproof-sim"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["matchproof-contracts"]
+dependencies = ["matchproof-contracts", "pyyaml"]
 
 [build-system]
 requires = ["hatchling"]

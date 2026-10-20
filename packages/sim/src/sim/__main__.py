@@ -8,6 +8,15 @@ from contracts.models import Event, MatchBrief
 
 from . import generate
 from .brief import DEFAULT_AWAY, DEFAULT_HOME, STORYLINES, TeamTactics, make_brief
+from .calibrate import (
+    collect,
+    evaluate,
+    format_table,
+    load_targets,
+    parse_seeds,
+    report_json,
+)
+from .positions import run
 from .tactics import FORMATIONS
 
 
@@ -53,6 +62,10 @@ def summarize(brief: MatchBrief, events: list[Event]) -> str:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="sim")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    c = sub.add_parser("calibrate")
+    c.add_argument("--seeds", default="1-8")
+    c.add_argument("--out", type=Path)
+    c.add_argument("--git-sha", default="unknown")
     g = sub.add_parser("generate")
     g.add_argument("--story", required=True, choices=sorted(STORYLINES))
     g.add_argument("--seed", type=int, default=0)
@@ -62,6 +75,14 @@ def main(argv: list[str] | None = None) -> int:
         for dial in ("press", "directness", "line-height"):
             g.add_argument(f"--{side}-{dial}", type=float)
     a = ap.parse_args(argv)
+    if a.cmd == "calibrate":
+        seeds = parse_seeds(a.seeds)
+        rows = evaluate(collect(seeds), load_targets())
+        print(format_table(rows))
+        if a.out:
+            a.out.parent.mkdir(parents=True, exist_ok=True)
+            a.out.write_text(report_json(rows, seeds, a.git_sha), encoding="utf-8")
+        return 0 if all(r.ok for r in rows) else 1
 
     def tactics(base: TeamTactics, side: str) -> TeamTactics:
         def pick(name: str, current: object) -> object:
@@ -90,8 +111,33 @@ def main(argv: list[str] | None = None) -> int:
         brief.model_dump_json(by_alias=True, exclude_none=True, indent=2),
         encoding="utf-8",
     )
+    frames_path = out.with_name(f"{brief.match_id}.frames.jsonl")
+    freeze_path = out.with_name(f"{brief.match_id}.freeze.jsonl")
+    n_frames = n_freeze = 0
+    with (
+        frames_path.open("w", encoding="utf-8") as ff,
+        freeze_path.open("w", encoding="utf-8") as fz,
+    ):
+        for kind, _, frame in run(brief, events):
+            if frame is None:
+                continue
+            line = frame.model_dump_json(by_alias=True, exclude_none=True) + "\n"
+            if kind == "frame":
+                ff.write(line)
+                n_frames += 1
+            else:
+                fz.write(line)
+                n_freeze += 1
     print(summarize(brief, events))
+    print(
+        f"files: events {_mb(out)}, frames {_mb(frames_path)} ({n_frames} at 5 Hz), "
+        f"freeze frames {_mb(freeze_path)} ({n_freeze})"
+    )
     return 0
+
+
+def _mb(path: Path) -> str:
+    return f"{path.stat().st_size / 1_000_000:.1f} MB"
 
 
 if __name__ == "__main__":

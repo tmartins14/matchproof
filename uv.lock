@@ -1444,10 +1444,14 @@ version = "0.1.0"
 source = { editable = "packages/sim" }
 dependencies = [
     { name = "matchproof-contracts" },
+    { name = "pyyaml" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "matchproof-contracts", editable = "packages/contracts" }]
+requires-dist = [
+    { name = "matchproof-contracts", editable = "packages/contracts" },
+    { name = "pyyaml" },
+]
 
 [[package]]
 name = "microsoft-opentelemetry"

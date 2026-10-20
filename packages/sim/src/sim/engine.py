@@ -3,10 +3,10 @@
 v1 simplification: only planted beats score. Organic shots that would score are recorded as
 saved, wide, blocked or post, so the final score always matches the storyline.
 
-Demonstration setting: goal-scoring propensity is deliberately high. Organic shot volume and xG run
-at about 2.6 xG per match on average (up to about 4), above the roughly 1.3 to 1.5 per team seen in
-real play, so that matches produce enough goals to narrate. Open task: bring this down (see
-docs/PLAN.md risks) once calibration targets are in.
+Calibration: organic counts (shots, fouls, corners, xG) are steered toward per-match targets by
+pacers, and the constants were tuned until the means across 32 runs sit inside the bands in
+packages/sim/calibration/targets.yaml (all provisional; see docs/compliance/DATA.md). Realism won
+over the earlier demonstration setting: planted beats still guarantee the storyline's goals.
 
 Internally each team reasons in its own attacking frame (u, v): u is metres toward the goal it
 attacks, v is the lateral coordinate. Events are stored in absolute coordinates (ADR 0007): the home
@@ -21,7 +21,8 @@ from typing import Any
 
 from contracts.models import Event, MatchBrief
 
-from .tactics import FORMATIONS, role_of
+from . import shape
+from .tactics import role_of
 
 Pt = tuple[float, float]
 
@@ -54,11 +55,8 @@ EVENT_DT: dict[str, tuple[float, float]] = {
 
 # ---- Team behaviour ---------------------------------------------------------------------------
 # Possession weight per storyline (home, away); smash_and_grab has Rivermouth dominating the ball.
-STORY_POSSESSION: dict[str, tuple[float, float]] = {"smash_and_grab": (1.4, 1.0)}
+STORY_POSSESSION: dict[str, tuple[float, float]] = {"smash_and_grab": (1.25, 1.0)}
 RED_CARD_WEIGHT = 0.8  # possession weight multiplier after a red card
-LINE_SHIFT = 14.0  # how far the whole outfield shape moves for line_height 0 -> 1
-BALL_PULL = 0.30  # how much a player's slot follows the ball along the pitch
-LATERAL_PULL = 0.25  # how much a player's slot follows the ball across the pitch
 ROLE_ACTOR_W: dict[str, float] = {
     "gk": 0.2,
     "def": 1.0,
@@ -71,14 +69,17 @@ ROLE_RECEIVE_W: dict[str, float] = {
     "mid": 1.3,
     "att": 1.0,
 }  # who receives a pass
-PICK_SCALE = 16.0  # distance scale for picking the player who wins a loose ball
+PICK_SCALE = 14.0  # distance scale for picking the player who acts near a spot; Gaussian, so far players rarely do
 
 # ---- Passing ----------------------------------------------------------------------------------
-PASS_LEN_PATIENT = 11.0  # preferred pass length at directness 0
-PASS_LEN_DIRECT = 27.0  # preferred pass length at directness 1
+PASS_LEN_PATIENT = 10.0  # preferred pass length at directness 0
+PASS_LEN_DIRECT = 22.0  # preferred pass length at directness 1
 PASS_SPREAD = 12.0  # how tightly recipients cluster around the preferred length
-FWD_BASE = 1.0  # forward preference at directness 0
-FWD_GAIN = 3.0  # extra forward preference per unit of directness
+FWD_BASE = -1.3  # forward preference at directness 0
+FWD_GAIN = 1.0  # extra forward preference per unit of directness
+PASS_COME_SHORT = (
+    0.45  # most a receiver closes the gap to the ball, as a share of the distance
+)
 MIN_PASS = 3.0  # shortest pass considered
 HIGH_BASE = 0.04  # share of passes that are high at directness 0 and short length
 HIGH_DIRECTNESS = 0.30  # extra high-pass share per unit of directness
@@ -89,7 +90,7 @@ DIFF_LENGTH = 0.0105  # difficulty per metre of pass length
 DIFF_PRESSURE = 0.16  # difficulty added when the passer is under pressure
 DIFF_HIGH = 0.08  # difficulty added to high passes
 COMPLETE_MAX = 0.985  # completion probability at zero difficulty
-COMPLETE_SLOPE = 0.45  # completion lost per unit of difficulty
+COMPLETE_SLOPE = 0.5  # completion lost per unit of difficulty
 COMPLETE_DIRECTNESS = 0.10  # completion lost per unit of directness above 0.5
 SPEED_RANGE: dict[str, tuple[float, float]] = {
     "ground": (8.0, 20.0),
@@ -106,7 +107,7 @@ OUT_SHARE = 0.18
 GOAL_LINE_U = 108.0  # an out-of-play pass ending beyond this u is a goal kick
 CARRY_W = 0.9  # weight of carrying the ball in the action choice
 PASS_W = 1.0  # weight of passing in the action choice
-CARRY_LEN = (4.0, 13.0)  # carry distance range
+CARRY_LEN = (3.0, 10.0)  # carry distance range
 
 # ---- Pressing and winning the ball ------------------------------------------------------------
 ENGAGE_DEEP = 35.0  # distance from own goal where a deep block starts to engage
@@ -135,25 +136,51 @@ CLEAR_LOSS = 0.5  # chance the opponent regains a clearance
 UNDER_PRESSURE_MAX = 3  # most defenders committed to one pressure event
 
 # ---- Shooting ---------------------------------------------------------------------------------
-SHOT_W = 0.38  # weight of shooting at the goal line; raised on purpose for demonstration (see module docstring)
-SHOT_DECAY = 15.0  # distance scale of the shot weight
-SHOT_RANGE = 32.0  # no organic shot from further out than this
+SHOT_W = 0.5  # weight of shooting at the goal line, before pacing
+SHOT_DECAY = 11.0  # distance scale of the shot weight
+SHOT_RANGE = 26.0  # no organic shot from further out than this
 GOAL_WIDTH = 8.0  # goal width in pitch units
-XG_B0 = -1.0  # logistic intercept for xG
-XG_DIST = -0.12  # logistic slope on distance
-XG_ANGLE = 1.4  # logistic slope on the angle the goal subtends
+XG_B0 = -1.4  # logistic intercept for xG
+XG_DIST = -0.07  # logistic slope on distance
+XG_ANGLE = 0.9  # logistic slope on the angle the goal subtends
 XG_HEADER = -0.9  # logistic offset for headers
+ORGANIC_XG_MAX = 0.3  # best chance an organic shot can be; bigger ones are planted
 XG_RANGE = (0.01, 0.9)  # xG clamp
 FOOT_SPEED = (18.0, 34.0)  # shot speed range, m/s
 HEADER_SPEED = (10.0, 20.0)  # header speed range, m/s
 # Organic outcome weights (saved, wide, blocked, post): a shot that "would score" vs one that would not.
 SCORING_OUTCOMES = (0.62, 0.05, 0.23, 0.10)
 MISSING_OUTCOMES = (0.22, 0.45, 0.30, 0.03)
-CORNER_AFTER_SAVE = 0.28  # chance a saved shot goes behind for a corner
-CORNER_AFTER_BLOCK = 0.35  # chance a blocked shot goes behind for a corner
+CORNER_AFTER_SAVE = 0.6  # chance a saved shot goes behind for a corner
+CORNER_AFTER_BLOCK = 0.7  # chance a blocked shot goes behind for a corner
 REBOUND_AFTER_POST = 0.5  # chance the attacking side keeps the ball after a post
-CORNER_SHOT_P = 0.30  # chance an organic corner produces a header
+CORNER_AFTER_DEFLECT = 0.8  # chance a pass that ends behind the goal line was last touched by a defender, giving a corner
+CORNER_AFTER_WIDE = 0.3  # chance a wide shot was deflected behind for a corner
+CORNER_AFTER_BOX_LOSS = (
+    0.3  # chance a pass lost in the box is deflected behind for a corner
+)
+CORNER_SHOT_P = 0.45  # chance an organic corner produces a header
 PENALTY_XG = 0.78  # xG of a penalty
+
+# ---- Pacing -----------------------------------------------------------------------------------
+# Counts such as shots and fouls are overdispersed when left to chance: one attacking streak can
+# double a team's shots. A pacer scales the chance of each by how far the team is ahead of or behind
+# a per-match target (organic events only; planted beats do not count), which keeps
+# seed-to-seed spread inside the calibration bands.
+MATCH_SECONDS_GUIDE = 5700.0  # expected match length, to turn the clock into a share
+SHOT_TARGET = 14.0  # organic shots per team per match the pacer steers toward
+FOUL_TARGET = 10.0  # organic fouls per team per match the pacer steers toward
+XG_TARGET = 1.25  # total xG per team per match; organic gets what planted beats leave
+XG_ORGANIC_MIN = 1.0  # least organic xG a team is steered toward
+PLANTED_XG_GUESS = 0.25  # typical xG of a planted goal, to budget organic xG
+PLANTED_XG_MIN = 0.1  # planted goals are real chances: xG is never lower than this
+PENALTY_EXTRA_SHOTS = 5.0  # extra organic shots targeted for a team with a penalty
+CORNER_TARGET = 5.0  # organic corners per team per match the pacer steers toward
+PACE_GAIN = 1.2  # how hard the pacer pushes back, per standard deviation off target
+XG_PACE_GAIN = 1.5  # pacer gain for xG
+XG_PACE_SCALE = 0.4  # xG shortfall or excess that counts as one deviation
+PACE_FLOOR = 3.0  # smallest expected count used to scale the shortfall
+PACE_RANGE = (0.15, 10.0)  # smallest and largest multiplier the pacer may apply
 
 # ---- Planted beats ----------------------------------------------------------------------------
 COUNTER_SECONDS = (8.0, 14.0)  # counter_goal: interception to shot
@@ -290,6 +317,29 @@ class _Engine:
         self.holder = 10
         self.pressured = False
         self.out: list[dict[str, Any]] = []
+        self.counts: dict[tuple[str, str], int] = {}
+        self.xg_total = {"home": 0.0, "away": 0.0}
+        self.shot_target = {
+            side: SHOT_TARGET
+            + sum(
+                PENALTY_EXTRA_SHOTS
+                for pb in brief.planted_beats
+                if pb.side.value == side and pb.kind.value == "penalty"
+            )
+            for side in ("home", "away")
+        }
+        self.xg_target = {
+            side: max(
+                XG_TARGET
+                - sum(
+                    PENALTY_XG if pb.kind.value == "penalty" else PLANTED_XG_GUESS
+                    for pb in brief.planted_beats
+                    if pb.side.value == side and pb.kind.value != "red_card"
+                ),
+                XG_ORGANIC_MIN,
+            )
+            for side in ("home", "away")
+        }
         self.p2_start = 0.0
 
     # ---- emission ----------------------------------------------------------------------------
@@ -311,6 +361,10 @@ class _Engine:
         lo, hi = EVENT_DT.get(type_, (0.0, 0.0))
         self.t += dt if dt is not None else self.rng.uniform(lo, hi)
         self.seq += 1
+        if beat is None and type_ in ("shot", "foul", "corner"):
+            self.counts[(side, type_)] = self.counts.get((side, type_), 0) + 1
+        if beat is None and type_ == "shot" and extra and "shot" in extra:
+            self.xg_total[side] += extra["shot"]["xg"]
         e: dict[str, Any] = {
             "id": f"ev-{self.seq:06d}",
             "match_id": self.brief.match_id,
@@ -337,6 +391,17 @@ class _Engine:
             e.update(extra)
         self.out.append(e)
 
+    def _pace(self, side: str, kind: str, target: float) -> float:
+        """Multiplier for the chance of an event, from how the team's count compares with its target."""
+        expected = target * min(self.t / MATCH_SECONDS_GUIDE, 1.0)
+        actual = (
+            self.xg_total[side] if kind == "xg" else self.counts.get((side, kind), 0)
+        )
+        spread = XG_PACE_SCALE if kind == "xg" else math.sqrt(max(expected, PACE_FLOOR))
+        behind = (expected - actual) / spread
+        gain = XG_PACE_GAIN if kind == "xg" else PACE_GAIN
+        return _clamp(math.exp(gain * behind), *PACE_RANGE)
+
     def _drain(self) -> Iterator[Event]:
         out, self.out = self.out, []
         for e in out:
@@ -353,17 +418,10 @@ class _Engine:
         self.pressured = False
 
     def _pos_rel(self, team: _Team, slot: int, ball_rel: Pt) -> Pt:
-        """Where a slot stands in its team's frame: anchor, line height and the ball's pull."""
-        ax, ay = FORMATIONS[team.formation][slot]
-        if slot == 0:
-            return (ax + 0.08 * (ball_rel[0] - 60.0), ay + 0.1 * (ball_rel[1] - ay))
-        u = (
-            ax
-            + (team.line_height - 0.5) * LINE_SHIFT
-            + BALL_PULL * (ball_rel[0] - 60.0)
+        """Where a slot stands in its team's frame, from the shared shape model."""
+        return shape.target(
+            team.formation, slot, team.line_height, ball_rel, team.side == self.poss
         )
-        v = ay + LATERAL_PULL * (ball_rel[1] - ay)
-        return (_clamp(u, 2.0, 118.0), _clamp(v, 2.0, 78.0))
 
     def _nearest(
         self,
@@ -379,7 +437,9 @@ class _Engine:
         ]
         w = [
             ROLE_ACTOR_W[team.role(s)]
-            * math.exp(-_dist(self._pos_rel(team, s, ball_rel), ball_rel) / PICK_SCALE)
+            * math.exp(
+                -((_dist(self._pos_rel(team, s, ball_rel), ball_rel) / PICK_SCALE) ** 2)
+            )
             for s in slots
         ]
         return self.rng.choices(slots, weights=w)[0]
@@ -441,7 +501,9 @@ class _Engine:
             return won
         r -= DUEL_P
         near_own_goal = to_rel(d.side, self.ball)[0] < BOX_ENGAGE_DEPTH
-        if r < FOUL_P * (FOUL_BOX_FACTOR if near_own_goal else 1.0):
+        if r < FOUL_P * self._pace(d.side, "foul", FOUL_TARGET) * (
+            FOUL_BOX_FACTOR if near_own_goal else 1.0
+        ):
             self._foul(p, d, slot)
             return True
         return False
@@ -501,7 +563,10 @@ class _Engine:
             self._pass(p, d)
             return
         w_shot = (
-            SHOT_W * math.exp(-dist_goal / SHOT_DECAY)
+            SHOT_W
+            * math.exp(-dist_goal / SHOT_DECAY)
+            * self._pace(p.side, "shot", self.shot_target[p.side])
+            * self._pace(p.side, "xg", self.xg_target[p.side])
             if dist_goal <= SHOT_RANGE
             else 0.0
         )
@@ -613,9 +678,17 @@ class _Engine:
 
     def _pass(self, p: _Team, d: _Team) -> None:
         slot, pos = self._choose_recipient(p)
+        ball_rel = to_rel(p.side, self.ball)
+        come = self.rng.uniform(
+            0.0, PASS_COME_SHORT
+        )  # the receiver comes toward the ball
         end_rel = (
-            _clamp(pos[0] + self.rng.gauss(0, 2.5), 1, 119),
-            _clamp(pos[1] + self.rng.gauss(0, 2.5), 1, 79),
+            _clamp(
+                pos[0] + come * (ball_rel[0] - pos[0]) + self.rng.gauss(0, 2.5), 1, 119
+            ),
+            _clamp(
+                pos[1] + come * (ball_rel[1] - pos[1]) + self.rng.gauss(0, 2.5), 1, 79
+            ),
         )
         end = to_abs(p.side, end_rel)
         fields, p_complete = self._pass_fields(p, self.ball, end, self.pressured)
@@ -637,6 +710,13 @@ class _Engine:
         self._lost_pass(p, d, end, slot)
 
     def _lost_pass(self, p: _Team, d: _Team, end: Pt, slot: int) -> None:
+        if to_rel(p.side, end)[
+            0
+        ] >= BOX_U and self.rng.random() < CORNER_AFTER_BOX_LOSS * self._pace(
+            p.side, "corner", CORNER_TARGET
+        ):
+            self._corner(p)
+            return
         r = self.rng.random()
         if r < INTERCEPT_SHARE:
             who = self._nearest(d, end, self._keeper_ok(d, end))
@@ -645,7 +725,12 @@ class _Engine:
             self._maybe_clear(d)
         elif r < INTERCEPT_SHARE + OUT_SHARE:
             if to_rel(p.side, end)[0] >= GOAL_LINE_U:
-                self._goal_kick(d)
+                if self.rng.random() < CORNER_AFTER_DEFLECT * self._pace(
+                    p.side, "corner", CORNER_TARGET
+                ):
+                    self._corner(p)
+                else:
+                    self._goal_kick(d)
             else:
                 edge = (end[0], 0.5 if end[1] < 40 else 79.5)
                 who = self._nearest(d, edge, ("def", "mid"))
@@ -675,7 +760,12 @@ class _Engine:
         xg: float | None = None,
         dt: float | None = None,
     ) -> None:
-        xg_val = xg if xg is not None else shot_xg(team.side, loc, header)
+        if xg is not None:
+            xg_val = xg
+        elif goal:
+            xg_val = max(shot_xg(team.side, loc, header), PLANTED_XG_MIN)
+        else:
+            xg_val = min(shot_xg(team.side, loc, header), ORGANIC_XG_MAX)
         lo, hi = HEADER_SPEED if header else FOOT_SPEED
         body = "head" if header else self.rng.choice(["right_foot", "left_foot"])
         opp = self.teams[_opp(team.side)]
@@ -710,14 +800,23 @@ class _Engine:
         if outcome == "goal":
             self._kick_off(opp)
         elif outcome == "saved":
-            if self.rng.random() < CORNER_AFTER_SAVE:
+            if self.rng.random() < CORNER_AFTER_SAVE * self._pace(
+                team.side, "corner", CORNER_TARGET
+            ):
                 self._corner(team)
             else:
                 self._give(opp.side, to_abs(opp.side, (8.0, 40.0)), 0)
         elif outcome == "wide":
-            self._goal_kick(opp)
+            if self.rng.random() < CORNER_AFTER_WIDE * self._pace(
+                team.side, "corner", CORNER_TARGET
+            ):
+                self._corner(team)
+            else:
+                self._goal_kick(opp)
         elif outcome == "blocked":
-            if self.rng.random() < CORNER_AFTER_BLOCK:
+            if self.rng.random() < CORNER_AFTER_BLOCK * self._pace(
+                team.side, "corner", CORNER_TARGET
+            ):
                 self._corner(team)
             else:
                 self._give(opp.side, loc, self._nearest(opp, loc))
@@ -799,7 +898,7 @@ class _Engine:
         )
         total = self.rng.uniform(*COUNTER_SECONDS)
         n_pass = self.rng.choice([1, 2])
-        shot_rel = (self.rng.uniform(100, 109), self.rng.uniform(28, 52))
+        shot_rel = (self.rng.uniform(106, 113), self.rng.uniform(32, 48))
         carry_end = (
             start_rel[0] + self.rng.uniform(14, 22),
             _clamp(start_rel[1] + self.rng.gauss(0, 4), 8, 72),
@@ -903,7 +1002,7 @@ class _Engine:
             "interception", s.side, winner, loc, dt=dts[0], outcome="won", beat=beat
         )
         end_rel = (
-            _clamp(loc_rel[0] + self.rng.uniform(2, 8), 90, 112),
+            _clamp(loc_rel[0] + self.rng.uniform(2, 8), 96, 113),
             self.rng.uniform(30, 50),
         )
         rec = self._nearest(s, to_abs(s.side, end_rel), ("att",), exclude=winner)
@@ -921,7 +1020,7 @@ class _Engine:
 
     def _seq_open_play_goal(self, s: _Team, beat: str) -> None:
         n = self.rng.randint(3, 6)
-        u0, uf = self.rng.uniform(38, 66), self.rng.uniform(98, 108)
+        u0, uf = self.rng.uniform(38, 66), self.rng.uniform(104, 112)
         pts: list[Pt] = [
             (
                 u0 + (uf - u0) * i / n,

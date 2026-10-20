@@ -32,4 +32,4 @@ Built for the Microsoft × Premier League *Inside the Game* Developer Hackathon 
 
 ## Status
 
-Day 3 of 10 (Oct 19). The walking skeleton is deployed on Azure: a Container App calls a Foundry model with managed identity (M1). Positioning revised after reviewing the field; the voice guide and voice lint are in (`docs/VOICE.md`, `voice/banned.yaml`, enforced in `make lint`); the match generator v1 produces a seeded, full match of events with the brief's planted beats (`python -m sim generate`); positions and calibration are next. See `PROGRESS.md`.
+Day 3 of 10 (Oct 19). The walking skeleton is deployed on Azure: a Container App calls a Foundry model with managed identity (M1). Positioning revised after reviewing the field; the voice guide and voice lint are in (`docs/VOICE.md`, `voice/banned.yaml`, enforced in `make lint`); the match generator v1 produces a seeded, full match of events with the brief's planted beats (`python -m sim generate`); calibrated against provisional bands (`make calibrate`), with 22-player positions at 5 Hz and a freeze frame per event; extractors are next. See `PROGRESS.md`.

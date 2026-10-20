@@ -40,3 +40,4 @@ exclude = ["packages/contracts/src/contracts/models\\.py$"]
 [tool.pytest.ini_options]
 testpaths = ["packages", "services", "tests"]
 addopts = "--import-mode=importlib"
+markers = ["slow: long-running calibration runs, excluded from make test, run by make calibrate"]

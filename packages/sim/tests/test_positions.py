@@ -9,7 +9,7 @@ from collections.abc import Iterator
 from dataclasses import replace
 from functools import cache
 from pathlib import Path
-from statistics import mean
+from statistics import mean, median, pstdev
 from typing import Any
 
 import pytest
@@ -19,7 +19,7 @@ from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 from sim import generate, iter_events
 from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, make_brief
-from sim.geometry import hull_area
+from sim.geometry import back_line_height, hull_area
 from sim.positions import (
     FRAME_DT,
     MAX_SPEED_V1,
@@ -235,6 +235,74 @@ def back_line(frames: list[Lite]) -> float:
         min(x for pid, side, x, _, _ in rows(f) if side == "home" and pid != "home-01")
         for f in frames[::25]
     )
+
+
+def ten_man_windows(seed: int) -> tuple[float, float, float, float]:
+    """Median out-of-possession back line and hull area of the sent-off team: 15 min before the card, 30 min after."""
+    m = match("red_card_flip", seed)
+    card = next(
+        e
+        for e in m.events
+        if e.type.value == "card" and e.outcome is not None and e.outcome.value == "red"
+    )
+    side = card.side.value
+    before: list[tuple[float, float]] = []
+    after: list[tuple[float, float]] = []
+    for f in m.frames[::5]:
+        if f[1] in ("", side):
+            continue
+        pts = [
+            (x, y)
+            for pid, s, x, y, _ in rows(f)
+            if s == side and not pid.endswith("-01")
+        ]
+        window = (
+            before
+            if card.t.root - 900 <= f[0] < card.t.root
+            else after
+            if card.t.root < f[0] <= card.t.root + 1800
+            else None
+        )
+        if window is not None:
+            window.append((back_line_height(pts, side), hull_area(pts)))
+    return (
+        median(b for b, _ in before),
+        median(b for b, _ in after),
+        median(a for _, a in before),
+        median(a for _, a in after),
+    )
+
+
+@pytest.mark.parametrize("seed", [1, 2, 3, 4])
+def test_ten_man_team_drops_and_compresses_after_the_red_card(seed: int) -> None:
+    back_before, back_after, area_before, area_after = ten_man_windows(seed)
+    assert back_before - back_after >= 5.0
+    assert area_after <= 0.85 * area_before
+
+
+def test_out_of_possession_block_varies_frame_to_frame(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    lengths: list[float] = []
+    areas: list[float] = []
+    for story, seed in (("red_card_flip", 3), ("late_comeback", 3)):
+        for f in match(story, seed).frames[::5]:
+            for side in ("home", "away"):
+                if f[1] in ("", side):
+                    continue
+                pts = [
+                    (x, y)
+                    for pid, s, x, y, _ in rows(f)
+                    if s == side and not pid.endswith("-01")
+                ]
+                lengths.append(max(x for x, _ in pts) - min(x for x, _ in pts))
+                areas.append(hull_area(pts))
+    with capsys.disabled():
+        print(
+            f"\nframe-level std over {len(areas)} out-of-possession frames: "
+            f"length {pstdev(lengths):.2f} m, area {pstdev(areas):.0f} m2"
+        )
+    assert pstdev(lengths) > 1.0 and pstdev(areas) > 50.0
 
 
 def test_line_height_moves_the_back_line() -> None:

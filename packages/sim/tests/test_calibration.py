@@ -1,4 +1,5 @@
 from functools import cache
+from statistics import pstdev
 
 import pytest
 from sim.calibrate import (
@@ -8,6 +9,7 @@ from sim.calibrate import (
     format_table,
     load_targets,
     parse_seeds,
+    run_limits,
 )
 
 TARGETS = load_targets()
@@ -54,6 +56,33 @@ def test_parse_seeds() -> None:
 
 def test_calibration_seeds_1_to_4() -> None:
     check([1, 2, 3, 4])
+
+
+def test_every_single_run_in_seeds_1_to_4_is_inside_its_limits() -> None:
+    v = values((1, 2, 3, 4))
+    for t in TARGETS:
+        lo, hi = run_limits(t)
+        bad = [x for x in v[t.id] if not lo <= x <= hi]
+        assert not bad, f"{t.id}: runs {bad} outside {lo:g} to {hi:g}"
+
+
+def test_only_xg_per_shot_has_a_match_band() -> None:
+    assert {t.id: t.match_band for t in TARGETS if t.match_band} == {
+        "xg_per_shot": (0.04, 0.25)
+    }
+    assert next(t for t in TARGETS if t.id == "xg_per_shot").band == (0.08, 0.15)
+
+
+def test_out_of_possession_area_varies_across_runs(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Run medians of team length are all within float noise of each other (the block only changes shape
+    on a red card, a late score or a press dial), so the frame-level check lives in test_positions."""
+    v = values((1, 2, 3, 4))
+    spread = {k: pstdev(v[k]) for k in ("team_length_out", "compactness_out")}
+    with capsys.disabled():
+        print(f"\nrun-median std over {len(v['team_length_out'])} runs: {spread}")
+    assert spread["compactness_out"] > 0.1
 
 
 def test_shape_rules_seeds_1_to_4() -> None:

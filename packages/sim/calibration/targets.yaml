@@ -4,6 +4,10 @@
 # unit: count, ratio (0 to 1), m, m2 or xg.
 # status: sourced (taken from the source), derived (computed from sourced figures) or provisional (no external figure).
 # reference_mean: where set, the mean across runs must be within 12% of it.
+# band: applies to the mean across runs, as the sourced season figures do.
+# match_band (optional): the range any single run must sit inside, because single matches vary more than season
+#   averages. match_band_status says how well founded it is. Without a match_band, no run may be outside band by
+#   more than 15% of the band width.
 
 - id: passes
   per: team
@@ -56,12 +60,14 @@
   source: "Twice the team mean above."
 - id: xg_per_shot
   per: team
-  band: [0.08, 0.17]
+  band: [0.08, 0.15]
+  match_band: [0.04, 0.25]
+  match_band_status: provisional
   unit: xg
   reference_mean: 0.117
   status: derived
   source: "1.47 xG / 12.5 shots per team per match, same season."
-  note: upper bound widened from 0.15 to 0.17 (Oct 19) because planted penalties and goals on about 10 shots put end_to_end runs at 0.15 to 0.19 whatever the organic tuning
+  note: "match_band: single matches vary more than season averages. In end_to_end the away side has 3 planted shots (counter goal, open-play goal, penalty at 0.78) carrying 1.1 to 1.2 xG on 12 to 15 shots, so runs above 0.17 are realistic (a real 3-3 with a penalty often is). Organic shots alone average 0.099 and never exceed 0.152."
 - id: possession_share
   per: team
   band: [0.35, 0.65]

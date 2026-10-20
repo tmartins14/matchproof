@@ -15,7 +15,7 @@ from .brief import STORYLINES, make_brief
 from .positions import iter_frames
 
 TARGETS_PATH = Path(__file__).resolve().parents[2] / "calibration" / "targets.yaml"
-# A single run may sit outside the band by at most this share of the band width.
+# Without a match band, a single run may sit outside the band by at most this share of the band width.
 RUN_TOLERANCE = 0.15
 # Where a reference mean is set, the mean across runs must be within this share of it.
 MEAN_TOLERANCE = 0.12
@@ -38,6 +38,7 @@ class Target:
     status: str
     reference_mean: float | None = None
     note: str = ""
+    match_band: tuple[float, float] | None = None
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,9 @@ def load_targets(path: Path | None = None) -> list[Target]:
             r["status"],
             None if r.get("reference_mean") is None else float(r["reference_mean"]),
             r.get("note", ""),
+            None
+            if r.get("match_band") is None
+            else (float(r["match_band"][0]), float(r["match_band"][1])),
         )
         for r in raw
     ]
@@ -200,14 +204,22 @@ def collect(seeds: list[int]) -> dict[str, list[float]]:
     return values
 
 
+def run_limits(t: Target) -> tuple[float, float]:
+    """Where a single run may sit: the match band if there is one, else the band plus 15% of its width."""
+    if t.match_band is not None:
+        return t.match_band
+    slack = RUN_TOLERANCE * (t.band[1] - t.band[0])
+    return (t.band[0] - slack, t.band[1] + slack)
+
+
 def evaluate(values: dict[str, list[float]], targets: list[Target]) -> list[Row]:
     rows: list[Row] = []
     for t in targets:
         vs = values[t.id]
         lo, hi = t.band
-        slack = RUN_TOLERANCE * (hi - lo)
+        run_lo, run_hi = run_limits(t)
         m = mean(vs)
-        ok = lo <= m <= hi and min(vs) >= lo - slack and max(vs) <= hi + slack
+        ok = lo <= m <= hi and min(vs) >= run_lo and max(vs) <= run_hi
         if t.reference_mean is not None:
             ok = ok and abs(m - t.reference_mean) <= MEAN_TOLERANCE * abs(
                 t.reference_mean
@@ -241,6 +253,9 @@ def report_json(rows: list[Row], seeds: list[int], git_sha: str) -> str:
                     "per": r.target.per,
                     "unit": r.target.unit,
                     "band": list(r.target.band),
+                    "match_band": None
+                    if r.target.match_band is None
+                    else list(r.target.match_band),
                     "source": r.target.source,
                     "status": r.target.status,
                     "reference_mean": r.target.reference_mean,

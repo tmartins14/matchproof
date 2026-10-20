@@ -72,10 +72,10 @@ ROLE_RECEIVE_W: dict[str, float] = {
 PICK_SCALE = 14.0  # distance scale for picking the player who acts near a spot; Gaussian, so far players rarely do
 
 # ---- Passing ----------------------------------------------------------------------------------
-PASS_LEN_PATIENT = 14.0  # preferred pass length at directness 0
+PASS_LEN_PATIENT = 13.0  # preferred pass length at directness 0
 PASS_LEN_DIRECT = 27.0  # preferred pass length at directness 1
 PASS_SPREAD = 12.0  # how tightly recipients cluster around the preferred length
-FWD_BASE = -1.92  # forward preference at directness 0
+FWD_BASE = -1.98  # forward preference at directness 0
 FWD_GAIN = 1.0  # extra forward preference per unit of directness
 PASS_COME_SHORT = (
     0.45  # most a receiver closes the gap to the ball, as a share of the distance
@@ -127,7 +127,7 @@ FOUL_P = 0.07  # chance a pressure event becomes a foul
 FOUL_BOX_FACTOR = (
     0.3  # fouls near own goal are rarer (v1 awards a free kick, no organic penalties)
 )
-YELLOW_P = 0.203  # chance a foul earns a yellow
+YELLOW_P = 0.186  # chance a foul earns a yellow
 FREE_KICK_SHOT_P = 0.3  # chance a free kick inside shooting range is a shot
 FREE_KICK_RANGE = 30.0  # distance to goal inside which a free kick can be a shot
 CLEAR_DEPTH = 18.0  # a team winning the ball this close to its own goal may clear it
@@ -136,11 +136,11 @@ CLEAR_LOSS = 0.5  # chance the opponent regains a clearance
 UNDER_PRESSURE_MAX = 3  # most defenders committed to one pressure event
 
 # ---- Shooting ---------------------------------------------------------------------------------
-SHOT_W = 0.87  # weight of shooting at the goal line, before pacing
+SHOT_W = 1.08  # weight of shooting at the goal line, before pacing
 SHOT_DECAY = 11.0  # distance scale of the shot weight
 SHOT_RANGE = 26.0  # no organic shot from further out than this
 GOAL_WIDTH = 8.0  # goal width in pitch units
-XG_B0 = -1.25  # logistic intercept for xG
+XG_B0 = -1.2  # logistic intercept for xG
 XG_DIST = -0.07  # logistic slope on distance
 XG_ANGLE = 0.9  # logistic slope on the angle the goal subtends
 XG_HEADER = -0.9  # logistic offset for headers
@@ -168,7 +168,7 @@ PENALTY_XG = 0.78  # xG of a penalty
 # a per-match target (organic events only; planted beats do not count), which keeps
 # seed-to-seed spread inside the calibration bands.
 MATCH_SECONDS_GUIDE = 5700.0  # expected match length, to turn the clock into a share
-SHOT_TARGET = 16.0  # organic shots per team per match the pacer steers toward
+SHOT_TARGET = 15.0  # organic shots per team per match the pacer steers toward
 FOUL_TARGET = 10.0  # organic fouls per team per match the pacer steers toward
 XG_TARGET = 1.61  # total xG per team per match; organic gets what planted beats leave
 XG_ORGANIC_MIN = 1.0  # least organic xG a team is steered toward
@@ -341,6 +341,7 @@ class _Engine:
             for side in ("home", "away")
         }
         self.p2_start = 0.0
+        self.goals = {"home": 0, "away": 0}
 
     # ---- emission ----------------------------------------------------------------------------
     def _emit(
@@ -363,6 +364,8 @@ class _Engine:
         self.seq += 1
         if beat is None and type_ in ("shot", "foul", "corner"):
             self.counts[(side, type_)] = self.counts.get((side, type_), 0) + 1
+        if type_ == "shot" and outcome == "goal":
+            self.goals[side] += 1
         if beat is None and type_ == "shot" and extra and "shot" in extra:
             self.xg_total[side] += extra["shot"]["xg"]
         e: dict[str, Any] = {
@@ -417,10 +420,25 @@ class _Engine:
         self.holder = slot
         self.pressured = False
 
+    def _state(self, team: _Team) -> shape.GameState:
+        """The score, clock and red cards as the shape model sees them for this team."""
+        opp = self.teams[_opp(team.side)]
+        return shape.GameState(
+            clock_minute(self.period, self.t, self.p2_start),
+            self.goals[team.side] - self.goals[opp.side],
+            11 - len(team.active),
+        )
+
     def _pos_rel(self, team: _Team, slot: int, ball_rel: Pt) -> Pt:
         """Where a slot stands in its team's frame, from the shared shape model."""
         return shape.target(
-            team.formation, slot, team.line_height, ball_rel, team.side == self.poss
+            team.formation,
+            slot,
+            team.line_height,
+            ball_rel,
+            team.side == self.poss,
+            self._state(team),
+            team.press,
         )
 
     def _nearest(

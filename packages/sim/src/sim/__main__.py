@@ -16,6 +16,7 @@ from .calibrate import (
     parse_seeds,
     report_json,
 )
+from .positions import run
 from .tactics import FORMATIONS
 
 
@@ -110,8 +111,33 @@ def main(argv: list[str] | None = None) -> int:
         brief.model_dump_json(by_alias=True, exclude_none=True, indent=2),
         encoding="utf-8",
     )
+    frames_path = out.with_name(f"{brief.match_id}.frames.jsonl")
+    freeze_path = out.with_name(f"{brief.match_id}.freeze.jsonl")
+    n_frames = n_freeze = 0
+    with (
+        frames_path.open("w", encoding="utf-8") as ff,
+        freeze_path.open("w", encoding="utf-8") as fz,
+    ):
+        for kind, _, frame in run(brief, events):
+            if frame is None:
+                continue
+            line = frame.model_dump_json(by_alias=True, exclude_none=True) + "\n"
+            if kind == "frame":
+                ff.write(line)
+                n_frames += 1
+            else:
+                fz.write(line)
+                n_freeze += 1
     print(summarize(brief, events))
+    print(
+        f"files: events {_mb(out)}, frames {_mb(frames_path)} ({n_frames} at 5 Hz), "
+        f"freeze frames {_mb(freeze_path)} ({n_freeze})"
+    )
     return 0
+
+
+def _mb(path: Path) -> str:
+    return f"{path.stat().st_size / 1_000_000:.1f} MB"
 
 
 if __name__ == "__main__":

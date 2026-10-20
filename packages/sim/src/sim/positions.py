@@ -103,6 +103,9 @@ class FrameSimulator:
         self._period = 1
         self.reset_at: float | None = None
         self.conceding: str | None = None
+        self.sent_off: list[
+            _Player
+        ] = []  # leave the frames once time moves past their card
         self._reset_shape()
 
     # ---- shape ---------------------------------------------------------------------------------
@@ -150,6 +153,9 @@ class FrameSimulator:
         dt = to_t - self.t
         if dt <= 0:
             return
+        for p in self.sent_off:
+            p.active = False
+        self.sent_off.clear()
         self.t = to_t
         self.ball = self._ball_at(to_t)
         if self.reset_at is not None and to_t >= self.reset_at:
@@ -216,7 +222,7 @@ class FrameSimulator:
                 actor.x, actor.y = loc
                 actor.commit = None
             if kind == "card" and e.outcome is not None and e.outcome.value == "red":
-                actor.active = False
+                self.sent_off.append(actor)
         self.ball = loc
         nxt = upcoming[0] if upcoming else None
         gap = (nxt.t.root - e.t.root) if nxt is not None else 0.0

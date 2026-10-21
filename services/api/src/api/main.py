@@ -3,6 +3,7 @@ import gc
 import hashlib
 from collections import Counter, OrderedDict
 from collections.abc import AsyncGenerator, AsyncIterator, Callable
+from contextlib import asynccontextmanager
 from functools import lru_cache
 from importlib.metadata import version
 from typing import Annotated, Any
@@ -10,7 +11,7 @@ from typing import Annotated, Any
 from agents.llm_client import LlmClient, LlmError, from_env
 from contracts.models import Fact, MatchBrief, StreamMessage
 from fastapi import Body, FastAPI, Header, HTTPException, Query, Request
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 from intel.beats import detect_all
 from intel.engine import extract_all
 from intel.registry import FactRegistry
@@ -20,9 +21,11 @@ from sim import generate
 from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, STORYLINES, make_brief
 from sim.positions import iter_frames, iter_freeze_frames
 from starlette.background import BackgroundTask
+from starlette.routing import Route
 
 from api.live import (
     HEARTBEAT_S,
+    MAX_LIVE_STREAMS,
     SPEED_FAST,
     SPEEDS,
     Pacer,
@@ -30,10 +33,14 @@ from api.live import (
     roster_of,
     run_live,
 )
+from api.matchdata import PublicMcp, store
 from api.telemetry import configure_telemetry
 
 MODEL_CHECK_PROMPT = "Reply with the single word: ready"
 MODEL_CHECK_TIMEOUT_S = 15.0
+RETRY_AFTER_S = (
+    30  # what a client is told to wait when the replica is at MAX_LIVE_STREAMS
+)
 MAX_STREAMS_PER_CLIENT = 2  # concurrent streams one client address may hold open
 MAX_BRIEFS = 200  # briefs kept in memory; the oldest goes first
 MAX_CACHED_REGISTRIES = 4  # full fact registries kept for fact lookups
@@ -43,7 +50,18 @@ HEARTBEAT_LINE = (
 
 configure_telemetry()
 
-app = FastAPI(title="Matchproof API")
+public_mcp = PublicMcp()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    server = public_mcp.start(store)
+    async with server.session_manager.run():
+        yield
+
+
+app = FastAPI(title="Matchproof API", lifespan=lifespan)
+app.router.routes.append(Route("/mcp", endpoint=public_mcp))
 FastAPIInstrumentor.instrument_app(app)
 
 
@@ -187,7 +205,7 @@ async def stream_match(
     match_id: str,
     speed: Annotated[int, Query()] = SPEED_FAST,
     last_event_id: Annotated[str | None, Header()] = None,
-) -> StreamingResponse:
+) -> Response:
     brief = brief_of(match_id)
     if speed not in SPEEDS:
         raise HTTPException(
@@ -201,6 +219,12 @@ async def stream_match(
             raise HTTPException(
                 status_code=400, detail="Last-Event-ID must be a seq number"
             ) from exc
+    if sum(_streams.values()) >= MAX_LIVE_STREAMS:
+        return JSONResponse(
+            status_code=503,
+            content={"fallback": "cached"},
+            headers={"Retry-After": str(RETRY_AFTER_S)},
+        )
     client = request.client.host if request.client else "unknown"
     if _streams[client] >= MAX_STREAMS_PER_CLIENT:
         raise HTTPException(status_code=429, detail="too many open streams")
@@ -216,7 +240,7 @@ async def stream_match(
     async def body() -> AsyncIterator[str]:
         try:
             async for chunk in sse_with_heartbeat(
-                run_live(brief, speed, pacer=make_pacer(), after_seq=after)
+                run_live(brief, speed, pacer=make_pacer(), after_seq=after, store=store)
             ):
                 yield chunk
         finally:

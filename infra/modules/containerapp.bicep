@@ -30,9 +30,13 @@ resource environment 'Microsoft.App/managedEnvironments@2025-07-01' = {
   }
 }
 
+// The app's public host name, which the MCP endpoint must accept (DNS-rebinding protection).
+var apiName = 'ca-api-${token}'
+var apiHost = '${apiName}.${environment.properties.defaultDomain}'
+
 // azd replaces the placeholder image on `azd deploy`; the azd-service-name tag is how it finds this app.
 resource api 'Microsoft.App/containerApps@2025-07-01' = {
-  name: 'ca-api-${token}'
+  name: apiName
   location: location
   tags: union(tags, { 'azd-service-name': 'api' })
   identity: {
@@ -60,8 +64,8 @@ resource api 'Microsoft.App/containerApps@2025-07-01' = {
           name: 'api'
           image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
           resources: {
-            cpu: json('0.5')
-            memory: '1Gi'
+            cpu: json('1')
+            memory: '2Gi'
           }
           env: [
             { name: 'AZURE_CLIENT_ID', value: identityClientId }
@@ -70,6 +74,7 @@ resource api 'Microsoft.App/containerApps@2025-07-01' = {
             { name: 'AZURE_STORAGE_ACCOUNT', value: storageAccountName }
             { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: appInsightsConnectionString }
             { name: 'OTEL_SERVICE_NAME', value: 'matchproof-api' }
+            { name: 'MCP_ALLOWED_HOSTS', value: apiHost }
           ]
         }
       ]

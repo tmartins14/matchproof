@@ -13,6 +13,10 @@ What is sent, and in what order, is decided by match time and the beats alone; o
 depends on a clock. The same brief and speed always give the same messages with the same seq, which
 is what lets a reconnect regenerate the match and carry on after Last-Event-ID.
 
+While it runs, the worker also writes what it has computed into a MatchStore (when given one), so
+agents can query a match mid-stream. It writes a batch only once the batch is within LOOKAHEAD_S of
+playback, so the store never holds more than the lookahead.
+
 Sent: every event, frames as above, window facts when their window closes, and each beat with the
 facts it cites just before it. The rest of the registry stays server-side, looked up by id.
 """
@@ -35,6 +39,7 @@ from contracts.models import (
 )
 from intel.beats import BeatDetector
 from intel.engine import FactEngine
+from mcp_match.store import MatchStore
 from sim import iter_events
 from sim.positions import run
 
@@ -42,6 +47,9 @@ SPEED_REAL_TIME = 1  # match minutes per real second: slowest
 SPEED_FAST = 3  # the default
 SPEED_FASTEST = 6  # fastest cruise
 SPEEDS = (SPEED_REAL_TIME, SPEED_FAST, SPEED_FASTEST)
+MAX_LIVE_STREAMS = (
+    3  # streams one replica runs at once; the API answers a further one with 503
+)
 WIRE_FPS = 10  # most frame messages per real second while cruising
 LOOKAHEAD_S = 120.0  # match seconds the pipeline runs ahead of playback
 FOCUS_BEFORE_S = 15.0  # a focus window opens this many match seconds before its anchor
@@ -125,9 +133,14 @@ class Entry:
     anchor_id: str | None = None  # freeze: the event the frame belongs to
 
 
-def pipeline(brief: MatchBrief) -> Iterator[list[Entry]]:
-    """The match through the engine and detector: the entries each generator item gives rise to."""
-    engine = FactEngine(roster_of(brief))
+def pipeline(
+    brief: MatchBrief, engine: FactEngine | None = None
+) -> Iterator[list[Entry]]:
+    """The match through the engine and detector: the entries each generator item gives rise to.
+
+    Pass `engine` to keep hold of its registry while the match runs.
+    """
+    engine = engine or FactEngine(roster_of(brief))
     detector = BeatDetector()
     sent: set[str] = set()
     clock = 0.0
@@ -229,21 +242,40 @@ def _post(
     return True
 
 
+def _publish(store: MatchStore, match_id: str, batch: list[Entry]) -> None:
+    """Make a batch visible to the agents' queries."""
+    for e in batch:
+        if e.kind == "event":
+            store.add_event(match_id, e.data)
+        elif e.kind == "freeze" and e.anchor_id is not None:
+            store.add_freeze_frame(match_id, e.anchor_id, e.data)
+        elif e.kind == "beat":
+            store.add_beat(match_id, e.data)
+
+
 def _produce(
     brief: MatchBrief,
     loop: asyncio.AbstractEventLoop,
     queue: "asyncio.Queue[Posted]",
     control: _Control,
+    store: MatchStore | None = None,
 ) -> None:
     """Thread body: feed the pipeline's entries to the player, never too far ahead of it."""
+    engine = FactEngine(roster_of(brief))
+    if store is not None:
+        store.begin(brief, engine.registry)
     try:
-        for batch in pipeline(brief):
+        for batch in pipeline(brief, engine):
             if not batch:
                 continue
             if not control.wait_until_allowed(batch[0].t):
                 return
+            if store is not None:
+                _publish(store, brief.match_id, batch)
             if not _post(loop, queue, batch):
                 return
+        if store is not None:
+            store.finish(brief.match_id)
     except Exception as exc:  # noqa: BLE001 - crosses the thread boundary; the player re-raises it
         _post(loop, queue, exc)
         return
@@ -415,12 +447,14 @@ async def run_live(
     *,
     pacer: Pacer | None = None,
     after_seq: int = -1,
+    store: MatchStore | None = None,
 ) -> AsyncGenerator[StreamMessage, None]:
     """The match as stream messages, each sent when its turn on the timeline comes.
 
     `after_seq` skips every message up to and including that seq without waiting; the clock then
     starts from the first message that is sent. Resume with the same `speed`: it decides which frames
-    are thinned, so it decides the numbering.
+    are thinned, so it decides the numbering. With a `store`, the match is registered in it and
+    filled in as the pipeline advances.
     """
     if speed not in SPEEDS:
         raise ValueError(f"speed must be one of {SPEEDS}, not {speed}")
@@ -429,7 +463,7 @@ async def run_live(
     control = _Control()
     worker = threading.Thread(
         target=_produce,
-        args=(brief, asyncio.get_running_loop(), queue, control),
+        args=(brief, asyncio.get_running_loop(), queue, control, store),
         name=f"pipeline-{brief.match_id}",
         daemon=True,
     )

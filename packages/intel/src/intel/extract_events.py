@@ -1,7 +1,7 @@
 """Event extractors: per-team counts and shares over a span, and per-event sequence, shot and card facts."""
 
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from contracts.models import Event, Fact
@@ -52,7 +52,13 @@ SEQUENCE_METRICS = (
     "sequence.start_clock",
     "sequence.shot_clock",
 )
-SHOT_METRICS = ("shot.xg", "shot.outcome", "shot.on_target", "shot.minute")
+SHOT_METRICS = (
+    "shot.xg",
+    "shot.outcome",
+    "shot.on_target",
+    "shot.minute",
+    "shot.shooter",
+)
 CARD_METRICS = ("card.kind", "card.players_after", "card.minute")
 
 
@@ -195,7 +201,8 @@ class EventObserver:
     The batch and incremental paths both feed events through one of these in stream order.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, roster: Mapping[str, str] | None = None) -> None:
+        self._roster = roster or {}
         self._groups: dict[int, list[Event]] = {}
         self._yellows: set[str] = set()
         self._dismissed = {"home": 0, "away": 0}
@@ -295,6 +302,18 @@ class EventObserver:
                 {lang: render_minute(shot.t.root, lang) for lang in LANGS},
             ),
         ]
+        if shot.player_id is not None:
+            who = shot.player_id.root
+            facts.append(
+                build_fact(
+                    f"shot({sid}).shooter",
+                    self._roster.get(who, who),
+                    "",
+                    [sid],
+                    EXTRACTOR,
+                    scope,
+                )
+            )
         if shot.shot is not None:
             facts.append(
                 build_fact(

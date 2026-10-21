@@ -160,7 +160,7 @@ def test_since_registered_aggregates_exist() -> None:
 
 
 # ---- coverage of voice/examples.yaml ---------------------------------------------------------------
-# Example fact id -> the metric that produces it. KNOWN_GAPS are facts the event schema cannot support.
+# Example fact id -> the metric that produces it. KNOWN_GAPS would hold facts the event schema cannot support.
 COVERAGE: dict[str, str] = {
     "fx-0101": "freeze_frame.home_ahead_of_ball",  # the side caught high has N players ahead of the ball
     "fx-0102": "freeze_frame.attackers_v_defenders",
@@ -190,9 +190,10 @@ COVERAGE: dict[str, str] = {
     "fx-1202": "sequence.shot_clock",
     "fx-1301": "since.back_line_change",
     "fx-1401": "since.possession_share",
-    "fx-1501": "shot.on_target",
+    "fx-1501": "shot.shooter",
+    "fx-1502": "shot.outcome",
 }
-KNOWN_GAPS = {"fx-1502": "no deflection or blocker in the event schema"}
+KNOWN_GAPS: dict[str, str] = {}
 CATALOGUE = {
     *extract_events.METRICS,
     *extract_events.SEQUENCE_METRICS,
@@ -246,3 +247,37 @@ def test_every_covered_metric_is_actually_produced() -> None:
         fid: metric for fid, metric in COVERAGE.items() if metric not in produced
     }
     assert not missing, missing
+
+
+# ---- one definition per measure --------------------------------------------------------------------
+def test_match_level_shape_facts_equal_calibration() -> None:
+    from sim.calibrate import shape_metrics
+    from sim.geometry import aggregate
+
+    m = match("red_card_flip", 3)
+    reg = batch("red_card_flip", 3)
+    cal = shape_metrics(m.frames)
+    for i, side in enumerate(("home", "away")):
+        for metric, key in (
+            ("compactness", "compactness_out"),
+            ("back_line_height", "back_line_height_out"),
+        ):
+            fact = reg.by_name(f"{metric}({side}, match, out_of_possession)")
+            assert abs(float(fact.value) - cal[key][i]) < 1e-3, (side, metric)
+    assert aggregate([1.0, 2.0, 10.0]) == 2.0  # the median, not the mean
+
+
+# ---- shooter ---------------------------------------------------------------------------------------
+def test_shooter_is_the_roster_name_or_the_player_id() -> None:
+    m = match("red_card_flip", 3)
+    shot = next(e for e in m.events if e.type.value == "shot" and e.player_id)
+    pid = shot.player_id.root  # type: ignore[union-attr]
+    name = f"shot({shot.id.root}).shooter"
+    plain = batch("red_card_flip", 3).by_name(name)
+    assert plain.value == pid and [s.root for s in plain.source_ids] == [shot.id.root]
+    named = extract_all(m.events, m.frames, m.freeze, {pid: "Varga"})
+    assert named.by_name(name).value == "Varga"
+    engine = FactEngine({pid: "Varga"})
+    for item in m.stream:
+        engine.push(item)
+    assert engine.registry == named

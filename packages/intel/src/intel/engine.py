@@ -66,8 +66,9 @@ def extract_all(
     events: Iterable[Event],
     frames: Iterable[PositionFrame],
     freeze_frames: Iterable[PositionFrame],
+    roster: Mapping[str, str] | None = None,
 ) -> FactRegistry:
-    """Every precomputed fact for a finished match."""
+    """Every precomputed fact for a finished match. `roster` maps player ids to names."""
     evs = list(events)
     registry = new_registry()
     bounds = period_bounds(evs)
@@ -86,7 +87,7 @@ def extract_all(
         n = int(w.id.removeprefix("win-"))
         for f in span_facts(by_window[n], window_span(w)):
             registry.add(f)
-        for f in position_facts(samples[n], w):
+        for f in position_facts(samples[n], window_span(w)):
             registry.add(f)
     for period, (start, end) in sorted(bounds.items()):
         first = (period - 1) * WINDOWS_PER_PERIOD + 1
@@ -104,8 +105,11 @@ def extract_all(
         )
         for f in span_facts(everything, span):
             registry.add(f)
+        every_sample = [x for n in sorted(samples) for x in samples[n]]
+        for f in position_facts(every_sample, span):
+            registry.add(f)
 
-    observer = EventObserver()
+    observer = EventObserver(roster)
     for e in evs:
         for f in observer.observe(e):
             registry.add(f)
@@ -126,9 +130,9 @@ class FactEngine:
     the freeze frame, which follows its event. Feed `finish()` for a match that stops early.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, roster: Mapping[str, str] | None = None) -> None:
         self.registry = new_registry()
-        self._observer = EventObserver()
+        self._observer = EventObserver(roster)
         self._period_start: dict[int, float] = {}
         self._period_end: dict[int, float] = {}
         self._p2_start: float | None = None
@@ -203,7 +207,7 @@ class FactEngine:
         )
         return self._take(
             span_facts(self._events[number], window_span(w))
-            + position_facts(self._samples[number], w)
+            + position_facts(self._samples[number], window_span(w))
         )
 
     def _end_period(self, period: int, t: float) -> list[Fact]:
@@ -233,7 +237,10 @@ class FactEngine:
             max(self._period_end.values()),
             done,
         )
-        return self._take(span_facts(everything, span))
+        every_sample = [x for n in sorted(self._samples) for x in self._samples[n]]
+        return self._take(
+            span_facts(everything, span) + position_facts(every_sample, span)
+        )
 
 
 def split_freeze(

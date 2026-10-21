@@ -9,6 +9,7 @@ from typing import NamedTuple
 
 from contracts.models import Event, Fact, PositionFrame
 from sim.geometry import (
+    aggregate,
     back_line_height,
     hull_area,
     outfield_points,
@@ -17,6 +18,7 @@ from sim.geometry import (
 )
 from sim.positions import freeze_source_id
 
+from .extract_events import Span
 from .football import (
     GOAL_HALF_WIDTH_M,
     SIDES,
@@ -29,13 +31,15 @@ from .football import (
     opponent,
 )
 from .registry import build_fact
-from .windows import Window
 
 EXTRACTOR = "extract_positions"
 FREEZE_EXTRACTOR = "extract_freeze_frames"
 SAMPLE_HZ = 1  # frames are 5 Hz; shape is measured on one frame per second
 SAMPLE_TOLERANCE = (
     1e-6  # float slack when deciding a frame time is on the sampling grid
+)
+MIN_OUTFIELD_PLAYERS = (
+    3  # a frame with fewer outfielders has no shape, as in calibration
 )
 MIN_PHASE_SAMPLES = (
     5  # fewer samples than this in a window and phase and no shape fact is made
@@ -119,7 +123,7 @@ def depth(side: str, x: float) -> float:
 
 
 def _shape(points: list[Pt], side: str) -> Shape | None:
-    if len(points) < DEFENSIVE_LINE_PLAYERS:
+    if len(points) < MIN_OUTFIELD_PLAYERS:
         return None
     depths = sorted(depth(side, x) for x, _ in points)
     defence = depths[:DEFENSIVE_LINE_PLAYERS]
@@ -153,14 +157,10 @@ def make_sample(frame: PositionFrame) -> Sample | None:
     )
 
 
-def _mean(values: list[float]) -> float:
-    return sum(values) / len(values)
-
-
 def position_values(
     samples: Sequence[Sample], side: str, phase: str
 ) -> list[tuple[str, float, str]]:
-    """Mean shape of a side over the samples where it was in or out of possession."""
+    """Shape of a side, aggregated as calibration does, over the samples where it was in or out of possession."""
     want = phase == "in_possession"
     shapes = [
         (s.home if side == "home" else s.away)
@@ -171,35 +171,36 @@ def position_values(
     if len(present) < MIN_PHASE_SAMPLES:
         return []
     out = [
-        ("back_line_height", _mean([s.back_line for s in present])),
-        ("team_length", _mean([s.length for s in present])),
-        ("team_width", _mean([s.width for s in present])),
-        ("compactness", _mean([s.area for s in present])),
+        ("back_line_height", aggregate([s.back_line for s in present])),
+        ("team_length", aggregate([s.length for s in present])),
+        ("team_width", aggregate([s.width for s in present])),
+        ("compactness", aggregate([s.area for s in present])),
     ]
     gaps = [s.line_gap for s in present if s.line_gap is not None]
     if gaps:
-        out.append(("line_gap", _mean(gaps)))
+        out.append(("line_gap", aggregate(gaps)))
     return [(m, v, POSITION_UNITS[m]) for m, v in out]
 
 
-def position_facts(samples: Sequence[Sample], window: Window) -> list[Fact]:
-    """Per team, per phase shape facts for one window."""
+def position_facts(samples: Sequence[Sample], span: Span) -> list[Fact]:
+    """Per team, per phase shape facts for one span (a window or the whole match)."""
     facts: list[Fact] = []
     for side in SIDES:
         scope: dict[str, object] = {
             "side": side,
-            "period": window.period,
-            "t_from": window.t_from,
-            "t_to": window.t_to,
+            "t_from": span.t_from,
+            "t_to": span.t_to,
         }
+        if span.period is not None:
+            scope["period"] = span.period
         for phase in PHASES:
             for metric, value, unit in position_values(samples, side, phase):
                 facts.append(
                     build_fact(
-                        f"{metric}({side}, {window.id}, {phase})",
+                        f"{metric}({side}, {span.label}, {phase})",
                         value,
                         unit,
-                        [window.id, AGG_POSITION_SAMPLES],
+                        [*span.source_ids, AGG_POSITION_SAMPLES],
                         EXTRACTOR,
                         scope,
                     )

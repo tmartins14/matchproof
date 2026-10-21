@@ -5,7 +5,6 @@ from intel.extract_positions import (
     make_sample,
     position_facts,
 )
-from intel.windows import Window
 
 SPAN = Span("win-01", 1, 0.0, 900.0, ("win-01",))
 
@@ -129,7 +128,7 @@ def test_back_line_is_thirty_metres_for_both_sides() -> None:
     samples = [
         make_sample(frame(home, away, t=float(t), possession="away")) for t in range(6)
     ]
-    window = Window("win-01", 1, 0.0, 900.0)
+    window = Span("win-01", 1, 0.0, 900.0, ("win-01",))
     facts = position_facts([s for s in samples if s is not None], window)
     by_name = {f.name: f.value for f in facts}
     assert by_name["back_line_height(home, win-01, out_of_possession)"] == 30.0

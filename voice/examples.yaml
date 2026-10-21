@@ -215,10 +215,10 @@
   mode: fan
   lang: en
   facts:
-    - { id: fx-1501, display: "shot by Varga, on target" }
-    - { id: fx-1502, display: "deflected off Asante" }
-  line: "Varga's shot, deflected in off Asante, puts Rivermouth ahead."
-  amended_from: "Asante's own goal puts Rivermouth ahead."
-  reason: "The shot was on target before the deflection, so the goal is Varga's."
+    - { id: fx-1501, display: "Varga" }
+    - { id: fx-1502, display: "goal" }
+  line: "Varga scores for Rivermouth."
+  amended_from: "Okoro scores for Rivermouth."
+  reason: "The shot event names Varga as the shooter, not Okoro."
   source: adapted
   source_ref: S13

@@ -2,6 +2,7 @@
 
 import argparse
 import gc
+import json
 from collections import Counter
 from pathlib import Path
 
@@ -25,6 +26,14 @@ def load_match(
     return events, frames, freeze
 
 
+def load_roster(base: Path) -> dict[str, str]:
+    """Player id to name from <match_id>.brief.json."""
+    brief = json.loads(base.with_name(base.name + ".brief.json").read_text("utf-8"))
+    return {
+        p["id"]: p["name"] for side in ("home", "away") for p in brief[side]["players"]
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="intel")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -35,7 +44,7 @@ def main(argv: list[str] | None = None) -> int:
     base: Path = a.match
     gc.disable()  # tens of thousands of frame models; the cyclic collector would crawl over them
     events, frames, freeze = load_match(base)
-    registry = extract_all(events, frames, freeze)
+    registry = extract_all(events, frames, freeze, load_roster(base))
     facts = registry.all()
     out = base.with_name(base.name + ".facts.jsonl")
     with out.open("w", encoding="utf-8") as fh:

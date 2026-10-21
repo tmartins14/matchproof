@@ -106,10 +106,13 @@ def _bypassed(registry: FactRegistry, event_id: str) -> int | None:
     return int(value) if isinstance(value, int | float) else None
 
 
-def _samples(frames: Iterable[PositionFrame]) -> list[Sample]:
+def _samples(frames: Iterable[PositionFrame | Sample]) -> list[Sample]:
+    """Samples from 5 Hz frames (those on the 1 Hz grid), or ready-made samples passed through."""
     out = []
     for f in frames:
-        if is_sample_time(f.t.root):
+        if isinstance(f, Sample):
+            out.append(f)
+        elif is_sample_time(f.t.root):
             s = make_sample(f)
             if s is not None:
                 out.append(s)
@@ -120,11 +123,12 @@ def since(
     anchor_event_id: str,
     registry: FactRegistry,
     events: Sequence[Event],
-    frames: Iterable[PositionFrame],
+    frames: Iterable[PositionFrame | Sample],
 ) -> list[Fact]:
     """Facts from the anchor to now, the same facts for the 15 minutes before, and change facts.
 
-    `events` and `frames` are everything seen so far. Returns every fact it made, adding them to the
+    `events` and `frames` are everything seen so far; frames may be Samples already (a caller that
+    streams keeps those, not the frames, which are hundreds of model objects each). Returns every fact it made, adding them to the
     registry. Positional measures are for the out-of-possession phase; counts are not compared
     across spans of different length, so only back_line_height and compactness get change facts.
     """

@@ -151,7 +151,8 @@ def check_red_card_follow_up(found: Lean) -> None:
 
 
 @pytest.mark.parametrize(
-    ("story", "seed"), [("red_card_flip", 3), ("late_comeback", 1)]
+    ("story", "seed"),
+    [("red_card_flip", 3), pytest.param("late_comeback", 1, marks=pytest.mark.slow)],
 )
 def test_live_equals_batch(story: str, seed: int) -> None:
     m = match(story, seed)
@@ -167,6 +168,7 @@ def test_live_equals_batch(story: str, seed: int) -> None:
     assert [dump(b) for b in live] == [dump(b) for b in batch_beats(story, seed)]
 
 
+@pytest.mark.slow
 def test_detection_is_deterministic() -> None:
     runs = [compute_lean("end_to_end", 2).beats for _ in range(2)]
     assert [dump(b) for b in runs[0]] == [dump(b) for b in runs[1]]
@@ -220,7 +222,15 @@ def check_label_shapes(found: Lean) -> None:
     assert all(shape.match(b.label) for b in found.beats)
 
 
-@pytest.mark.parametrize(("story", "seed"), [(s, n) for s in STORIES for n in SEEDS])
+# The fast suite checks one seed per storyline; the other seeds run with `make slow`.
+MATCHES = [
+    pytest.param(s, n, marks=[pytest.mark.slow] if n != SEEDS[0] else [])
+    for s in STORIES
+    for n in SEEDS
+]
+
+
+@pytest.mark.parametrize(("story", "seed"), MATCHES)
 def test_beats_of_a_match(story: str, seed: int) -> None:
     """Every check that needs only a match's beats, so each of the 16 matches is built once."""
     found = lean(story, seed)
@@ -238,18 +248,19 @@ def test_beats_of_a_match(story: str, seed: int) -> None:
             check_stoppage_time_goal_has_no_follow_up(found)
 
 
-PEAK_RSS_LIMIT_MB = 2048  # CI kills the run above this
+PEAK_RSS_LIMIT_MB = 1024  # the 16 matches one after another must fit in this
 
 
+@pytest.mark.slow
 def test_planted_matrix_stays_under_the_memory_limit(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """All 16 matches in a fresh process, so the peak is theirs and not the rest of the suite's."""
     code = (
-        "import resource, json; from beat_checks import run_planted_matrix; "
+        "import json; from beat_checks import peak_rss_mb, run_planted_matrix; "
         "counts = run_planted_matrix(); "
         "print(json.dumps([[k[0], k[1], v] for k, v in counts.items()])); "
-        "print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)"
+        "print(peak_rss_mb())"
     )
     env = {**os.environ, "PYTHONPATH": str(Path(__file__).parent)}
     done = subprocess.run(
@@ -260,7 +271,7 @@ def test_planted_matrix_stays_under_the_memory_limit(
         check=True,
     )
     counts_line, raw = done.stdout.strip().splitlines()[-2:]
-    peak_mb = int(raw) / (1024 if sys.platform.startswith("linux") else 1024 * 1024)
+    peak_mb = float(raw)
     per_story = {
         story: [n for s, _, n in json.loads(counts_line) if s == story]
         for story in STORIES

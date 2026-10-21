@@ -1,5 +1,10 @@
 """The planted-beat check over every storyline and seed, shared by the tests and the memory test."""
 
+import gc
+import resource
+import sys
+from pathlib import Path
+
 from contracts.models import Beat
 from matches import compute_lean
 from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, make_brief
@@ -45,4 +50,21 @@ def run_planted_matrix() -> dict[tuple[str, int], int]:
             beats = compute_lean(story, seed).beats
             check_planted(story, seed, beats)
             counts[(story, seed)] = len(beats)
+            del beats
+            gc.collect()  # nothing of this match is needed once its count is taken
     return counts
+
+
+def peak_rss_mb() -> float:
+    """This process's own peak resident memory.
+
+    On Linux ru_maxrss is inherited from the parent across fork and exec, so a child of a large
+    pytest process reports the parent's size; VmHWM belongs to the new image and does not.
+    """
+    status = Path("/proc/self/status")
+    if status.exists():
+        for line in status.read_text().splitlines():
+            if line.startswith("VmHWM:"):
+                return int(line.split()[1]) / 1024  # kB
+    raw = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    return raw / (1024 if sys.platform.startswith("linux") else 1024 * 1024)

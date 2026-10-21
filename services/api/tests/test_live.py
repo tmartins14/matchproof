@@ -160,6 +160,7 @@ def test_window_and_beat_facts_only() -> None:
     assert {f["id"] for f in facts} == cited | {f["id"] for f in windows}
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("story", STORIES)
 def test_stream_beats_equal_batch(story: str) -> None:
     brief = brief_for(story)
@@ -178,7 +179,9 @@ def test_stream_beats_equal_batch(story: str) -> None:
     assert live == expected
 
 
-@pytest.mark.parametrize("speed", [SPEED_REAL_TIME, SPEED_FASTEST])
+@pytest.mark.parametrize(
+    "speed", [pytest.param(SPEED_REAL_TIME, marks=pytest.mark.slow), SPEED_FASTEST]
+)
 def test_frame_rate_on_the_wire_is_capped(speed: int) -> None:
     per_second = Counter(
         int(t) for t, m in stream("red_card_flip", speed) if m.type.value == "frame"
@@ -329,6 +332,7 @@ def test_focus_freeze_then_beat() -> None:
         )
 
 
+@pytest.mark.slow
 def test_content_does_not_depend_on_the_clock() -> None:
     unpaced = asyncio.run(collect_unpaced(brief_for("red_card_flip"), SPEED_FASTEST))
     assert [dump(m) for m in unpaced] == [

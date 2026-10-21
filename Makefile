@@ -1,4 +1,4 @@
-.PHONY: setup gen lint typecheck test calibrate web-dev api-dev check-contracts
+.PHONY: setup gen lint typecheck test slow calibrate web-dev api-dev check-contracts
 
 setup:
 	uv sync --all-packages
@@ -24,8 +24,10 @@ typecheck:
 test:
 	uv run pytest -m "not slow"
 
-calibrate:
+slow:
 	uv run pytest -m slow
+
+calibrate: slow
 	uv run python -m sim calibrate --seeds 1-8 --out data/calibration.json --git-sha $$(git rev-parse --short HEAD)
 
 web-dev:

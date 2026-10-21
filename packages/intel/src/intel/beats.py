@@ -22,7 +22,7 @@ from contracts.models import Beat, Event, Fact, PositionFrame
 
 from .display import minute_of
 from .extract_events import CARD_METRICS, SEQUENCE_METRICS, SHOT_METRICS
-from .extract_positions import is_sample_time
+from .extract_positions import Sample, make_sample
 from .football import (
     HIGH_TURNOVER_DISTANCE_M,
     SIDES,
@@ -191,7 +191,7 @@ class BeatDetector:
 
     def __init__(self) -> None:
         self._events: list[Event] = []
-        self._samples: list[PositionFrame] = []
+        self._samples: list[Sample] = []
         self._groups: dict[int, list[Event]] = {}
         self._awaiting: dict[str, list[_Candidate]] = defaultdict(list)
         self._follow_ups: deque[Event] = deque()
@@ -215,8 +215,11 @@ class BeatDetector:
             return out
         if item.freeze_frame_of is not None:
             return self._emit_awaiting(item.freeze_frame_of.root, registry)
-        if is_sample_time(item.t.root):
-            self._samples.append(item)
+        sample = make_sample(
+            item
+        )  # None off the 1 Hz grid; the frame itself is not kept
+        if sample is not None:
+            self._samples.append(sample)
         return self._due_follow_ups(item.t.root, registry)
 
     def finish(self, registry: FactRegistry) -> list[Beat]:
@@ -479,7 +482,7 @@ class BeatDetector:
         return out
 
     def _follow_up(self, anchor: Event, registry: FactRegistry) -> Beat | None:
-        now = max([self._events[-1].t.root] + [s.t.root for s in self._samples[-1:]])
+        now = max([self._events[-1].t.root] + [s.t for s in self._samples[-1:]])
         if now - anchor.t.root < MIN_SINCE_S:
             return None  # e.g. a goal in stoppage time: too little play to say what changed
         made = since(anchor.id.root, registry, self._events, self._samples)

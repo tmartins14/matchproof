@@ -70,14 +70,13 @@ def compute_lean(story: str, seed: int) -> Lean:
     events = generate(brief)
     engine, detector = FactEngine(), BeatDetector()
     beats: list[Beat] = []
-    with gc_paused():
-        for kind, event, frame in run(brief, events):
-            item = event if kind == "event" else frame
-            if item is not None:
-                engine.push(item)
-                beats += detector.push(item, engine.registry)
-        engine.finish()
-        beats += detector.finish(engine.registry)
+    for kind, event, frame in run(brief, events):
+        item = event if kind == "event" else frame
+        if item is not None:
+            engine.push(item)
+            beats += detector.push(item, engine.registry)
+    engine.finish()
+    beats += detector.finish(engine.registry)
     return Lean(events, beats, engine.registry)
 
 

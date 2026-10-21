@@ -6,10 +6,12 @@ from typing import Any
 
 import pytest
 from contracts.models import Beat
+from intel.__main__ import main as intel_main
 from intel.beats import (
     BIG_CHANCE_XG,
     DEBOUNCE_S,
     GOAL_KINDS,
+    MIN_SINCE_S,
     BeatDetector,
     beat_id,
     detect_all,
@@ -21,18 +23,19 @@ from jsonschema import Draft202012Validator
 from matches import match
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
+from sim.__main__ import main as sim_main
 from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, make_brief
 
 ROOT = Path(__file__).resolve().parents[3]
 STORIES = ("late_comeback", "red_card_flip", "smash_and_grab", "end_to_end")
 SEEDS = (1, 2, 3, 4)
-# The beat kinds a planted beat may be detected as. A high-turnover goal is a high_turnover_chance
-# anchored on the goal; a penalty has no restart event of its own, so it reads as an open-play goal.
+# The beat kinds a planted beat may be detected as. A penalty has no restart event of its own, so it
+# reads as an open-play goal.
 EXPECTED_KINDS = {
     "counter_goal": {"counter_goal"},
     "set_piece_goal": {"set_piece_goal"},
     "open_play_goal": {"open_play_goal"},
-    "high_turnover_goal": {"high_turnover_chance"},
+    "high_turnover_goal": {"high_turnover_goal"},
     "red_card": {"card"},
     "penalty": {"open_play_goal"},
 }
@@ -93,6 +96,56 @@ def test_planted_beats_are_detected_as_planted(story: str, seed: int) -> None:
         assert all(b.origin.value == "planted" for b in found)
     for b in beats:
         assert (b.origin.value == "planted") == (b.planted_beat_id is not None)
+        if b.kind.value in ("momentum_swing", "territorial_spell"):
+            assert b.origin.value == "detected"
+
+
+@pytest.mark.parametrize("story", STORIES)
+def test_one_beat_per_anchor_event(story: str) -> None:
+    beats, _ = detected(story, 1)
+    anchored = [
+        b.anchor_event_id.root for b in beats if b.kind.value != "momentum_swing"
+    ]
+    assert len(anchored) == len(set(anchored))
+    follow_ups = [b for b in beats if b.kind.value == "momentum_swing"]
+    by_anchor = {
+        b.anchor_event_id.root: b for b in beats if b.kind.value != "momentum_swing"
+    }
+    assert all(b.anchor_event_id.root in by_anchor for b in follow_ups)
+
+
+@pytest.mark.parametrize("story", ["late_comeback", "end_to_end"])
+@pytest.mark.parametrize("seed", SEEDS)
+def test_planted_high_turnover_goal_is_one_planted_beat(story: str, seed: int) -> None:
+    beats, _ = detected(story, seed)
+    brief = make_brief(DEFAULT_HOME, DEFAULT_AWAY, story, seed)
+    for planted in brief.planted_beats:
+        if planted.kind.value != "high_turnover_goal":
+            continue
+        own = [b for b in beats if b.planted_beat_id == planted.id]
+        assert [b.kind.value for b in own] == ["high_turnover_goal"]
+        assert own[0].origin.value == "planted"
+
+
+def test_follow_up_after_a_stoppage_time_goal_is_skipped() -> None:
+    beats, _ = detected("end_to_end", 1)
+    m = match("end_to_end", 1)
+    late = [
+        e
+        for e in m.events
+        if e.type.value == "shot"
+        and e.outcome is not None
+        and e.outcome.value == "goal"
+        and e.t.root > m.events[-1].t.root - MIN_SINCE_S
+    ]
+    assert late  # the 90+7 goal
+    anchors = {
+        b.anchor_event_id.root for b in beats if b.kind.value == "momentum_swing"
+    }
+    assert not anchors & {e.id.root for e in late}
+    assert any(
+        b.anchor_event_id.root == late[0].id.root for b in beats
+    )  # the goal itself stays
 
 
 @pytest.mark.parametrize("seed", SEEDS)
@@ -210,3 +263,30 @@ def test_beats_per_match_report(capsys: pytest.CaptureFixture[str]) -> None:
         for story in STORIES:
             counts = [len(detected(story, seed)[0]) for seed in SEEDS]
             print(f"\nbeats {story}: {counts} (target 12-30, not asserted)", end="")
+
+
+@pytest.mark.parametrize(("story", "seed"), [("late_comeback", 4), ("end_to_end", 1)])
+def test_beats_command_writes_every_fact_it_cites(
+    story: str, seed: int, tmp_path: Path
+) -> None:
+    out = tmp_path / f"m-{story.replace('_', '-')}-{seed}.jsonl"
+    assert (
+        sim_main(["generate", "--story", story, "--seed", str(seed), "--out", str(out)])
+        == 0
+    )
+    base = tmp_path / out.stem
+    assert intel_main(["beats", "--match", str(base)]) == 0
+    beats = [
+        json.loads(x)
+        for x in (tmp_path / f"{out.stem}.beats.jsonl").read_text().splitlines()
+    ]
+    facts = {
+        json.loads(x)["id"]
+        for x in (tmp_path / f"{out.stem}.facts.jsonl").read_text().splitlines()
+    }
+    cited = {fid for b in beats for fid in b["fact_ids"]}
+    assert beats
+    assert cited <= facts
+    assert any(
+        "-since-" in fid or "-before-" in fid for fid in cited
+    )  # on-demand facts are in

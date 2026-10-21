@@ -6,10 +6,11 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from contracts.models import Beat, Event, PositionFrame
+from contracts.models import Beat, Event, Fact, PositionFrame
 
 from .beats import detect_all
 from .engine import extract_all
+from .registry import FactRegistry
 
 
 def load_match(
@@ -35,12 +36,26 @@ def load_roster(base: Path) -> dict[str, str]:
     }
 
 
-def print_beats(base: Path, beats: list[Beat]) -> int:
+def write_facts(base: Path, registry: FactRegistry) -> tuple[Path, list[Fact]]:
+    facts = registry.all()
+    out = base.with_name(base.name + ".facts.jsonl")
+    with out.open("w", encoding="utf-8") as fh:
+        for fact in facts:
+            fh.write(fact.model_dump_json(by_alias=True, exclude_none=True) + "\n")
+    return out, facts
+
+
+def print_beats(base: Path, beats: list[Beat], registry: FactRegistry) -> int:
     out = base.with_name(base.name + ".beats.jsonl")
     with out.open("w", encoding="utf-8") as fh:
         for beat in beats:
             fh.write(beat.model_dump_json(by_alias=True, exclude_none=True) + "\n")
-    print(f"{base.name}: {len(beats)} beats -> {out}")
+    # The registry now holds the on-demand since() and last-minutes facts the beats cite, so this
+    # file has every fact in beats.jsonl; the cached replay follows the chain from beats to facts.
+    facts_out, facts = write_facts(base, registry)
+    print(
+        f"{base.name}: {len(beats)} beats -> {out}; {len(facts)} facts -> {facts_out}"
+    )
     for beat in beats:
         print(
             f"  {beat.label:>11}  {beat.kind.value:21}{beat.origin.value:9}"
@@ -63,12 +78,8 @@ def main(argv: list[str] | None = None) -> int:
     events, frames, freeze = load_match(base)
     registry = extract_all(events, frames, freeze, load_roster(base))
     if a.cmd == "beats":
-        return print_beats(base, detect_all(events, frames, freeze, registry))
-    facts = registry.all()
-    out = base.with_name(base.name + ".facts.jsonl")
-    with out.open("w", encoding="utf-8") as fh:
-        for fact in facts:
-            fh.write(fact.model_dump_json(by_alias=True, exclude_none=True) + "\n")
+        return print_beats(base, detect_all(events, frames, freeze, registry), registry)
+    out, facts = write_facts(base, registry)
     counts = Counter(x.extractor.name for x in facts)
     print(f"{base.name}: {len(facts)} facts -> {out}")
     for name, n in sorted(counts.items()):

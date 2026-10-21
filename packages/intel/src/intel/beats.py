@@ -44,7 +44,19 @@ BIG_CHANCE = "big_chance"
 CARD = "card"
 TERRITORIAL_SPELL = "territorial_spell"
 MOMENTUM_SWING = "momentum_swing"
-GOAL_KINDS = frozenset({COUNTER_GOAL, SET_PIECE_GOAL, OPEN_PLAY_GOAL})
+HIGH_TURNOVER_GOAL = "high_turnover_goal"
+GOAL_KINDS = frozenset(
+    {COUNTER_GOAL, SET_PIECE_GOAL, HIGH_TURNOVER_GOAL, OPEN_PLAY_GOAL}
+)
+# Most specific first; when several kinds match one shot, the first of these is the beat.
+SPECIFICITY = (
+    COUNTER_GOAL,
+    SET_PIECE_GOAL,
+    HIGH_TURNOVER_GOAL,
+    OPEN_PLAY_GOAL,
+    HIGH_TURNOVER_CHANCE,
+    BIG_CHANCE,
+)
 
 # ---- thresholds -------------------------------------------------------------------------------
 COUNTER_MAX_S = 15.0  # a goal is a counter when the ball was won in the scorer's half this long before the shot
@@ -76,6 +88,7 @@ SPELL_WARMUP_S = (
 )
 SPELL_MIN_TOUCHES = 40  # fewest touches in the window before a share means anything
 FOLLOW_UP_S = 900.0  # how long after a goal or red card the momentum check runs
+MIN_SINCE_S = 480.0  # a follow-up needs at least this much play since its anchor, or it is skipped
 SWING_BACK_LINE_M = 4.0  # back line moved at least this far
 SWING_COMPACTNESS = (
     0.10  # compactness changed by at least this fraction of its earlier value
@@ -264,33 +277,47 @@ class BeatDetector:
             *(f"freeze_frame({sid}).{m}" for m in FREEZE_BEAT_METRICS),
         ]
         win = begin if begin is not None and is_ball_won(begin) else None
+        high_turnover = (
+            win is not None
+            and distance_to_goal(side, location(win)) <= HIGH_TURNOVER_MAX_M
+            and shot.t.root - win.t.root <= HIGH_TURNOVER_SHOT_S
+        )
+        matched: list[str] = []
         if goal:
             if (
                 begin is not None
                 and begin.type.value in SET_PIECE_STARTS
                 and shot.t.root - begin.t.root <= SET_PIECE_MAX_S
             ):
-                kind = SET_PIECE_GOAL
-            elif (
+                matched.append(SET_PIECE_GOAL)
+            if (
                 win is not None
                 and not in_opponent_half(side, location(win)[0])
                 and shot.t.root - win.t.root <= COUNTER_MAX_S
             ):
-                kind = COUNTER_GOAL
-            else:
-                kind = OPEN_PLAY_GOAL
-            self._add(_Candidate(kind, side, shot, SALIENCE_GOAL, names))
+                matched.append(COUNTER_GOAL)
+            if high_turnover:
+                matched.append(HIGH_TURNOVER_GOAL)
+            matched.append(OPEN_PLAY_GOAL)
             self._follow_ups.append(shot)
-        if (
-            win is not None
-            and distance_to_goal(side, location(win)) <= HIGH_TURNOVER_MAX_M
-            and shot.t.root - win.t.root <= HIGH_TURNOVER_SHOT_S
-        ):
-            self._add(
-                _Candidate(HIGH_TURNOVER_CHANCE, side, shot, chance_salience(xg), names)
-            )
-        if not goal and xg >= BIG_CHANCE_XG:
-            self._add(_Candidate(BIG_CHANCE, side, shot, chance_salience(xg), names))
+        else:
+            if high_turnover:
+                matched.append(HIGH_TURNOVER_CHANCE)
+            if xg >= BIG_CHANCE_XG:
+                matched.append(BIG_CHANCE)
+        # One beat per anchor: the most specific kind that matched, unless debounce silences it. Every
+        # candidate cites the same shot, sequence and freeze-frame facts, so the losers' facts are
+        # already the winner's.
+        for kind in sorted(matched, key=SPECIFICITY.index):
+            if kind in GOAL_KINDS:
+                salience = SALIENCE_GOAL
+            elif self._debounce_ok(kind, side, shot.t.root):
+                salience = chance_salience(xg)
+            else:
+                continue
+            self._record(kind, side, shot.t.root)
+            self._awaiting[sid].append(_Candidate(kind, side, shot, salience, names))
+            return
 
     def _card_candidate(self, card: Event) -> None:
         sid = card.id.root
@@ -298,22 +325,26 @@ class BeatDetector:
             *(f"card({sid}).{m.removeprefix('card.')}" for m in CARD_METRICS),
             *(f"freeze_frame({sid}).{m}" for m in FREEZE_BEAT_METRICS),
         ]
-        self._add(_Candidate(CARD, card.side.value, card, SALIENCE_RED_CARD, names))
+        side = card.side.value
+        if self._debounce(CARD, side, card.t.root):
+            self._awaiting[sid].append(
+                _Candidate(CARD, side, card, SALIENCE_RED_CARD, names)
+            )
         self._follow_ups.append(card)
 
-    def _add(self, c: _Candidate) -> None:
-        if c.kind not in GOAL_KINDS and not self._debounce(
-            c.kind, c.side, c.anchor.t.root
-        ):
-            return
-        self._awaiting[c.anchor.id.root].append(c)
+    def _debounce_ok(self, kind: str, side: str, t: float) -> bool:
+        """True when no beat of this kind for this side is closer than DEBOUNCE_S."""
+        last = self._last_beat.get((kind, side))
+        return last is None or t - last >= DEBOUNCE_S
+
+    def _record(self, kind: str, side: str, t: float) -> None:
+        self._last_beat[(kind, side)] = t
 
     def _debounce(self, kind: str, side: str, t: float) -> bool:
         """True (and the beat is recorded) when no beat of this kind for this side is too close."""
-        last = self._last_beat.get((kind, side))
-        if last is not None and t - last < DEBOUNCE_S:
+        if not self._debounce_ok(kind, side, t):
             return False
-        self._last_beat[(kind, side)] = t
+        self._record(kind, side, t)
         return True
 
     def _emit_awaiting(self, event_id: str, registry: FactRegistry) -> list[Beat]:
@@ -352,13 +383,15 @@ class BeatDetector:
         t_from: float,
         t_to: float,
         label: str,
+        planted: bool = True,
     ) -> Beat:
+        """`planted` is False for beats the detector finds afterwards (follow-ups and spells)."""
         if not fact_ids:
             raise ValueError(f"beat {kind} on {anchor.id.root} has no facts")
         raw: dict[str, object] = {
             "id": beat_id(anchor.id.root, kind),
             "kind": kind,
-            "origin": "planted" if anchor.planted_beat_id else "detected",
+            "origin": "planted" if planted and anchor.planted_beat_id else "detected",
             "side": side,
             "t_detect": t_detect,
             "t_from": t_from,
@@ -368,7 +401,7 @@ class BeatDetector:
             "fact_ids": list(dict.fromkeys(fact_ids)),
             "salience": round(min(max(salience, 0.0), 1.0), 4),
         }
-        if anchor.planted_beat_id:
+        if planted and anchor.planted_beat_id:
             raw["planted_beat_id"] = anchor.planted_beat_id
         return Beat.model_validate(raw)
 
@@ -431,6 +464,7 @@ class BeatDetector:
                 spell.t_open,
                 t,
                 self._span_label(spell.t_open, t),
+                planted=False,
             )
         ]
 
@@ -445,13 +479,14 @@ class BeatDetector:
         return out
 
     def _follow_up(self, anchor: Event, registry: FactRegistry) -> Beat | None:
-        # Without freeze frames or samples there is nothing to compare; the check needs both spans.
+        now = max([self._events[-1].t.root] + [s.t.root for s in self._samples[-1:]])
+        if now - anchor.t.root < MIN_SINCE_S:
+            return None  # e.g. a goal in stoppage time: too little play to say what changed
         made = since(anchor.id.root, registry, self._events, self._samples)
         swing = _swing(made)
         if swing.ratio < 1.0:
             return None
         side = anchor.side.value
-        now = max([self._events[-1].t.root] + [s.t.root for s in self._samples[-1:]])
         if not self._debounce(MOMENTUM_SWING, side, now):
             return None
         t0 = anchor.t.root
@@ -465,6 +500,7 @@ class BeatDetector:
             t0,
             now,
             self._span_label(t0, now),
+            planted=False,
         )
 
 

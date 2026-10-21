@@ -2,7 +2,7 @@
 name = "matchproof-intel"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["matchproof-contracts", "pyyaml"]
+dependencies = ["matchproof-contracts", "matchproof-sim", "pyyaml"]
 
 [build-system]
 requires = ["hatchling"]
@@ -13,3 +13,4 @@ packages = ["src/intel"]
 
 [tool.uv.sources]
 matchproof-contracts = { workspace = true }
+matchproof-sim = { workspace = true }

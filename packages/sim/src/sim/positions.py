@@ -91,6 +91,13 @@ class FrameSimulator:
             "home": brief.home.line_height.root,
             "away": brief.away.line_height.root,
         }
+        self.press = {
+            "home": brief.home.press.root,
+            "away": brief.away.press.root,
+        }
+        self.goals = {"home": 0, "away": 0}
+        self.down = {"home": 0, "away": 0}  # players sent off
+        self.p2_start = 0.0
         self.step_cap = MAX_SPEED_V1 - ROUNDING_MARGIN_MS
         self.t = 0.0
         self.poss = "home"
@@ -103,6 +110,9 @@ class FrameSimulator:
         self._period = 1
         self.reset_at: float | None = None
         self.conceding: str | None = None
+        self.sent_off: list[
+            _Player
+        ] = []  # leave the frames once time moves past their card
         self._reset_shape()
 
     # ---- shape ---------------------------------------------------------------------------------
@@ -112,12 +122,23 @@ class FrameSimulator:
             if p.side == "home"
             else (120.0 - self.ball[0], self.ball[1])
         )
+        other = "away" if p.side == "home" else "home"
+        minute = (
+            self.t / 60.0
+            if self._period == 1
+            else 45.0 + (self.t - self.p2_start) / 60.0
+        )
+        state = shape.GameState(
+            minute, self.goals[p.side] - self.goals[other], self.down[p.side]
+        )
         u, v = shape.target(
             self.formations[p.side],
             p.slot,
             self.line[p.side],
             ball_rel,
             p.side == self.poss,
+            state,
+            self.press[p.side],
         )
         return (
             (u, v) if p.side == "home" else (120.0 - u, v)
@@ -150,6 +171,9 @@ class FrameSimulator:
         dt = to_t - self.t
         if dt <= 0:
             return
+        for p in self.sent_off:
+            p.active = False
+        self.sent_off.clear()
         self.t = to_t
         self.ball = self._ball_at(to_t)
         if self.reset_at is not None and to_t >= self.reset_at:
@@ -200,6 +224,7 @@ class FrameSimulator:
         side = e.side.value
         if kind == "period_start" and e.period.value == 2:
             self._period = 2
+            self.p2_start = e.t.root
             self._reset_shape()
             self.stats.reset_ticks.append(e.t.root)
         if kind in POSSESSION_TYPES or (
@@ -216,11 +241,13 @@ class FrameSimulator:
                 actor.x, actor.y = loc
                 actor.commit = None
             if kind == "card" and e.outcome is not None and e.outcome.value == "red":
-                actor.active = False
+                self.sent_off.append(actor)
+                self.down[side] += 1
         self.ball = loc
         nxt = upcoming[0] if upcoming else None
         gap = (nxt.t.root - e.t.root) if nxt is not None else 0.0
         if kind == "shot" and e.outcome is not None and e.outcome.value == "goal":
+            self.goals[side] += 1
             self.reset_at = e.t.root + GOAL_RESET_S
             self.conceding = "away" if side == "home" else "home"
         if end is None:

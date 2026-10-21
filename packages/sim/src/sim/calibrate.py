@@ -1,19 +1,31 @@
 """Calibration report: run every storyline on each seed with default tactics and compare to bands."""
 
 import json
+import math
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from statistics import mean
+from statistics import mean, median
 
 import yaml
-from contracts.models import Event
+from contracts.models import Event, MatchBrief, PositionFrame
 
-from . import generate
+from . import generate, geometry
 from .brief import STORYLINES, make_brief
+from .positions import iter_frames
 
 TARGETS_PATH = Path(__file__).resolve().parents[2] / "calibration" / "targets.yaml"
-# A single run may sit outside the band by at most this share of the band width.
+# Without a match band, a single run may sit outside the band by at most this share of the band width.
 RUN_TOLERANCE = 0.15
+# Where a reference mean is set, the mean across runs must be within this share of it.
+MEAN_TOLERANCE = 0.12
+SAMPLE_EVERY = 5  # 5 Hz frames sampled at 1 Hz
+MID_BLOCK_BALL_M = (
+    35.0,
+    85.0,
+)  # ball distance from the defending goal that counts as a mid-block
+# Not targets: per team and match, in-possession shape minus out-of-possession shape, for the shape rules.
+SHAPE_GAIN_KEYS = ("back_line_gain", "length_gain")
 
 
 @dataclass(frozen=True)
@@ -24,6 +36,9 @@ class Target:
     unit: str
     source: str
     status: str
+    reference_mean: float | None = None
+    note: str = ""
+    match_band: tuple[float, float] | None = None
 
 
 @dataclass(frozen=True)
@@ -45,6 +60,11 @@ def load_targets(path: Path | None = None) -> list[Target]:
             r["unit"],
             r["source"],
             r["status"],
+            None if r.get("reference_mean") is None else float(r["reference_mean"]),
+            r.get("note", ""),
+            None
+            if r.get("match_band") is None
+            else (float(r["match_band"][0]), float(r["match_band"][1])),
         )
         for r in raw
     ]
@@ -112,15 +132,84 @@ def match_metrics(events: list[Event]) -> dict[str, list[float]]:
     return out
 
 
+def _median(xs: list[float]) -> float:
+    return median(xs) if xs else float("nan")
+
+
+def shape_metrics(frames: Iterable[PositionFrame]) -> dict[str, list[float]]:
+    """Positional metrics for one match, two values per metric (home, then away), from frames sampled at 1 Hz."""
+    series: dict[str, dict[str, list[float]]] = {}
+
+    def add(side: str, key: str, value: float) -> None:
+        series.setdefault(key, {}).setdefault(side, []).append(value)
+
+    for i, frame in enumerate(frames):
+        if i % SAMPLE_EVERY or frame.possession is None:
+            continue
+        poss = frame.possession.value
+        bx, by = frame.ball.root[0].root, frame.ball.root[1].root
+        for side in ("home", "away"):
+            pts = geometry.outfield_points(frame, side)
+            if len(pts) < 3:
+                continue
+            if side == poss:
+                add(side, "back_line_height_in", geometry.back_line_height(pts, side))
+                add(side, "team_length_in", geometry.team_length(pts))
+                continue
+            add(side, "back_line_height_out", geometry.back_line_height(pts, side))
+            add(side, "compactness_out", geometry.hull_area(pts))
+            goal_x = 0.0 if side == "home" else geometry.PITCH_LENGTH
+            if (
+                MID_BLOCK_BALL_M[0]
+                <= math.hypot(bx - goal_x, by - 40.0)
+                <= MID_BLOCK_BALL_M[1]
+            ):
+                add(side, "team_length_out", geometry.team_length(pts))
+                add(side, "team_width_out", geometry.team_width(pts))
+            add(side, "team_length_out_all", geometry.team_length(pts))
+    out: dict[str, list[float]] = {}
+    for key in (
+        "back_line_height_out",
+        "back_line_height_in",
+        "team_length_out",
+        "team_width_out",
+        "compactness_out",
+    ):
+        for side in ("home", "away"):
+            out.setdefault(key, []).append(_median(series.get(key, {}).get(side, [])))
+    for side in ("home", "away"):
+        med = {k: _median(series.get(k, {}).get(side, [])) for k in series}
+        out.setdefault("back_line_gain", []).append(
+            med["back_line_height_in"] - med["back_line_height_out"]
+        )
+        out.setdefault("length_gain", []).append(
+            med["team_length_in"] - med["team_length_out_all"]
+        )
+    return out
+
+
+def match_values(brief: MatchBrief) -> dict[str, list[float]]:
+    events = generate(brief)
+    return match_metrics(events) | shape_metrics(iter_frames(brief, events))
+
+
 def collect(seeds: list[int]) -> dict[str, list[float]]:
     values: dict[str, list[float]] = {}
     for story in sorted(STORYLINES):
         for seed in seeds:
-            for key, vs in match_metrics(
-                generate(make_brief(storyline_id=story, seed=seed))
+            for key, vs in match_values(
+                make_brief(storyline_id=story, seed=seed)
             ).items():
                 values.setdefault(key, []).extend(vs)
     return values
+
+
+def run_limits(t: Target) -> tuple[float, float]:
+    """Where a single run may sit: the match band if there is one, else the band plus 15% of its width."""
+    if t.match_band is not None:
+        return t.match_band
+    slack = RUN_TOLERANCE * (t.band[1] - t.band[0])
+    return (t.band[0] - slack, t.band[1] + slack)
 
 
 def evaluate(values: dict[str, list[float]], targets: list[Target]) -> list[Row]:
@@ -128,19 +217,26 @@ def evaluate(values: dict[str, list[float]], targets: list[Target]) -> list[Row]
     for t in targets:
         vs = values[t.id]
         lo, hi = t.band
-        slack = RUN_TOLERANCE * (hi - lo)
+        run_lo, run_hi = run_limits(t)
         m = mean(vs)
-        ok = lo <= m <= hi and min(vs) >= lo - slack and max(vs) <= hi + slack
+        ok = lo <= m <= hi and min(vs) >= run_lo and max(vs) <= run_hi
+        if t.reference_mean is not None:
+            ok = ok and abs(m - t.reference_mean) <= MEAN_TOLERANCE * abs(
+                t.reference_mean
+            )
         rows.append(Row(t, m, min(vs), max(vs), ok))
     return rows
 
 
 def format_table(rows: list[Row]) -> str:
-    lines = [f"{'metric':24}{'band':>16}{'mean':>9}{'min':>9}{'max':>9}  result"]
+    lines = [
+        f"{'metric':24}{'band':>16}{'ref':>9}{'mean':>9}{'min':>9}{'max':>9}  result"
+    ]
     for r in rows:
         band = f"{r.target.band[0]:g} to {r.target.band[1]:g}"
+        ref = "-" if r.target.reference_mean is None else f"{r.target.reference_mean:g}"
         lines.append(
-            f"{r.target.id:24}{band:>16}{r.mean:>9.3f}{r.low:>9.3f}{r.high:>9.3f}  {'pass' if r.ok else 'fail'}"
+            f"{r.target.id:24}{band:>16}{ref:>9}{r.mean:>9.3f}{r.low:>9.3f}{r.high:>9.3f}  {'pass' if r.ok else 'fail'}"
         )
     return "\n".join(lines)
 
@@ -157,8 +253,12 @@ def report_json(rows: list[Row], seeds: list[int], git_sha: str) -> str:
                     "per": r.target.per,
                     "unit": r.target.unit,
                     "band": list(r.target.band),
+                    "match_band": None
+                    if r.target.match_band is None
+                    else list(r.target.match_band),
                     "source": r.target.source,
                     "status": r.target.status,
+                    "reference_mean": r.target.reference_mean,
                     "mean": round(r.mean, 4),
                     "min": round(r.low, 4),
                     "max": round(r.high, 4),

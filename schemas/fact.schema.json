@@ -13,7 +13,7 @@
       "type": "string"
     },
     "value": { "type": ["number", "integer", "string", "boolean"] },
-    "unit": { "type": "string", "enum": ["", "m", "s", "pct", "xg", "count", "m_s"] },
+    "unit": { "type": "string", "enum": ["", "m", "m2", "s", "pct", "xg", "count", "m_s"] },
     "display": {
       "description": "How the number may be written in prose, e.g. 1.18 shown as 1.2. The reconciler accepts only these renderings.",
       "type": "object",

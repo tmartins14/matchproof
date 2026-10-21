@@ -261,6 +261,7 @@ class Event(BaseModel):
 class Unit(StrEnum):
     field_ = ''
     m = 'm'
+    m2 = 'm2'
     s = 's'
     pct = 'pct'
     xg = 'xg'

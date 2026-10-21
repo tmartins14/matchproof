@@ -171,7 +171,7 @@ def since(
             )
             scope: dict[str, object] = {
                 "side": side,
-                "t_from": t0 - BEFORE_S,
+                "t_from": max(t0 - BEFORE_S, 0.0),
                 "t_to": now,
             }
             fact = build_fact(

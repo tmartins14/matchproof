@@ -17,6 +17,7 @@ dev = [
     "uvicorn>=0.54.0",
     "types-pyyaml",
     "types-jsonschema>=4.26.0.20261006",
+    "pytest-xdist>=3.8.0",
 ]
 
 [tool.uv]

@@ -22,7 +22,7 @@ typecheck:
 	cd apps/web && npm run typecheck
 
 test:
-	uv run pytest -m "not slow"
+	uv run pytest -n auto --dist loadfile -m "not slow"
 
 slow:
 	uv run pytest -m slow

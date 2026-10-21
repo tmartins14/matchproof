@@ -28,3 +28,6 @@ next-env.d.ts
 
 # Generated matches
 data/
+
+# Test caches
+.cache/

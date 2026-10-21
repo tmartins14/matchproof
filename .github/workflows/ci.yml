@@ -25,6 +25,13 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
 
+      - name: Cache generated test matches
+        uses: actions/cache@v4
+        with:
+          path: .cache/matches
+          key: matches-${{ hashFiles('packages/sim/src/**') }}
+          restore-keys: matches-
+
       - name: Install
         run: make setup
 

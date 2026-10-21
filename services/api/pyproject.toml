@@ -6,6 +6,8 @@ dependencies = [
     "matchproof-contracts",
     "fastapi>=0.115",
     "matchproof-agents",
+    "matchproof-intel",
+    "matchproof-sim",
     "microsoft-opentelemetry>=1.4.0",
     "uvicorn>=0.54.0",
     "opentelemetry-instrumentation-fastapi>=0.66b1",
@@ -21,3 +23,5 @@ packages = ["src/api"]
 [tool.uv.sources]
 matchproof-contracts = { workspace = true }
 matchproof-agents = { workspace = true }
+matchproof-intel = { workspace = true }
+matchproof-sim = { workspace = true }

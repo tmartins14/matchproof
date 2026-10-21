@@ -28,7 +28,11 @@
       "pattern": "^(ev-[0-9]{6}|win-[0-9]{2}|agg-[a-z0-9_]+|ff-[0-9]{6})$"
     },
     "factId": { "type": "string", "pattern": "^fx-[a-z0-9_-]+$" },
-    "beatId": { "type": "string", "pattern": "^bt-[0-9]{3}$" },
+    "beatId": {
+      "description": "bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.",
+      "type": "string",
+      "pattern": "^bt-([0-9]{3}|[0-9]{6}-[a-z_]+)$"
+    },
     "claimId": { "type": "string", "pattern": "^cl-[0-9]{3}-[0-9]{2}$" },
     "playerId": { "type": "string", "pattern": "^(home|away)-[0-9]{2}$" },
     "lang": { "type": "string", "enum": ["en", "es", "fr", "pt"] },

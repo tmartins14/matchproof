@@ -11,6 +11,10 @@ export type Claim = Claim1
  * @maxItems 2
  */
 export type Point = [number, number]
+/**
+ * One message on the live SSE stream (ADR 0003). The data shape depends on type. claim and verdict are reserved for the agents and carry a claim.
+ */
+export type StreamMessage = StreamMessage1
 
 export interface Contracts {
 beat?: Beat
@@ -22,11 +26,15 @@ fact?: Fact
 match_brief?: MatchBrief
 overlay?: Overlay
 position_frame?: PositionFrame
+stream_message?: StreamMessage
 }
 /**
  * One key moment worth explaining, either planted by the brief or found by the detector.
  */
 export interface Beat {
+/**
+ * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
+ */
 id: string
 kind: ("high_turnover_chance" | "counter_goal" | "set_piece_goal" | "open_play_goal" | "territorial_spell" | "momentum_swing" | "big_chance" | "card" | "substitution")
 origin: ("planted" | "detected")
@@ -58,6 +66,9 @@ rank?: number
 }
 export interface Claim1 {
 id: string
+/**
+ * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
+ */
 beat_id: string
 lang: ("en" | "es" | "fr" | "pt")
 /**
@@ -225,6 +236,9 @@ version: string
  * Timed drawing instructions for one beat, readable by the desk and by a graphics operator's overlay route.
  */
 export interface Overlay {
+/**
+ * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
+ */
 beat_id: string
 /**
  * Seconds since kickoff on the match clock, stoppage time included.
@@ -335,4 +349,27 @@ speed_ms?: number
  */
 role?: ("hold_slot" | "press" | "run" | "track" | "carry" | "receive" | "keep")
 }[]
+}
+export interface StreamMessage1 {
+/**
+ * Starts at 0 and increases by one per message; the SSE id.
+ */
+seq: number
+type: ("status" | "event" | "frame" | "fact" | "beat" | "claim" | "verdict")
+/**
+ * Seconds since kickoff on the match clock, stoppage time included.
+ */
+t: number
+data: (Status | Event | PositionFrame | Fact | Beat | Claim)
+}
+export interface Status {
+state: ("pre_match" | "live" | "half_time" | "full_time" | "error")
+/**
+ * Match minutes per real second.
+ */
+speed?: (1 | 3 | 6)
+/**
+ * Viewer-facing text; follows docs/VOICE.md.
+ */
+message?: string
 }

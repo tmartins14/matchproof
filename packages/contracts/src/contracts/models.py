@@ -114,7 +114,13 @@ class FactId(RootModel[str]):
 
 
 class BeatId(RootModel[str]):
-    root: Annotated[str, Field(pattern='^bt-[0-9]{3}$')]
+    root: Annotated[
+        str,
+        Field(
+            description="bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.",
+            pattern='^bt-([0-9]{3}|[0-9]{6}-[a-z_]+)$',
+        ),
+    ]
 
 
 class ClaimId(RootModel[str]):
@@ -447,6 +453,16 @@ class PositionFrame(BaseModel):
     players: Annotated[list[Player], Field(max_length=22, min_length=20)]
 
 
+class Type1(StrEnum):
+    status = 'status'
+    event = 'event'
+    frame = 'frame'
+    fact = 'fact'
+    beat = 'beat'
+    claim = 'claim'
+    verdict = 'verdict'
+
+
 class ByLang(RootModel[dict[Lang, dict[BeatId, str]]]):
     root: dict[Lang, dict[BeatId, str]]
 
@@ -484,6 +500,33 @@ class Team(BaseModel):
         UnitInterval, Field(description='0 = deep block, 1 = high line.')
     ]
     players: Annotated[list[Player1], Field(max_length=18, min_length=11)]
+
+
+class State(StrEnum):
+    pre_match = 'pre_match'
+    live = 'live'
+    half_time = 'half_time'
+    full_time = 'full_time'
+    error = 'error'
+
+
+class Speed(IntEnum):
+    integer_1 = 1
+    integer_3 = 3
+    integer_6 = 6
+
+
+class Status(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    state: State
+    speed: Annotated[
+        Speed | None, Field(description='Match minutes per real second.')
+    ] = None
+    message: Annotated[
+        str | None, Field(description='Viewer-facing text; follows docs/VOICE.md.')
+    ] = None
 
 
 class Beat(BaseModel):
@@ -591,6 +634,22 @@ class MatchBrief(BaseModel):
             max_length=6,
         ),
     ]
+
+
+class StreamMessage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    seq: Annotated[
+        int,
+        Field(
+            description='Starts at 0 and increases by one per message; the SSE id.',
+            ge=0,
+        ),
+    ]
+    type: Type1
+    t: MatchClock
+    data: Status | Event | PositionFrame | Fact | Beat | Claim
 
 
 class ClaimGraph(BaseModel):

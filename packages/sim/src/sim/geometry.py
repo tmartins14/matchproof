@@ -4,13 +4,17 @@ Calibration uses these now; the positional extractors import the same functions 
 Outfield means every player of a side except the goalkeeper (shirt 01). The home side attacks toward x = 120.
 """
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
+from statistics import mean, median
 
 from contracts.models import PositionFrame
 
 Pt = tuple[float, float]
 
 PITCH_LENGTH = 120.0
+POSITION_AGGREGATE = (
+    "median"  # how sampled frames of a positional measure are combined, everywhere
+)
 GOALKEEPER_ID_SUFFIX = "-01"
 
 
@@ -69,3 +73,10 @@ def hull_area(points: Iterable[Pt]) -> float:
         )
         / 2
     )
+
+
+def aggregate(values: Sequence[float]) -> float:
+    """Combine a measure's per-frame values the one way calibration and the facts both do."""
+    if not values:
+        return float("nan")
+    return median(values) if POSITION_AGGREGATE == "median" else mean(values)

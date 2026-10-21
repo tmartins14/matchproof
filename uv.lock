@@ -1418,12 +1418,14 @@ version = "0.1.0"
 source = { editable = "packages/intel" }
 dependencies = [
     { name = "matchproof-contracts" },
+    { name = "matchproof-sim" },
     { name = "pyyaml" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "matchproof-contracts", editable = "packages/contracts" },
+    { name = "matchproof-sim", editable = "packages/sim" },
     { name = "pyyaml" },
 ]
 

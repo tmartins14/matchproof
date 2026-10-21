@@ -5,7 +5,7 @@ import math
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from statistics import mean, median
+from statistics import mean
 
 import yaml
 from contracts.models import Event, MatchBrief, PositionFrame
@@ -132,10 +132,6 @@ def match_metrics(events: list[Event]) -> dict[str, list[float]]:
     return out
 
 
-def _median(xs: list[float]) -> float:
-    return median(xs) if xs else float("nan")
-
-
 def shape_metrics(frames: Iterable[PositionFrame]) -> dict[str, list[float]]:
     """Positional metrics for one match, two values per metric (home, then away), from frames sampled at 1 Hz."""
     series: dict[str, dict[str, list[float]]] = {}
@@ -176,9 +172,11 @@ def shape_metrics(frames: Iterable[PositionFrame]) -> dict[str, list[float]]:
         "compactness_out",
     ):
         for side in ("home", "away"):
-            out.setdefault(key, []).append(_median(series.get(key, {}).get(side, [])))
+            out.setdefault(key, []).append(
+                geometry.aggregate(series.get(key, {}).get(side, []))
+            )
     for side in ("home", "away"):
-        med = {k: _median(series.get(k, {}).get(side, [])) for k in series}
+        med = {k: geometry.aggregate(series.get(k, {}).get(side, [])) for k in series}
         out.setdefault("back_line_gain", []).append(
             med["back_line_height_in"] - med["back_line_height_out"]
         )

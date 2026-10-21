@@ -191,7 +191,7 @@ id: string
  */
 name: string
 value: (number | string | boolean)
-unit?: ("" | "m" | "s" | "pct" | "xg" | "count" | "m_s")
+unit?: ("" | "m" | "m2" | "s" | "pct" | "xg" | "count" | "m_s")
 /**
  * How the number may be written in prose, e.g. 1.18 shown as 1.2. The reconciler accepts only these renderings.
  */

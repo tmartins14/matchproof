@@ -1,0 +1,98 @@
+"""The one place numbers are rounded and written out. Every rendering uses digits.
+
+render() returns the renderings the reconciler will accept for a fact value. Extractors never format
+numbers themselves.
+"""
+
+from decimal import ROUND_HALF_UP, Decimal
+
+Value = float | int | str | bool
+
+PCT_DECIMALS = 0  # percentages are shown as whole numbers
+METRE_DECIMALS = 0  # metres, and square metres, are shown as whole numbers
+SECOND_DECIMALS = 0  # seconds are shown as whole numbers
+XG_DECIMALS = 2  # the primary xG rendering
+XG_SHORT_DECIMALS = 1  # the shorter xG rendering also accepted
+SPEED_DECIMALS = 1  # metres per second
+SECONDS_PER_MINUTE = 60
+
+UNIT_DECIMALS = {
+    "pct": PCT_DECIMALS,
+    "m": METRE_DECIMALS,
+    "m2": METRE_DECIMALS,
+    "s": SECOND_DECIMALS,
+    "xg": XG_DECIMALS,
+    "m_s": SPEED_DECIMALS,
+}
+
+
+def round_half_up(value: float, decimals: int) -> Decimal:
+    """Round the way a reader would (0.5 goes up), not the way Python's round() does."""
+    return Decimal(str(value)).quantize(Decimal(1).scaleb(-decimals), ROUND_HALF_UP)
+
+
+def display_value(value: float, unit: str) -> float:
+    """The value as it is shown in English, for arithmetic that must agree with the prose."""
+    return float(round_half_up(value, UNIT_DECIMALS.get(unit, 0)))
+
+
+def _number(value: float, decimals: int, lang: str) -> str:
+    text = f"{round_half_up(value, decimals):f}"
+    return text.replace(".", ",") if lang == "es" else text
+
+
+def _unique(items: list[str]) -> list[str]:
+    return list(dict.fromkeys(items))
+
+
+def render(value: Value, unit: str, lang: str) -> list[str]:
+    """Renderings of a value in a unit, most natural first. Strings and booleans pass through."""
+    if isinstance(value, bool):
+        return [str(value).lower()]
+    if isinstance(value, str):
+        return [value]
+    es = lang == "es"
+    if unit == "pct":
+        pct = float(value) * 100
+        n = _number(pct, PCT_DECIMALS, lang)
+        return [f"{n} %"] if es else [f"{n}%", f"{n} per cent"]
+    if unit == "m":
+        n = _number(value, METRE_DECIMALS, lang)
+        return [f"{n} m"] if es else [f"{n} m", f"{n} metres"]
+    if unit == "m2":
+        n = _number(value, METRE_DECIMALS, lang)
+        return (
+            [f"{n} m²", f"{n} metros cuadrados"]
+            if es
+            else [f"{n} m²", f"{n} square metres"]
+        )
+    if unit == "s":
+        n = _number(value, SECOND_DECIMALS, lang)
+        return [f"{n} segundos", f"{n} s"] if es else [f"{n} seconds", f"{n} s"]
+    if unit == "xg":
+        return _unique(
+            [
+                f"{_number(value, XG_DECIMALS, lang)} xG",
+                f"{_number(value, XG_SHORT_DECIMALS, lang)} xG",
+            ]
+        )
+    if unit == "m_s":
+        return [f"{_number(value, SPEED_DECIMALS, lang)} m/s"]
+    if isinstance(value, int):
+        return [str(value)]
+    return [_number(value, XG_DECIMALS, lang).rstrip("0").rstrip(",.")]
+
+
+def minute_of(t: float) -> int:
+    """The football minute a match-clock time falls in: 40:12 is in the 41st minute."""
+    return int(t // SECONDS_PER_MINUTE) + 1
+
+
+def render_minute(t: float, lang: str) -> list[str]:
+    return [f"{minute_of(t)}′"]
+
+
+def render_clock(t: float, lang: str) -> list[str]:
+    """Match clock as mm:ss, the way a producer reads a clip in and out point."""
+    whole = int(t)
+    return [f"{whole // SECONDS_PER_MINUTE}:{whole % SECONDS_PER_MINUTE:02d}"]

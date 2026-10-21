@@ -1,4 +1,4 @@
-"""CLI: uv run python -m intel facts --match data/matches/<match_id>"""
+"""CLI: uv run python -m intel facts|beats --match data/matches/<match_id>"""
 
 import argparse
 import gc
@@ -6,8 +6,9 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from contracts.models import Event, PositionFrame
+from contracts.models import Beat, Event, PositionFrame
 
+from .beats import detect_all
 from .engine import extract_all
 
 
@@ -34,17 +35,35 @@ def load_roster(base: Path) -> dict[str, str]:
     }
 
 
+def print_beats(base: Path, beats: list[Beat]) -> int:
+    out = base.with_name(base.name + ".beats.jsonl")
+    with out.open("w", encoding="utf-8") as fh:
+        for beat in beats:
+            fh.write(beat.model_dump_json(by_alias=True, exclude_none=True) + "\n")
+    print(f"{base.name}: {len(beats)} beats -> {out}")
+    for beat in beats:
+        print(
+            f"  {beat.label:>11}  {beat.kind.value:21}{beat.origin.value:9}"
+            f"salience={beat.salience:.2f}  facts={len(beat.fact_ids)}"
+        )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="intel")
     sub = ap.add_subparsers(dest="cmd", required=True)
     f = sub.add_parser("facts")
     f.add_argument("--match", type=Path, required=True)
     f.add_argument("--samples", type=int, default=10)
+    b = sub.add_parser("beats")
+    b.add_argument("--match", type=Path, required=True)
     a = ap.parse_args(argv)
     base: Path = a.match
     gc.disable()  # tens of thousands of frame models; the cyclic collector would crawl over them
     events, frames, freeze = load_match(base)
     registry = extract_all(events, frames, freeze, load_roster(base))
+    if a.cmd == "beats":
+        return print_beats(base, detect_all(events, frames, freeze, registry))
     facts = registry.all()
     out = base.with_name(base.name + ".facts.jsonl")
     with out.open("w", encoding="utf-8") as fh:

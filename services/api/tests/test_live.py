@@ -1,7 +1,9 @@
 import asyncio
 import json
+import threading
 from collections import Counter
 from functools import cache
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -9,10 +11,16 @@ import httpx
 import pytest
 from api import main
 from api.live import (
+    FOCUS_AFTER_S,
+    FOCUS_BEFORE_S,
+    FREEZE_HOLD_S,
+    LOOKAHEAD_S,
     SPEED_FASTEST,
     SPEED_REAL_TIME,
     WIRE_FPS,
     NoPacer,
+    _Control,
+    merge_windows,
     run_live,
 )
 from contracts.models import MatchBrief, StreamMessage
@@ -127,7 +135,11 @@ def test_ordering_and_facts_before_beats() -> None:
             assert set(dump(m)["data"]["fact_ids"]) <= seen
     assert beats
     states = [dump(m)["data"]["state"] for m in messages if m.type.value == "status"]
-    assert states == ["pre_match", "live", "half_time", "live", "full_time"]
+    assert [x for x in states if x in ("pre_match", "half_time", "full_time")] == [
+        "pre_match",
+        "half_time",
+        "full_time",
+    ]
 
 
 def test_window_and_beat_facts_only() -> None:
@@ -266,3 +278,85 @@ def test_third_concurrent_stream_from_one_client_gets_429(
 
     assert asyncio.run(scenario()) == [429, 200, 200]
     assert main._streams["203.0.113.9"] == 0
+
+
+def test_windows_around_anchors_merge_when_they_overlap() -> None:
+    assert merge_windows([200.0, 100.0, 110.0]) == [
+        (100.0 - FOCUS_BEFORE_S, 110.0 + FOCUS_AFTER_S),
+        (200.0 - FOCUS_BEFORE_S, 200.0 + FOCUS_AFTER_S),
+    ]
+    assert merge_windows([4.0]) == [(0.0, 4.0 + FOCUS_AFTER_S)]
+
+
+def test_focus_freeze_then_beat() -> None:
+    timed = list(stream("red_card_flip", SPEED_FASTEST))
+    freezes = [
+        i
+        for i, (_, m) in enumerate(timed)
+        if m.type.value == "status" and dump(m)["data"]["state"] == "freeze"
+    ]
+    assert freezes
+    for i in freezes:
+        status = dump(timed[i][1])["data"]
+        assert "speed" not in status
+        event_id = status["event_id"]
+        # the freeze frame follows its status at the same second, and the beat only after the hold
+        frozen = dump(timed[i + 1][1])
+        assert (
+            frozen["type"] == "frame" and frozen["data"]["freeze_frame_of"] == event_id
+        )
+        beat_at = next(
+            t
+            for t, m in timed[i + 2 :]
+            if m.type.value == "beat" and dump(m)["data"]["anchor_event_id"] == event_id
+        )
+        assert beat_at - timed[i + 1][0] >= FREEZE_HOLD_S
+        # a focus status opens the window; it carries nothing about what comes
+        start = max(
+            j
+            for j in range(i)
+            if timed[j][1].type.value == "status"
+            and dump(timed[j][1])["data"]["state"] == "focus"
+        )
+        assert dump(timed[start][1])["data"] == {"state": "focus"}
+        frames = [
+            dump(m)["data"]["t"] for _, m in timed[start:i] if m.type.value == "frame"
+        ]
+        assert len(frames) >= 2
+        assert all(abs((b - a) - 0.2) < 0.011 for a, b in pairwise(frames))
+        assert (
+            dump(timed[i][1])["t"] - dump(timed[start][1])["t"] <= FOCUS_BEFORE_S + 0.01
+        )
+
+
+def test_content_does_not_depend_on_the_clock() -> None:
+    unpaced = asyncio.run(collect_unpaced(brief_for("red_card_flip"), SPEED_FASTEST))
+    assert [dump(m) for m in unpaced] == [
+        dump(m) for _, m in stream("red_card_flip", SPEED_FASTEST)
+    ]
+
+
+async def collect_unpaced(brief: MatchBrief, speed: int) -> list[StreamMessage]:
+    return [m async for m in run_live(brief, speed, pacer=NoPacer())]
+
+
+def test_pipeline_waits_for_playback() -> None:
+    control = _Control()
+    allowed: list[bool] = []
+    worker = threading.Thread(
+        target=lambda: allowed.append(control.wait_until_allowed(LOOKAHEAD_S + 10))
+    )
+    worker.start()
+    worker.join(0.2)
+    assert worker.is_alive()  # beyond the lookahead: blocked
+    control.advance(20.0)
+    worker.join(2.0)
+    assert allowed == [True]
+    stopped: list[bool] = []
+    blocked = threading.Thread(
+        target=lambda: stopped.append(control.wait_until_allowed(10_000.0))
+    )
+    blocked.start()
+    control.cancel()
+    blocked.join(2.0)
+    assert stopped == [False]

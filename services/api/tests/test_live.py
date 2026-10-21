@@ -2,7 +2,7 @@ import asyncio
 import json
 import threading
 from collections import Counter
-from functools import cache
+from functools import lru_cache
 from itertools import pairwise
 from pathlib import Path
 from typing import Any
@@ -65,7 +65,7 @@ async def collect(
     ]
 
 
-@cache
+@lru_cache(maxsize=2)  # each run holds thousands of frame messages
 def stream(story: str, speed: int) -> tuple[tuple[float, StreamMessage], ...]:
     return tuple(asyncio.run(collect(brief_for(story), speed)))
 

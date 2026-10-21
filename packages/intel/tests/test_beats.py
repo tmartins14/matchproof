@@ -1,10 +1,17 @@
 import json
+import os
 import re
-from functools import cache
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 import pytest
+from beat_checks import (
+    SEEDS,
+    STORIES,
+    check_planted,
+)
 from contracts.models import Beat
 from intel.__main__ import main as intel_main
 from intel.beats import (
@@ -18,34 +25,22 @@ from intel.beats import (
     minute_text,
 )
 from intel.engine import FactEngine, extract_all
-from intel.registry import FactRegistry
 from jsonschema import Draft202012Validator
-from matches import match
+from matches import Lean, compute_lean, gc_paused, lean, match
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 from sim.__main__ import main as sim_main
 from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, make_brief
 
 ROOT = Path(__file__).resolve().parents[3]
-STORIES = ("late_comeback", "red_card_flip", "smash_and_grab", "end_to_end")
-SEEDS = (1, 2, 3, 4)
-# The beat kinds a planted beat may be detected as. A penalty has no restart event of its own, so it
-# reads as an open-play goal.
-EXPECTED_KINDS = {
-    "counter_goal": {"counter_goal"},
-    "set_piece_goal": {"set_piece_goal"},
-    "open_play_goal": {"open_play_goal"},
-    "high_turnover_goal": {"high_turnover_goal"},
-    "red_card": {"card"},
-    "penalty": {"open_play_goal"},
-}
 
 
-@cache
-def detected(story: str, seed: int) -> tuple[list[Beat], FactRegistry]:
+def batch_beats(story: str, seed: int) -> list[Beat]:
+    """The same beats from the finished match, through detect_all."""
     m = match(story, seed)
-    registry = extract_all(m.events, m.frames, m.freeze)
-    return detect_all(m.events, m.frames, m.freeze, registry), registry
+    with gc_paused():
+        registry = extract_all(m.events, m.frames, m.freeze)
+        return detect_all(m.events, m.frames, m.freeze, registry)
 
 
 def beat_validator() -> Draft202012Validator:
@@ -68,9 +63,8 @@ def dump(b: Beat) -> dict[str, Any]:
     return out
 
 
-@pytest.mark.parametrize("story", STORIES)
-def test_beats_validate_and_every_fact_exists(story: str) -> None:
-    beats, registry = detected(story, 1)
+def check_valid_and_facts_exist(found: Lean) -> None:
+    beats, registry = found.beats, found.registry
     check = beat_validator()
     ids = [b.id.root for b in beats]
     assert len(ids) == len(set(ids))
@@ -82,27 +76,8 @@ def test_beats_validate_and_every_fact_exists(story: str) -> None:
             registry.get(fid.root)
 
 
-@pytest.mark.parametrize(("story", "seed"), [(s, n) for s in STORIES for n in SEEDS])
-def test_planted_beats_are_detected_as_planted(story: str, seed: int) -> None:
-    beats, _ = detected(story, seed)
-    brief = make_brief(DEFAULT_HOME, DEFAULT_AWAY, story, seed)
-    for planted in brief.planted_beats:
-        pid = planted.id
-        kinds = EXPECTED_KINDS[planted.kind.value]
-        found = [b for b in beats if b.planted_beat_id == pid and b.kind.value in kinds]
-        assert found, (
-            f"{story}/{seed}: {pid} {planted.kind.value} not detected as {kinds}"
-        )
-        assert all(b.origin.value == "planted" for b in found)
-    for b in beats:
-        assert (b.origin.value == "planted") == (b.planted_beat_id is not None)
-        if b.kind.value in ("momentum_swing", "territorial_spell"):
-            assert b.origin.value == "detected"
-
-
-@pytest.mark.parametrize("story", STORIES)
-def test_one_beat_per_anchor_event(story: str) -> None:
-    beats, _ = detected(story, 1)
+def check_one_beat_per_anchor(found: Lean) -> None:
+    beats = found.beats
     anchored = [
         b.anchor_event_id.root for b in beats if b.kind.value != "momentum_swing"
     ]
@@ -114,10 +89,10 @@ def test_one_beat_per_anchor_event(story: str) -> None:
     assert all(b.anchor_event_id.root in by_anchor for b in follow_ups)
 
 
-@pytest.mark.parametrize("story", ["late_comeback", "end_to_end"])
-@pytest.mark.parametrize("seed", SEEDS)
-def test_planted_high_turnover_goal_is_one_planted_beat(story: str, seed: int) -> None:
-    beats, _ = detected(story, seed)
+def check_high_turnover_goal_is_one_planted_beat(
+    story: str, seed: int, found: Lean
+) -> None:
+    beats = found.beats
     brief = make_brief(DEFAULT_HOME, DEFAULT_AWAY, story, seed)
     for planted in brief.planted_beats:
         if planted.kind.value != "high_turnover_goal":
@@ -127,16 +102,15 @@ def test_planted_high_turnover_goal_is_one_planted_beat(story: str, seed: int) -
         assert own[0].origin.value == "planted"
 
 
-def test_follow_up_after_a_stoppage_time_goal_is_skipped() -> None:
-    beats, _ = detected("end_to_end", 1)
-    m = match("end_to_end", 1)
+def check_stoppage_time_goal_has_no_follow_up(found: Lean) -> None:
+    beats, events = found.beats, found.events
     late = [
         e
-        for e in m.events
+        for e in events
         if e.type.value == "shot"
         and e.outcome is not None
         and e.outcome.value == "goal"
-        and e.t.root > m.events[-1].t.root - MIN_SINCE_S
+        and e.t.root > events[-1].t.root - MIN_SINCE_S
     ]
     assert late  # the 90+7 goal
     anchors = {
@@ -148,13 +122,11 @@ def test_follow_up_after_a_stoppage_time_goal_is_skipped() -> None:
     )  # the goal itself stays
 
 
-@pytest.mark.parametrize("seed", SEEDS)
-def test_red_card_has_a_momentum_swing_follow_up(seed: int) -> None:
-    m = match("red_card_flip", seed)
-    beats, registry = detected("red_card_flip", seed)
+def check_red_card_follow_up(found: Lean) -> None:
+    beats, registry = found.beats, found.registry
     cards = [
         e
-        for e in m.events
+        for e in found.events
         if e.type.value == "card" and e.outcome and e.outcome.value == "red"
     ]
     assert len(cards) == 1
@@ -186,31 +158,23 @@ def test_live_equals_batch(story: str, seed: int) -> None:
     engine = FactEngine()
     detector = BeatDetector()
     live: list[Beat] = []
-    for item in m.stream:
-        engine.push(item)
-        live += detector.push(item, engine.registry)
-    engine.finish()
-    live += detector.finish(engine.registry)
-    batch, _ = detected(story, seed)
-    assert [dump(b) for b in live] == [dump(b) for b in batch]
+    with gc_paused():
+        for item in m.stream:
+            engine.push(item)
+            live += detector.push(item, engine.registry)
+        engine.finish()
+        live += detector.finish(engine.registry)
+    assert [dump(b) for b in live] == [dump(b) for b in batch_beats(story, seed)]
 
 
 def test_detection_is_deterministic() -> None:
-    m = match("end_to_end", 2)
-    runs = [
-        detect_all(
-            m.events, m.frames, m.freeze, extract_all(m.events, m.frames, m.freeze)
-        )
-        for _ in range(2)
-    ]
+    runs = [compute_lean("end_to_end", 2).beats for _ in range(2)]
     assert [dump(b) for b in runs[0]] == [dump(b) for b in runs[1]]
 
 
-@pytest.mark.parametrize("story", STORIES)
-def test_rules_hold(story: str) -> None:
-    m = match(story, 1)
-    beats, _ = detected(story, 1)
-    by_id = {e.id.root: e for e in m.events}
+def check_rules_hold(found: Lean) -> None:
+    beats = found.beats
+    by_id = {e.id.root: e for e in found.events}
     last: dict[tuple[str, str], float] = {}
     for b in sorted(beats, key=lambda x: (x.t_to.root, x.id.root)):
         kind, side = b.kind.value, b.side.value if b.side else ""
@@ -251,18 +215,60 @@ def test_label_forms() -> None:
     assert re.fullmatch(r"\d+′|\d+(\+\d+)?–\d+(\+\d+)?′|\d+\+\d+′", "55–70′")
 
 
-@pytest.mark.parametrize("story", STORIES)
-def test_label_shapes(story: str) -> None:
-    beats, _ = detected(story, 1)
+def check_label_shapes(found: Lean) -> None:
     shape = re.compile(r"^\d+(\+\d+)?(–\d+(\+\d+)?)?′$")
-    assert all(shape.match(b.label) for b in beats)
+    assert all(shape.match(b.label) for b in found.beats)
 
 
-def test_beats_per_match_report(capsys: pytest.CaptureFixture[str]) -> None:
+@pytest.mark.parametrize(("story", "seed"), [(s, n) for s in STORIES for n in SEEDS])
+def test_beats_of_a_match(story: str, seed: int) -> None:
+    """Every check that needs only a match's beats, so each of the 16 matches is built once."""
+    found = lean(story, seed)
+    check_planted(story, seed, found.beats)
+    if story in ("late_comeback", "end_to_end"):
+        check_high_turnover_goal_is_one_planted_beat(story, seed, found)
+    if story == "red_card_flip":
+        check_red_card_follow_up(found)
+    if seed == 1:
+        check_valid_and_facts_exist(found)
+        check_one_beat_per_anchor(found)
+        check_rules_hold(found)
+        check_label_shapes(found)
+        if story == "end_to_end":
+            check_stoppage_time_goal_has_no_follow_up(found)
+
+
+PEAK_RSS_LIMIT_MB = 2048  # CI kills the run above this
+
+
+def test_planted_matrix_stays_under_the_memory_limit(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """All 16 matches in a fresh process, so the peak is theirs and not the rest of the suite's."""
+    code = (
+        "import resource, json; from beat_checks import run_planted_matrix; "
+        "counts = run_planted_matrix(); "
+        "print(json.dumps([[k[0], k[1], v] for k, v in counts.items()])); "
+        "print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)"
+    )
+    env = {**os.environ, "PYTHONPATH": str(Path(__file__).parent)}
+    done = subprocess.run(
+        [sys.executable, "-c", code],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    counts_line, raw = done.stdout.strip().splitlines()[-2:]
+    peak_mb = int(raw) / (1024 if sys.platform.startswith("linux") else 1024 * 1024)
+    per_story = {
+        story: [n for s, _, n in json.loads(counts_line) if s == story]
+        for story in STORIES
+    }
     with capsys.disabled():
-        for story in STORIES:
-            counts = [len(detected(story, seed)[0]) for seed in SEEDS]
-            print(f"\nbeats {story}: {counts} (target 12-30, not asserted)", end="")
+        print(f"\nbeats per match (target 12-30, not asserted): {per_story}")
+        print(f"peak RSS of the 16-match check: {peak_mb:.0f} MB", end="")
+    assert peak_mb < PEAK_RSS_LIMIT_MB
 
 
 @pytest.mark.parametrize(("story", "seed"), [("late_comeback", 4), ("end_to_end", 1)])

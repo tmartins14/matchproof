@@ -18,7 +18,7 @@ AI can already write match commentary, recaps and "why it mattered" explanations
 
 ## What it does
 
-1. Takes a tactical setup (formation and three dials per team, plus a storyline) or a free-text brief, kept in sync both ways.
+1. Takes a tactical setup (formation and three dials per team, plus a storyline or custom planted moments such as a red card at 30′) or a free-text brief, kept in sync both ways. Custom moments make the tactics panel a scenario harness: set up a situation, then watch every claim about it get checked.
 2. Generates a full synthetic match: events plus positions for all 22 players, calibrated against real-match distributions.
 3. Streams it live at 1×, 3× or 6× speed, or plays a cached run.
 4. Detects key moments, narrates them from computed facts, and checks every claim before it is shown.

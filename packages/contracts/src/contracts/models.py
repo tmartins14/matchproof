@@ -16,6 +16,7 @@ class Kind(StrEnum):
     high_turnover_chance = 'high_turnover_chance'
     counter_goal = 'counter_goal'
     set_piece_goal = 'set_piece_goal'
+    high_turnover_goal = 'high_turnover_goal'
     open_play_goal = 'open_play_goal'
     territorial_spell = 'territorial_spell'
     momentum_swing = 'momentum_swing'
@@ -508,6 +509,8 @@ class State(StrEnum):
     half_time = 'half_time'
     full_time = 'full_time'
     error = 'error'
+    focus = 'focus'
+    freeze = 'freeze'
 
 
 class Speed(IntEnum):
@@ -520,9 +523,20 @@ class Status(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    state: State
+    state: Annotated[
+        State,
+        Field(
+            description='focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it.'
+        ),
+    ]
     speed: Annotated[
-        Speed | None, Field(description='Match minutes per real second.')
+        Speed | None,
+        Field(
+            description='Match minutes per real second while cruising. Absent in focus and freeze.'
+        ),
+    ] = None
+    event_id: Annotated[
+        EventId | None, Field(description='The anchor event, on a freeze status only.')
     ] = None
     message: Annotated[
         str | None, Field(description='Viewer-facing text; follows docs/VOICE.md.')

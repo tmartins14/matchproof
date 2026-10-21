@@ -35,8 +35,13 @@
       "additionalProperties": false,
       "required": ["state"],
       "properties": {
-        "state": { "type": "string", "enum": ["pre_match", "live", "half_time", "full_time", "error"] },
-        "speed": { "type": "integer", "enum": [1, 3, 6], "description": "Match minutes per real second." },
+        "state": {
+          "type": "string",
+          "enum": ["pre_match", "live", "half_time", "full_time", "error", "focus", "freeze"],
+          "description": "focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it."
+        },
+        "speed": { "type": "integer", "enum": [1, 3, 6], "description": "Match minutes per real second while cruising. Absent in focus and freeze." },
+        "event_id": { "$ref": "common.schema.json#/$defs/eventId", "description": "The anchor event, on a freeze status only." },
         "message": { "type": "string", "description": "Viewer-facing text; follows docs/VOICE.md." }
       }
     }

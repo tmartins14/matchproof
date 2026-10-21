@@ -36,7 +36,7 @@ export interface Beat {
  * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
  */
 id: string
-kind: ("high_turnover_chance" | "counter_goal" | "set_piece_goal" | "open_play_goal" | "territorial_spell" | "momentum_swing" | "big_chance" | "card" | "substitution")
+kind: ("high_turnover_chance" | "counter_goal" | "set_piece_goal" | "high_turnover_goal" | "open_play_goal" | "territorial_spell" | "momentum_swing" | "big_chance" | "card" | "substitution")
 origin: ("planted" | "detected")
 planted_beat_id?: string
 side?: ("home" | "away")
@@ -363,11 +363,18 @@ t: number
 data: (Status | Event | PositionFrame | Fact | Beat | Claim)
 }
 export interface Status {
-state: ("pre_match" | "live" | "half_time" | "full_time" | "error")
 /**
- * Match minutes per real second.
+ * focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it.
+ */
+state: ("pre_match" | "live" | "half_time" | "full_time" | "error" | "focus" | "freeze")
+/**
+ * Match minutes per real second while cruising. Absent in focus and freeze.
  */
 speed?: (1 | 3 | 6)
+/**
+ * The anchor event, on a freeze status only.
+ */
+event_id?: string
 /**
  * Viewer-facing text; follows docs/VOICE.md.
  */

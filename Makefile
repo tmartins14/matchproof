@@ -25,6 +25,7 @@ test:
 	uv run pytest -m "not slow"
 
 calibrate:
+	uv run pytest -m slow
 	uv run python -m sim calibrate --seeds 1-8 --out data/calibration.json --git-sha $$(git rev-parse --short HEAD)
 
 web-dev:

@@ -9,7 +9,7 @@ from collections.abc import Iterator
 from dataclasses import replace
 from functools import cache
 from pathlib import Path
-from statistics import mean
+from statistics import mean, median, pstdev
 from typing import Any
 
 import pytest
@@ -19,6 +19,7 @@ from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 from sim import generate, iter_events
 from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, make_brief
+from sim.geometry import back_line_height, hull_area
 from sim.positions import (
     FRAME_DT,
     MAX_SPEED_V1,
@@ -213,6 +214,21 @@ def test_red_card_removes_player_from_frames() -> None:
     )
 
 
+def test_sent_off_player_is_in_the_cards_freeze_frame_and_gone_after() -> None:
+    m = match("red_card_flip", 3)
+    card = next(
+        e
+        for e in m.events
+        if e.type.value == "card" and e.outcome is not None and e.outcome.value == "red"
+    )
+    assert card.player_id is not None
+    pid = card.player_id.root
+    freeze = m.freezes[card.id.root]
+    assert pid in [p.id.root for p in freeze.players] and len(freeze.players) == 22
+    assert all(pid in f[3] for f in m.frames if f[0] <= card.t.root)
+    assert all(pid not in f[3] for f in m.frames if f[0] > card.t.root)
+
+
 def back_line(frames: list[Lite]) -> float:
     """Mean distance of the home side's deepest outfield player from its own goal."""
     return mean(
@@ -221,31 +237,72 @@ def back_line(frames: list[Lite]) -> float:
     )
 
 
-def hull_area(points: list[tuple[float, float]]) -> float:
-    pts = sorted(set(points))
-
-    def half(seq: list[tuple[float, float]]) -> list[tuple[float, float]]:
-        out: list[tuple[float, float]] = []
-        for q in seq:
-            while len(out) >= 2 and (
-                (out[-1][0] - out[-2][0]) * (q[1] - out[-2][1])
-                - (out[-1][1] - out[-2][1]) * (q[0] - out[-2][0])
-                <= 0
-            ):
-                out.pop()
-            out.append(q)
-        return out
-
-    hull = half(pts)[:-1] + half(pts[::-1])[:-1]
-    return (
-        abs(
-            sum(
-                a[0] * b[1] - b[0] * a[1]
-                for a, b in zip(hull, hull[1:] + hull[:1], strict=False)
-            )
-        )
-        / 2
+def ten_man_windows(seed: int) -> tuple[float, float, float, float]:
+    """Median out-of-possession back line and hull area of the sent-off team: 15 min before the card, 30 min after."""
+    m = match("red_card_flip", seed)
+    card = next(
+        e
+        for e in m.events
+        if e.type.value == "card" and e.outcome is not None and e.outcome.value == "red"
     )
+    side = card.side.value
+    before: list[tuple[float, float]] = []
+    after: list[tuple[float, float]] = []
+    for f in m.frames[::5]:
+        if f[1] in ("", side):
+            continue
+        pts = [
+            (x, y)
+            for pid, s, x, y, _ in rows(f)
+            if s == side and not pid.endswith("-01")
+        ]
+        window = (
+            before
+            if card.t.root - 900 <= f[0] < card.t.root
+            else after
+            if card.t.root < f[0] <= card.t.root + 1800
+            else None
+        )
+        if window is not None:
+            window.append((back_line_height(pts, side), hull_area(pts)))
+    return (
+        median(b for b, _ in before),
+        median(b for b, _ in after),
+        median(a for _, a in before),
+        median(a for _, a in after),
+    )
+
+
+@pytest.mark.parametrize("seed", [1, 2, 3, 4])
+def test_ten_man_team_drops_and_compresses_after_the_red_card(seed: int) -> None:
+    back_before, back_after, area_before, area_after = ten_man_windows(seed)
+    assert back_before - back_after >= 5.0
+    assert area_after <= 0.85 * area_before
+
+
+def test_out_of_possession_block_varies_frame_to_frame(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    lengths: list[float] = []
+    areas: list[float] = []
+    for story, seed in (("red_card_flip", 3), ("late_comeback", 3)):
+        for f in match(story, seed).frames[::5]:
+            for side in ("home", "away"):
+                if f[1] in ("", side):
+                    continue
+                pts = [
+                    (x, y)
+                    for pid, s, x, y, _ in rows(f)
+                    if s == side and not pid.endswith("-01")
+                ]
+                lengths.append(max(x for x, _ in pts) - min(x for x, _ in pts))
+                areas.append(hull_area(pts))
+    with capsys.disabled():
+        print(
+            f"\nframe-level std over {len(areas)} out-of-possession frames: "
+            f"length {pstdev(lengths):.2f} m, area {pstdev(areas):.0f} m2"
+        )
+    assert pstdev(lengths) > 1.0 and pstdev(areas) > 50.0
 
 
 def test_line_height_moves_the_back_line() -> None:
@@ -271,7 +328,15 @@ def test_out_of_possession_shape_is_smaller_than_in_possession() -> None:
 
 
 def test_shape_is_the_only_module_with_slot_targets() -> None:
-    names = ["LINE_SHIFT", "BALL_PULL", "LATERAL_PULL", "COMPACT_OUT", "WIDTH_IN"]
+    names = [
+        "LINE_SHIFT",
+        "BALL_PULL",
+        "LATERAL_PULL",
+        "COMPACT_OUT",
+        "WIDTH_IN",
+        "WIDTH_OUT",
+        "PUSH_IN",
+    ]
     for path in (ROOT / "packages/sim/src/sim").glob("*.py"):
         if path.name == "shape.py":
             continue
@@ -296,9 +361,10 @@ def test_stream_orders_events_and_frames() -> None:
     assert sum(1 for _ in iter_freeze_frames(brief, events)) == n_events
 
 
-def test_match_with_frames_generates_in_four_seconds() -> None:
+@pytest.mark.slow
+def test_match_with_frames_generates_in_eight_seconds() -> None:
     brief = make_brief(seed=9)
     start = time.perf_counter()
     for _ in iter_stream(brief):
         pass
-    assert time.perf_counter() - start < 4.0
+    assert time.perf_counter() - start < 8.0

@@ -199,9 +199,9 @@ Oct 26 and 27 are off at about 10 hours each: 57 hours in total. Weekdays before
 | Tue Oct 20 | 3 | Calibration tests; 22-player position layer (formation shape shifted by ball and team dials, 5 Hz, freeze frame per event); extractors with provenance, batch and incremental, including positional facts (line height, compactness, distance between lines) for the hero claim. Confirm registration before 12 PM PT (3 PM ET) | **Generator done**: every calibration metric inside its band |
 | Wed Oct 21 | 3 | Beat detector (live and batch); MCP server; SSE endpoint that streams a match at a chosen speed | A curl of the stream shows events, facts and beats arriving on time |
 | Thu Oct 22 | 3 | Narrator (gpt-5-mini) and Checker with Claude Sonnet 5.5 judge on Foundry; number reconciler; voice lint in the Checker; retry loop; eval runner + adversarial set. First draft of the video beat sheet (train) | Checker catches 28 of 30 adversarial claims; one beat verified in under 8 s |
-| Fri Oct 23 | 3 | Composer with randomize; Producer; full workflow; claim graph to Blob; tracing. Collect 5 to 10 design references on the train | **M2 pipeline complete**: brief in, live claims out, one trace per run |
+| Fri Oct 23 | 3 | Composer with randomize, including custom planted moments from free text (a `custom` storyline with validation: at most 6 moments, windows inside the match, final score derived from planted goals); Producer; full workflow; claim graph to Blob; tracing. Collect 5 to 10 design references on the train | **M2 pipeline complete**: brief in, live claims out, one trace per run |
 | Sat Oct 24 | 7 | Design system: hallmark study on references, hand-edited DESIGN.md, tokens. Chart primitives from scratch, including the 22-player layer and freeze frames. Live desk wired to SSE; deployed to Static Web Apps | **M3 live end to end on Azure**: kick off a match on the live URL and watch claims get checked |
-| Sun Oct 25 | 7 | Evidence rail with CHECKING, STANDS, AMENDED and OVERTURNED states and the evidence highlight on the pitch; fan, analyst and producer modes; Localizer (EN, ES); cached replay as the fallback path; 3 pre-generated matches | Live and cached paths both work on the live URL |
+| Sun Oct 25 | 7 | Evidence rail with CHECKING, STANDS, AMENDED and OVERTURNED states and the evidence highlight on the pitch; fan, analyst and producer modes; Moments editor in the Tactics panel (add a red card, goal or penalty by side and minute, about 1 to 1.5 h); Localizer (EN, ES); cached replay as the fallback path; 3 pre-generated matches | Live and cached paths both work on the live URL |
 | Mon Oct 26 (off) | 10 | Realistic movement first (committed); add-backs below; evals in CI; impeccable critique and detect on every screen; bug bash on phone and laptop; accessibility pass | **M4 feature freeze** at 8 PM: nothing new after this |
 | Tue Oct 27 (off) | 10 | Fresh-eyes review by a separate agent; fixes only; README, DEMO.md, testing instructions; record and cut the video; pitch; submission form; tag v1.0; uptime check to Nov 10 | **M5 submitted by 9 PM ET** |
 
@@ -225,9 +225,10 @@ If a gate slips, cut from the top of this list down. Never cut the evidence rail
 1. Azure AI Speech narration (never in scope unless everything else is done)
 2. Live Compose button: ship cached matches only
 3. Player-focus mode
-4. Producer agent: rank beats in code instead
-5. Third pre-generated match
-6. Composer agent: hand-write the MatchBrief JSON (last resort: it weakens the agentic story)
+4. Moments editor in the UI (the four preset storylines and the Composer still cover custom moments)
+5. Producer agent: rank beats in code instead
+6. Third pre-generated match
+7. Composer agent: hand-write the MatchBrief JSON (last resort: it weakens the agentic story)
 
 | Risk | Likelihood | Impact | Mitigation |
 | --- | --- | --- | --- |

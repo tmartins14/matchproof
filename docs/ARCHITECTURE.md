@@ -42,7 +42,7 @@ All agents read and write one match store through the `match-data` MCP server. T
 | Checker | Python reconciler + LLM judge (Claude Sonnet 5.5; the Narrator runs on gpt-5-mini, so the judge is a different model from a different vendor) | Draft claims, facts | Verdict per claim; one retry to Narrator with reasons |
 | Localizer | Agent + Azure AI Translator | Verified claims | Fan, analyst and producer renderings; EN and ES; number invariance check |
 | Renderer | Python | Beat, events, frames | `Overlay` JSON, timed to the match clock |
-| match-data MCP | MCP server | Tool calls | `get_fact`, `get_events`, `get_frame`, `list_beats`, `put_claims` |
+| match-data MCP | MCP server | Tool calls | Facts, events, freeze frames, beats and claims (see Match-data MCP) |
 
 ## Tactics and the brief
 
@@ -59,6 +59,26 @@ The Tactics object inside `MatchBrief` (formation and press, directness and line
 - Each beat is narrated and checked asynchronously. The UI shows claims as Checking, then flips them to a verdict.
 - Budget: 8 s per beat at p90 from detection to verdict.
 - Degrade, don't fail: a model timeout or a tripped token cap shows "verification delayed" and keeps the match running. If the API is unreachable, the site offers the cached replay.
+
+## Match-data MCP
+
+`packages/mcp_match` is the agents' only door to match data (ADR 0008). `build_server(store, writable)` defines the tools once and adds `put_claims` only when `writable` is true.
+
+- **Public, read-only:** `/mcp` on the API, streamable HTTP, 60 requests per minute per client address, no write tool and no key.
+- **Internal, read-write:** `get_internal_server(store)` in `services/api/src/api/matchdata.py`, used in process by the agent workflow and never routed.
+
+| Tool | Returns | Public | Internal |
+| --- | --- | --- | --- |
+| `get_brief(match_id)` | The match brief | yes | yes |
+| `get_fact(match_id, fact_id)` | One fact in full, with display renderings and sources | yes | yes |
+| `find_facts(match_id, name_prefix, side, t_from, t_to, limit)` | Facts in id order, at most 200, with the matching `total` | yes | yes |
+| `get_events(match_id, t_from, t_to, types, limit)` | Events in a time range, at most 200, with `total` | yes | yes |
+| `get_freeze_frame(match_id, event_id)` | Player ids, sides and positions rounded to 0.1 m, plus the ball | yes | yes |
+| `list_beats(match_id, after_t)` | Beats detected so far | yes | yes |
+| `get_beat_bundle(match_id, beat_id)` | A beat and every fact it cites; this is what the Narrator reads | yes | yes |
+| `put_claims(match_id, beat_id, claims)` | Per-claim `accepted` and `errors`; each claim is checked against `claim.schema.json`, the beat and the fact ids it cites | no | yes |
+
+Unknown match, fact, beat and event ids return a tool error. A running match is registered in the store when its stream starts and filled in as the pipeline advances; the pipeline writes a batch only once it is within the 120 s lookahead of playback, so a query never sees further ahead than that. The store keeps six matches and drops the least recently used.
 
 ## Player positions
 

@@ -34,6 +34,23 @@ curl "$(azd env get-value API_URL)/health/model"
 
 The first request after idle is slow while the app scales up from zero.
 
+## Container size and streams
+
+The API container has 1 vCPU and 2 GiB (`infra/modules/containerapp.bicep`). Each live stream runs a generator, fact engine and beat detector on a worker thread, so one replica serves at most `MAX_LIVE_STREAMS = 3` streams at once. A fourth gets HTTP 503 with `Retry-After: 30` and the body `{"fallback": "cached"}`; the cached replay that answers it comes Sunday.
+
+## Connect with an MCP client
+
+The read-only match-data server is at `<API_URL>/mcp` (streamable HTTP, no key, 60 requests per minute per client). Start a match first, then list its beats:
+
+```bash
+API_URL="$(azd env get-value API_URL)"
+curl -s -X POST "$API_URL/matches" -H 'Content-Type: application/json' -d '{"story": "red_card_flip", "seed": 3}'
+npx @modelcontextprotocol/inspector --cli "$API_URL/mcp" --transport http --method tools/list
+npx @modelcontextprotocol/inspector --cli "$API_URL/mcp" --transport http --method tools/call --tool-name list_beats --tool-arg match_id=<match_id>
+```
+
+A match shows up in the server once its stream has started (`GET /matches/{match_id}/stream`).
+
 ## Run locally
 
 ```bash

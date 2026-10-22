@@ -2,7 +2,11 @@
 name = "matchproof-mcp_match"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["matchproof-contracts"]
+dependencies = [
+    "matchproof-contracts",
+    "matchproof-intel",
+    "mcp>=1.9,<2",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -13,3 +17,4 @@ packages = ["src/mcp_match"]
 
 [tool.uv.sources]
 matchproof-contracts = { workspace = true }
+matchproof-intel = { workspace = true }

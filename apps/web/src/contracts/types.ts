@@ -65,6 +65,9 @@ salience: number
 rank?: number
 }
 export interface Claim1 {
+/**
+ * cl- plus the beat id without its bt- prefix and a two-digit number, e.g. cl-001484-card-01. The older cl-NNN-NN form is still accepted.
+ */
 id: string
 /**
  * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
@@ -268,6 +271,8 @@ xg?: number
 text?: string
 /**
  * Claims this layer supports, so selecting a claim can highlight its layers.
+ * 
+ * Items: cl- plus the beat id without its bt- prefix and a two-digit number, e.g. cl-001484-card-01. The older cl-NNN-NN form is still accepted.
  */
 claim_ids?: string[]
 }[]

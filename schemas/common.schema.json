@@ -33,7 +33,11 @@
       "type": "string",
       "pattern": "^bt-([0-9]{3}|[0-9]{6}-[a-z_]+)$"
     },
-    "claimId": { "type": "string", "pattern": "^cl-[0-9]{3}-[0-9]{2}$" },
+    "claimId": {
+      "description": "cl- plus the beat id without its bt- prefix and a two-digit number, e.g. cl-001484-card-01. The older cl-NNN-NN form is still accepted.",
+      "type": "string",
+      "pattern": "^cl-([0-9]{3}-[0-9]{2}|[0-9]{6}-[a-z_]+-[0-9]{2})$"
+    },
     "playerId": { "type": "string", "pattern": "^(home|away)-[0-9]{2}$" },
     "lang": { "type": "string", "enum": ["en", "es", "fr", "pt"] },
     "formation": { "type": "string", "enum": ["4-3-3", "4-2-3-1", "4-4-2", "3-5-2", "5-3-2"] },

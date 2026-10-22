@@ -125,7 +125,13 @@ class BeatId(RootModel[str]):
 
 
 class ClaimId(RootModel[str]):
-    root: Annotated[str, Field(pattern='^cl-[0-9]{3}-[0-9]{2}$')]
+    root: Annotated[
+        str,
+        Field(
+            description='cl- plus the beat id without its bt- prefix and a two-digit number, e.g. cl-001484-card-01. The older cl-NNN-NN form is still accepted.',
+            pattern='^cl-([0-9]{3}-[0-9]{2}|[0-9]{6}-[a-z_]+-[0-9]{2})$',
+        ),
+    ]
 
 
 class PlayerId(RootModel[str]):

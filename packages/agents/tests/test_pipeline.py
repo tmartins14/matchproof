@@ -13,10 +13,23 @@ def test_claims_are_written_with_beat_derived_ids_and_match_the_schema() -> None
     match_id = fill(store, "red_card_flip", 3)
     server = build_server(store, writable=True)
     beat = next(b for b in store.beats(match_id) if b.kind.value == "card")
-    fact = store.registry(match_id).get(beat.fact_ids[0].root)
+    fact = next(
+        f
+        for f in (store.registry(match_id).get(x.root) for x in beat.fact_ids)
+        if f.name.endswith(".players_after")
+    )
     shown = fact.display.en[0]
     narrator = FakeChat(
-        [{"claims": [{"text": f"Card shown: {shown}.", "fact_ids": [fact.id.root]}]}]
+        [
+            {
+                "claims": [
+                    {
+                        "text": f"Ashford Vale are down to {shown} players.",
+                        "fact_ids": [fact.id.root],
+                    }
+                ]
+            }
+        ]
     )
     deps = Deps(server=server, narrator=narrator, judge=FakeChat([GOOD]))
 

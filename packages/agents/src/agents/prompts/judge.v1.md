@@ -24,7 +24,7 @@ Beat: {{beat_kind}}, {{beat_label}}
 
 Sentence: {{claim}}
 
-Cited facts (id: name = value; the renderings it may be written as; side):
+Cited facts (id: what it measures = value; the words it may be written as; side):
 {{facts}}
 
 Reply with JSON only: {"supported": true or false, "problem": "overclaim" | "unsupported_cause" | "wrong_entity" | "wrong_time" | "outside_knowledge" | null, "reason": "one short sentence"}

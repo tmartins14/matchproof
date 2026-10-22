@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Literal
 
 from contracts.models import Claim, Fact
+from intel.labels import say
 from intel.voice_lint import Rule, lint, load_rules
 from pydantic import BaseModel
 
@@ -82,14 +83,16 @@ def render_judge_prompt(
     teams: Mapping[str, str],
     beat_kind: str,
     beat_label: str,
+    labels: Mapping[str, str] | None = None,
 ) -> str:
     lines = []
     for f in facts:
-        side = f.scope.side.value if f.scope and f.scope.side else "n/a"
+        side = teams[f.scope.side.value] if f.scope and f.scope.side else "n/a"
         unit = f" {f.unit.value}" if f.unit else ""
+        what = (labels or {}).get(f.id.root, f.name)
         lines.append(
-            f"- {f.id.root}: {f.name} = {f.value}{unit}; may be written as "
-            f"{' | '.join(f.display.en)}; side {side}"
+            f"- {f.id.root}: {what} = {f.value}{unit}; may be written as "
+            f"{' | '.join(say(f.value, f.display.en, teams))}; side {side}"
         )
     values = {
         "home": teams["home"],
@@ -127,6 +130,7 @@ class Checker:
         teams: Mapping[str, str],
         beat_kind: str,
         beat_label: str,
+        labels: Mapping[str, str] | None = None,
     ) -> ClaimCheck:
         """Reconcile, lint, then judge. The judge is asked only if the code checks pass."""
         rec = reconcile(draft.text, draft.fact_ids, bundle)
@@ -152,6 +156,7 @@ class Checker:
             teams,
             beat_kind,
             beat_label,
+            labels,
         )
         result.judged = True
         try:
@@ -189,13 +194,19 @@ class Checker:
         teams: Mapping[str, str],
         beat_kind: str,
         beat_label: str,
+        labels: Mapping[str, str] | None = None,
         renarrate: Callable[[Revision], list[DraftClaim]],
     ) -> list[CheckedClaim]:
         """Check a beat's drafts, send the failures back to `renarrate` once, and re-check."""
 
         def check(d: DraftClaim) -> ClaimCheck:
             return self.check_one(
-                d, bundle, teams=teams, beat_kind=beat_kind, beat_label=beat_label
+                d,
+                bundle,
+                teams=teams,
+                beat_kind=beat_kind,
+                beat_label=beat_label,
+                labels=labels,
             )
 
         def check_all(items: list[DraftClaim]) -> list[ClaimCheck]:

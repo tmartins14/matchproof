@@ -1,6 +1,7 @@
 # TEST DATA. The bad claims in this file are written to be wrong and are not product text: the voice
 # rules in voice/banned.yaml do not apply to them. Fictional clubs and players only.
 #
+# Players are named as the match's roster names them (each seed has its own roster).
 # Each claim is tied to a real beat of a fixed generated match (Rivermouth at home, Ashford Vale away)
 # by beat id, and cites fact ids from that beat's bundle. `expected`:
 #   verified   a good claim; the Checker must pass it on the first check
@@ -96,7 +97,7 @@
   kind: uncited_number
   match: { story: end_to_end, seed: 1 }
   beat_id: bt-001439-open_play_goal
-  text: "Ashford Vale's away-09 finishes it after 4 passes, 10 seconds from the interception."
+  text: "Ashford Vale's Kowal finishes it after 4 passes, 10 seconds from the interception."
   fact_ids: [fx-shot-ev-001439-shooter]
   expected: rephrased
 
@@ -179,14 +180,14 @@
   kind: wrong_entity
   match: { story: end_to_end, seed: 1 }
   beat_id: bt-000733-counter_goal
-  text: "Rivermouth's away-09 finishes the counter."
+  text: "Rivermouth's Kowal finishes the counter."
   fact_ids: [fx-shot-ev-000733-shooter]
   expected: blocked
 - id: adv-24
   kind: wrong_entity
   match: { story: red_card_flip, seed: 3 }
   beat_id: bt-001670-open_play_goal
-  text: "away-10 scores for Rivermouth."
+  text: "Bellamy-Cruz scores for Rivermouth."
   fact_ids: [fx-shot-ev-001670-shooter, fx-shot-ev-001670-outcome]
   expected: blocked
 - id: adv-25
@@ -225,7 +226,7 @@
   kind: outside_knowledge
   match: { story: end_to_end, seed: 1 }
   beat_id: bt-000733-counter_goal
-  text: "Ashford Vale's away-09 scores again, matching the form of last season."
+  text: "Ashford Vale's Kowal scores again, matching the form of last season."
   fact_ids: [fx-shot-ev-000733-shooter]
   expected: blocked
 - id: adv-30
@@ -268,7 +269,7 @@
   kind: good
   match: { story: red_card_flip, seed: 3 }
   beat_id: bt-001670-open_play_goal
-  text: "Rivermouth score through home-10 after 4 passes in 16 seconds."
+  text: "Rivermouth score through Pryce after 4 passes in 16 seconds."
   fact_ids:
     - fx-shot-ev-001670-shooter
     - fx-shot-ev-001670-outcome
@@ -313,7 +314,7 @@
   kind: good
   match: { story: end_to_end, seed: 1 }
   beat_id: bt-001439-open_play_goal
-  text: "Ashford Vale's away-09 scores after 4 passes in 10 seconds."
+  text: "Ashford Vale's Kowal scores after 4 passes in 10 seconds."
   fact_ids:
     - fx-shot-ev-001439-shooter
     - fx-shot-ev-001439-outcome

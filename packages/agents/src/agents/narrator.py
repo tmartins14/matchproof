@@ -5,11 +5,13 @@ examples are built from voice/examples.yaml for the beat's kind and mode.
 """
 
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Literal
 
 import yaml
+from intel.labels import say
+from intel.voice_lint import lint, load_rules
 from pydantic import BaseModel, Field, field_validator
 
 from .llm_client import ChatClient
@@ -17,7 +19,9 @@ from .structured import Structured, complete_structured
 
 Mode = Literal["fan", "analyst", "producer"]
 
-PROMPT_PATH = Path(__file__).parent / "prompts" / "narrator.v1.md"
+PROMPT_PATH = (
+    Path(__file__).parent / "prompts" / "narrator.v2.md"
+)  # v1 is kept for the record
 EXAMPLES_PATH = Path(__file__).resolve().parents[4] / "voice" / "examples.yaml"
 MAX_WORDS = 30
 MIN_CLAIMS, MAX_CLAIMS = 1, 3
@@ -26,6 +30,18 @@ REGISTER = (
     "live-text football commentary. Present tense. Short: one or two sentences. Team before "
     "player. A number appears only when a fact supplies it."
 )
+MODE_CLAIMS: Mapping[str, tuple[int, int]] = {
+    "fan": (1, 2),
+    "analyst": (1, 3),
+    "producer": (1, 2),
+}
+NUMBER_RULES: Mapping[str, str] = {
+    "fan": 'At most two numbers in a claim, and never a zero count ("0 passes", "0 attackers"): '
+    "leave that fact out instead.",
+    "analyst": "Use at most three numbers in a claim and no zero counts. xG and positional "
+    "numbers are welcome here.",
+    "producer": "Use at most two numbers in a claim, and no zero counts.",
+}
 MODE_RULES: Mapping[str, str] = {
     "fan": "fan. What happened and why it matters.",
     "analyst": "analyst. The mechanism: shape, distances, sequences.",
@@ -62,7 +78,15 @@ def load_examples(path: Path | None = None) -> list[dict[str, Any]]:
     raw: list[dict[str, Any]] = yaml.safe_load(
         (path or EXAMPLES_PATH).read_text("utf-8")
     )
-    return [e for e in raw if not e.get("format_only") and e["lang"] == "en"]
+    rules = load_rules()
+    return [
+        e
+        for e in raw
+        if not e.get("format_only")
+        and e["lang"] == "en"
+        # A line that breaks a voice rule, even a warning, would teach the model to break it.
+        and not lint(e["line"], "narration", rules)
+    ]
 
 
 def pick_examples(
@@ -91,7 +115,8 @@ def pick_examples(
 
 def format_example(example: dict[str, Any]) -> str:
     facts = "; ".join(f"{f['id']}: {f['display']}" for f in example["facts"])
-    lines = [f"Beat: {example['beat_kind']} ({example['mode']})", f"Facts: {facts}"]
+    kind = example["beat_kind"].replace("_", " ")
+    lines = [f"Beat: {kind} ({example['mode']})", f"Facts: {facts}"]
     if example.get("amended_from"):
         lines += [
             f"AMENDED. Draft: {example['amended_from']}",
@@ -103,11 +128,12 @@ def format_example(example: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def format_fact(fact: Mapping[str, Any]) -> str:
-    shown = " | ".join(fact["display"]["en"])
+def format_fact(fact: Mapping[str, Any], teams: Mapping[str, str]) -> str:
+    """One fact as the Narrator sees it: id, what it measures, the words it may be written as."""
+    shown = " / ".join(say(fact["value"], fact["display"]["en"], teams))
     scope = fact.get("scope") or {}
-    side = f", side {scope['side']}" if scope.get("side") else ""
-    return f"- {fact['id']}: {fact['name']} = {fact['value']} (write as: {shown}{side})"
+    side = f" | {teams[scope['side']]}" if scope.get("side") else ""
+    return f"- {fact['id']} | {fact['label']} | write as: {shown}{side}"
 
 
 def build_prompt(
@@ -142,17 +168,19 @@ def build_prompt(
             )
         revise += "\n"
     values = {
-        "min_claims": str(MIN_CLAIMS),
-        "max_claims": str(MAX_CLAIMS),
+        "min_claims": str(MODE_CLAIMS[mode][0]),
+        "max_claims": str(MODE_CLAIMS[mode][1]),
+        "plural": "" if MODE_CLAIMS[mode][1] == 1 else "s",
+        "number_rule": NUMBER_RULES[mode],
         "max_words": str(MAX_WORDS),
         "register": REGISTER,
         "mode_rule": MODE_RULES[mode],
         "home": teams["home"],
         "away": teams["away"],
         "examples": "\n\n".join(format_example(e) for e in picked),
-        "beat_kind": beat["kind"],
+        "beat_kind": beat["kind"].replace("_", " "),
         "beat_label": beat["label"],
-        "facts": "\n".join(format_fact(f) for f in bundle["facts"]),
+        "facts": "\n".join(format_fact(f, teams) for f in bundle["facts"]),
         "revision": revise,
     }
     prompt = PROMPT_PATH.read_text("utf-8")
@@ -174,4 +202,10 @@ def narrate(
     """Draft claims for one beat. `revise` carries the Checker's reasons for the one retry."""
     assert lang == "en"  # the Localizer handles the other languages
     prompt = build_prompt(bundle, mode, teams, revise)
-    return complete_structured(client, NarratorOutput, prompt, max_tokens=max_tokens)
+    out = complete_structured(client, NarratorOutput, prompt, max_tokens=max_tokens)
+    keep = MODE_CLAIMS[mode][
+        1
+    ]  # a mode's claim limit is enforced here, not left to the model
+    if len(out.value.claims) > keep:
+        out = replace(out, value=NarratorOutput(claims=out.value.claims[:keep]))
+    return out

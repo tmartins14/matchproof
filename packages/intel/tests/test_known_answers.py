@@ -95,7 +95,7 @@ def test_sequence_facts_for_a_possession_ending_in_a_shot() -> None:
     assert by_name["sequence(ev-000004).seconds"].value == 11.0
     assert by_name["sequence(ev-000004).passes"].value == 2
     assert round(float(by_name["sequence(ev-000004).ball_won_distance"].value)) == 30
-    assert by_name["sequence(ev-000004).start_clock"].display.en == ["1:40"]
+    assert by_name["sequence(ev-000004).start_clock"].display.en == ["2′"]
     assert [s.root for s in by_name["sequence(ev-000004).seconds"].source_ids] == [
         "ev-000001",
         "ev-000002",

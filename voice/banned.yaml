@@ -145,3 +145,58 @@
   severity: error
   applies_to: [ui]
   why: No sparkle icons.
+
+# ---- machine tokens and stat-sheet wording in narration (prompt 08.1) -----------------------------
+- id: player-id
+  pattern: '\b(?:home|away)-\d{2}\b'
+  severity: error
+  applies_to: [narration]
+  why: "A player is named, or \"the Ashford Vale No. 10\"; never an internal id."
+
+- id: event-id
+  pattern: '\bev-\d{6}\b'
+  severity: error
+  applies_to: [narration]
+  why: "Event ids are internal."
+
+- id: snake-case-token
+  pattern: '\b[a-z]+_[a-z_]+\b'
+  severity: error
+  applies_to: [narration]
+  why: "A machine name leaked into the text (\"second_yellow\")."
+
+- id: since-the-event
+  pattern: '\bsince the event\b'
+  severity: error
+  applies_to: [narration]
+  why: "Name the event: since the red card, since the goal."
+
+- id: freeze-frame
+  pattern: '\bfreeze[- ]frames?\b'
+  severity: error
+  applies_to: [narration]
+  why: "An internal data term; say what the frame showed."
+
+- id: zone-players
+  pattern: '\bzone (?:attackers|defenders)\b'
+  severity: error
+  applies_to: [narration]
+  why: "An internal data term."
+
+- id: clock-time
+  pattern: '\b\d{2,3}:\d{2}\b'
+  severity: error
+  applies_to: [narration]
+  why: "Say the minute the way a broadcast does (90+7′), not a clock time."
+
+- id: zero-count
+  pattern: '\b0 (?:passes|attackers|defenders|shots)\b'
+  severity: warn
+  applies_to: [narration]
+  why: "A zero count reads like a stat sheet; leave the fact out unless it is the point."
+
+- id: many-numbers
+  pattern: '(?:\d+(?:[.,]\d+)*\D+?){3}\d+'
+  severity: warn
+  applies_to: [narration]
+  why: "More than three numbers in one claim reads like a stat sheet."

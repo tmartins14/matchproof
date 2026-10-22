@@ -1,5 +1,6 @@
 """The adversarial claims file and the judge pick rule. No model calls."""
 
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -95,3 +96,16 @@ def test_set_active_judge_rewrites_only_the_judge_block(tmp_path: Path) -> None:
     assert new["narrator"] == yaml.safe_load(text)["narrator"]
     assert new["judge_candidates"] == yaml.safe_load(text)["judge_candidates"]
     assert path.read_text("utf-8").startswith("# Model deployments by role")
+
+
+def test_the_golden_matches_are_built_with_the_roster() -> None:
+    from evals.golden import build_store
+
+    store, match_id = build_store("red_card_flip", 3)
+    shooters = [
+        f for f in store.registry(match_id).all() if f.name.endswith(".shooter")
+    ]
+    assert shooters
+    for f in shooters:
+        assert not re.fullmatch(r"(home|away)-\d{2}", str(f.value)), f.value
+    assert any(f.value == "Pryce" for f in shooters)

@@ -6,7 +6,7 @@ Generation is cached on disk by the intel tests' helper (.cache/matches), so a s
 import sys
 from pathlib import Path
 
-from contracts.models import Event, PositionFrame
+from contracts.models import Event, MatchBrief, PositionFrame
 from intel.beats import BeatDetector
 from intel.engine import FactEngine
 from mcp_match import InMemoryMatchStore
@@ -18,13 +18,20 @@ sys.path.insert(
 from matches import read_stream  # type: ignore[import-not-found]
 
 
+def roster_of(brief: MatchBrief) -> dict[str, str]:
+    """Player id to name, as the live path passes it to the fact engine."""
+    return {
+        p.id.root: p.name for team in (brief.home, brief.away) for p in team.players
+    }
+
+
 def build_store(
     story: str, seed: int, store: InMemoryMatchStore | None = None
 ) -> tuple[InMemoryMatchStore, str]:
     """Run one match through the engine and beat detector into a store; returns it and the match id."""
     store = store or InMemoryMatchStore()
     brief = make_brief(DEFAULT_HOME, DEFAULT_AWAY, story, seed)
-    engine, detector = FactEngine(), BeatDetector()
+    engine, detector = FactEngine(roster_of(brief)), BeatDetector()
     store.begin(brief, engine.registry)
     for _, item in read_stream(brief):
         if isinstance(item, Event):

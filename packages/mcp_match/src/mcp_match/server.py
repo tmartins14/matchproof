@@ -270,11 +270,12 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
         """The beats found so far, in the order they were detected. Pass `after_t` to get only
         beats detected after that match time."""
         known_match(match_id)
+        upto = horizon(match_id)
         beats = [
             b
             for b in store.beats(match_id)
             if (after_t is None or b.t_detect.root > after_t)
-            and (horizon(match_id) is None or b.t_detect.root <= horizon(match_id))
+            and (upto is None or b.t_detect.root <= upto)
         ]
         return {"beats": [dump(b) for b in beats]}
 

@@ -78,12 +78,12 @@ class PublicMcp:
         if scope["method"] in ("GET", "DELETE"):
             # Stateless server: no stream to open and no session to end. Answering at once keeps
             # clients such as the MCP Inspector from stalling on a held-open GET.
-            reply = JSONResponse(
+            not_allowed = JSONResponse(
                 {"error": "method not allowed; POST only"},
                 status_code=405,
                 headers={"Allow": "POST"},
             )
-            await reply(scope, receive, send)
+            await not_allowed(scope, receive, send)
             return
         client = scope.get("client")
         key = client[0] if client else "unknown"

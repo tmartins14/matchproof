@@ -120,3 +120,13 @@ def test_only_the_failed_claim_is_retried() -> None:
     assert [c.claim.verdict.value for c in out] == ["verified", "rephrased"]
     assert [c.claim.id.root for c in out] == ["cl-001484-card-01", "cl-001484-card-02"]
     assert asked[0].kept == ["Ashford drop 8 m."]
+
+
+def test_a_retry_that_repeats_an_accepted_claim_is_not_a_fix() -> None:
+    judge = FakeChat([GOOD, BAD])
+    out, _ = run(
+        judge,
+        [draft("Ashford drop 8 m."), draft("Ashford look tired.")],
+        [draft("Ashford drop 8 m.")],
+    )
+    assert [c.claim.verdict.value for c in out] == ["verified", "blocked"]

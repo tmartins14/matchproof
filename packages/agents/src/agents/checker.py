@@ -7,7 +7,7 @@ claim is `rephrased`, if not it is `blocked`. A judge that cannot answer in time
 """
 
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Collection, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -131,9 +131,10 @@ class Checker:
         beat_kind: str,
         beat_label: str,
         labels: Mapping[str, str] | None = None,
+        names: Collection[str] = (),
     ) -> ClaimCheck:
         """Reconcile, lint, then judge. The judge is asked only if the code checks pass."""
-        rec = reconcile(draft.text, draft.fact_ids, bundle)
+        rec = reconcile(draft.text, draft.fact_ids, bundle, names)
         result = ClaimCheck(draft.text, list(draft.fact_ids), rec.numbers)
         result.reconciled = rec.ok
         result.reasons.extend(rec.reasons)
@@ -195,6 +196,7 @@ class Checker:
         beat_kind: str,
         beat_label: str,
         labels: Mapping[str, str] | None = None,
+        names: Collection[str] = (),
         renarrate: Callable[[Revision], list[DraftClaim]],
     ) -> list[CheckedClaim]:
         """Check a beat's drafts, send the failures back to `renarrate` once, and re-check."""
@@ -207,6 +209,7 @@ class Checker:
                 beat_kind=beat_kind,
                 beat_label=beat_label,
                 labels=labels,
+                names=names,
             )
 
         def check_all(items: list[DraftClaim]) -> list[ClaimCheck]:
@@ -226,8 +229,12 @@ class Checker:
                 ],
                 kept=[drafts[i].text for i, c in enumerate(first) if c.passed],
             )
+            kept = {t.strip().lower() for t in revision.kept}
             for i, new in zip(failed, renarrate(revision), strict=False):
-                revised[i] = new
+                if (
+                    new.text.strip().lower() not in kept
+                ):  # a repeat of an accepted claim is no fix
+                    revised[i] = new
         stem = re.sub(r"^bt-", "", beat_id)
         redone = dict(zip(revised, check_all(list(revised.values())), strict=True))
         out: list[CheckedClaim] = []

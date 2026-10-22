@@ -115,6 +115,11 @@ def run_judge(
     tokens: list[int] = []
     for c in claims:
         store, match_id = stores[(c["match"]["story"], c["match"]["seed"])]
+        names = {
+            p.name
+            for t in (store.brief(match_id).home, store.brief(match_id).away)
+            for p in t.players
+        }
         facts, kind, label, teams, labels = bundle_for(store, match_id, c["beat_id"])
         draft = DraftClaim.model_construct(text=c["text"], fact_ids=list(c["fact_ids"]))
         started = time.perf_counter()
@@ -125,6 +130,7 @@ def run_judge(
             beat_kind=kind,
             beat_label=label,
             labels=labels,
+            names=names,
         )
         wall_ms = round((time.perf_counter() - started) * 1000)
         bad = c["expected"] != "verified"

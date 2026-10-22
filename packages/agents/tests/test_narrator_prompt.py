@@ -121,3 +121,14 @@ def test_a_fan_beat_gets_at_most_two_claims() -> None:
     )
     out = narrate(chat, BUNDLE, "fan", teams=TEAMS)
     assert len(out.value.claims) == 2
+
+
+def test_draft_text_is_normalised_but_ranges_keep_their_dash() -> None:
+    claim = DraftClaim(
+        text="Ashford fire immediately — a 0.14 xG shot by Bellamy‑Cruz, Rivermouth’s 55–70′ spell.",
+        fact_ids=["fx-1"],
+    )
+    assert (
+        claim.text
+        == "Ashford fire immediately, a 0.14 xG shot by Bellamy-Cruz, Rivermouth's 55–70′ spell."
+    )

@@ -70,7 +70,7 @@ EVENT_METRICS: Mapping[str, str] = {
     "shot.on_target": "shot on target",
     "shot.minute": "minute of the shot",
     "shot.shooter": "shooter",
-    "sequence.seconds": "time from winning the ball to the shot",
+    "sequence.seconds": "time from the start of the move to the shot",
     "sequence.passes": "passes in the move",
     "sequence.ball_won_distance": "distance from goal where the ball was won",
     "sequence.start_clock": "minute the move began",

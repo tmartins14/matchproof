@@ -47,3 +47,19 @@ def test_each_number_is_checked() -> None:
         "They dropped 7 m and have 70% of the ball.", ["fx-drop", "fx-poss"], BUNDLE
     )
     assert not r.ok and len(r.reasons) == 1 and '"70%"' in r.reasons[0]
+
+
+def test_a_player_name_must_come_from_a_cited_fact() -> None:
+    scorer = fact("fx-who", "Pryce")
+    scorer = scorer.model_copy(update={"value": "Pryce"})
+    bundle = bundle_of(scorer, DROP)
+    names = {"Pryce", "Dunmore"}
+    assert reconcile("Pryce scores.", ["fx-who"], bundle, names).ok
+    r = reconcile("Dunmore is sent off.", ["fx-who"], bundle, names)
+    assert not r.ok and '"Dunmore"' in r.reasons[0]
+    assert not reconcile(
+        "Pryce scores.", ["fx-drop"], bundle, names
+    ).ok  # fact not cited
+    assert reconcile(
+        "Pryce-Roe scores.", ["fx-drop"], bundle, names
+    ).ok  # another surname

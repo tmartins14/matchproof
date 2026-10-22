@@ -5,7 +5,7 @@ when it has the same numeric part and a compatible unit word ("64 per cent" agai
 """
 
 import re
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
 from decimal import Decimal
 
@@ -89,9 +89,13 @@ def _matches(token_at: str, token: Reading, rendering: str) -> bool:
 
 
 def reconcile(
-    text: str, fact_ids: list[str], bundle: Mapping[str, Fact]
+    text: str,
+    fact_ids: list[str],
+    bundle: Mapping[str, Fact],
+    names: Collection[str] = (),
 ) -> Reconciliation:
-    """Check `text` against the facts it cites. `bundle` is the beat's facts by id."""
+    """Check `text` against the facts it cites. `bundle` is the beat's facts by id. `names` are the
+    roster's player names: one that appears in the text must be a cited fact's value."""
     reasons: list[str] = []
     if not fact_ids:
         reasons.append("The claim cites no facts.")
@@ -121,4 +125,11 @@ def reconcile(
             )
         else:
             matched.append(NumberMatch(token, found.id.root))
+    named = {f.value for f in cited if isinstance(f.value, str)}
+    for name in sorted(names):
+        if (
+            re.search(rf"(?<![\w-]){re.escape(name)}(?![\w-])", text)
+            and name not in named
+        ):
+            reasons.append(f'The player "{name}" is not named by any cited fact.')
     return Reconciliation(not reasons, matched, reasons)

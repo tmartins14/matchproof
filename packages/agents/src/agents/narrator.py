@@ -4,6 +4,7 @@ It reads the bundle, never raw events (seam rule 2). The prompt is a versioned f
 examples are built from voice/examples.yaml for the beat's kind and mode.
 """
 
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -42,11 +43,23 @@ NUMBER_RULES: Mapping[str, str] = {
     "numbers are welcome here.",
     "producer": "Use at most two numbers in a claim, and no zero counts.",
 }
+NUMBER_CHECKS: Mapping[str, str] = {
+    "fan": "More than two: cut it down to two.",
+    "analyst": "More than three: cut it down to three.",
+    "producer": "More than two: cut it down to two.",
+}
 MODE_RULES: Mapping[str, str] = {
     "fan": "fan. What happened and why it matters.",
     "analyst": "analyst. The mechanism: shape, distances, sequences.",
     "producer": "producer. A rundown note (clip window, angle, what to show), not commentary.",
 }
+
+
+def normalise_punctuation(text: str) -> str:
+    """Punctuation only: an em dash becomes a comma, and typographic hyphens and apostrophes become
+    plain ones, so names still match and the voice lint is not tripped by a character."""
+    text = re.sub(r"\s*—\s*", ", ", text)
+    return text.replace("\u2011", "-").replace("\u2019", "'").strip()
 
 
 class DraftClaim(BaseModel):
@@ -58,7 +71,7 @@ class DraftClaim(BaseModel):
     def _short(cls, text: str) -> str:
         if len(text.split()) > MAX_WORDS:
             raise ValueError(f"text must be {MAX_WORDS} words or fewer")
-        return text.strip()
+        return normalise_punctuation(text)
 
 
 class NarratorOutput(BaseModel):
@@ -172,6 +185,7 @@ def build_prompt(
         "max_claims": str(MODE_CLAIMS[mode][1]),
         "plural": "" if MODE_CLAIMS[mode][1] == 1 else "s",
         "number_rule": NUMBER_RULES[mode],
+        "number_check": NUMBER_CHECKS[mode],
         "max_words": str(MAX_WORDS),
         "register": REGISTER,
         "mode_rule": MODE_RULES[mode],

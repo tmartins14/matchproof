@@ -8,11 +8,18 @@ Mode: {{mode_rule}}
 
 How to write it:
 - Find the story of the beat and tell it with the one or two facts that carry it. Leave the other
-  facts out. {{number_rule}}
+  facts out. {{number_rule}} Count the numbers in your sentence before you answer and cut until it
+  fits. Too many: "Ashford win it 7 m out and Okoro shoots 4 seconds later, a 0.30 xG chance."
+  Better: "Okoro shoots 4 seconds after winning it, a 0.30 xG chance."
+- Say nothing about a zero, in digits or in words: not "0 attackers", not "no attackers ahead of the
+  ball". Leave that fact out.
 - Football verbs that restate the event are fine: "scores", "levels", "breaks", "wins it back",
   "hits the post", "is sent off", "goes ahead". An adjective or a cause needs a fact behind it, so
-  leave out "dominant", "tired", "relentless", "dangerous" and the like unless a fact measures it.
-- Team before player. Say the player as the fact gives it ("Okoro", or "the Ashford Vale No. 10").
+  leave out "dominant", "in control", "pinning", "steady", "tired", "relentless", "dangerous", "quick"
+  and the like unless a fact measures it. Do not say why something happened ("after conceding",
+  "pushing on"): use the moment the label names ("since the red card").
+- Team before player. Name a player only as a fact below gives it ("Okoro", or "the Ashford Vale
+  No. 10"). If no fact names the player, say the team. Never make up a name.
 - Each claim is {{max_words}} words or fewer, in the present tense, plain wording.
 
 Where the numbers come from:
@@ -39,4 +46,8 @@ Beat: {{beat_kind}}, {{beat_label}}
 Facts:
 {{facts}}
 {{revision}}
+Before you answer, check each claim: how many digits-or-numbers does it contain ("4 seconds", "7 m",
+"0.30 xG", "63′" and "61%" are one each)? {{number_check}} A shot has many facts (distance, time, xG, minute);
+pick the one that tells the story, say the rest in words, or leave it out.
+
 Reply with JSON: {"claims": [{"text": "...", "fact_ids": ["fx-..."]}]}

@@ -35,10 +35,11 @@ extend-select = ["I", "UP"]
 [tool.mypy]
 strict = true
 explicit_package_bases = true
-mypy_path = "packages/contracts/src:packages/sim/src:packages/intel/src:packages/agents/src:packages/mcp_match/src:services/api/src"
+mypy_path = ".:packages/contracts/src:packages/sim/src:packages/intel/src:packages/agents/src:packages/mcp_match/src:services/api/src"
 exclude = ["packages/contracts/src/contracts/models\\.py$"]
 
 [tool.pytest.ini_options]
 testpaths = ["packages", "services", "tests"]
 addopts = "--import-mode=importlib"
+pythonpath = ["."]
 markers = ["slow: long-running calibration and the 16-match beat checks, excluded from make test, run by make slow"]

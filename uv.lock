@@ -1386,16 +1386,22 @@ source = { editable = "packages/agents" }
 dependencies = [
     { name = "azure-identity" },
     { name = "matchproof-contracts" },
+    { name = "matchproof-intel" },
     { name = "openai" },
     { name = "opentelemetry-api" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "azure-identity", specifier = ">=1.26.0" },
     { name = "matchproof-contracts", editable = "packages/contracts" },
+    { name = "matchproof-intel", editable = "packages/intel" },
     { name = "openai", specifier = ">=3.35.1" },
     { name = "opentelemetry-api", specifier = ">=1.45.1" },
+    { name = "pydantic", specifier = ">=2" },
+    { name = "pyyaml" },
 ]
 
 [[package]]

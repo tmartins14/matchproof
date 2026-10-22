@@ -1,4 +1,4 @@
-.PHONY: setup gen lint typecheck test slow calibrate web-dev api-dev check-contracts
+.PHONY: setup gen lint typecheck test slow calibrate web-dev api-dev check-contracts evals bakeoff
 
 setup:
 	uv sync --all-packages
@@ -18,7 +18,7 @@ lint:
 	cd apps/web && npm run lint
 
 typecheck:
-	uv run mypy packages/*/src services/api/src scripts
+	uv run mypy packages/*/src services/api/src scripts evals
 	cd apps/web && npm run typecheck
 
 test:
@@ -35,3 +35,10 @@ web-dev:
 
 api-dev:
 	uv run uvicorn api.main:app --reload --app-dir services/api/src
+
+# Manual: these call real models (MODEL_BASE_URL and `az login`). Not run in CI.
+evals:
+	uv run python -m evals.run --judge $(JUDGE)
+
+bakeoff:
+	uv run python -m evals.run --bakeoff

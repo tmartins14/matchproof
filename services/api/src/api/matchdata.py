@@ -75,6 +75,16 @@ class PublicMcp:
         return self.server
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["method"] in ("GET", "DELETE"):
+            # Stateless server: no stream to open and no session to end. Answering at once keeps
+            # clients such as the MCP Inspector from stalling on a held-open GET.
+            reply = JSONResponse(
+                {"error": "method not allowed; POST only"},
+                status_code=405,
+                headers={"Allow": "POST"},
+            )
+            await reply(scope, receive, send)
+            return
         client = scope.get("client")
         key = client[0] if client else "unknown"
         wait = self.limiter.retry_after(key)

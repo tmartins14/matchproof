@@ -167,13 +167,19 @@ def test_mid_match_the_store_holds_only_what_is_computed_so_far() -> None:
                 break
             await asyncio.sleep(0.05)
         await asyncio.sleep(0.2)
+        args = {"match_id": brief.match_id, "t_from": now - 60, "t_to": 99_999}
         async with create_connected_server_and_client_session(
             build_server(store, writable=False)._mcp_server
+        ) as public:
+            seen = await public.call_tool("get_events", args)
+            seen_times = [e["t"] for e in (seen.structuredContent or {})["events"]]
+            assert (
+                seen_times and max(seen_times) <= now
+            )  # the public server has no lookahead
+        async with create_connected_server_and_client_session(
+            build_server(store, writable=True)._mcp_server
         ) as session:
-            got = await session.call_tool(
-                "get_events",
-                {"match_id": brief.match_id, "t_from": now - 60, "t_to": 99_999},
-            )
+            got = await session.call_tool("get_events", args)
             times = [e["t"] for e in (got.structuredContent or {})["events"]]
             assert times and now < max(times) <= now + LOOKAHEAD_S
             listed = await session.call_tool("list_beats", {"match_id": brief.match_id})
@@ -187,3 +193,16 @@ def test_mid_match_the_store_holds_only_what_is_computed_so_far() -> None:
         assert len(partial_ids) < len(final)
 
     asyncio.run(scenario())
+
+
+def test_get_and_delete_on_mcp_return_405_at_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("MCP_ALLOWED_HOSTS", "testserver")
+    with TestClient(main.app) as client:
+        for method in ("GET", "DELETE"):
+            started = time.monotonic()
+            resp = client.request(method, "/mcp", headers=MCP_HEADERS)
+            assert resp.status_code == 405
+            assert resp.headers["Allow"] == "POST"
+            assert time.monotonic() - started < 1.0

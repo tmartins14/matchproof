@@ -88,6 +88,31 @@ def fact_in_range(fact: Fact, t_from: float | None, t_to: float | None) -> bool:
     return not (t_to is not None and scope.t_from.root > t_to)
 
 
+def visible_facts(store: MatchStore, match_id: str, upto: float | None) -> list[Fact]:
+    """Facts a viewer may see at playback position `upto` (None: all). A fact is visible when its
+    time scope ends by then, or when a visible beat cites it. Facts with no time scope wait for
+    the end of the match."""
+    facts = store.registry(match_id).all()
+    if upto is None:
+        return facts
+    cited = {
+        f.root
+        for b in store.beats(match_id)
+        if b.t_detect.root <= upto
+        for f in b.fact_ids
+    }
+    return [
+        f
+        for f in facts
+        if f.id.root in cited
+        or (
+            f.scope is not None
+            and f.scope.t_to is not None
+            and f.scope.t_to.root <= upto
+        )
+    ]
+
+
 def claim_errors(
     store: MatchStore, match_id: str, beat_id: str, raw: Any, seen: set[str]
 ) -> tuple[Claim | None, list[str]]:
@@ -123,7 +148,11 @@ def claim_errors(
 
 
 def build_server(store: MatchStore, writable: bool) -> FastMCP:
-    """The match-data server over `store`. Only a writable server has `put_claims`."""
+    """The match-data server over `store`. Only a writable server has `put_claims`.
+
+    A read-only server is the public one: while a match is streaming it shows only what viewers
+    have already seen (events, facts and beats at or before the playback position). The writable
+    server is internal and sees the full lookahead."""
     server = FastMCP(
         "match-data",
         instructions=INSTRUCTIONS,
@@ -139,12 +168,22 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
         except UnknownMatch as exc:
             raise ToolError(f"Unknown match {match_id}.") from exc
 
+    def horizon(match_id: str) -> float | None:
+        """Latest match time this server may show; None means no limit."""
+        return None if writable else store.playback(match_id)
+
     def known_fact(match_id: str, fact_id: str) -> Fact:
         known_match(match_id)
+        unknown = ToolError(f"Unknown fact {fact_id} in match {match_id}.")
         try:
-            return store.registry(match_id).get(fact_id)
+            fact = store.registry(match_id).get(fact_id)
         except KeyError as exc:
-            raise ToolError(f"Unknown fact {fact_id} in match {match_id}.") from exc
+            raise unknown from exc
+        if horizon(match_id) is not None and fact_id not in {
+            f.id.root for f in visible_facts(store, match_id, horizon(match_id))
+        }:
+            raise unknown
+        return fact
 
     @server.tool()
     def get_brief(match_id: str) -> dict[str, Any]:
@@ -174,7 +213,7 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
             raise ToolError("side must be home or away.")
         facts = [
             f
-            for f in store.registry(match_id).all()
+            for f in visible_facts(store, match_id, horizon(match_id))
             if (name_prefix is None or f.name.startswith(name_prefix))
             and (
                 side is None
@@ -201,10 +240,13 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
         shot or card). At most 200 are returned; `total` is how many matched."""
         known_match(match_id)
         wanted = set(types) if types else None
+        upto = horizon(match_id)
         events: list[Event] = [
             e
             for e in store.events(match_id)
-            if t_from <= e.t.root <= t_to and (wanted is None or e.type.value in wanted)
+            if t_from <= e.t.root <= t_to
+            and (upto is None or e.t.root <= upto)
+            and (wanted is None or e.type.value in wanted)
         ]
         cap = clamp_limit(limit, MAX_EVENTS)
         return {"events": [dump(e) for e in events[:cap]], "total": len(events)}
@@ -214,6 +256,9 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
         """The 22 players and the ball at one event: ids, sides and positions rounded to 0.1 m."""
         known_match(match_id)
         frame = store.freeze_frame(match_id, event_id)
+        upto = horizon(match_id)
+        if frame is not None and upto is not None and frame.t.root > upto:
+            frame = None
         if frame is None:
             raise ToolError(
                 f"No freeze frame for event {event_id} in match {match_id}."
@@ -225,10 +270,12 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
         """The beats found so far, in the order they were detected. Pass `after_t` to get only
         beats detected after that match time."""
         known_match(match_id)
+        upto = horizon(match_id)
         beats = [
             b
             for b in store.beats(match_id)
-            if after_t is None or b.t_detect.root > after_t
+            if (after_t is None or b.t_detect.root > after_t)
+            and (upto is None or b.t_detect.root <= upto)
         ]
         return {"beats": [dump(b) for b in beats]}
 
@@ -236,7 +283,15 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
     def get_beat_bundle(match_id: str, beat_id: str) -> dict[str, Any]:
         """One beat and every fact it cites, in one call. This is what the Narrator reads."""
         known_match(match_id)
-        beat = next((b for b in store.beats(match_id) if b.id.root == beat_id), None)
+        upto = horizon(match_id)
+        beat = next(
+            (
+                b
+                for b in store.beats(match_id)
+                if b.id.root == beat_id and (upto is None or b.t_detect.root <= upto)
+            ),
+            None,
+        )
         if beat is None:
             raise ToolError(f"Unknown beat {beat_id} in match {match_id}.")
         facts = [known_fact(match_id, f.root) for f in beat.fact_ids]

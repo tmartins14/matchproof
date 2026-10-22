@@ -1,0 +1,43 @@
+# Model deployments by role (Foundry resource ais-oou4h3al, one /openai/v1 endpoint, one Entra token).
+# The Narrator and the active judge are read by agents.llm_client.client_for(role). The judge can be
+# overridden for one run with JUDGE_DEPLOYMENT=<deployment>. `make bakeoff` rewrites `judge:` below
+# from the measured winner (evals/pick.py); do not hand-edit it to change the result.
+#
+# response_format: json_schema | json_object | none (the schema goes in the prompt instead).
+# temperature is left out where the deployment only takes its default.
+# Checked 2026-10-22 against /openai/v1: gpt-5-mini takes json_schema and json_object but only the
+# default temperature; judge-mai rejects every response_format ("Structured response_format is not
+# enabled for model mai-thinking-1") and needs a large output budget because it reasons first;
+# judge-grok takes json_schema and temperature but json_object timed out.
+
+narrator:
+  deployment: gpt-5-mini
+  max_output_tokens: 700
+  timeout_s: 20
+  response_format: json_schema
+  reasoning_effort: minimal
+
+judge:
+  deployment: gpt-5-mini
+  max_output_tokens: 800
+  timeout_s: 30
+  response_format: json_schema
+  reasoning_effort: minimal
+
+judge_candidates:
+  - deployment: judge-mai
+    max_output_tokens: 800
+    timeout_s: 30
+    response_format: none
+  - deployment: judge-grok
+    max_output_tokens: 800
+    timeout_s: 30
+    response_format: json_schema
+    temperature: 0
+
+judge_fallback:
+  deployment: gpt-5-mini
+  max_output_tokens: 800
+  timeout_s: 30
+  response_format: json_schema
+  reasoning_effort: minimal

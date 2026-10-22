@@ -1,0 +1,332 @@
+# TEST DATA. The bad claims in this file are written to be wrong and are not product text: the voice
+# rules in voice/banned.yaml do not apply to them. Fictional clubs and players only.
+#
+# Each claim is tied to a real beat of a fixed generated match (Rivermouth at home, Ashford Vale away)
+# by beat id, and cites fact ids from that beat's bundle. `expected`:
+#   verified   a good claim; the Checker must pass it on the first check
+#   rephrased  a bad claim whose facts support an honest rewording (the number or wording can be fixed)
+#   blocked    a bad claim with no honest rewording from the cited facts
+# The runner counts a bad claim as caught when the first check does not pass it, so rephrased and
+# blocked are scored the same. `kind` says what is wrong with a bad claim.
+#
+# Bad mix: 7 wrong_number, 5 uncited_number, 6 overclaim, 4 invented_cause, 3 wrong_entity,
+# 2 wrong_minute, 3 outside_knowledge. 10 good.
+
+# ---------------------------------------------------------------- wrong number (7)
+- id: adv-01
+  kind: wrong_number
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale's back line has dropped 12 m since the second yellow."
+  fact_ids: [fx-back_line_change-away-ev-001484-to-t4671-00]
+  expected: rephrased
+- id: adv-02
+  kind: wrong_number
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-open_play_goal
+  text: "Rivermouth score after a 9 pass move."
+  fact_ids: [fx-sequence-ev-001670-passes]
+  expected: rephrased
+- id: adv-03
+  kind: wrong_number
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000733-counter_goal
+  text: "Ashford Vale win it 90 m from goal and score in 40 seconds."
+  fact_ids: [fx-sequence-ev-000733-ball_won_distance, fx-sequence-ev-000733-seconds]
+  expected: rephrased
+- id: adv-04
+  kind: wrong_number
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000993-territorial_spell
+  text: "Rivermouth have 75% of the ball in this spell."
+  fact_ids: [fx-possession_share-home-last-11m-to-t3103-99]
+  expected: rephrased
+- id: adv-05
+  kind: wrong_number
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000937-set_piece_goal
+  text: "Rivermouth score from a chance worth 0.31 xG."
+  fact_ids: [fx-shot-ev-000937-xg]
+  expected: rephrased
+- id: adv-06
+  kind: wrong_number
+  match: { story: late_comeback, seed: 4 }
+  beat_id: bt-001806-set_piece_goal
+  text: "Rivermouth score 6 seconds after the set piece."
+  fact_ids: [fx-sequence-ev-001806-seconds]
+  expected: rephrased
+- id: adv-07
+  kind: wrong_number
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-card
+  text: "Ashford Vale are down to 9 players."
+  fact_ids: [fx-card-ev-001484-players_after]
+  expected: rephrased
+
+# ---------------------------------------------------------------- number with no cited fact (5)
+- id: adv-08
+  kind: uncited_number
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-open_play_goal
+  text: "Rivermouth score after 4 passes in 16 seconds."
+  fact_ids: [fx-sequence-ev-001670-seconds]
+  expected: rephrased
+- id: adv-09
+  kind: uncited_number
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000993-territorial_spell
+  text: "Rivermouth have 61% of the ball and 4 shots."
+  fact_ids: [fx-possession_share-home-last-11m-to-t3103-99]
+  expected: rephrased
+- id: adv-10
+  kind: uncited_number
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000733-counter_goal
+  text: "Ashford Vale win it 56 m from goal and score."
+  fact_ids: []
+  expected: rephrased
+- id: adv-11
+  kind: uncited_number
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale's back line has dropped 9 m, Rivermouth's only 2 m."
+  fact_ids: [fx-back_line_change-away-ev-001484-to-t4671-00]
+  expected: rephrased
+- id: adv-12
+  kind: uncited_number
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-001439-open_play_goal
+  text: "Ashford Vale's away-09 finishes it after 4 passes, 10 seconds from the interception."
+  fact_ids: [fx-shot-ev-001439-shooter]
+  expected: rephrased
+
+# ---------------------------------------------------------------- overclaiming adjective (6)
+- id: adv-13
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000993-territorial_spell
+  text: "Rivermouth are dominant, with 61% of the ball."
+  fact_ids: [fx-possession_share-home-last-11m-to-t3103-99]
+  expected: blocked
+- id: adv-14
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale have collapsed, with the back line 9 m deeper."
+  fact_ids: [fx-back_line_change-away-ev-001484-to-t4671-00]
+  expected: blocked
+- id: adv-15
+  kind: overclaim
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000830-territorial_spell
+  text: "Rivermouth are in total control with 67% of the ball."
+  fact_ids: [fx-possession_share-home-last-6m-to-t2534-01]
+  expected: blocked
+- id: adv-16
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-open_play_goal
+  text: "Rivermouth are clinical, scoring after 4 passes."
+  fact_ids: [fx-sequence-ev-001670-passes]
+  expected: blocked
+- id: adv-17
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000222-high_turnover_chance
+  text: "Ashford Vale's press is relentless, winning the ball 7 m from goal."
+  fact_ids: [fx-sequence-ev-000222-ball_won_distance]
+  expected: blocked
+- id: adv-18
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-card
+  text: "Ashford Vale are reeling after the second yellow."
+  fact_ids: [fx-card-ev-001484-kind]
+  expected: blocked
+
+# ---------------------------------------------------------------- invented cause (4)
+- id: adv-19
+  kind: invented_cause
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale's back line is 9 m deeper, a sign of tired legs."
+  fact_ids: [fx-back_line_change-away-ev-001484-to-t4671-00]
+  expected: blocked
+- id: adv-20
+  kind: invented_cause
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000733-counter_goal
+  text: "Ashford Vale score in 40 seconds because Rivermouth's full-backs were pushed up."
+  fact_ids: [fx-sequence-ev-000733-seconds]
+  expected: blocked
+- id: adv-21
+  kind: invented_cause
+  match: { story: late_comeback, seed: 4 }
+  beat_id: bt-001806-set_piece_goal
+  text: "Rivermouth score 3 seconds after the set piece, thanks to a rehearsed routine."
+  fact_ids: [fx-sequence-ev-001806-seconds]
+  expected: blocked
+- id: adv-22
+  kind: invented_cause
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000993-territorial_spell
+  text: "Rivermouth have 61% of the ball because Ashford Vale have stopped pressing."
+  fact_ids: [fx-possession_share-home-last-11m-to-t3103-99]
+  expected: blocked
+
+# ---------------------------------------------------------------- wrong player or side (3)
+- id: adv-23
+  kind: wrong_entity
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000733-counter_goal
+  text: "Rivermouth's away-09 finishes the counter."
+  fact_ids: [fx-shot-ev-000733-shooter]
+  expected: blocked
+- id: adv-24
+  kind: wrong_entity
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-open_play_goal
+  text: "away-10 scores for Rivermouth."
+  fact_ids: [fx-shot-ev-001670-shooter, fx-shot-ev-001670-outcome]
+  expected: blocked
+- id: adv-25
+  kind: wrong_entity
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-card
+  text: "Rivermouth are down to 10 players after the second yellow."
+  fact_ids: [fx-card-ev-001484-kind, fx-card-ev-001484-players_after]
+  expected: blocked
+
+# ---------------------------------------------------------------- wrong minute (2)
+- id: adv-26
+  kind: wrong_minute
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale's back line is 9 m deeper since half-time."
+  fact_ids: [fx-back_line_change-away-ev-001484-to-t4671-00]
+  expected: blocked
+- id: adv-27
+  kind: wrong_minute
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-open_play_goal
+  text: "Rivermouth score in the 74′."
+  fact_ids: [fx-shot-ev-001670-minute]
+  expected: rephrased
+
+# ---------------------------------------------------------------- outside knowledge (3)
+- id: adv-28
+  kind: outside_knowledge
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000993-territorial_spell
+  text: "Rivermouth have 61% of the ball, their best spell in years."
+  fact_ids: [fx-possession_share-home-last-11m-to-t3103-99]
+  expected: blocked
+- id: adv-29
+  kind: outside_knowledge
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000733-counter_goal
+  text: "Ashford Vale's away-09 scores again, matching the form of last season."
+  fact_ids: [fx-shot-ev-000733-shooter]
+  expected: blocked
+- id: adv-30
+  kind: outside_knowledge
+  match: { story: late_comeback, seed: 4 }
+  beat_id: bt-000824-counter_goal
+  text: "Ashford Vale score on the break in 11 seconds, the way last season's champions do."
+  fact_ids: [fx-sequence-ev-000824-seconds]
+  expected: blocked
+
+# ---------------------------------------------------------------- good claims (10)
+- id: good-01
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-card
+  text: "Ashford Vale are down to 10 players after a second yellow."
+  fact_ids: [fx-card-ev-001484-kind, fx-card-ev-001484-players_after]
+  expected: verified
+- id: good-02
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale's back line has dropped 9 m since the second yellow, from 34 m to 25 m."
+  fact_ids:
+    - fx-back_line_change-away-ev-001484-to-t4671-00
+    - fx-back_line_height-away-before-ev-001484
+    - fx-back_line_height-away-since-ev-001484-to-t4671-00
+  expected: verified
+- id: good-03
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000993-territorial_spell
+  text: "Rivermouth have 61% of the ball and 4 shots in this spell, to 1 for Ashford Vale."
+  fact_ids:
+    - fx-possession_share-home-last-11m-to-t3103-99
+    - fx-shots-home-last-11m-to-t3103-99
+    - fx-shots-away-last-11m-to-t3103-99
+  expected: verified
+- id: good-04
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-open_play_goal
+  text: "Rivermouth score through home-10 after 4 passes in 16 seconds."
+  fact_ids:
+    - fx-shot-ev-001670-shooter
+    - fx-shot-ev-001670-outcome
+    - fx-sequence-ev-001670-passes
+    - fx-sequence-ev-001670-seconds
+  expected: verified
+- id: good-05
+  kind: good
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000733-counter_goal
+  text: "Ashford Vale win the ball 56 m out and score 40 seconds later, 5 passes on."
+  fact_ids:
+    - fx-sequence-ev-000733-ball_won_distance
+    - fx-sequence-ev-000733-seconds
+    - fx-sequence-ev-000733-passes
+    - fx-shot-ev-000733-outcome
+  expected: verified
+- id: good-06
+  kind: good
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000937-set_piece_goal
+  text: "Rivermouth score from a set piece worth 0.11 xG."
+  fact_ids: [fx-shot-ev-000937-xg, fx-shot-ev-000937-outcome]
+  expected: verified
+- id: good-07
+  kind: good
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000830-territorial_spell
+  text: "Rivermouth have 67% of the ball in this spell, with 39 touches in Ashford Vale's half."
+  fact_ids:
+    - fx-possession_share-home-last-6m-to-t2534-01
+    - fx-touches_in_opponent_half-home-last-6m-to-t2534-01
+  expected: verified
+- id: good-08
+  kind: good
+  match: { story: late_comeback, seed: 4 }
+  beat_id: bt-001806-set_piece_goal
+  text: "Rivermouth score 3 seconds after the set piece."
+  fact_ids: [fx-sequence-ev-001806-seconds, fx-shot-ev-001806-outcome]
+  expected: verified
+- id: good-09
+  kind: good
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-001439-open_play_goal
+  text: "Ashford Vale's away-09 scores after 4 passes in 10 seconds."
+  fact_ids:
+    - fx-shot-ev-001439-shooter
+    - fx-shot-ev-001439-outcome
+    - fx-sequence-ev-001439-passes
+    - fx-sequence-ev-001439-seconds
+  expected: verified
+- id: good-10
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000222-high_turnover_chance
+  text: "Ashford Vale win it 7 m from goal and shoot 4 seconds later, but the effort is blocked."
+  fact_ids:
+    - fx-sequence-ev-000222-ball_won_distance
+    - fx-sequence-ev-000222-seconds
+    - fx-shot-ev-000222-outcome
+  expected: verified

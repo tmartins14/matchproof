@@ -477,6 +477,8 @@ async def run_live(
             if origin is None:
                 origin = pacer.now() - due
             await pacer.sleep_until(origin + due)
+            if store is not None:
+                store.set_playback(brief.match_id, msg.t.root)
             yield msg
     finally:
         control.cancel()

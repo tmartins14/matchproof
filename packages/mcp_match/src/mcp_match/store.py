@@ -29,6 +29,7 @@ class MatchRecord:
     beats: list[Beat] = field(default_factory=list)
     claims: dict[str, list[Claim]] = field(default_factory=dict)
     finished: bool = False
+    playback_t: float = 0.0  # match time last sent to viewers
 
 
 class MatchStore(Protocol):
@@ -45,6 +46,10 @@ class MatchStore(Protocol):
     def add_beat(self, match_id: str, beat: Beat) -> None: ...
 
     def finish(self, match_id: str) -> None: ...
+
+    def set_playback(self, match_id: str, t: float) -> None: ...
+
+    def playback(self, match_id: str) -> float | None: ...
 
     def brief(self, match_id: str) -> MatchBrief: ...
 
@@ -109,6 +114,19 @@ class InMemoryMatchStore:
     def finish(self, match_id: str) -> None:
         with self._lock:
             self._get(match_id).finished = True
+
+    def set_playback(self, match_id: str, t: float) -> None:
+        """Record the match time last sent to viewers. It never moves back."""
+        with self._lock:
+            record = self._get(match_id)
+            record.playback_t = max(record.playback_t, t)
+
+    def playback(self, match_id: str) -> float | None:
+        """The match time viewers have reached, or None once the match is finished and
+        everything may be shown."""
+        with self._lock:
+            record = self._get(match_id)
+            return None if record.finished else record.playback_t
 
     def brief(self, match_id: str) -> MatchBrief:
         with self._lock:

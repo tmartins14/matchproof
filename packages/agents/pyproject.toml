@@ -5,6 +5,9 @@ requires-python = ">=3.12"
 dependencies = [
     "azure-identity>=1.26.0",
     "matchproof-contracts",
+    "matchproof-intel",
+    "pydantic>=2",
+    "pyyaml",
     "openai>=3.35.1",
     "opentelemetry-api>=1.45.1",
 ]
@@ -18,3 +21,4 @@ packages = ["src/agents"]
 
 [tool.uv.sources]
 matchproof-contracts = { workspace = true }
+matchproof-intel = { workspace = true }

@@ -315,3 +315,42 @@ def test_seventh_match_evicts_the_least_recently_used() -> None:
     store.begin(briefs[MAX_MATCHES], FactRegistry())
     assert ids[1] not in store
     assert all(i in store for i in [ids[0], *ids[2:]])
+
+
+def test_public_server_hides_beats_past_the_playback_position() -> None:
+    store = InMemoryMatchStore()
+    match_id = fill(store, "red_card_flip", 3)
+    full = finished()[0]
+    assert match_id == finished()[1]
+    first, last = full.beats(match_id)[0], full.beats(match_id)[-1]
+    assert first.t_detect.root < last.t_detect.root
+    store._records[match_id].finished = False  # as if still streaming
+    store.set_playback(match_id, first.t_detect.root)
+
+    async def scenario() -> None:
+        async with (
+            client_for(store, False) as public,
+            client_for(store, True) as internal,
+        ):
+            seen = (await call(public, "list_beats", match_id=match_id))["beats"]
+            full_list = (await call(internal, "list_beats", match_id=match_id))["beats"]
+            assert len(full_list) == len(store.beats(match_id)) > len(seen) >= 1
+            assert all(b["t_detect"] <= first.t_detect.root for b in seen)
+            hidden = await public.call_tool(
+                "get_beat_bundle", {"match_id": match_id, "beat_id": last.id.root}
+            )
+            assert hidden.isError
+            events = await call(
+                public, "get_events", match_id=match_id, t_from=0, t_to=6000
+            )
+            assert all(e["t"] <= first.t_detect.root for e in events["events"])
+            for f in (await call(public, "find_facts", match_id=match_id))["facts"]:
+                assert f["scope"]["t_to"] <= first.t_detect.root or f["id"] in {
+                    x.root for x in first.fact_ids
+                }
+        store.finish(match_id)
+        async with client_for(store, False) as public:
+            done = (await call(public, "list_beats", match_id=match_id))["beats"]
+            assert len(done) == len(store.beats(match_id))
+
+    run(scenario())

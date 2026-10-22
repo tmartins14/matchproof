@@ -39,10 +39,24 @@ All agents read and write one match store through the `match-data` MCP server. T
 | Beat detector | Python | Facts, events | Candidate `Beat[]`, marked planted or detected |
 | Producer | Agent | Candidate beats | Ranked feed of 6 to 10 beats |
 | Narrator | Agent | One beat's fact bundle | Draft `Claim[]` with `fact_ids` |
-| Checker | Python reconciler + LLM judge (Claude Sonnet 5.5; the Narrator runs on gpt-5-mini, so the judge is a different model from a different vendor) | Draft claims, facts | Verdict per claim; one retry to Narrator with reasons |
+| Checker | Python reconciler and voice lint, then an LLM judge (gpt-5-mini with a separate judge prompt, chosen by the bake-off below; the Claude judge is blocked, see ADR 0002) | Draft claims, facts | Verdict per claim; one retry to Narrator with reasons |
 | Localizer | Agent + Azure AI Translator | Verified claims | Fan, analyst and producer renderings; EN and ES; number invariance check |
 | Renderer | Python | Beat, events, frames | `Overlay` JSON, timed to the match clock |
 | match-data MCP | MCP server | Tool calls | Facts, events, freeze frames, beats and claims (see Match-data MCP) |
+
+### Checker order and judge bake-off
+
+Per claim: the reconciler matches every number to a cited fact's display rendering, the voice lint runs, and only a claim that passes both reaches the judge. The judge sees the claim and its cited facts only and answers `supported`, `problem` and `reason`. Any failure sends the beat's failed claims back to the Narrator once with the reasons; a pass after that is `rephrased`, a second failure is `blocked`, and a judge that does not answer within 6 s leaves the claim `delayed`.
+
+The judge was chosen by measurement (`make bakeoff`, 2026-10-22): 30 bad and 10 good claims in `evals/adversarial/claims.yaml`. Rule, applied in `evals/pick.py`: at least 28 of 30 caught, at most 1 of 10 good blocked, judge p90 at most 4 s; highest catch count wins, then lower p90.
+
+| Judge | Bad caught (of 30) | by code | by judge | Good blocked (of 10) | Judge unavailable | p50 | p90 | Tokens per claim |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| judge-mai (MAI-Thinking-1) | 25 | 13 | 12 | 0 | 12 | 22.5 s | 25.0 s | 1310 |
+| judge-grok (grok-4.7) | 13 | 13 | 0 | 0 | 27 | 0.3 s | 30.3 s | 0 |
+| gpt-5-mini (fallback) | 29 | 13 | 16 | 0 | 0 | 1.7 s | 2.1 s | 658 |
+
+Neither candidate qualified, so the fallback judge is active. Full report: `evals/reports/bakeoff.md`.
 
 ## Tactics and the brief
 

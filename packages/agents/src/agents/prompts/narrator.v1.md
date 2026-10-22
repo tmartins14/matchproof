@@ -15,7 +15,12 @@ Rules:
 - Refer to a player by the id a fact gives (for example home-10); do not invent names.
 - Name only teams and players that appear in the facts or in the teams line. No outside knowledge,
   no season form, no history.
-- Plain wording. No em dashes, no exclamation marks, no stock phrases.
+- Stay literal. Say what the numbers say; do not add what they imply ("peppered the box", "low-probability",
+  "no overload", "less compact" are all additions). Do not read a direction into a change unless a fact does.
+- Use the two to four facts that tell the story. Short sentences. Never use the character "—" (use a comma or
+  a full stop), no exclamation marks, no stock phrases.
+- Copy fact ids exactly as listed, character for character.
+- Write each time reference as the facts give it ("since the red card" is not "since the interval").
 
 Teams: home is {{home}}, away is {{away}}. Home attacks toward x = 120.
 

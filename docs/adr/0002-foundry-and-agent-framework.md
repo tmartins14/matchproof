@@ -34,3 +34,13 @@ Stage One judging checks that entries "reasonably apply the required technologie
 - **The Narrator, Composer, Producer and Localizer stay on `gpt-5-mini`.** Writer and judge are different models from different vendors, so the judge is not grading its own output.
 - **Not yet verified:** a smoke-test deployment and call. The Bicep and client changes listed under "To switch back to Claude" land with the Checker prompt (Thu Oct 22): the client module gains a second provider; agent code does not change.
 - **Cost:** Azure credits do not cover Claude; usage bills to the card. The budget alert in `infra/modules/budget.bicep` must be checked before evals run in a loop.
+
+### 2026-10-22: the Claude judge is blocked; the bake-off picks gpt-5-mini
+
+- **Claude Marketplace deployment failed twice** with `MarketplaceSubscriptionCannotBeCompleted`. A support request is open. Until it resolves there is no Claude judge.
+- **Candidates deployed in `ais-oou4h3al`:** `judge-mai` (Microsoft MAI-Thinking-1) and `judge-grok` (xAI grok-4.7). Both answer through the shared `/openai/v1` endpoint with the same Entra token. `judge-mai` rejects every `response_format`, so the schema goes in the prompt; `judge-grok` takes `json_schema`.
+- **Rule (in `evals/pick.py`):** among candidates with at least 28 of 30 bad claims caught, at most 1 of 10 good claims blocked and judge p90 at most 4 s, take the most caught, then the lower p90. If none qualify, use `gpt-5-mini` with the judge prompt.
+- **Result:** `judge-mai` caught 25/30, blocked 0/10 good, p90 25.0 s, and gave no answer on 12 of 27 judged claims. `judge-grok` answered none of its 27 (HTTP 429 `pd_decode_pushback`, "All available decode workers reached a configured load limit", and timeouts), so it caught only the 13 that code stops. Neither qualified.
+- **Winner: `gpt-5-mini` (fallback judge, own prompt `judge.v1.md`):** caught 29/30 (13 by code, 16 by the judge), blocked 0/10 good, p50 1.7 s, p90 2.1 s, 658 tokens per judged claim. The one miss is a wrong "since half-time" on a back-line change that is measured from the red card. `models.yaml` now has it as the active judge.
+- **Not independent:** the Narrator and the judge are now the same model, which the 2026-10-19 entry avoided. The judge has a different prompt and sees only the claim and its cited facts, but it is not a different vendor. Revisit when the Claude deployment works, and re-run `make bakeoff` then (and for `judge-grok` once its capacity recovers).
+

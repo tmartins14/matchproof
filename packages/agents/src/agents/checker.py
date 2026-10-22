@@ -8,6 +8,7 @@ claim is `rephrased`, if not it is `blocked`. A judge that cannot answer in time
 
 import re
 from collections.abc import Callable, Mapping
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -23,6 +24,7 @@ from .structured import StructuredOutputError, complete_structured
 
 JUDGE_TIMEOUT_S = 6.0
 JUDGE_MAX_TOKENS = 800
+MAX_WORKERS = 4  # claims of one beat checked at the same time
 JUDGE_PROMPT_PATH = Path(__file__).parent / "prompts" / "judge.v1.md"
 MAX_REASON_CHARS = 400
 
@@ -110,7 +112,9 @@ class Checker:
         *,
         rules: list[Rule] | None = None,
         timeout_s: float = JUDGE_TIMEOUT_S,
+        max_workers: int = MAX_WORKERS,
     ) -> None:
+        self._workers = max_workers
         self._judge = judge
         self._rules = rules if rules is not None else load_rules()
         self._timeout_s = timeout_s
@@ -194,7 +198,11 @@ class Checker:
                 d, bundle, teams=teams, beat_kind=beat_kind, beat_label=beat_label
             )
 
-        first = [check(d) for d in drafts]
+        def check_all(items: list[DraftClaim]) -> list[ClaimCheck]:
+            with ThreadPoolExecutor(max_workers=self._workers) as pool:
+                return list(pool.map(check, items))
+
+        first = check_all(drafts)
         failed = [i for i, c in enumerate(first) if not c.passed and not c.delayed]
         revised: dict[int, DraftClaim] = {}
         if failed:
@@ -210,11 +218,12 @@ class Checker:
             for i, new in zip(failed, renarrate(revision), strict=False):
                 revised[i] = new
         stem = re.sub(r"^bt-", "", beat_id)
+        redone = dict(zip(revised, check_all(list(revised.values())), strict=True))
         out: list[CheckedClaim] = []
         for i, (draft, c1) in enumerate(zip(drafts, first, strict=True)):
             claim_id = f"cl-{stem}-{i + 1:02d}"
             retries = 1 if i in failed else 0
-            c2 = check(revised[i]) if i in revised else c1
+            c2 = redone.get(i, c1)
             out.append(self._finish(claim_id, beat_id, lang, draft, c1, c2, retries))
         return out
 
@@ -264,6 +273,6 @@ class Checker:
         }
         if verdict in ("rephrased", "blocked", "delayed") and reason:
             data["reason"] = reason
-        if verdict in ("rephrased", "blocked"):
+        if verdict in ("rephrased", "blocked") or (verdict == "delayed" and retries):
             data["draft_text"] = draft.text
         return CheckedClaim(Claim.model_validate(data), first, final)

@@ -18,10 +18,11 @@ narrator:
   reasoning_effort: minimal
 
 judge:
-  deployment: judge-mai
+  deployment: gpt-5-mini
   max_output_tokens: 800
   timeout_s: 30
-  response_format: none
+  response_format: json_schema
+  reasoning_effort: minimal
 
 judge_candidates:
   - deployment: judge-mai

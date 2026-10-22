@@ -25,7 +25,7 @@ def run(
         asked.append(revision)
         return retried or []
 
-    out = Checker(judge).check_beat(
+    out = Checker(judge, max_workers=1).check_beat(
         drafts,
         BUNDLE,
         beat_id="bt-001484-card",

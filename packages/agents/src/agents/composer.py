@@ -123,7 +123,13 @@ def _tactics(
         dials[dial] = min(1.0, max(0.0, value))
         if dials[dial] != value:
             warnings.append(f"The {side} {dial} was {value}; moved to {dials[dial]}.")
-    return replace(base, formation=formation, **dials)
+    return replace(
+        base,
+        formation=formation,
+        press=dials["press"],
+        directness=dials["directness"],
+        line_height=dials["line_height"],
+    )
 
 
 def repair(answer: ComposerAnswer, seed: int) -> tuple[MatchBrief, list[str]]:

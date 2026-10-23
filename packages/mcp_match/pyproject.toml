@@ -3,6 +3,8 @@ name = "matchproof-mcp_match"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "azure-identity>=1.26.0",
+    "azure-storage-blob>=12.31.0",
     "matchproof-contracts",
     "matchproof-intel",
     "mcp>=1.9,<2",

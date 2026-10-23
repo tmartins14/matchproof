@@ -11,7 +11,7 @@ from collections.abc import Callable
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
-from mcp_match import InMemoryMatchStore, MatchStore, build_server
+from mcp_match import InMemoryMatchStore, MatchStore, archive_from_env, build_server
 from starlette.responses import JSONResponse
 from starlette.types import Receive, Scope, Send
 
@@ -21,7 +21,7 @@ MAX_TRACKED_CLIENTS = (
     10_000  # addresses remembered; beyond this the idle ones are dropped
 )
 
-store = InMemoryMatchStore()
+store = InMemoryMatchStore(archive=archive_from_env())  # MATCH_ARCHIVE=file|blob
 
 
 def get_internal_server(match_store: MatchStore) -> FastMCP:

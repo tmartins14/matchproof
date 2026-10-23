@@ -21,6 +21,9 @@ from intel.engine import extract_all
 from intel.registry import FactRegistry
 from mcp import ClientSession
 from mcp.shared.memory import create_connected_server_and_client_session
+from mcp_match import ArchiveMissing
+from mcp_match.persist import AUDIT, PRODUCER_LOG, list_manifests, load_json
+from mcp_match.store import UnknownMatch
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from pydantic import ValidationError
 from sim import generate
@@ -37,6 +40,7 @@ from starlette.background import BackgroundTask
 from starlette.routing import Route
 
 from api.agents_runtime import AgentRuntime, DownRun, MatchRun, SessionServer
+from api.archiving import schedule_save
 from api.live import (
     HEARTBEAT_S,
     MAX_LIVE_STREAMS,
@@ -171,10 +175,33 @@ def store_brief(brief: MatchBrief) -> str:
 
 
 def brief_of(match_id: str) -> MatchBrief:
+    """A brief posted since the process started, or one from an archived match."""
     brief = _briefs.get(match_id)
     if brief is None:
-        raise HTTPException(status_code=404, detail=f"unknown match {match_id}")
+        try:
+            brief = store.brief(match_id)
+        except UnknownMatch as exc:
+            raise HTTPException(
+                status_code=404, detail=f"unknown match {match_id}"
+            ) from exc
     return brief
+
+
+@app.get("/matches")
+def list_matches() -> list[dict[str, Any]]:
+    """Archived matches, newest first, from their manifests."""
+    if store.archive is None:
+        return []
+    return [
+        {
+            "match_id": m["match_id"],
+            "storyline": m["storyline"],
+            "score": m["final_score"],
+            "created_at": m["created_at"],
+            "claims": m["claims"],
+        }
+        for m in list_manifests(store.archive)
+    ]
 
 
 @app.post("/matches")
@@ -275,8 +302,11 @@ def compose_brief(
 
 @lru_cache(maxsize=MAX_CACHED_REGISTRIES)
 def match_registry(match_id: str) -> FactRegistry:
-    """Every fact of a match, on-demand beat facts included, for lookups by id."""
+    """Every fact of a match, on-demand beat facts included, for lookups by id. An archived match
+    comes from the archive; any other is generated again."""
     brief = brief_of(match_id)
+    if store.archive is not None and match_id in store.archive.matches():
+        return store.registry(match_id)
     events = generate(brief)
     gc.disable()  # tens of thousands of frame models; the cyclic collector would crawl over them
     try:
@@ -310,16 +340,34 @@ def run_of(match_id: str) -> MatchRun:
     return run
 
 
+def archived_json(match_id: str, name: str) -> Any:
+    """audit.json or producer_log.json of an archived match; 404 if it is not archived."""
+    if store.archive is not None:
+        try:
+            return load_json(store.archive, match_id, name)
+        except ArchiveMissing:
+            pass
+    raise HTTPException(status_code=404, detail=f"no agent run for {match_id}")
+
+
 @app.get("/matches/{match_id}/audit")
 def get_audit(match_id: str) -> dict[str, Any]:
     """The second model's check of this match's claims: how many, how often it agreed, and why not."""
-    return run_of(match_id).audit_summary()
+    brief_of(match_id)
+    if agent_runtime is not None and agent_runtime.existing(match_id) is not None:
+        return run_of(match_id).audit_summary()
+    audit: dict[str, Any] = archived_json(match_id, AUDIT)
+    return audit
 
 
 @app.get("/matches/{match_id}/producer-log")
 def get_producer_log(match_id: str) -> list[dict[str, Any]]:
     """Which beats the Producer put on the feed and which it left off, with a line each."""
-    return run_of(match_id).producer_log()
+    brief_of(match_id)
+    if agent_runtime is not None and agent_runtime.existing(match_id) is not None:
+        return run_of(match_id).producer_log()
+    log: list[dict[str, Any]] = archived_json(match_id, PRODUCER_LOG)
+    return log
 
 
 def sse(msg: StreamMessage) -> str:
@@ -397,6 +445,7 @@ async def stream_match(
         agents = DownRun()  # models are configured but the workflow did not start
 
     async def body() -> AsyncIterator[str]:
+        completed = False
         try:
             async for chunk in sse_with_heartbeat(
                 run_live(
@@ -409,7 +458,12 @@ async def stream_match(
                 )
             ):
                 yield chunk
+            completed = True
         finally:
+            if completed:
+                schedule_save(
+                    store, brief, agents
+                )  # full time: archive in the background
             if agents is not None:
                 agents.close()  # ends the match's root span; a reconnect's spans still nest under it
             release()

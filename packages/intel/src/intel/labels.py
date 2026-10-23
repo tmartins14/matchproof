@@ -18,6 +18,7 @@ from .registry import FactRegistry
 
 TEAM_FACT = re.compile(r"^(?P<metric>[a-z_]+)\((?P<side>home|away), (?P<rest>.*)\)$")
 EVENT_FACT = re.compile(r"^(?P<family>[a-z_]+)\((?P<ev>ev-\d{6})\)\.(?P<key>[a-z_]+)$")
+SCORE_FACT = re.compile(r"^(?P<kind>score_after|lead)\((?P<ev>ev-\d{6})\)$")
 EVENT_ID = re.compile(r"ev-\d{6}")
 SINCE = re.compile(r"^since (?P<ev>ev-\d{6}) to t[\d.]+$")
 BEFORE = re.compile(r"^before (?P<ev>ev-\d{6})$")
@@ -88,6 +89,10 @@ EVENT_METRICS: Mapping[str, str] = {
     "freeze_frame.players_bypassed": "opponents bypassed by the pass",
     "freeze_frame.home_ahead_of_ball": "{home} players ahead of the ball",
     "freeze_frame.away_ahead_of_ball": "{away} players ahead of the ball",
+}
+SCORE_LABELS: Mapping[str, str] = {
+    "score_after": "score after the goal",
+    "lead": "who leads",
 }
 CARD_KINDS: Mapping[str, str] = {
     "yellow": "yellow card",
@@ -185,6 +190,8 @@ def label_for(fact: Fact, ctx: LabelContext) -> str:
     """The plain-English label of one fact. Never contains an event id or an underscore."""
     if m := EVENT_FACT.match(fact.name):
         return _event_label(fact, m, ctx)
+    if m := SCORE_FACT.match(fact.name):
+        return SCORE_LABELS[m["kind"]]
     if m := TEAM_FACT.match(fact.name):
         metric, side, rest = m["metric"], m["side"], m["rest"]
         period = fact.scope.period.value if fact.scope and fact.scope.period else None

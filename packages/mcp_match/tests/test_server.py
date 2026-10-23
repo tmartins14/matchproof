@@ -457,3 +457,21 @@ def test_follow_up_bundles_keep_only_changes_that_meet_the_beat_threshold() -> N
         if f["name"].startswith("compactness_change(") and f["value"] < 5
     ]
     assert small == []
+
+
+def test_goal_bundles_and_goal_follow_ups_carry_the_score() -> None:
+    store, match_id = finished()
+
+    async def bundle(beat_id: str) -> list[dict[str, Any]]:
+        async with client_for(store, False) as s:
+            out = await call(s, "get_beat_bundle", match_id=match_id, beat_id=beat_id)
+            return list(out["facts"])
+
+    for beat_id in ("bt-001670-open_play_goal", "bt-001670-momentum_swing"):
+        facts = {f["name"]: f for f in run(bundle(beat_id))}
+        score = facts["score_after(ev-001670)"]
+        assert score["label"] == "score after the goal"
+        assert " – " not in score["value"] and "–" in score["value"]
+        assert facts["lead(ev-001670)"]["label"] == "who leads"
+    card = run(bundle("bt-001484-card"))
+    assert not [f for f in card if f["name"].startswith(("score_after(", "lead("))]

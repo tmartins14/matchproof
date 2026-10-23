@@ -59,6 +59,11 @@ CASES: list[tuple[str, str, str]] = [
         "Rivermouth score from 7 m out.",
     ),
     (
+        "evaluative-adjective",
+        "Pryce scores, a composed finish.",
+        "Pryce scores from 7 m out.",
+    ),
+    (
         "shielding",
         "Ashford Vale are shielding their goal.",
         "Ashford Vale have two defenders near their goal.",

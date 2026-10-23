@@ -20,10 +20,12 @@ from .football import (
     opponent,
 )
 from .registry import build_fact
+from .score import is_goal, lead_text, match_score, score_text
 
 EXTRACTOR = "extract_events"
 SEQUENCE_EXTRACTOR = "extract_sequences"
 DISCIPLINE_EXTRACTOR = "extract_discipline"
+SCORE_EXTRACTOR = "extract_score"
 ON_TARGET = frozenset({"goal", "saved"})  # shot outcomes that count as on target
 SQUAD_SIZE = 11  # players a side starts with
 LANGS = ("en", "es")
@@ -201,8 +203,14 @@ class EventObserver:
     The batch and incremental paths both feed events through one of these in stream order.
     """
 
-    def __init__(self, roster: Mapping[str, str] | None = None) -> None:
+    def __init__(
+        self,
+        roster: Mapping[str, str] | None = None,
+        teams: Mapping[str, str] | None = None,
+    ) -> None:
         self._roster = roster or {}
+        self._teams = teams or {"home": "Home", "away": "Away"}
+        self._goals: list[Event] = []
         self._groups: dict[int, list[Event]] = {}
         self._yellows: set[str] = set()
         self._dismissed = {"home": 0, "away": 0}
@@ -222,7 +230,35 @@ class EventObserver:
             facts += self._shot_facts(e)
         if kind == "card":
             facts += self._card_facts(e)
+        if is_goal(e):
+            facts += self._score_facts(e)
         return facts
+
+    def _score_facts(self, goal: Event) -> list[Fact]:
+        """The score after a goal and who leads, citing every goal so far."""
+        self._goals.append(goal)
+        home, away = match_score(self._goals)
+        sid = goal.id.root
+        scope: dict[str, object] = {
+            "side": goal.side.value,
+            "t_from": goal.t.root,
+            "t_to": goal.t.root,
+        }
+        sources = [g.id.root for g in self._goals]
+        score = score_text(home, away, self._teams)
+        lead = lead_text(home, away, self._teams)
+        return [
+            build_fact(
+                f"score_after({sid})",
+                score,
+                "",
+                sources,
+                SCORE_EXTRACTOR,
+                scope,
+                {lang: [score, f"{home}–{away}"] for lang in LANGS},
+            ),
+            build_fact(f"lead({sid})", lead, "", sources, SCORE_EXTRACTOR, scope),
+        ]
 
     def _sequence_facts(self, shot: Event, group: list[Event]) -> list[Fact]:
         mine = [x for x in group if x.side == shot.side] + [shot]

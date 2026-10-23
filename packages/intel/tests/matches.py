@@ -143,7 +143,10 @@ def compute_lean(story: str, seed: int) -> Lean:
     """The live path, minus the wire: no frame is kept once the engine and detector have seen it."""
     brief = make_brief(DEFAULT_HOME, DEFAULT_AWAY, story, seed)
     events: list[Event] = []
-    engine, detector = FactEngine(), BeatDetector()
+    engine, detector = (
+        FactEngine(None, {"home": brief.home.name, "away": brief.away.name}),
+        BeatDetector(),
+    )
     beats: list[Beat] = []
     for _, item in read_stream(brief):
         if isinstance(item, Event):

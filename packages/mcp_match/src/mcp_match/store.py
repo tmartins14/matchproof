@@ -10,7 +10,7 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Protocol
 
-from contracts.models import Beat, Claim, Event, MatchBrief, PositionFrame
+from contracts.models import Audit, Beat, Claim, Event, MatchBrief, PositionFrame
 from intel.registry import FactRegistry
 
 MAX_MATCHES = 6  # matches held at once; the least recently used goes first
@@ -64,6 +64,8 @@ class MatchStore(Protocol):
     def put_claims(self, match_id: str, beat_id: str, claims: list[Claim]) -> None: ...
 
     def claims(self, match_id: str) -> dict[str, list[Claim]]: ...
+
+    def put_audit(self, match_id: str, claim_id: str, audit: Audit) -> bool: ...
 
 
 class InMemoryMatchStore:
@@ -155,6 +157,16 @@ class InMemoryMatchStore:
     def claims(self, match_id: str) -> dict[str, list[Claim]]:
         with self._lock:
             return {k: list(v) for k, v in self._get(match_id).claims.items()}
+
+    def put_audit(self, match_id: str, claim_id: str, audit: Audit) -> bool:
+        """Attach an audit to a stored claim. False if the claim is not there."""
+        with self._lock:
+            for claims in self._get(match_id).claims.values():
+                for i, claim in enumerate(claims):
+                    if claim.id.root == claim_id:
+                        claims[i] = claim.model_copy(update={"audit": audit})
+                        return True
+            return False
 
     def __contains__(self, match_id: str) -> bool:
         with self._lock:

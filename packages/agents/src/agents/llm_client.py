@@ -26,7 +26,7 @@ DEFAULT_TIMEOUT_S = 15.0
 MODELS_PATH = Path(__file__).resolve().parents[2] / "config" / "models.yaml"
 JUDGE_DEPLOYMENT_ENV = "JUDGE_DEPLOYMENT"
 
-Role = Literal["narrator", "judge"]
+Role = Literal["narrator", "judge", "producer", "auditor"]
 # How a deployment returns JSON: a response_format JSON schema, JSON mode, or only by prompt.
 ResponseFormat = Literal["json_schema", "json_object", "none"]
 
@@ -221,9 +221,9 @@ def client_for(role: Role, *, deployment: str | None = None) -> LlmClient:
         raise LlmError("MissingModelConfig")
     models = load_models()
     settings = (
-        settings_for(models["narrator"])
-        if role == "narrator"
-        else judge_settings(models, deployment)
+        judge_settings(models, deployment)
+        if role == "judge"
+        else settings_for(models[role])
     )
     return LlmClient(
         base_url,

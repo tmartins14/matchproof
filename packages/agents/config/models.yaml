@@ -17,6 +17,23 @@ narrator:
   response_format: json_schema
   reasoning_effort: minimal
 
+# The Producer decides which beats are narrated (hard rules are code; this model judges inside them).
+producer:
+  deployment: gpt-5-mini
+  max_output_tokens: 300
+  timeout_s: 10
+  response_format: json_schema
+  reasoning_effort: minimal
+
+# The independent auditor: a second vendor runs the judge rubric on settled claims, log-only.
+# judge-grok was accurate on the v2 bake-off (38 of 38) but too slow for the inline check (p50 7.8 s).
+auditor:
+  deployment: judge-grok
+  max_output_tokens: 800
+  timeout_s: 45
+  response_format: json_schema
+  temperature: 0
+
 # The judge prompt file in agents/prompts/. v1 is kept for the record.
 judge_prompt: judge.v2.md
 

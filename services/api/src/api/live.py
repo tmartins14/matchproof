@@ -19,9 +19,17 @@ playback, so the store never holds more than the lookahead.
 
 Sent: every event, frames as above, window facts when their window closes, and each beat with the
 facts it cites just before it. The rest of the registry stays server-side, looked up by id.
+
+With a MatchRun (the agent workflow), each beat is also handed to it as the worker finds it, in the
+lookahead. When playback reaches the beat, its claims follow it: a claim whose check has finished is
+sent with its final verdict; one still being checked is sent as `checking` and gets a `verdict`
+message the moment the Checker finishes. That is verify before air. The messages then count in the
+order they are sent, so a stream with agents is not reproducible by seq alone; resume after a
+Last-Event-ID continues the numbering and reuses the claims already settled.
 """
 
 import asyncio
+import json
 import threading
 import time
 from collections import deque
@@ -31,6 +39,7 @@ from typing import Any, Protocol
 
 from contracts.models import (
     Beat,
+    Claim,
     Event,
     Fact,
     MatchBrief,
@@ -42,6 +51,8 @@ from intel.engine import FactEngine
 from mcp_match.store import MatchStore
 from sim import iter_events
 from sim.positions import run
+
+from api.agents_runtime import DownRun, MatchRun
 
 SPEED_REAL_TIME = 1  # match minutes per real second: slowest
 SPEED_FAST = 3  # the default
@@ -77,6 +88,12 @@ FRAME_GUARD_S = (
 PRE_MATCH_TEXT = "Teams are out."
 HALF_TIME_TEXT = "Half-time."
 FULL_TIME_TEXT = "Full-time."
+PRODUCER_WAIT_S = 15.0  # real seconds a beat waits at air for the Producer's decision
+DRAIN_TIMEOUT_S = (
+    60.0  # real seconds after full time the stream waits for checks still running
+)
+PAUSED_TEXT = "Narration is paused for today."
+UNAVAILABLE_TEXT = "Verification is unavailable right now."
 
 
 class Pacer(Protocol):
@@ -259,8 +276,10 @@ def _produce(
     queue: "asyncio.Queue[Posted]",
     control: _Control,
     store: MatchStore | None = None,
+    on_beat: Callable[[Beat], None] | None = None,
 ) -> None:
-    """Thread body: feed the pipeline's entries to the player, never too far ahead of it."""
+    """Thread body: feed the pipeline's entries to the player, never too far ahead of it.
+    `on_beat` is called on the event loop for each beat as it is found."""
     engine = FactEngine(roster_of(brief))
     if store is not None:
         store.begin(brief, engine.registry)
@@ -272,6 +291,10 @@ def _produce(
                 return
             if store is not None:
                 _publish(store, brief.match_id, batch)
+            if on_beat is not None:
+                for e in batch:
+                    if e.kind == "beat":
+                        loop.call_soon_threadsafe(on_beat, e.data)
             if not _post(loop, queue, batch):
                 return
         if store is not None:
@@ -441,6 +464,106 @@ async def schedule(
             yield due_s, builder.message(e.kind, e.t, e.data)
 
 
+class _AgentTrack:
+    """What one stream has sent about the agents: the numbering, and which claims are on screen."""
+
+    def __init__(self, run: MatchRun | DownRun, first_seq: int) -> None:
+        self.run = run
+        self.seq = first_seq
+        self.t = 0.0
+        self.aired: dict[str, str | None] = {}  # claim id to the span id of its beat
+        self.late: asyncio.Queue[tuple[str, Claim, str | None]] = asyncio.Queue()
+        self.followers: set[asyncio.Task[None]] = set()
+        self.told_paused = False
+        self.told_down = False
+
+    def number(self, msg: StreamMessage) -> StreamMessage:
+        self.t = max(self.t, msg.t.root)
+        out = msg.model_copy(update={"seq": self.seq})
+        self.seq += 1
+        return out
+
+    def build(
+        self, kind: str, data: dict[str, Any], span_id: str | None = None
+    ) -> StreamMessage:
+        raw: dict[str, Any] = {"seq": self.seq, "type": kind, "t": self.t, "data": data}
+        if span_id is not None:
+            raw["span_id"] = span_id
+        self.seq += 1
+        return StreamMessage.model_validate(raw)
+
+    def notice(self, text: str) -> StreamMessage:
+        return self.build("status", {"state": "notice", "message": text})
+
+    def from_late(self, item: tuple[str, Claim, str | None]) -> StreamMessage:
+        kind, claim, span_id = item
+        return self.build(kind, _claim_data(claim), span_id)
+
+    def drain(self) -> Iterator[StreamMessage]:
+        while not self.late.empty():
+            yield self.from_late(self.late.get_nowait())
+
+    async def follow(self, beat_id: str) -> None:
+        """Queue the beat's claims for sending: as `checking` while the Checker works, then their
+        verdicts; at once with their verdicts if the check finished before the beat aired."""
+        track = self.run.track(beat_id)
+        if track is None:
+            return
+        if not track.done.done():
+            first: set[asyncio.Future[Any]] = {track.drafted, track.done}
+            await asyncio.wait(first, return_when=asyncio.FIRST_COMPLETED)
+            if track.drafted.done() and not track.done.done():
+                for claim in track.drafted.result():
+                    self.aired[claim.id.root] = None
+                    self.late.put_nowait(("claim", claim, None))
+        await asyncio.shield(track.done)
+        span_id = self.run.span_id(beat_id)
+        for claim in self.run.claims_now(beat_id):
+            kind = "verdict" if claim.id.root in self.aired else "claim"
+            self.aired[claim.id.root] = span_id
+            self.late.put_nowait((kind, claim, span_id))
+
+    def audited(self, claim: Claim, span_id: str | None) -> None:
+        """An audit landed: tell the viewer only if the claim is already on screen."""
+        if claim.id.root in self.aired:
+            self.late.put_nowait(("verdict", claim, span_id))
+
+
+def _claim_data(claim: Claim) -> dict[str, Any]:
+    data: dict[str, Any] = claim.model_dump(
+        mode="json", by_alias=True, exclude_none=True
+    )
+    return data
+
+
+async def _air_beat(msg: StreamMessage, track: _AgentTrack) -> list[StreamMessage]:
+    """The beat message with the Producer's rank, then any notice the beat calls for. Starts the
+    beat's claims on their way."""
+    beat_id = msg.data.root.id.root  # type: ignore[union-attr]
+    decision = await track.run.decision(beat_id, PRODUCER_WAIT_S)
+    out: list[StreamMessage] = []
+    if decision is not None and decision.rank is not None:
+        raw = json.loads(msg.model_dump_json(by_alias=True, exclude_none=True))
+        raw["data"]["rank"] = decision.rank
+        msg = StreamMessage.model_validate(raw)
+    out.append(track.number(msg))
+    if decision is not None and decision.narrate:
+        task = asyncio.ensure_future(track.follow(beat_id))
+        track.followers.add(task)
+        task.add_done_callback(track.followers.discard)
+    if (
+        decision is not None
+        and decision.reason == "token_cap"
+        and not track.told_paused
+    ):
+        track.told_paused = True
+        out.append(track.notice(PAUSED_TEXT))
+    if track.run.down and not track.told_down:
+        track.told_down = True
+        out.append(track.notice(UNAVAILABLE_TEXT))
+    return out
+
+
 async def run_live(
     brief: MatchBrief,
     speed: int = SPEED_FAST,
@@ -448,27 +571,32 @@ async def run_live(
     pacer: Pacer | None = None,
     after_seq: int = -1,
     store: MatchStore | None = None,
+    agents: MatchRun | DownRun | None = None,
 ) -> AsyncGenerator[StreamMessage, None]:
     """The match as stream messages, each sent when its turn on the timeline comes.
 
     `after_seq` skips every message up to and including that seq without waiting; the clock then
     starts from the first message that is sent. Resume with the same `speed`: it decides which frames
     are thinned, so it decides the numbering. With a `store`, the match is registered in it and
-    filled in as the pipeline advances.
+    filled in as the pipeline advances. With `agents`, beats go to the workflow as they are found
+    and their claims follow them on the stream (needs a `store`: the agents read it).
     """
     if speed not in SPEEDS:
         raise ValueError(f"speed must be one of {SPEEDS}, not {speed}")
     pacer = pacer or RealPacer()
     queue: asyncio.Queue[Posted] = asyncio.Queue()
     control = _Control()
+    on_beat = agents.submit if agents is not None else None
     worker = threading.Thread(
         target=_produce,
-        args=(brief, asyncio.get_running_loop(), queue, control, store),
+        args=(brief, asyncio.get_running_loop(), queue, control, store, on_beat),
         name=f"pipeline-{brief.match_id}",
         daemon=True,
     )
     worker.start()
     plan = schedule(_Feed(queue), speed, control)
+    track = _AgentTrack(agents, after_seq + 1) if agents is not None else None
+    unsubscribe = agents.subscribe(track.audited) if agents and track else None
     origin: float | None = None
     try:
         async for due, msg in plan:
@@ -476,10 +604,48 @@ async def run_live(
                 continue
             if origin is None:
                 origin = pacer.now() - due
-            await pacer.sleep_until(origin + due)
+            if track is None:
+                await pacer.sleep_until(origin + due)
+            else:
+                # Claims that land while we wait for this message's turn are sent as they land.
+                sleeper = asyncio.ensure_future(pacer.sleep_until(origin + due))
+                while True:
+                    getter = asyncio.ensure_future(track.late.get())
+                    waiting: set[asyncio.Future[Any]] = {sleeper, getter}
+                    await asyncio.wait(waiting, return_when=asyncio.FIRST_COMPLETED)
+                    if getter.done():
+                        yield track.from_late(getter.result())
+                    else:
+                        getter.cancel()
+                    if sleeper.done():
+                        break
+                for late_msg in track.drain():
+                    yield late_msg
             if store is not None:
                 store.set_playback(brief.match_id, msg.t.root)
-            yield msg
+            if track is None:
+                yield msg
+            elif msg.type.value == "beat":
+                for sent in await _air_beat(msg, track):
+                    yield sent
+            else:
+                yield track.number(msg)
+        if track is not None:
+            # Full time: let the checks still running finish and be sent. Audits are not waited for.
+            while track.followers or not track.late.empty():
+                for late_msg in track.drain():
+                    yield late_msg
+                if track.followers:
+                    await asyncio.wait(set(track.followers), timeout=DRAIN_TIMEOUT_S)
+                    if track.followers:
+                        break
+            for late_msg in track.drain():
+                yield late_msg
     finally:
         control.cancel()
+        if unsubscribe is not None:
+            unsubscribe()
+        if track is not None:
+            for task in track.followers:
+                task.cancel()
         await plan.aclose()

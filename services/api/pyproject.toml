@@ -12,6 +12,7 @@ dependencies = [
     "microsoft-opentelemetry>=1.4.0",
     "uvicorn>=0.54.0",
     "opentelemetry-instrumentation-fastapi>=0.66b1",
+    "opentelemetry-sdk>=1.45",
 ]
 
 [build-system]

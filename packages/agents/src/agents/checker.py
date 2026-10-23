@@ -6,6 +6,7 @@ claim is `rephrased`, if not it is `blocked`. A judge that cannot answer in time
 `delayed`.
 """
 
+import contextvars
 import re
 from collections.abc import Callable, Collection, Mapping
 from concurrent.futures import ThreadPoolExecutor
@@ -15,6 +16,7 @@ from typing import Literal
 
 from contracts.models import Claim, Fact
 from intel.labels import say
+from opentelemetry import trace
 from intel.voice_lint import Rule, lint, load_rules
 from pydantic import BaseModel
 
@@ -28,6 +30,7 @@ JUDGE_MAX_TOKENS = 800
 MAX_WORKERS = 4  # claims of one beat checked at the same time
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 MAX_REASON_CHARS = 400
+_tracer = trace.get_tracer(__name__)
 
 Problem = Literal[
     "overclaim",
@@ -59,6 +62,7 @@ class ClaimCheck:
         None  # None: the judge was not asked or did not answer
     )
     judge_problem: str | None = None
+    judge_reason: str = ""  # what the judge said, whether or not it passed the claim
     judged: bool = False
     delayed: bool = False
     model: str | None = None
@@ -147,15 +151,19 @@ class Checker:
         names: Collection[str] = (),
     ) -> ClaimCheck:
         """Reconcile, lint, then judge. The judge is asked only if the code checks pass."""
-        rec = reconcile(draft.text, draft.fact_ids, bundle, names)
+        with _tracer.start_as_current_span("reconcile") as span:
+            rec = reconcile(draft.text, draft.fact_ids, bundle, names)
+            span.set_attribute("matchproof.ok", rec.ok)
         result = ClaimCheck(draft.text, list(draft.fact_ids), rec.numbers)
         result.reconciled = rec.ok
         result.reasons.extend(rec.reasons)
-        violations = [
-            v
-            for v in lint(draft.text, "narration", self._rules)
-            if v.severity == "error"
-        ]
+        with _tracer.start_as_current_span("lint") as span:
+            violations = [
+                v
+                for v in lint(draft.text, "narration", self._rules)
+                if v.severity == "error"
+            ]
+            span.set_attribute("matchproof.ok", not violations)
         result.lint_ok = not violations
         rule_why = {r.id: r.why for r in self._rules}
         for v in violations:
@@ -175,13 +183,16 @@ class Checker:
         )
         result.judged = True
         try:
-            reply = complete_structured(
-                self._judge,
-                JudgeAnswer,
-                prompt,
-                max_tokens=JUDGE_MAX_TOKENS,
-                timeout_s=self._timeout_s,
-            )
+            with _tracer.start_as_current_span(
+                "judge", attributes={"gen_ai.request.model": self._judge.deployment}
+            ):
+                reply = complete_structured(
+                    self._judge,
+                    JudgeAnswer,
+                    prompt,
+                    max_tokens=JUDGE_MAX_TOKENS,
+                    timeout_s=self._timeout_s,
+                )
         except (LlmError, StructuredOutputError) as exc:
             result.delayed = True
             result.model = self._judge.deployment
@@ -194,10 +205,95 @@ class Checker:
         result.output_tokens = reply.output_tokens
         result.judge_supported = answer.supported
         result.judge_problem = answer.problem
+        result.judge_reason = answer.reason
         if not answer.supported:
             problem = answer.problem or "unsupported"
             result.reasons.append(f"Judge ({problem}): {answer.reason}".strip())
         return result
+
+    def check_all(
+        self,
+        drafts: list[DraftClaim],
+        bundle: Mapping[str, Fact],
+        *,
+        teams: Mapping[str, str],
+        beat_kind: str,
+        beat_label: str,
+        labels: Mapping[str, str] | None = None,
+        names: Collection[str] = (),
+    ) -> list[ClaimCheck]:
+        """Check every draft of a beat, a few at a time."""
+
+        def check(d: DraftClaim) -> ClaimCheck:
+            return self.check_one(
+                d,
+                bundle,
+                teams=teams,
+                beat_kind=beat_kind,
+                beat_label=beat_label,
+                labels=labels,
+                names=names,
+            )
+
+        with ThreadPoolExecutor(max_workers=self._workers) as pool:
+            # Each task runs in a copy of this context, so its spans nest under the caller's.
+            return list(
+                pool.map(lambda d: contextvars.copy_context().run(check, d), drafts)
+            )
+
+    @staticmethod
+    def plan_retry(
+        drafts: list[DraftClaim], first: list[ClaimCheck]
+    ) -> tuple[list[int], Revision | None]:
+        """The drafts that failed their first check and what to tell the Narrator about them."""
+        failed = [i for i, c in enumerate(first) if not c.passed and not c.delayed]
+        if not failed:
+            return failed, None
+        return failed, Revision(
+            draft=[drafts[i] for i in failed],
+            reasons=[
+                f"Claim {n}: {r}"
+                for n, i in enumerate(failed, 1)
+                for r in first[i].reasons
+            ],
+            kept=[drafts[i].text for i, c in enumerate(first) if c.passed],
+        )
+
+    @staticmethod
+    def accept_revisions(
+        failed: list[int], revision: Revision, new: list[DraftClaim]
+    ) -> dict[int, DraftClaim]:
+        """Pair the Narrator's new drafts with the claims they replace; a repeat of an accepted claim
+        is no fix."""
+        kept = {t.strip().lower() for t in revision.kept}
+        return {
+            i: n
+            for i, n in zip(failed, new, strict=False)
+            if n.text.strip().lower() not in kept
+        }
+
+    def settle(
+        self,
+        drafts: list[DraftClaim],
+        first: list[ClaimCheck],
+        failed: list[int],
+        redone: Mapping[int, ClaimCheck],
+        *,
+        beat_id: str,
+        lang: str,
+    ) -> list[CheckedClaim]:
+        """The checked claims, from the first checks and the re-checks of the revised drafts."""
+        stem = re.sub(r"^bt-", "", beat_id)
+        out: list[CheckedClaim] = []
+        for i, (draft, c1) in enumerate(zip(drafts, first, strict=True)):
+            claim_id = f"cl-{stem}-{i + 1:02d}"
+            retries = 1 if i in failed else 0
+            out.append(
+                self._finish(
+                    claim_id, beat_id, lang, draft, c1, redone.get(i, c1), retries
+                )
+            )
+        return out
 
     def check_beat(
         self,
@@ -214,50 +310,21 @@ class Checker:
         renarrate: Callable[[Revision], list[DraftClaim]],
     ) -> list[CheckedClaim]:
         """Check a beat's drafts, send the failures back to `renarrate` once, and re-check."""
-
-        def check(d: DraftClaim) -> ClaimCheck:
-            return self.check_one(
-                d,
-                bundle,
-                teams=teams,
-                beat_kind=beat_kind,
-                beat_label=beat_label,
-                labels=labels,
-                names=names,
-            )
-
-        def check_all(items: list[DraftClaim]) -> list[ClaimCheck]:
-            with ThreadPoolExecutor(max_workers=self._workers) as pool:
-                return list(pool.map(check, items))
-
-        first = check_all(drafts)
-        failed = [i for i, c in enumerate(first) if not c.passed and not c.delayed]
+        context = {
+            "teams": teams,
+            "beat_kind": beat_kind,
+            "beat_label": beat_label,
+            "labels": labels,
+            "names": names,
+        }
+        first = self.check_all(drafts, bundle, **context)  # type: ignore[arg-type]
+        failed, revision = self.plan_retry(drafts, first)
         revised: dict[int, DraftClaim] = {}
-        if failed:
-            revision = Revision(
-                draft=[drafts[i] for i in failed],
-                reasons=[
-                    f"Claim {n}: {r}"
-                    for n, i in enumerate(failed, 1)
-                    for r in first[i].reasons
-                ],
-                kept=[drafts[i].text for i, c in enumerate(first) if c.passed],
-            )
-            kept = {t.strip().lower() for t in revision.kept}
-            for i, new in zip(failed, renarrate(revision), strict=False):
-                if (
-                    new.text.strip().lower() not in kept
-                ):  # a repeat of an accepted claim is no fix
-                    revised[i] = new
-        stem = re.sub(r"^bt-", "", beat_id)
-        redone = dict(zip(revised, check_all(list(revised.values())), strict=True))
-        out: list[CheckedClaim] = []
-        for i, (draft, c1) in enumerate(zip(drafts, first, strict=True)):
-            claim_id = f"cl-{stem}-{i + 1:02d}"
-            retries = 1 if i in failed else 0
-            c2 = redone.get(i, c1)
-            out.append(self._finish(claim_id, beat_id, lang, draft, c1, c2, retries))
-        return out
+        if revision is not None:
+            revised = self.accept_revisions(failed, revision, renarrate(revision))
+        again = self.check_all(list(revised.values()), bundle, **context)  # type: ignore[arg-type]
+        redone = dict(zip(revised, again, strict=True))
+        return self.settle(drafts, first, failed, redone, beat_id=beat_id, lang=lang)
 
     @staticmethod
     def _finish(

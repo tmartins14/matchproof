@@ -9,7 +9,7 @@ the registry and everything else is stored data, rounded or filtered but not der
 import os
 from typing import Any
 
-from contracts.models import Claim, Event, Fact, PositionFrame
+from contracts.models import Audit, Claim, Event, Fact, PositionFrame
 from intel.beats import swing_fact_ids
 from intel.labels import LabelContext, label_for
 from mcp.server.fastmcp import FastMCP
@@ -350,5 +350,20 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
             if accepted:
                 store.put_claims(match_id, beat_id, accepted)
             return {"results": results}
+
+        @server.tool()
+        def put_audit(
+            match_id: str, claim_id: str, audit: dict[str, Any]
+        ) -> dict[str, Any]:
+            """Attach the independent auditor's result to a stored claim. It never changes the
+            claim's verdict."""
+            known_match(match_id)
+            try:
+                parsed = Audit.model_validate(audit)
+            except ValidationError as exc:
+                raise ToolError(f"Invalid audit: {exc.error_count()} errors.") from exc
+            if not store.put_audit(match_id, claim_id, parsed):
+                raise ToolError(f"Unknown claim {claim_id} in match {match_id}.")
+            return {"claim_id": claim_id, "stored": True}
 
     return server

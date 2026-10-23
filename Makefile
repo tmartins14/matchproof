@@ -34,7 +34,7 @@ web-dev:
 	cd apps/web && npm run dev
 
 api-dev:
-	uv run uvicorn api.main:app --reload --app-dir services/api/src
+	MATCHPROOF_TRACE_CONSOLE=1 uv run uvicorn api.main:app --reload --app-dir services/api/src
 
 # Manual: these call real models (MODEL_BASE_URL and `az login`). Not run in CI.
 evals:

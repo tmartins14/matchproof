@@ -151,11 +151,12 @@ class Entry:
 
 
 def pipeline(
-    brief: MatchBrief, engine: FactEngine | None = None
+    brief: MatchBrief, engine: FactEngine | None = None, until_s: float | None = None
 ) -> Iterator[list[Entry]]:
     """The match through the engine and detector: the entries each generator item gives rise to.
 
-    Pass `engine` to keep hold of its registry while the match runs.
+    Pass `engine` to keep hold of its registry while the match runs. `until_s` ends the match early
+    with a full-time status once play passes that match second; tests use it to play a short match.
     """
     engine = engine or FactEngine(roster_of(brief))
     detector = BeatDetector()
@@ -194,6 +195,13 @@ def pipeline(
         if item is None:
             continue
         t = item.t.root
+        if until_s is not None and t > until_s:
+            yield [
+                entry(
+                    until_s, "status", {"state": "full_time", "message": FULL_TIME_TEXT}
+                )
+            ]
+            break
         facts = engine.push(item)
         beats = detector.push(item, engine.registry)
         out = window_entries(facts, t)
@@ -277,6 +285,7 @@ def _produce(
     control: _Control,
     store: MatchStore | None = None,
     on_beat: Callable[[Beat], None] | None = None,
+    until_s: float | None = None,
 ) -> None:
     """Thread body: feed the pipeline's entries to the player, never too far ahead of it.
     `on_beat` is called on the event loop for each beat as it is found."""
@@ -284,7 +293,7 @@ def _produce(
     if store is not None:
         store.begin(brief, engine.registry)
     try:
-        for batch in pipeline(brief, engine):
+        for batch in pipeline(brief, engine, until_s):
             if not batch:
                 continue
             if not control.wait_until_allowed(batch[0].t):
@@ -573,6 +582,7 @@ async def run_live(
     after_seq: int = -1,
     store: MatchStore | None = None,
     agents: MatchRun | DownRun | None = None,
+    until_s: float | None = None,
 ) -> AsyncGenerator[StreamMessage, None]:
     """The match as stream messages, each sent when its turn on the timeline comes.
 
@@ -580,7 +590,8 @@ async def run_live(
     starts from the first message that is sent. Resume with the same `speed`: it decides which frames
     are thinned, so it decides the numbering. With a `store`, the match is registered in it and
     filled in as the pipeline advances. With `agents`, beats go to the workflow as they are found
-    and their claims follow them on the stream (needs a `store`: the agents read it).
+    and their claims follow them on the stream (needs a `store`: the agents read it). `until_s` plays
+    only the first part of the match (tests).
     """
     if speed not in SPEEDS:
         raise ValueError(f"speed must be one of {SPEEDS}, not {speed}")
@@ -590,7 +601,15 @@ async def run_live(
     on_beat = agents.submit if agents is not None else None
     worker = threading.Thread(
         target=_produce,
-        args=(brief, asyncio.get_running_loop(), queue, control, store, on_beat),
+        args=(
+            brief,
+            asyncio.get_running_loop(),
+            queue,
+            control,
+            store,
+            on_beat,
+            until_s,
+        ),
         name=f"pipeline-{brief.match_id}",
         daemon=True,
     )

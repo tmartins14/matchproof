@@ -183,6 +183,14 @@ class MatchRun:
         except TimeoutError:
             return None
 
+    async def quiesce(self) -> None:
+        """Wait until every beat taken so far has settled. Tests use it to hold playback still."""
+        pending: list[asyncio.Future[BeatRun]] = [
+            t.done for t in self._tracks.values() if not t.done.done()
+        ]
+        if pending:
+            await asyncio.wait(pending)
+
     def claims_now(self, beat_id: str) -> list[Claim]:
         return list(self._claims.get(beat_id, []))
 

@@ -307,7 +307,8 @@ def test_a_disagreeing_auditor_never_changes_a_verdict() -> None:
             assert len(summary["disagreements"]) == len(audited)
             assert summary["disagreements"][0]["auditor"]["reason"]
             log = [e["audit"] for e in run.producer_log() if "audit" in e]
-            assert len(log) == len(audited)
+            # each disagreement is logged, and then the re-check that left it unresolved
+            assert len(log) == 2 * len(audited)
             assert all("disagrees" in line for line in log)
 
     asyncio.run(scenario())

@@ -110,3 +110,50 @@ async def agent_runtime(
 
 def rate_limited() -> LlmError:
     return LlmError("RateLimitError")
+
+
+class ConsensusJudge(FakeModel):
+    """The inline judge for the consensus tests: it passes every claim, except that asked again
+    after a second reviewer's finding it agrees with the reviewer (or not), and it can refuse the
+    rewrite."""
+
+    def __init__(
+        self,
+        deployment: str = "fake-judge",
+        *,
+        agrees_on_recheck: bool = True,
+        refuses_rewrite: bool = False,
+    ) -> None:
+        super().__init__(deployment)
+        self.agrees_on_recheck = agrees_on_recheck
+        self.refuses_rewrite = refuses_rewrite
+        self.rechecks = 0
+
+    def complete(self, prompt: str, **kwargs: Any) -> LlmReply:
+        if "A second reviewer raised this" in prompt:
+            with self._lock:
+                self.rechecks += 1
+            supported = not self.agrees_on_recheck
+        else:
+            supported = not (self.refuses_rewrite and REWRITE in prompt)
+        body = {
+            "supported": supported,
+            "problem": None if supported else "overclaim",
+            "reason": "Matches." if supported else "Says more than the facts.",
+        }
+        return LlmReply(json.dumps(body), self.deployment, 5, 10, 4)
+
+
+REWRITE = "A shot is blocked."
+
+
+class RewritingNarrator(FakeModel):
+    """Drafts one claim; asked to revise a rejected one, it answers with a different claim."""
+
+    def complete(self, prompt: str, **kwargs: Any) -> LlmReply:
+        if "was rejected by the Checker" not in prompt:
+            return super().complete(prompt, **kwargs)
+        fact_id = FACT_LINE.search(prompt)
+        assert fact_id is not None
+        body = {"claims": [{"text": REWRITE, "fact_ids": [fact_id.group(1)]}]}
+        return LlmReply(json.dumps(body), self.deployment, 5, 10, 4)

@@ -7,7 +7,8 @@ from fastapi.testclient import TestClient
 def test_health() -> None:
     response = TestClient(app).get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "version": "0.1.0"}
+    body = response.json()
+    assert body["status"] == "ok" and body["version"] == "0.1.0" and "agents" in body
 
 
 def test_health_budget_reports_tokens_against_the_cap(
@@ -49,4 +50,23 @@ def test_the_api_starts_without_agents_when_the_runtime_cannot_be_built(
     with TestClient(main.app) as client:
         assert client.get("/health").status_code == 200
         assert main.agent_runtime is None and main.agents_configured is True
+        agents = client.get("/health").json()["agents"]
+        assert agents == "unavailable: FileNotFoundError: models.yaml"
     assert "agent runtime did not start" in caplog.text
+
+
+def test_health_reports_the_agent_status(monkeypatch: pytest.MonkeyPatch) -> None:
+    from api import main
+
+    monkeypatch.setattr(main, "agent_runtime", None)
+    monkeypatch.setattr(main, "agents_error", None)
+    body = TestClient(main.app).get("/health").json()
+    assert (
+        body["status"] == "ok" and body["agents"] == "unavailable: no model configured"
+    )
+    monkeypatch.setattr(main, "agents_error", "FileNotFoundError: models.yaml")
+    assert TestClient(main.app).get("/health").json()["agents"] == (
+        "unavailable: FileNotFoundError: models.yaml"
+    )
+    monkeypatch.setattr(main, "agent_runtime", object())
+    assert TestClient(main.app).get("/health").json()["agents"] == "ready"

@@ -22,7 +22,7 @@ for _ in $(seq 1 60); do
   if curl -fsS "http://localhost:$PORT/health" >/dev/null 2>&1; then break; fi
   sleep 1
 done
-curl -fsS "http://localhost:$PORT/health"
+curl -fsS "http://localhost:$PORT/health" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert "agents" in d, d; print(d)'
 echo
 
 curl -fsS "http://localhost:$PORT/openapi.json" | python3 -c '

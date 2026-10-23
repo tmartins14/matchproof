@@ -143,11 +143,16 @@ class Auditor:
 
 
 def summarize_audits(
-    match_id: str, rows: Sequence[tuple[Claim, Audit, str]]
+    match_id: str,
+    rows: Sequence[tuple[Claim, Audit, str]],
+    corrections: Sequence[Claim] = (),
+    unresolved: Sequence[tuple[Claim, str]] = (),
 ) -> dict[str, Any]:
     """How the auditor did on a match: claims audited, agreement rate, each disagreement with both
     judges' reasons (`rows` are the claim, its audit and what the inline judge said), and how many
-    audits had no answer."""
+    audits had no answer. `corrections` are the claims changed or blocked after a consensus
+    re-check and `unresolved` the disagreements the re-check did not support (claim, what the judge
+    said); the agreement rate after corrections counts a corrected disagreement as settled."""
     agreed = sum(1 for _, a, _ in rows if a.outcome.value == "agree")
     disagreed = [(c, a, r) for c, a, r in rows if a.outcome.value == "disagree"]
     audited = agreed + len(disagreed)
@@ -155,9 +160,34 @@ def summarize_audits(
         "match_id": match_id,
         "claims_audited": audited,
         "agreement_rate": round(agreed / audited, 3) if audited else None,
+        "agreement_rate_after_corrections": (
+            round((agreed + len(corrections)) / audited, 3) if audited else None
+        ),
+        "corrections": [
+            {
+                "claim_id": c.id.root,
+                "verdict": c.verdict.value,
+                "previous_text": c.correction.previous_text if c.correction else None,
+                "text": c.text,
+                "reason": c.correction.reason if c.correction else None,
+                "by": c.correction.by if c.correction else None,
+                "at_t": c.correction.at_t if c.correction else None,
+            }
+            for c in corrections
+        ],
+        "unresolved": [
+            {
+                "claim_id": c.id.root,
+                "text": c.text,
+                "judge_on_recheck": judge_said,
+            }
+            for c, judge_said in unresolved
+        ],
         "disagreements": [
             {
                 "claim_id": c.id.root,
+                "beat_id": c.beat_id.root,
+                "fact_ids": [f.root for f in c.fact_ids],
                 "text": c.text,
                 "verdict": c.verdict.value,
                 "checker": {

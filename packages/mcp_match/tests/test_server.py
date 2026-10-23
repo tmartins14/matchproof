@@ -40,7 +40,11 @@ def test_read_only_server_has_no_write_tool_and_internal_one_has() -> None:
             return {t.name for t in (await s.list_tools()).tools}
 
     assert run(names(False)) == READ_TOOLS
-    assert run(names(True)) == READ_TOOLS | {"put_claims", "put_audit"}
+    assert run(names(True)) == READ_TOOLS | {
+        "put_claims",
+        "put_audit",
+        "put_correction",
+    }
 
 
 def test_every_tool_validates_against_its_schema() -> None:

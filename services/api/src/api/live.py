@@ -536,6 +536,12 @@ class _AgentTrack:
             self.aired[claim.id.root] = span_id
             self.late.put_nowait((kind, claim, span_id))
 
+    def corrected(self, claim: Claim, span_id: str | None) -> None:
+        """A claim was corrected or blocked: a verdict with the `correction`, if it is on screen. A
+        claim not yet aired goes out later in its corrected form."""
+        if claim.id.root in self.aired:
+            self.late.put_nowait(("verdict", claim, span_id))
+
     def audited(self, claim: Claim, span_id: str | None) -> None:
         """An audit landed: tell the viewer only if the claim is already on screen."""
         if claim.id.root in self.aired:
@@ -620,7 +626,10 @@ async def run_live(
     worker.start()
     plan = schedule(_Feed(queue), speed, control)
     track = _AgentTrack(agents, after_seq + 1) if agents is not None else None
-    unsubscribe = agents.subscribe(track.audited) if agents and track else None
+    unsubscribe_audits = agents.subscribe(track.audited) if agents and track else None
+    unsubscribe_corrections = (
+        agents.subscribe_corrections(track.corrected) if agents and track else None
+    )
     origin: float | None = None
     try:
         async for due, msg in plan:
@@ -667,8 +676,10 @@ async def run_live(
                 yield late_msg
     finally:
         control.cancel()
-        if unsubscribe is not None:
-            unsubscribe()
+        if unsubscribe_audits is not None:
+            unsubscribe_audits()
+        if unsubscribe_corrections is not None:
+            unsubscribe_corrections()
         if track is not None:
             for task in track.followers:
                 task.cancel()

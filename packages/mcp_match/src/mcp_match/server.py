@@ -115,6 +115,9 @@ def visible_facts(store: MatchStore, match_id: str, upto: float | None) -> list[
     ]
 
 
+CORRECTED_VERDICTS = ("rephrased", "blocked")
+
+
 def claim_errors(
     store: MatchStore, match_id: str, beat_id: str, raw: Any, seen: set[str]
 ) -> tuple[Claim | None, list[str]]:
@@ -377,5 +380,29 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
             if not store.put_audit(match_id, claim_id, parsed):
                 raise ToolError(f"Unknown claim {claim_id} in match {match_id}.")
             return {"claim_id": claim_id, "stored": True}
+
+        @server.tool()
+        def put_correction(match_id: str, claim: dict[str, Any]) -> dict[str, Any]:
+            """Replace a stored claim with its corrected version after the auditor and the inline
+            judge agreed it was wrong. The claim must carry a `correction` with the previous text,
+            keep its id and beat, and cite known facts."""
+            known_match(match_id)
+            try:
+                parsed = Claim.model_validate(claim)
+            except ValidationError as exc:
+                raise ToolError(f"Invalid claim: {exc.error_count()} errors.") from exc
+            if parsed.correction is None:
+                raise ToolError("A corrected claim needs a correction.")
+            if parsed.verdict.value not in CORRECTED_VERDICTS:
+                raise ToolError("A corrected claim is rephrased or blocked.")
+            registry = store.registry(match_id)
+            for fid in dict.fromkeys(f.root for f in parsed.fact_ids):
+                try:
+                    registry.get(fid)
+                except KeyError as exc:
+                    raise ToolError(f"Unknown fact id {fid}.") from exc
+            if not store.replace_claim(match_id, parsed):
+                raise ToolError(f"Unknown claim {parsed.id.root} in match {match_id}.")
+            return {"claim_id": parsed.id.root, "stored": True}
 
     return server

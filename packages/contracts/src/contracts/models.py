@@ -55,6 +55,28 @@ class Checker(BaseModel):
     trace_id: str | None = None
 
 
+class Correction(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    at_t: Annotated[
+        float,
+        Field(
+            description='Match time in seconds when the correction was made.', ge=0.0
+        ),
+    ]
+    previous_text: Annotated[str, Field(max_length=280)]
+    reason: Annotated[str, Field(description="The auditor's reason.", max_length=400)]
+    by: Annotated[
+        list[str],
+        Field(
+            description='The two models that agreed: the auditor, then the inline judge.',
+            max_length=2,
+            min_length=2,
+        ),
+    ]
+
+
 class Outcome(StrEnum):
     agree = 'agree'
     disagree = 'disagree'
@@ -643,6 +665,12 @@ class Claim(BaseModel):
         ),
     ] = None
     checker: Checker | None = None
+    correction: Annotated[
+        Correction | None,
+        Field(
+            description='Present when a claim already published was changed or blocked after the auditor disagreed and the inline judge, asked again, agreed with it. The text before the change is always here, so a correction is never a silent rewrite.'
+        ),
+    ] = None
     audit: Annotated[
         Audit | None,
         Field(

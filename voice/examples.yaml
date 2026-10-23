@@ -177,9 +177,9 @@
   mode: producer
   lang: en
   facts:
-    - { id: fx-1201, display: "40:12" }
-    - { id: fx-1202, display: "40:23" }
-  line: "Clip 40:12 to 40:23, counter goal. Wide on the interception, follow the run, freeze at the finish. Into the half-time package."
+    - { id: fx-1201, display: "41′" }
+    - { id: fx-1202, display: "41′" }
+  line: "Clip the counter goal in the 41′. Wide on the interception, follow the run, freeze at the finish. Into the half-time package."
   amended_from: null
   reason: null
   source: adapted

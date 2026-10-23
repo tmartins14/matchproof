@@ -88,8 +88,23 @@ def minute_of(t: float) -> int:
     return int(t // SECONDS_PER_MINUTE) + 1
 
 
-def render_minute(t: float, lang: str) -> list[str]:
-    return [f"{minute_of(t)}′"]
+STOPPAGE_AFTER_MIN = {
+    1: 45,
+    2: 90,
+}  # minutes after which a half's labels read 45+n and 90+n
+
+
+def minute_text(t: float, period: int) -> str:
+    """41, or 45+2 / 90+3 once the half is past its 45th / 90th minute."""
+    m = minute_of(t)
+    limit = STOPPAGE_AFTER_MIN.get(period)
+    return f"{limit}+{m - limit}" if limit is not None and m > limit else str(m)
+
+
+def render_minute(t: float, lang: str, period: int | None = None) -> list[str]:
+    """The broadcast minute: 41′, 45+2′, 90+8′. Without a period there is no stoppage form."""
+    text = minute_text(t, period) if period is not None else str(minute_of(t))
+    return [f"{text}′"]
 
 
 def render_clock(t: float, lang: str) -> list[str]:

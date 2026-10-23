@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 
 from contracts.models import Beat, Event, Fact, PositionFrame
 
-from .display import minute_of
+from .display import minute_text
 from .extract_events import CARD_METRICS, SEQUENCE_METRICS, SHOT_METRICS
 from .extract_positions import Sample, make_sample
 from .football import (
@@ -95,10 +95,6 @@ SWING_COMPACTNESS = (
 )
 SWING_POSSESSION_PTS = 10.0  # possession share moved at least this many points
 SWING_TERRITORY_PTS = 10.0  # territory moved at least this many points
-STOPPAGE_AFTER_MIN = {
-    1: 45,
-    2: 90,
-}  # minutes after which a half's labels read 45+n and 90+n
 SECONDS_PER_MINUTE = 60.0
 
 # ---- salience (0 to 1): goals, then red cards, then follow-ups, then chances, then spells -------
@@ -158,13 +154,6 @@ class _Swing:
 
     ratio: float = 0.0
     facts: list[Fact] = field(default_factory=list)
-
-
-def minute_text(t: float, period: int) -> str:
-    """41, or 45+2 / 90+3 once the half is past its 45th / 90th minute."""
-    m = minute_of(t)
-    limit = STOPPAGE_AFTER_MIN[period]
-    return f"{limit}+{m - limit}" if m > limit else str(m)
 
 
 def beat_id(anchor_event_id: str, kind: str) -> str:

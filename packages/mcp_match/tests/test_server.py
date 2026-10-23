@@ -119,6 +119,10 @@ def test_red_card_follow_up_bundle_has_every_cited_fact() -> None:
             assert bundle["beat"] == beat
             assert [f["id"] for f in bundle["facts"]] == beat["fact_ids"]
             for f in bundle["facts"]:
+                label = f.pop(
+                    "label"
+                )  # added by the bundle, not part of the Fact schema
+                assert label and "ev-" not in label and "_" not in label
                 validator("fact").validate(f)
             ten_men = card["side"]
             assert any(

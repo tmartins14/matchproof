@@ -6,6 +6,7 @@ uv run python -m evals.e2e            # red_card_flip seed 3, fan mode
 import argparse
 import asyncio
 import json
+import re
 import statistics
 from collections import Counter
 from datetime import date
@@ -13,12 +14,38 @@ from typing import Any
 
 from agents.llm_client import client_for
 from agents.pipeline import Deps, run_beat
+from intel.voice_lint import lint, numbers_in
 from mcp_match import build_server
 
 from .golden import build_store
 from .run import REPORTS_DIR, percentile
 
 TARGET_P90_MS = 8000
+TARGET_NUMBERS_PER_FAN_CLAIM = 2.0
+MACHINE_TOKEN = re.compile(
+    r"\b(?:home|away)-\d{2}\b|\bev-\d{6}\b|\b[a-z]+_[a-z_]+\b", re.IGNORECASE
+)
+
+
+def readability(texts: list[str], beats: int, latencies: list[int]) -> dict[str, Any]:
+    """How the published claims read: lint violations, numbers per claim, leaked machine tokens."""
+    flagged = {t: [v.rule_id for v in lint(t, "narration")] for t in texts}
+    return {
+        "claims": len(texts),
+        "claims_per_beat": round(len(texts) / beats, 2) if beats else 0.0,
+        "claims_with_lint_violation": sum(1 for v in flagged.values() if v),
+        "lint_violations": {t: v for t, v in flagged.items() if v},
+        "numbers_per_claim": round(
+            sum(len(numbers_in(t)) for t in texts) / len(texts), 2
+        )
+        if texts
+        else 0.0,
+        "machine_tokens_in_published_text": sum(
+            len(MACHINE_TOKEN.findall(t)) for t in texts
+        ),
+        "beat_latency_p50_ms": round(statistics.median(latencies)),
+        "beat_latency_p90_ms": percentile(latencies, 0.9),
+    }
 
 
 async def main_async(story: str, seed: int, mode: str) -> dict[str, Any]:
@@ -59,9 +86,14 @@ async def main_async(story: str, seed: int, mode: str) -> dict[str, Any]:
         "beats": len(runs),
         "claims": sum(verdicts.values()),
         "verdicts": dict(verdicts),
-        "beat_latency_p50_ms": round(statistics.median(latencies)),
-        "beat_latency_p90_ms": percentile(latencies, 0.9),
-        "target_p90_ms": TARGET_P90_MS,
+        "readability": readability(
+            [c.text for _, r in runs for c in r.claims], len(runs), latencies
+        ),
+        "targets": {
+            "machine_tokens": 0,
+            "numbers_per_fan_claim": TARGET_NUMBERS_PER_FAN_CLAIM,
+            "beat_latency_p90_ms": TARGET_P90_MS,
+        },
         "tokens": {
             "narrator": sum(r.narrator_tokens for _, r in runs),
             "judge": sum(r.judge_tokens for _, r in runs),
@@ -74,13 +106,23 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--story", default="red_card_flip")
     parser.add_argument("--seed", type=int, default=3)
-    parser.add_argument("--mode", default="fan")
+    parser.add_argument("--modes", default="fan,analyst")
     args = parser.parse_args()
-    out = asyncio.run(main_async(args.story, args.seed, args.mode))
-    path = REPORTS_DIR / f"{date.today().isoformat()}-e2e-{args.story}-{args.seed}.json"
-    path.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", "utf-8")
-    print({k: v for k, v in out.items() if k != "chains"})
-    print(path)
+    for mode in args.modes.split(","):
+        out = asyncio.run(main_async(args.story, args.seed, mode))
+        name = f"{date.today().isoformat()}-e2e-{args.story}-{args.seed}-{mode}.json"
+        path = REPORTS_DIR / name
+        path.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", "utf-8")
+        print(
+            json.dumps(
+                {k: v for k, v in out.items() if k != "chains"},
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
+        for c in out["chains"]:
+            print(f"[{c['verdict']}] {c['beat_id']}: {c['text']}")
+        print(path)
 
 
 if __name__ == "__main__":

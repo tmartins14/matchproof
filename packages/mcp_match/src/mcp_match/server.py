@@ -10,6 +10,7 @@ import os
 from typing import Any
 
 from contracts.models import Claim, Event, Fact, PositionFrame
+from intel.labels import LabelContext, label_for
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
 from mcp.server.transport_security import TransportSecuritySettings
@@ -281,7 +282,8 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
 
     @server.tool()
     def get_beat_bundle(match_id: str, beat_id: str) -> dict[str, Any]:
-        """One beat and every fact it cites, in one call. This is what the Narrator reads."""
+        """One beat and every fact it cites, in one call, each with a plain-English `label`. This is
+        what the Narrator reads."""
         known_match(match_id)
         upto = horizon(match_id)
         beat = next(
@@ -295,7 +297,17 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
         if beat is None:
             raise ToolError(f"Unknown beat {beat_id} in match {match_id}.")
         facts = [known_fact(match_id, f.root) for f in beat.fact_ids]
-        return {"beat": dump(beat), "facts": [dump(f) for f in facts]}
+        brief = store.brief(match_id)
+        ctx = LabelContext(
+            {"home": brief.home.name, "away": brief.away.name},
+            {e.id.root: e for e in store.events(match_id)},
+            store.registry(match_id),
+        )
+        # `label` is not part of the Fact schema: it is added here, by code, for the Narrator.
+        return {
+            "beat": dump(beat),
+            "facts": [{**dump(f), "label": label_for(f, ctx)} for f in facts],
+        }
 
     if writable:
 

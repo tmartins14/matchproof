@@ -23,6 +23,7 @@ from agents.checker import Checker, ClaimCheck
 from agents.llm_client import MODELS_PATH, client_for, load_models
 from agents.narrator import DraftClaim
 from contracts.models import Fact
+from intel.labels import LabelContext, labels_for
 from mcp_match import InMemoryMatchStore
 
 from .golden import build_store
@@ -92,13 +93,14 @@ def stores_for(
 
 def bundle_for(
     store: InMemoryMatchStore, match_id: str, beat_id: str
-) -> tuple[dict[str, Fact], str, str, dict[str, str]]:
+) -> tuple[dict[str, Fact], str, str, dict[str, str], dict[str, str]]:
     beat = next(b for b in store.beats(match_id) if b.id.root == beat_id)
     registry = store.registry(match_id)
     facts = {f.root: registry.get(f.root) for f in beat.fact_ids}
     brief = store.brief(match_id)
     teams = {"home": brief.home.name, "away": brief.away.name}
-    return facts, beat.kind.value, beat.label, teams
+    ctx = LabelContext(teams, {e.id.root: e for e in store.events(match_id)}, registry)
+    return facts, beat.kind.value, beat.label, teams, labels_for(facts, ctx)
 
 
 def run_judge(
@@ -113,11 +115,22 @@ def run_judge(
     tokens: list[int] = []
     for c in claims:
         store, match_id = stores[(c["match"]["story"], c["match"]["seed"])]
-        facts, kind, label, teams = bundle_for(store, match_id, c["beat_id"])
+        names = {
+            p.name
+            for t in (store.brief(match_id).home, store.brief(match_id).away)
+            for p in t.players
+        }
+        facts, kind, label, teams, labels = bundle_for(store, match_id, c["beat_id"])
         draft = DraftClaim.model_construct(text=c["text"], fact_ids=list(c["fact_ids"]))
         started = time.perf_counter()
         check: ClaimCheck = checker.check_one(
-            draft, facts, teams=teams, beat_kind=kind, beat_label=label
+            draft,
+            facts,
+            teams=teams,
+            beat_kind=kind,
+            beat_label=label,
+            labels=labels,
+            names=names,
         )
         wall_ms = round((time.perf_counter() - started) * 1000)
         bad = c["expected"] != "verified"

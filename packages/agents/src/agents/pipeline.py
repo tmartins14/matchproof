@@ -85,7 +85,12 @@ async def run_beat(match_id: str, beat_id: str, mode: Mode, *, deps: Deps) -> Be
                 await deps.server.call_tool("get_brief", {"match_id": match_id})
             )
         teams = {"home": brief["home"]["name"], "away": brief["away"]["name"]}
-        facts = {f["id"]: Fact.model_validate(f) for f in bundle["facts"]}
+        names = {p["name"] for side in ("home", "away") for p in brief[side]["players"]}
+        labels = {f["id"]: f["label"] for f in bundle["facts"]}
+        facts = {
+            f["id"]: Fact.model_validate({k: v for k, v in f.items() if k != "label"})
+            for f in bundle["facts"]
+        }
         beat = bundle["beat"]
         calls: list[Structured[NarratorOutput]] = []
 
@@ -125,6 +130,8 @@ async def run_beat(match_id: str, beat_id: str, mode: Mode, *, deps: Deps) -> Be
                     teams=teams,
                     beat_kind=beat["kind"],
                     beat_label=beat["label"],
+                    labels=labels,
+                    names=names,
                     renarrate=lambda rev: draft(rev),
                 )
                 _span_attrs(

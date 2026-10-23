@@ -2,15 +2,15 @@
   "deployment": "gpt-5-mini",
   "date": "2026-10-22",
   "bad_total": 30,
-  "caught": 29,
-  "caught_by_code": 13,
+  "caught": 30,
+  "caught_by_code": 14,
   "caught_by_judge": 16,
   "judge_unavailable": 0,
   "good_total": 10,
   "good_blocked": 0,
-  "judge_calls": 27,
-  "p50_ms": 1654,
-  "p90_ms": 2148,
+  "judge_calls": 26,
+  "p50_ms": 1334,
+  "p90_ms": 1627,
   "tokens_per_claim": 658.0,
   "results": [
     {
@@ -172,7 +172,7 @@
       "id": "adv-12",
       "kind": "uncited_number",
       "expected": "rephrased",
-      "text": "Ashford Vale's away-09 finishes it after 4 passes, 10 seconds from the interception.",
+      "text": "Ashford Vale's Kowal finishes it after 4 passes, 10 seconds from the interception.",
       "passed_first_check": false,
       "stopped_by": "code",
       "reasons": [
@@ -191,11 +191,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Calling Rivermouth 'dominant' is an interpretive adjective not supported by the possession figure alone."
+        "Judge (overclaim): Calling Rivermouth \"dominant\" asserts more than the possession figure alone shows; 61% possession is a measured figure but not equivalent to dominance."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 2359,
-      "tokens": 629
+      "judge_ms": 3455,
+      "tokens": 640
     },
     {
       "id": "adv-14",
@@ -205,11 +205,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Saying they \"have collapsed\" is a judgment beyond the fact that their back line is 9 m deeper."
+        "Judge (overclaim): \u2018have collapsed\u2019 overstates the fact that their back line dropped 9 m; the fact only measures depth change, not a collapse."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1271,
-      "tokens": 635
+      "judge_ms": 1548,
+      "tokens": 646
     },
     {
       "id": "adv-15",
@@ -219,11 +219,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): The phrase 'in total control' overstates the fact of 67% possession; the fact gives possession share only, not 'total control'."
+        "Judge (overclaim): Calling Rivermouth 'in total control' is an overclaim not supported by the possession percentage alone."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1700,
-      "tokens": 639
+      "judge_ms": 1390,
+      "tokens": 631
     },
     {
       "id": "adv-16",
@@ -233,11 +233,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Calling Rivermouth \"clinical\" is an evaluative adjective not stated by the fact that the goal came after 4 passes."
+        "Judge (overclaim): Calling Rivermouth 'clinical' is an evaluative judgement not supported by the factual count of four passes."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 2148,
-      "tokens": 609
+      "judge_ms": 1042,
+      "tokens": 605
     },
     {
       "id": "adv-17",
@@ -247,11 +247,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Calling Ashford Vale's press \"relentless\" overstates the fact that they won the ball 7 m from goal; the fact only records a single ball-won distance."
+        "Judge (overclaim): Calling the press \"relentless\" adds an evaluative adjective not supported by the single fact that they won the ball 7 m from goal."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1637,
-      "tokens": 639
+      "judge_ms": 1627,
+      "tokens": 633
     },
     {
       "id": "adv-18",
@@ -261,11 +261,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Saying they are 'reeling' asserts a state (psychological/impact) not established by the fact that an away player received a second yellow."
+        "Judge (overclaim): saying they are 'reeling' attributes an emotional/state reaction not stated by the fact of a second yellow and sending-off."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1825,
-      "tokens": 610
+      "judge_ms": 1680,
+      "tokens": 607
     },
     {
       "id": "adv-19",
@@ -275,11 +275,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): The facts only show the back line moved 9 m; they do not state that this is a sign of tired legs (a causal claim)."
+        "Judge (unsupported_cause): Facts show the back line dropped 9 m since the red card but do not state this is due to tired legs, so the causal claim is unsupported."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 1433,
-      "tokens": 645
+      "judge_ms": 1567,
+      "tokens": 653
     },
     {
       "id": "adv-20",
@@ -289,10 +289,10 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): Facts show the away goal after 40 seconds but give no evidence that Rivermouth\u2019s full-backs were pushed up, so the causal claim is unsupported."
+        "Judge (unsupported_cause): No cited fact says Rivermouth's full-backs were pushed up, so the sentence gives an unsupported cause for the goal."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 1654,
+      "judge_ms": 1120,
       "tokens": 630
     },
     {
@@ -303,11 +303,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): The facts only give the time (3.09s) and home side; they do not state it was from a rehearsed routine or that the goal was 'thanks to' that cause."
+        "Judge (unsupported_cause): The sentence claims the goal was 'thanks to a rehearsed routine' (a cause) but the facts only give the 3.09s time and no information about rehearsed routines."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 1445,
-      "tokens": 637
+      "judge_ms": 1503,
+      "tokens": 642
     },
     {
       "id": "adv-22",
@@ -317,39 +317,39 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): The facts show Rivermouth have 61% possession but give no evidence that Ashford Vale have stopped pressing, so the stated cause is unsupported."
+        "Judge (unsupported_cause): The fact only gives Rivermouth's possession share; it does not state that Ashford Vale have stopped pressing, so the cause is unsupported."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 1625,
+      "judge_ms": 1595,
       "tokens": 643
     },
     {
       "id": "adv-23",
       "kind": "wrong_entity",
       "expected": "blocked",
-      "text": "Rivermouth's away-09 finishes the counter.",
+      "text": "Rivermouth's Kowal finishes the counter.",
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (wrong_entity): The fact says away-09 (an Ashford Vale player) was the shooter, but the sentence calls them 'Rivermouth' (home)."
+        "Judge (wrong_entity): Fact says Kowal is on Ashford Vale but sentence says Rivermouth's Kowal."
       ],
       "judge_problem": "wrong_entity",
-      "judge_ms": 2047,
-      "tokens": 613
+      "judge_ms": 1185,
+      "tokens": 594
     },
     {
       "id": "adv-24",
       "kind": "wrong_entity",
       "expected": "blocked",
-      "text": "away-10 scores for Rivermouth.",
+      "text": "Bellamy-Cruz scores for Rivermouth.",
       "passed_first_check": false,
-      "stopped_by": "judge",
+      "stopped_by": "code",
       "reasons": [
-        "Judge (wrong_entity): Facts show home-10 (Rivermouth) scored, but sentence says away-10 scored for Rivermouth (wrong team assignment)."
+        "The player \"Bellamy-Cruz\" is not named by any cited fact."
       ],
-      "judge_problem": "wrong_entity",
-      "judge_ms": 1538,
-      "tokens": 641
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
     },
     {
       "id": "adv-25",
@@ -359,23 +359,25 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (wrong_entity): The card facts apply to the away team (Ashford Vale), but the sentence says Rivermouth (home)."
+        "Judge (wrong_entity): Facts show Ashford Vale received the second yellow and were reduced to 10, not Rivermouth."
       ],
       "judge_problem": "wrong_entity",
-      "judge_ms": 2148,
-      "tokens": 640
+      "judge_ms": 1183,
+      "tokens": 639
     },
     {
       "id": "adv-26",
       "kind": "wrong_minute",
       "expected": "blocked",
       "text": "Ashford Vale's back line is 9 m deeper since half-time.",
-      "passed_first_check": true,
-      "stopped_by": "none",
-      "reasons": [],
-      "judge_problem": null,
-      "judge_ms": 1641,
-      "tokens": 633
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (wrong_time): Fact attributes the drop as occurring since the red card at 63\u2032, not since half-time."
+      ],
+      "judge_problem": "wrong_time",
+      "judge_ms": 1267,
+      "tokens": 638
     },
     {
       "id": "adv-27",
@@ -399,25 +401,25 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): 'their best spell in years' is not supported by the possession fact, which only gives a percentage for the last 11 minutes."
+        "Judge (outside_knowledge): The fact gives possession (61%) but does not support the claim that this is their 'best spell in years', which is outside the provided data."
       ],
-      "judge_problem": "overclaim",
-      "judge_ms": 1636,
-      "tokens": 638
+      "judge_problem": "outside_knowledge",
+      "judge_ms": 1230,
+      "tokens": 643
     },
     {
       "id": "adv-29",
       "kind": "outside_knowledge",
       "expected": "blocked",
-      "text": "Ashford Vale's away-09 scores again, matching the form of last season.",
+      "text": "Ashford Vale's Kowal scores again, matching the form of last season.",
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (outside_knowledge): The claim about matching 'the form of last season' is not supported by the single fact that away-09 scored."
+        "Judge (outside_knowledge): The sentence claims Kowal 'scores again' and 'matching the form of last season'\u2014facts only identify the shooter, not that he scored previously or his last-season form."
       ],
       "judge_problem": "outside_knowledge",
-      "judge_ms": 1714,
-      "tokens": 613
+      "judge_ms": 1495,
+      "tokens": 618
     },
     {
       "id": "adv-30",
@@ -427,11 +429,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (outside_knowledge): Calling them 'last season's champions' is not stated in the cited facts."
+        "Judge (outside_knowledge): calling them 'last season's champions' is information not supported by the cited fact, which only gives the 11-second move by Ashford Vale."
       ],
       "judge_problem": "outside_knowledge",
-      "judge_ms": 1671,
-      "tokens": 614
+      "judge_ms": 1375,
+      "tokens": 634
     },
     {
       "id": "good-01",
@@ -442,20 +444,20 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1531,
-      "tokens": 640
+      "judge_ms": 1273,
+      "tokens": 638
     },
     {
       "id": "good-02",
       "kind": "good",
       "expected": "verified",
-      "text": "Ashford Vale's back line has dropped 9 m since the second yellow, from 34 m to 25 m.",
+      "text": "Ashford Vale's back line has dropped 9 m since the red card, from 34 m to 25 m.",
       "passed_first_check": true,
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1769,
-      "tokens": 761
+      "judge_ms": 1293,
+      "tokens": 768
     },
     {
       "id": "good-03",
@@ -466,20 +468,20 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1298,
-      "tokens": 741
+      "judge_ms": 1001,
+      "tokens": 723
     },
     {
       "id": "good-04",
       "kind": "good",
       "expected": "verified",
-      "text": "Rivermouth score through home-10 after 4 passes in 16 seconds.",
+      "text": "Rivermouth score through Pryce after 4 passes in 16 seconds.",
       "passed_first_check": true,
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1429,
-      "tokens": 722
+      "judge_ms": 930,
+      "tokens": 711
     },
     {
       "id": "good-05",
@@ -490,8 +492,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1545,
-      "tokens": 738
+      "judge_ms": 1492,
+      "tokens": 733
     },
     {
       "id": "good-06",
@@ -502,8 +504,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1939,
-      "tokens": 669
+      "judge_ms": 1507,
+      "tokens": 652
     },
     {
       "id": "good-07",
@@ -514,8 +516,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1334,
-      "tokens": 691
+      "judge_ms": 1117,
+      "tokens": 692
     },
     {
       "id": "good-08",
@@ -526,19 +528,19 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 2149,
-      "tokens": 655
+      "judge_ms": 984,
+      "tokens": 651
     },
     {
       "id": "good-09",
       "kind": "good",
       "expected": "verified",
-      "text": "Ashford Vale's away-09 scores after 4 passes in 10 seconds.",
+      "text": "Ashford Vale's Kowal scores after 4 passes in 10 seconds.",
       "passed_first_check": true,
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1842,
+      "judge_ms": 1625,
       "tokens": 721
     },
     {
@@ -550,8 +552,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 2055,
-      "tokens": 719
+      "judge_ms": 1177,
+      "tokens": 723
     }
   ]
 }

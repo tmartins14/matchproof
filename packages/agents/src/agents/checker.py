@@ -7,13 +7,14 @@ claim is `rephrased`, if not it is `blocked`. A judge that cannot answer in time
 """
 
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Collection, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
 from contracts.models import Claim, Fact
+from intel.labels import say
 from intel.voice_lint import Rule, lint, load_rules
 from pydantic import BaseModel
 
@@ -82,14 +83,16 @@ def render_judge_prompt(
     teams: Mapping[str, str],
     beat_kind: str,
     beat_label: str,
+    labels: Mapping[str, str] | None = None,
 ) -> str:
     lines = []
     for f in facts:
-        side = f.scope.side.value if f.scope and f.scope.side else "n/a"
+        side = teams[f.scope.side.value] if f.scope and f.scope.side else "n/a"
         unit = f" {f.unit.value}" if f.unit else ""
+        what = (labels or {}).get(f.id.root, f.name)
         lines.append(
-            f"- {f.id.root}: {f.name} = {f.value}{unit}; may be written as "
-            f"{' | '.join(f.display.en)}; side {side}"
+            f"- {f.id.root}: {what} = {f.value}{unit}; may be written as "
+            f"{' | '.join(say(f.value, f.display.en, teams))}; side {side}"
         )
     values = {
         "home": teams["home"],
@@ -127,9 +130,11 @@ class Checker:
         teams: Mapping[str, str],
         beat_kind: str,
         beat_label: str,
+        labels: Mapping[str, str] | None = None,
+        names: Collection[str] = (),
     ) -> ClaimCheck:
         """Reconcile, lint, then judge. The judge is asked only if the code checks pass."""
-        rec = reconcile(draft.text, draft.fact_ids, bundle)
+        rec = reconcile(draft.text, draft.fact_ids, bundle, names)
         result = ClaimCheck(draft.text, list(draft.fact_ids), rec.numbers)
         result.reconciled = rec.ok
         result.reasons.extend(rec.reasons)
@@ -152,6 +157,7 @@ class Checker:
             teams,
             beat_kind,
             beat_label,
+            labels,
         )
         result.judged = True
         try:
@@ -189,13 +195,21 @@ class Checker:
         teams: Mapping[str, str],
         beat_kind: str,
         beat_label: str,
+        labels: Mapping[str, str] | None = None,
+        names: Collection[str] = (),
         renarrate: Callable[[Revision], list[DraftClaim]],
     ) -> list[CheckedClaim]:
         """Check a beat's drafts, send the failures back to `renarrate` once, and re-check."""
 
         def check(d: DraftClaim) -> ClaimCheck:
             return self.check_one(
-                d, bundle, teams=teams, beat_kind=beat_kind, beat_label=beat_label
+                d,
+                bundle,
+                teams=teams,
+                beat_kind=beat_kind,
+                beat_label=beat_label,
+                labels=labels,
+                names=names,
             )
 
         def check_all(items: list[DraftClaim]) -> list[ClaimCheck]:
@@ -215,8 +229,12 @@ class Checker:
                 ],
                 kept=[drafts[i].text for i, c in enumerate(first) if c.passed],
             )
+            kept = {t.strip().lower() for t in revision.kept}
             for i, new in zip(failed, renarrate(revision), strict=False):
-                revised[i] = new
+                if (
+                    new.text.strip().lower() not in kept
+                ):  # a repeat of an accepted claim is no fix
+                    revised[i] = new
         stem = re.sub(r"^bt-", "", beat_id)
         redone = dict(zip(revised, check_all(list(revised.values())), strict=True))
         out: list[CheckedClaim] = []

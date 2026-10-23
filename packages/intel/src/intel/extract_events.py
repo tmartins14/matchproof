@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from contracts.models import Event, Fact
 
-from .display import minute_of, render_clock, render_minute
+from .display import minute_of, render_minute
 from .football import (
     HIGH_TURNOVER_DISTANCE_M,
     SIDES,
@@ -259,13 +259,19 @@ class EventObserver:
                 "start_clock",
                 start.t.root,
                 "s",
-                {lang: render_clock(start.t.root, lang) for lang in LANGS},
+                {
+                    lang: render_minute(start.t.root, lang, start.period.value)
+                    for lang in LANGS
+                },
             ),
             fact(
                 "shot_clock",
                 shot.t.root,
                 "s",
-                {lang: render_clock(shot.t.root, lang) for lang in LANGS},
+                {
+                    lang: render_minute(shot.t.root, lang, shot.period.value)
+                    for lang in LANGS
+                },
             ),
         ]
         if is_ball_won(start):
@@ -299,7 +305,10 @@ class EventObserver:
                 [sid],
                 EXTRACTOR,
                 scope,
-                {lang: render_minute(shot.t.root, lang) for lang in LANGS},
+                {
+                    lang: render_minute(shot.t.root, lang, shot.period.value)
+                    for lang in LANGS
+                },
             ),
         ]
         if shot.player_id is not None:
@@ -357,6 +366,9 @@ class EventObserver:
                 [sid],
                 DISCIPLINE_EXTRACTOR,
                 scope,
-                {lang: render_minute(card.t.root, lang) for lang in LANGS},
+                {
+                    lang: render_minute(card.t.root, lang, card.period.value)
+                    for lang in LANGS
+                },
             ),
         ]

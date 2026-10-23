@@ -40,6 +40,19 @@ CASES: list[tuple[str, str, str]] = [
     ("exclamation", "Ashford score!", "Ashford score."),
     ("hedging", "Ashford seem to tire.", "Ashford seem tired."),
     ("long-sentence", " ".join(["word"] * 31) + ".", " ".join(["word"] * 30) + "."),
+    ("player-id", "away-10 scores.", "The Ashford No. 10 scores."),
+    ("event-id", "Since ev-001484 they sit deep.", "Since the red card they sit deep."),
+    ("snake-case-token", "A second_yellow is shown.", "A second yellow is shown."),
+    ("since-the-event", "Deeper since the event.", "Deeper since the red card."),
+    ("freeze-frame", "The freeze frame shows one.", "One defender is in the way."),
+    ("zone-players", "Two zone defenders wait.", "Two defenders wait."),
+    ("clock-time", "Shot at 97:22.", "Shot at 90+7′."),
+    ("zero-count", "The move has 0 passes.", "The move has no passes."),
+    (
+        "many-numbers",
+        "A 4 second move, 7 m out, worth 0.30 xG at 9′.",
+        "A 4 second move, 7 m out, at 9′.",
+    ),
 ]
 
 

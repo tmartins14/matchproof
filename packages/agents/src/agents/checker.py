@@ -18,7 +18,7 @@ from intel.labels import say
 from intel.voice_lint import Rule, lint, load_rules
 from pydantic import BaseModel
 
-from .llm_client import ChatClient, LlmError
+from .llm_client import ChatClient, LlmError, load_models
 from .narrator import DraftClaim, Revision
 from .reconcile import NumberMatch, reconcile
 from .structured import StructuredOutputError, complete_structured
@@ -26,11 +26,16 @@ from .structured import StructuredOutputError, complete_structured
 JUDGE_TIMEOUT_S = 6.0
 JUDGE_MAX_TOKENS = 800
 MAX_WORKERS = 4  # claims of one beat checked at the same time
-JUDGE_PROMPT_PATH = Path(__file__).parent / "prompts" / "judge.v1.md"
+PROMPTS_DIR = Path(__file__).parent / "prompts"
 MAX_REASON_CHARS = 400
 
 Problem = Literal[
-    "overclaim", "unsupported_cause", "wrong_entity", "wrong_time", "outside_knowledge"
+    "overclaim",
+    "motive",
+    "unsupported_cause",
+    "wrong_entity",
+    "wrong_time",
+    "outside_knowledge",
 ]
 
 
@@ -77,6 +82,11 @@ class CheckedClaim:
     final: ClaimCheck
 
 
+def judge_prompt_path(name: str | None = None) -> Path:
+    """The judge prompt file: `name`, else `judge_prompt` in config/models.yaml."""
+    return PROMPTS_DIR / (name or str(load_models()["judge_prompt"]))
+
+
 def render_judge_prompt(
     check_text: str,
     facts: list[Fact],
@@ -84,6 +94,7 @@ def render_judge_prompt(
     beat_kind: str,
     beat_label: str,
     labels: Mapping[str, str] | None = None,
+    prompt_file: str | None = None,
 ) -> str:
     lines = []
     for f in facts:
@@ -102,7 +113,7 @@ def render_judge_prompt(
         "claim": check_text,
         "facts": "\n".join(lines),
     }
-    prompt = JUDGE_PROMPT_PATH.read_text("utf-8")
+    prompt = judge_prompt_path(prompt_file).read_text("utf-8")
     for key, value in values.items():
         prompt = prompt.replace("{{" + key + "}}", value)
     return prompt
@@ -116,8 +127,10 @@ class Checker:
         rules: list[Rule] | None = None,
         timeout_s: float = JUDGE_TIMEOUT_S,
         max_workers: int = MAX_WORKERS,
+        prompt_file: str | None = None,
     ) -> None:
         self._workers = max_workers
+        self._prompt_file = prompt_file
         self._judge = judge
         self._rules = rules if rules is not None else load_rules()
         self._timeout_s = timeout_s
@@ -158,6 +171,7 @@ class Checker:
             beat_kind,
             beat_label,
             labels,
+            self._prompt_file,
         )
         result.judged = True
         try:

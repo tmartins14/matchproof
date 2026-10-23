@@ -11,7 +11,8 @@
 # blocked are scored the same. `kind` says what is wrong with a bad claim.
 #
 # Bad mix: 7 wrong_number, 5 uncited_number, 6 overclaim, 4 invented_cause, 3 wrong_entity,
-# 2 wrong_minute, 3 outside_knowledge. 10 good.
+# 2 wrong_minute, 3 outside_knowledge, 8 motive (a correct statement plus a motive or team-state
+# clause). 14 good, the last 4 with vivid action verbs on supported events.
 
 # ---------------------------------------------------------------- wrong number (7)
 - id: adv-01
@@ -237,7 +238,65 @@
   fact_ids: [fx-sequence-ev-000824-seconds]
   expected: blocked
 
-# ---------------------------------------------------------------- good claims (10)
+# ---------------------------------------------------------------- motive or team-state clause (8)
+- id: adv-31
+  kind: motive
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001997-open_play_goal
+  text: "Rivermouth's Pryce scores after a 3 pass move, as they push to see the game out."
+  fact_ids: [fx-shot-ev-001997-shooter, fx-shot-ev-001997-outcome, fx-sequence-ev-001997-passes]
+  expected: rephrased
+- id: adv-32
+  kind: motive
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale's back line has dropped 9 m since the red card, and they are pinned back."
+  fact_ids: [fx-back_line_change-away-ev-001484-to-t4671-00]
+  expected: rephrased
+- id: adv-33
+  kind: motive
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000993-territorial_spell
+  text: "Rivermouth have 61% of the ball in this spell, piling on the pressure."
+  fact_ids: [fx-possession_share-home-last-11m-to-t3103-99]
+  expected: rephrased
+- id: adv-34
+  kind: motive
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000733-counter_goal
+  text: "Kowal scores for Ashford Vale after 5 passes, as they try to quieten the crowd."
+  fact_ids: [fx-shot-ev-000733-shooter, fx-shot-ev-000733-outcome, fx-sequence-ev-000733-passes]
+  expected: rephrased
+- id: adv-35
+  kind: motive
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-momentum_swing
+  text: "Rivermouth have 57% of the ball since their goal, as they look to see the game out."
+  fact_ids: [fx-possession_share-home-since-ev-001670-to-t5128-00]
+  expected: rephrased
+- id: adv-36
+  kind: motive
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-card
+  text: "Ashford Vale are down to 10 and left short upfront."
+  fact_ids: [fx-card-ev-001484-players_after]
+  expected: rephrased
+- id: adv-37
+  kind: motive
+  match: { story: late_comeback, seed: 4 }
+  beat_id: bt-001806-set_piece_goal
+  text: "Rivermouth score 3 seconds after the set piece and are now on top."
+  fact_ids: [fx-sequence-ev-001806-seconds, fx-shot-ev-001806-outcome]
+  expected: rephrased
+- id: adv-38
+  kind: motive
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000830-territorial_spell
+  text: "Rivermouth have 67% of the ball in this spell, and Ashford Vale are hanging on."
+  fact_ids: [fx-possession_share-home-last-6m-to-t2534-01]
+  expected: rephrased
+
+# ---------------------------------------------------------------- good claims (14)
 - id: good-01
   kind: good
   match: { story: red_card_flip, seed: 3 }
@@ -330,4 +389,35 @@
     - fx-sequence-ev-000222-ball_won_distance
     - fx-sequence-ev-000222-seconds
     - fx-shot-ev-000222-outcome
+  expected: verified
+- id: good-11
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-open_play_goal
+  text: "Pryce smashes a 0.10 xG shot in for Rivermouth."
+  fact_ids: [fx-shot-ev-001670-shooter, fx-shot-ev-001670-xg, fx-shot-ev-001670-outcome]
+  expected: verified
+- id: good-12
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001796-high_turnover_chance
+  text: "Marchetti-Roe lashes a 0.06 xG shot off the post for Rivermouth."
+  fact_ids: [fx-shot-ev-001796-shooter, fx-shot-ev-001796-xg, fx-shot-ev-001796-outcome]
+  expected: verified
+- id: good-13
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-000556-high_turnover_chance
+  text: "Ashford Vale win it 15 metres out and Bellamy-Cruz drags a shot wide."
+  fact_ids:
+    - fx-sequence-ev-000556-ball_won_distance
+    - fx-shot-ev-000556-shooter
+    - fx-shot-ev-000556-outcome
+  expected: verified
+- id: good-14
+  kind: good
+  match: { story: end_to_end, seed: 1 }
+  beat_id: bt-000937-set_piece_goal
+  text: "Rivermouth's Throgmorton fires home from a set piece, a 0.11 xG chance."
+  fact_ids: [fx-shot-ev-000937-shooter, fx-shot-ev-000937-xg, fx-shot-ev-000937-outcome]
   expected: verified

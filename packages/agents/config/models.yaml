@@ -17,6 +17,9 @@ narrator:
   response_format: json_schema
   reasoning_effort: minimal
 
+# The judge prompt file in agents/prompts/. v1 is kept for the record.
+judge_prompt: judge.v2.md
+
 judge:
   deployment: gpt-5-mini
   max_output_tokens: 800

@@ -25,7 +25,7 @@ CODE_KINDS = {"wrong_number", "uncited_number"}
 CODE_IDS = {"adv-27"}  # a wrong minute written as a number
 
 
-def test_mix_is_30_bad_and_10_good() -> None:
+def test_mix_is_38_bad_and_14_good() -> None:
     counts = Counter(c["kind"] for c in CLAIMS)
     assert counts == {
         "wrong_number": 7,
@@ -35,7 +35,8 @@ def test_mix_is_30_bad_and_10_good() -> None:
         "wrong_entity": 3,
         "wrong_minute": 2,
         "outside_knowledge": 3,
-        "good": 10,
+        "motive": 8,
+        "good": 14,
     }
     assert {c["expected"] for c in CLAIMS if c["kind"] == "good"} == {"verified"}
     assert {c["expected"] for c in CLAIMS if c["kind"] != "good"} <= {
@@ -66,20 +67,20 @@ def test_code_checks_stop_exactly_the_claims_meant_for_them(
 
 def test_pick_takes_most_caught_then_lower_p90() -> None:
     pick = pick_judge(
-        [Score("a", 28, 0, 3000), Score("b", 29, 1, 3900), Score("c", 29, 1, 3500)]
+        [Score("a", 35, 0, 3000), Score("b", 36, 1, 3900), Score("c", 36, 1, 3500)]
     )
     assert (pick.deployment, pick.fallback) == ("c", False)
 
 
 def test_pick_skips_candidates_that_miss_any_threshold() -> None:
     scores = [
-        Score("few", 27, 0, 1000),
-        Score("blocks", 30, 2, 1000),
-        Score("slow", 30, 0, 4001),
+        Score("few", 34, 0, 1000),
+        Score("blocks", 38, 2, 1000),
+        Score("slow", 38, 0, 4001),
     ]
     pick = pick_judge(scores)
     assert pick.fallback and pick.deployment == "gpt-5-mini"
-    assert pick_judge([Score("edge", 28, 1, 4000)]).deployment == "edge"
+    assert pick_judge([Score("edge", 35, 1, 4000)]).deployment == "edge"
 
 
 def test_set_active_judge_rewrites_only_the_judge_block(tmp_path: Path) -> None:
@@ -109,3 +110,30 @@ def test_the_golden_matches_are_built_with_the_roster() -> None:
     for f in shooters:
         assert not re.fullmatch(r"(home|away)-\d{2}", str(f.value)), f.value
     assert any(f.value == "Pryce" for f in shooters)
+
+
+def test_the_file_counts_match_the_pick_rule_denominators() -> None:
+    from evals.pick import BAD_TOTAL, GOOD_TOTAL, MAX_GOOD_BLOCKED, MIN_CAUGHT
+
+    bad = [c for c in CLAIMS if c["kind"] != "good"]
+    assert (len(bad), len(CLAIMS) - len(bad)) == (BAD_TOTAL, GOOD_TOTAL)
+    assert (MIN_CAUGHT, MAX_GOOD_BLOCKED) == (35, 1)
+
+
+def test_the_card_label_names_the_player_from_the_roster() -> None:
+    from intel.labels import LabelContext, label_for
+
+    from evals.golden import build_store
+
+    store, match_id = build_store("red_card_flip", 3)
+    registry = store.registry(match_id)
+    ctx = LabelContext(
+        {"home": "Rivermouth", "away": "Ashford Vale"},
+        {e.id.root: e for e in store.events(match_id)},
+        registry,
+    )
+    player = registry.by_name("card(ev-001484).player")
+    assert not re.fullmatch(r"(home|away)-\d{2}", str(player.value))
+    assert label_for(registry.by_name("card(ev-001484).kind"), ctx) == (
+        f"{player.value}, second yellow, sent off"
+    )

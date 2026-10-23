@@ -27,8 +27,8 @@ def test_known_labels(red_card: tuple[LabelContext, dict[str, str]]) -> None:
         "Ashford Vale back line, since the red card (63′)"
     )
     assert labels["shot(ev-000222).xg"] == "chance quality (xG)"
-    assert labels["card(ev-001484).kind"] == "card: second yellow, sent off"
-    assert labels["card(ev-001479).kind"] == "card: yellow"
+    assert labels["card(ev-001484).kind"].endswith(", second yellow, sent off")
+    assert labels["card(ev-001479).kind"].endswith(", yellow card")
 
 
 def test_since_spans_name_the_anchor_event_and_never_its_id(

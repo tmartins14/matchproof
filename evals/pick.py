@@ -7,12 +7,14 @@ from typing import Any
 
 import yaml
 
-MIN_CAUGHT = 28  # of 30 bad claims
-MAX_GOOD_BLOCKED = 1  # of 10 good claims
+BAD_TOTAL = 38  # bad claims in evals/adversarial/claims.yaml
+GOOD_TOTAL = 14  # good claims in the same file
+MIN_CAUGHT = 35  # of BAD_TOTAL
+MAX_GOOD_BLOCKED = 1  # of GOOD_TOTAL
 MAX_P90_MS = 4000
 FALLBACK_DEPLOYMENT = "gpt-5-mini"
 RULE_TEXT = (
-    f"at least {MIN_CAUGHT} of 30 bad claims caught, at most {MAX_GOOD_BLOCKED} of 10 good claims "
+    f"at least {MIN_CAUGHT} of {BAD_TOTAL} bad claims caught, at most {MAX_GOOD_BLOCKED} of {GOOD_TOTAL} good claims "
     f"blocked, judge p90 at most {MAX_P90_MS / 1000:g} s; highest catch count wins, then lower p90"
 )
 
@@ -51,7 +53,7 @@ def pick_judge(scores: list[Score]) -> Pick:
         return Pick(
             best.deployment,
             False,
-            f"{best.deployment} caught {best.caught}/30, blocked {best.good_blocked}/10 good, "
+            f"{best.deployment} caught {best.caught}/{BAD_TOTAL}, blocked {best.good_blocked}/{GOOD_TOTAL} good, "
             f"p90 {best.p90_ms / 1000:.1f} s",
         )
     return Pick(

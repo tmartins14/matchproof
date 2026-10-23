@@ -130,3 +130,14 @@ def test_a_retry_that_repeats_an_accepted_claim_is_not_a_fix() -> None:
         [draft("Ashford drop 8 m.")],
     )
     assert [c.claim.verdict.value for c in out] == ["verified", "blocked"]
+
+
+def test_the_judge_prompt_is_the_configured_file() -> None:
+    from agents.checker import judge_prompt_path, render_judge_prompt
+
+    assert judge_prompt_path().name == "judge.v2.md"  # config/models.yaml points at v2
+    args = ([DROP], TEAMS, "card", "63′")
+    v2 = render_judge_prompt("Ashford drop 8 m.", *args)
+    v1 = render_judge_prompt("Ashford drop 8 m.", *args, prompt_file="judge.v1.md")
+    assert "motive" in v2 and "Allowed without a fact" in v2
+    assert "motive" not in v1 and "You are strict" in v1

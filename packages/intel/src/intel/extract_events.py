@@ -59,7 +59,7 @@ SHOT_METRICS = (
     "shot.minute",
     "shot.shooter",
 )
-CARD_METRICS = ("card.kind", "card.players_after", "card.minute")
+CARD_METRICS = ("card.kind", "card.player", "card.players_after", "card.minute")
 
 
 @dataclass(frozen=True)
@@ -347,10 +347,21 @@ class EventObserver:
             "t_from": card.t.root,
             "t_to": card.t.root,
         }
+        who = [
+            build_fact(
+                f"card({sid}).player",
+                self._roster.get(player, player),
+                "",
+                [sid],
+                DISCIPLINE_EXTRACTOR,
+                scope,
+            )
+        ]
         return [
             build_fact(
                 f"card({sid}).kind", kind, "", [sid], DISCIPLINE_EXTRACTOR, scope
             ),
+            *(who if card.player_id is not None else []),
             build_fact(
                 f"card({sid}).players_after",
                 SQUAD_SIZE - self._dismissed[side],

@@ -61,9 +61,32 @@ flowchart LR
 
 - **Producer.** Hard rules are code (`producer.py`): goals, red cards and follow-up `momentum_swing` beats are always narrated; `NARRATION_BUDGET = 12` beats chosen by judgement; no two narrated beats of one kind within 3 match minutes, except goals. Beats that are always narrated are not held back by the budget or the spacing. The model sees only the beat, its salience and a one-line summary of what was narrated, and judges salience, variety and whether the beat adds anything. Its `note` follows `docs/VOICE.md` and is linted; a note that breaks a rule is replaced. Decisions are made one at a time in the order beats were found, so ranks run 1 to n with no gaps.
 - **Tools.** The agents reach match data only through the internal MCP server: `get_beat_bundle`, `get_brief`, `put_claims`, `put_audit`. No agent imports the store or the fact registry (a test asserts it). The server is reached in process over a memory transport and is never exposed on a network.
-- **Auditor.** After the Checker settles a claim as `verified` or `rephrased`, `judge-grok` runs the same rubric (`judge.v2.md`) on its own pool of 2, with a 45 s timeout and one retry on a 429 or a timeout. The result is stored on the claim through `put_audit` and sent to the screen only as a `verdict` message carrying the same verdict plus `audit`. A disagreement goes to the Producer log (one plain line), the trace (an `audit` span linked to the beat's span) and `GET /matches/{match_id}/audit`. It does not change a published verdict in this version.
+- **Auditor.** After the Checker settles a claim as `verified` or `rephrased`, `judge-grok` runs the same rubric (`judge.v2.md`, which it keeps so the two prompts stay independent) on its own pool of 2, with a 45 s timeout and one retry on a 429 or a timeout. The result is stored on the claim through `put_audit` and sent to the screen only as a `verdict` message carrying the same verdict plus `audit`. A disagreement goes to the Producer log (one plain line), the trace (an `audit` span linked to the beat's span) and `GET /matches/{match_id}/audit`. It does not change a published verdict in this version.
 - **Cost guard.** `DAILY_TOKEN_CAP` (default 2,000,000) counts every model call by agent. At 90% of the cap auditing stops; at the cap new beats stream without narration and a `notice` status says narration is paused. `GET /health/budget` shows usage by agent, tokens in and out by agent, and the cost when `packages/agents/config/prices.yaml` is filled in ("prices not set" until then).
 - **Tracing.** One OpenTelemetry trace per match run, a child span per beat workflow (`beat`), and spans for `producer`, `narrate`, `check` (with `reconcile`, `lint` and `judge`, the judge span holding the `chat <deployment>` span and its token usage), `retry` and `put_claims`. Every model call of a match is a `chat <deployment>` span with `gen_ai.usage.*` attributes. `claim.checker.trace_id` holds the trace id; `claim` and `verdict` messages carry the beat's span id.
+
+### Corrections by consensus
+
+The auditor alone is log-only. It can correct a claim already on air only when the inline judge, asked again, agrees with it. A correction is never silent: the previous text travels with it.
+
+```mermaid
+flowchart LR
+    W[Narrator, the writer] --> J[Inline judge, gpt-5-mini]
+    J -- verified / rephrased --> A[Auditor, judge-grok]
+    A -- agree --> D((no change))
+    A -- disagree --> R[Inline judge re-check, with the auditor's reason]
+    R -- still supports the claim --> U((unresolved: logged, nothing changes))
+    R -- agrees with the auditor --> W2[Narrator rewrites once, with both reasons]
+    W2 --> K{reconcile, lint, judge}
+    K -- pass --> C((corrected: rephrased, new text))
+    K -- fail --> B((blocked))
+```
+
+- **Rule** (`agents/consensus.py`). Trigger: the auditor returns `disagree` on a claim whose verdict is `verified` or `rephrased`. The inline judge (the current judge prompt) re-checks the same claim and facts with the auditor's problem and reason added. If it now says the claim is unsupported, the Narrator revises the claim once with both reasons and the full check runs on the new wording: pass gives verdict `rephrased` with the new text, fail gives `blocked`. If the re-check still supports the claim, nothing changes on screen and the disagreement is logged as unresolved.
+- **Limits.** At most one correction per claim. Corrections use the same pools, count toward `DAILY_TOKEN_CAP` and stop when auditing stops (90% of the cap).
+- **On the stream.** A correction is a `verdict` message with the new verdict and text and a `correction` object (`at_t`, `previous_text`, `reason`, `by`). A claim not yet on screen is simply sent in its corrected form. The store keeps the corrected claim (`put_correction` on the internal server), so an archived match carries it.
+- **Audit summary.** `GET /matches/{id}/audit` adds `corrections`, `unresolved` and `agreement_rate_after_corrections` (a corrected disagreement counts as settled).
+- **Every auditor disagreement becomes an eval case.** `uv run python -m evals.from_audit <audit.json or /matches/{id}/audit URL>` prints the disagreements as YAML entries for `evals/adversarial/claims.yaml`, with the beat id and fact ids filled in. Paste them in, update the totals in `evals/pick.py` and `tests/test_evals.py`, and re-run `make bakeoff`. The judge prompt learns from them (`judge.v3.md` has a "commonly missed" section built from the first six).
 
 ### Checker order and judge bake-off
 

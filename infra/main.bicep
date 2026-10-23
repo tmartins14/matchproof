@@ -130,3 +130,4 @@ output API_URL string = app.outputs.url
 output MODEL_BASE_URL string = foundry.outputs.modelBaseUrl
 output MODEL_DEPLOYMENT_NAME string = foundry.outputs.deploymentName
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.appInsightsName
+output AZURE_STORAGE_ACCOUNT string = storage.outputs.accountName

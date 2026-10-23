@@ -33,7 +33,7 @@ All agents read and write one match store through the `match-data` MCP server. T
 
 | Component | Kind | Input | Output |
 | --- | --- | --- | --- |
-| Composer | Agent | Free-text brief | `MatchBrief` (schema-valid) |
+| Composer | Agent (`gpt-5-mini`; code validates, the model only proposes) | Free-text brief | `{brief, brief_text, warnings}`: per-team formation and dials plus a preset storyline or custom planted moments. `sim.brief.validate_planted` and the schema check the answer; on errors it retries once with them, then keeps the valid part and warns. `brief_text` is the template, never model prose |
 | Generator | Python | `MatchBrief` | `Event[]`, `PositionFrame[]` at 5 Hz, freeze frame per event |
 | Extractors | Python | Events, frames | `Fact[]`, each with `source_ids` |
 | Beat detector | Python | Facts, events | Candidate `Beat[]`, marked planted or detected |
@@ -84,8 +84,9 @@ Neither candidate met the p90 limit, so the fallback judge is active. Full repor
 The Tactics object inside `MatchBrief` (formation and press, directness and line height per team, plus a storyline) is the canonical generator input. Same tactics and seed produce the same match.
 
 - Tactics → brief: deterministic template, in code.
-- Brief → tactics: the Composer agent returns structured tactics; the UI shows them for the user to confirm or adjust.
-- Randomize: random tactics, then the template writes the brief.
+- Brief → tactics: the Composer agent returns structured tactics; the UI shows them for the user to confirm or adjust. Nothing it returns reaches the generator without passing the validator a hand-written brief passes (`POST /matches` runs the same one and answers 422 with its messages).
+- Randomize: `random_brief(seed)` picks random formations and dials, then a preset storyline or 1–3 random valid custom moments; the same seed gives the same brief (`POST /matches/random`). The template writes the brief text.
+- Custom moments: storyline id `custom` plus up to 6 planted moments. Rules (`validate_planted`): windows inside 0–95′ with `minute_from` before `minute_to`; at most one red card per side; a penalty counts as a goal; goals for one side have windows at least 2 minutes apart. Three more keep a moment inside its window, which the generator cannot promise otherwise: a window stays within one half, `open_play_goal` and `penalty` windows are at least 2 minutes wide, and no two windows overlap. The final score is the planted goals; nothing else scores. The storyline text is a template ("Custom: Ashford Vale red card 30–35′; Rivermouth goal 70–80′").
 
 ## Live mode
 
@@ -117,6 +118,26 @@ The Tactics object inside `MatchBrief` (formation and press, directness and line
 | `put_audit(match_id, claim_id, audit)` | Attaches the auditor's result to a stored claim; the verdict is untouched | no | yes |
 
 Unknown match, fact, beat and event ids return a tool error. A running match is registered in the store when its stream starts and filled in as the pipeline advances; the pipeline writes a batch only once it is within the 120 s lookahead of playback, so a query never sees further ahead than that. The store keeps six matches and drops the least recently used.
+
+## Match storage
+
+A match is archived at full time, in a background task, so the stream is not delayed. The save waits up to 60 s for audits still running, then writes `<match_id>/` through a `MatchArchive` (`mcp_match/persist.py`): `FileArchive` under `data/archive/` locally (the default; `MATCH_ARCHIVE_DIR` moves it), or `BlobArchive` on the `matches` container (`MATCH_ARCHIVE=blob`, account from `AZURE_STORAGE_ACCOUNT`, `DefaultAzureCredential`; the API's managed identity holds Storage Blob Data Contributor on that container). An archived match is not saved again.
+
+| File | Holds |
+| --- | --- |
+| `brief.json` | The `MatchBrief` |
+| `events.jsonl.gz` | Every event |
+| `facts.jsonl.gz` | The fact registry; the first line is `{"aggregates": {...}}` |
+| `beats.jsonl` | The detected beats |
+| `claim_graph.json` | A `ClaimGraph` (`claim_graph.schema.json`): facts, beats, claims with their audits, final score |
+| `audit.json` | The auditor's summary, as `GET /matches/{id}/audit` serves it |
+| `producer_log.json` | The Producer's decisions, as `GET /matches/{id}/producer-log` serves them |
+| `usage.json` | Tokens per role and model for this match, and cost if `prices.yaml` is set |
+| `frames.jsonl.gz` | Position frames at 5 Hz (regenerated from the brief and events at save time) |
+| `freeze.jsonl.gz` | One `{event_id, frame}` per freeze frame |
+| `manifest.json` | Written last: files and sizes, schema versions, git SHA (`GIT_SHA`), created time, storyline, final score, claim counts |
+
+The manifest is the commit marker. A match without one is a save that did not finish; it is not listed and not loaded. A match that is not in memory is loaded from the archive when the store, MCP, fact lookup, `/audit` or `/producer-log` asks for it; least-recently-used eviction applies to memory only. `GET /matches` lists archived matches from their manifests, newest first.
 
 ## Player positions
 

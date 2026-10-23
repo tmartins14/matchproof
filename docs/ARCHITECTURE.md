@@ -19,7 +19,7 @@ Tactics / brief ──► Composer ──► MatchBrief
                     Producer ──► Narrator ──► Checker ──┐
                                     ▲          (retry once) │
                                     └───────────────────────┘
-                                    │ verdicts
+                                    │ verdicts          └──► Auditor (log-only, second vendor)
                                     ▼
                          Localizer (modes, EN/ES)
                                     │
@@ -37,12 +37,33 @@ All agents read and write one match store through the `match-data` MCP server. T
 | Generator | Python | `MatchBrief` | `Event[]`, `PositionFrame[]` at 5 Hz, freeze frame per event |
 | Extractors | Python | Events, frames | `Fact[]`, each with `source_ids` |
 | Beat detector | Python | Facts, events | Candidate `Beat[]`, marked planted or detected |
-| Producer | Agent | Candidate beats | Ranked feed of 6 to 10 beats |
+| Producer | Agent (hard rules in code, model judges inside them) | One beat, its salience, a line on the beats already narrated | `{narrate, priority, note}` per beat and a `rank` on the narrated ones; at most 12 chosen by judgement a match |
 | Narrator | Agent | One beat's fact bundle | Draft `Claim[]` with `fact_ids` |
 | Checker | Python reconciler and voice lint, then an LLM judge (gpt-5-mini with a separate judge prompt, chosen by the bake-off below; the Claude judge is blocked, see ADR 0002) | Draft claims, facts | Verdict per claim; one retry to Narrator with reasons |
+| Auditor | Agent (`judge-grok`, a second vendor), log-only | A claim the Checker settled as `verified` or `rephrased`, its facts | `audit` on the claim: `agree`, `disagree` (problem and reason) or `unavailable`; never changes the verdict |
 | Localizer | Agent + Azure AI Translator | Verified claims | Fan, analyst and producer renderings; EN and ES; number invariance check |
 | Renderer | Python | Beat, events, frames | `Overlay` JSON, timed to the match clock |
 | match-data MCP | MCP server | Tool calls | Facts, events, freeze frames, beats and claims (see Match-data MCP) |
+
+### Agent workflow
+
+The agents are a Microsoft Agent Framework workflow (`packages/agents/src/agents/workflow.py`). One beat is one run of the graph; the Checker to Narrator edge is the only loop and is taken at most once per claim. The Checker's steps are the ones `Checker.check_beat` uses, so the verdicts are the same.
+
+```mermaid
+flowchart LR
+    P[Producer] -- narrate --> N[Narrator]
+    P -- skip --> O((output))
+    N --> C[Checker]
+    C -- failed claims + reasons, once --> N
+    C -- settled --> O
+    C -. verified / rephrased .-> A[Auditor, log-only]
+```
+
+- **Producer.** Hard rules are code (`producer.py`): goals, red cards and follow-up `momentum_swing` beats are always narrated; `NARRATION_BUDGET = 12` beats chosen by judgement; no two narrated beats of one kind within 3 match minutes, except goals. Beats that are always narrated are not held back by the budget or the spacing. The model sees only the beat, its salience and a one-line summary of what was narrated, and judges salience, variety and whether the beat adds anything. Its `note` follows `docs/VOICE.md` and is linted; a note that breaks a rule is replaced. Decisions are made one at a time in the order beats were found, so ranks run 1 to n with no gaps.
+- **Tools.** The agents reach match data only through the internal MCP server: `get_beat_bundle`, `get_brief`, `put_claims`, `put_audit`. No agent imports the store or the fact registry (a test asserts it). The server is reached in process over a memory transport and is never exposed on a network.
+- **Auditor.** After the Checker settles a claim as `verified` or `rephrased`, `judge-grok` runs the same rubric (`judge.v2.md`) on its own pool of 2, with a 45 s timeout and one retry on a 429 or a timeout. The result is stored on the claim through `put_audit` and sent to the screen only as a `verdict` message carrying the same verdict plus `audit`. A disagreement goes to the Producer log (one plain line), the trace (an `audit` span linked to the beat's span) and `GET /matches/{match_id}/audit`. It does not change a published verdict in this version.
+- **Cost guard.** `DAILY_TOKEN_CAP` (default 2,000,000) counts every model call by agent. At 90% of the cap auditing stops; at the cap new beats stream without narration and a `notice` status says narration is paused. `GET /health/budget` shows usage.
+- **Tracing.** One OpenTelemetry trace per match run, a child span per beat workflow (`beat`), and spans for `producer`, `narrate`, `check` (with `reconcile`, `lint` and `judge`), `retry` and `put_claims`. `claim.checker.trace_id` holds the trace id; `claim` and `verdict` messages carry the beat's span id.
 
 ### Checker order and judge bake-off
 
@@ -70,13 +91,15 @@ The Tactics object inside `MatchBrief` (formation and press, directness and line
 
 - The API streams the generator's output over Server-Sent Events: `event`, `frame` (5 Hz), `fact`, `beat`, `claim` and `verdict` messages.
 - Extractors run incrementally per event. The beat detector fires when a pattern completes.
-- Each beat is narrated and checked asynchronously. The UI shows claims as Checking, then flips them to a verdict.
+- Each beat is handed to the agent workflow the moment the detector finds it, on a pool of 3 (`MAX_CONCURRENT_BEATS`). The Producer decides whether it is narrated; the Narrator and Checker follow.
+- **Verify before air.** The pipeline runs 120 match seconds ahead of playback, and playback slows to 1 match second per second inside the window before a beat, so a beat's claims are usually narrated and checked before the viewer reaches the moment, like a broadcast delay. When playback reaches the beat the stream sends its facts, the beat (with its `rank`), then its claims: a claim whose check has finished goes out as a `claim` with its final verdict and `checker.latency_ms`; a claim still being checked goes out as `checking` and gets a `verdict` message the moment the Checker finishes. Nothing is delayed to make this look better, and a verdict is never sent before the check ended. A beat the Producer skipped is still streamed, with no claims.
+- Messages count in the order they are sent, so a stream with agent messages is not reproducible from the brief alone. A reconnect reuses the match's settled claims and does not call the models again, but `Last-Event-ID` resumes the numbering only approximately; the UI keeps claims by id.
 - Budget: 8 s per beat at p90 from detection to verdict.
-- Degrade, don't fail: a model timeout or a tripped token cap shows "verification delayed" and keeps the match running. If the API is unreachable, the site offers the cached replay.
+- Degrade, don't fail: a model error or timeout leaves the claim `delayed` and the match keeps playing. A tripped token cap streams beats without narration and sends a `notice` status ("Narration is paused for today."). If the workflow is down, beats stream without claims and a `notice` says verification is unavailable. If the API is unreachable, the site offers the cached replay.
 
 ## Match-data MCP
 
-`packages/mcp_match` is the agents' only door to match data (ADR 0008). `build_server(store, writable)` defines the tools once and adds `put_claims` only when `writable` is true.
+`packages/mcp_match` is the agents' only door to match data (ADR 0008). `build_server(store, writable)` defines the tools once and adds `put_claims` and `put_audit` only when `writable` is true.
 
 - **Public, read-only:** `/mcp` on the API, streamable HTTP, 60 requests per minute per client address, no write tool and no key.
 - **Internal, read-write:** `get_internal_server(store)` in `services/api/src/api/matchdata.py`, used in process by the agent workflow and never routed.
@@ -91,6 +114,7 @@ The Tactics object inside `MatchBrief` (formation and press, directness and line
 | `list_beats(match_id, after_t)` | Beats detected so far | yes | yes |
 | `get_beat_bundle(match_id, beat_id)` | A beat and every fact it cites; this is what the Narrator reads | yes | yes |
 | `put_claims(match_id, beat_id, claims)` | Per-claim `accepted` and `errors`; each claim is checked against `claim.schema.json`, the beat and the fact ids it cites | no | yes |
+| `put_audit(match_id, claim_id, audit)` | Attaches the auditor's result to a stored claim; the verdict is untouched | no | yes |
 
 Unknown match, fact, beat and event ids return a tool error. A running match is registered in the store when its stream starts and filled in as the pipeline advances; the pipeline writes a batch only once it is within the 120 s lookahead of playback, so a query never sees further ahead than that. The store keeps six matches and drops the least recently used.
 

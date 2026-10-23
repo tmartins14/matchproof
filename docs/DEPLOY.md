@@ -62,6 +62,19 @@ make api-dev
 
 Your own user needs the `Cognitive Services OpenAI User` role on the Foundry account to call the model locally.
 
+## Find a match's trace
+
+Every match run is one OpenTelemetry trace. A claim's `checker.trace_id` is its trace id, and its `verdict` message carries the beat's span id. Locally, `make api-dev` prints spans to the console (`MATCHPROOF_TRACE_CONSOLE=1`); in Azure they go to Application Insights. In the Logs blade of the Application Insights resource, with the trace id from a claim:
+
+```kusto
+union dependencies, requests, traces
+| where operation_Id == "<trace_id>"
+| project timestamp, itemType, name, duration, id, operation_ParentId, customDimensions
+| order by timestamp asc
+```
+
+The `match` span is the root. Each `beat` span has `producer`, `narrate`, `check` (with `reconcile`, `lint` and `judge`), `retry` and `put_claims` children. An `audit` span sits under the match and links to the beat span it audits.
+
 ## Tear down
 
 ```bash

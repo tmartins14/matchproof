@@ -10,6 +10,7 @@ import os
 from typing import Any
 
 from contracts.models import Claim, Event, Fact, PositionFrame
+from intel.beats import swing_fact_ids
 from intel.labels import LabelContext, label_for
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
@@ -297,6 +298,10 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
         if beat is None:
             raise ToolError(f"Unknown beat {beat_id} in match {match_id}.")
         facts = [known_fact(match_id, f.root) for f in beat.fact_ids]
+        if beat.kind.value == "momentum_swing":
+            # Only the changes big enough to be the story; a 1 m\u00b2 drift is not narrated.
+            keep = swing_fact_ids(facts)
+            facts = [f for f in facts if f.id.root in keep] or facts
         brief = store.brief(match_id)
         ctx = LabelContext(
             {"home": brief.home.name, "away": brief.away.name},

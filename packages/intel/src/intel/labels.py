@@ -75,6 +75,7 @@ EVENT_METRICS: Mapping[str, str] = {
     "sequence.ball_won_distance": "distance from goal where the ball was won",
     "sequence.start_clock": "minute the move began",
     "sequence.shot_clock": "minute of the shot",
+    "card.player": "player shown the card",
     "card.players_after": "players left after the card",
     "card.minute": "minute of the card",
     "freeze_frame.attackers_v_defenders": "attackers against defenders near the ball",
@@ -89,9 +90,9 @@ EVENT_METRICS: Mapping[str, str] = {
     "freeze_frame.away_ahead_of_ball": "{away} players ahead of the ball",
 }
 CARD_KINDS: Mapping[str, str] = {
-    "yellow": "card: yellow",
-    "red": "card: straight red, sent off",
-    "second_yellow": "card: second yellow, sent off",
+    "yellow": "yellow card",
+    "red": "straight red, sent off",
+    "second_yellow": "second yellow, sent off",
 }
 CHANGE_WORDS: Mapping[str, tuple[str, str, str]] = {
     # metric: (word when the later value is lower, when higher, when level)
@@ -168,9 +169,12 @@ def _change_label(metric: str, side: str, ev: str, ctx: LabelContext, rest: str)
 def _event_label(fact: Fact, m: re.Match[str], ctx: LabelContext) -> str:
     key = f"{m['family']}.{m['key']}"
     if key == "card.kind":
-        return CARD_KINDS.get(
-            str(fact.value), f"card: {str(fact.value).replace('_', ' ')}"
-        )
+        what = CARD_KINDS.get(str(fact.value), str(fact.value).replace("_", " "))
+        name = f"card({m['ev']}).player"
+        if ctx.registry.has_name(name):
+            player = ctx.registry.by_name(name)
+            return f"{say(player.value, player.display.en, ctx.teams)[0]}, {what}"
+        return f"card: {what}"
     template = EVENT_METRICS.get(key)
     if template is None:
         return m["key"].replace("_", " ")

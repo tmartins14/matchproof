@@ -4,37 +4,39 @@
   "judge": "gpt-5-mini",
   "narrator": "gpt-5-mini",
   "beats": 11,
-  "claims": 18,
+  "claims": 17,
   "verdicts": {
-    "verified": 14,
-    "blocked": 2,
-    "rephrased": 2
+    "verified": 13,
+    "rephrased": 4
   },
   "readability": {
-    "claims": 18,
-    "claims_per_beat": 1.64,
-    "claims_with_lint_violation": 5,
+    "claims": 17,
+    "claims_per_beat": 1.55,
+    "claims_with_lint_violation": 6,
     "lint_violations": {
-      "Ashford Vale win it 7 m from goal and Bellamy-Cruz shoots 4 seconds later, a blocked 0.30 xG chance.": [
+      "Ashford Vale win the ball 7 m out and Bellamy-Cruz shoots 4 seconds later, a 0.30 xG chance that is blocked.": [
         "many-numbers"
       ],
-      "Ashford Vale win the ball 15 metres out and Bellamy-Cruz shoots 2 s later, a 0.14 xG chance that flies wide.": [
+      "Ashford Vale shoot after a 2 s break in play, Bellamy-Cruz's attempt is wide from about 15 metres, a 0.14 xG chance.": [
         "many-numbers"
       ],
-      "Rivermouth win the ball 32 metres out and Marchetti-Roe fires after a 7 s move, the shot cannoning back off the post, a 0.06 xG chance.": [
+      "Rivermouth's move starts 73 metres out, builds through four passes and Pryce finishes after 16 seconds for a 0.10 xG goal.": [
         "many-numbers"
       ],
-      "Pryce scores for Rivermouth, a tidy finish after a 6-second move that included 3 passes and registers as a 0.14 xG chance.": [
+      "Rivermouth win the ball 32 metres out and Marchetti-Roe fires after a 7-second, one-pass move that clips the post, a 0.06 xG chance.": [
         "many-numbers"
       ],
-      "Ashford Vale win the ball 6 m out and Bellamy-Cruz fires a blocked 0.30 xG shot after 3 s.": [
+      "Rivermouth's Pryce finishes a 6-second move to score, a tidy 0.14 xG strike in the 86′.": [
+        "many-numbers"
+      ],
+      "Ashford Vale win it 6 m from goal and shoot 3 s later, a 0.30 xG effort that is blocked.": [
         "many-numbers"
       ]
     },
-    "numbers_per_claim": 1.83,
+    "numbers_per_claim": 2.12,
     "machine_tokens_in_published_text": 0,
-    "beat_latency_p50_ms": 3877,
-    "beat_latency_p90_ms": 7228
+    "beat_latency_p50_ms": 4326,
+    "beat_latency_p90_ms": 7566
   },
   "targets": {
     "machine_tokens": 0,
@@ -42,14 +44,14 @@
     "beat_latency_p90_ms": 8000
   },
   "tokens": {
-    "narrator": 31140,
-    "judge": 26009
+    "narrator": 28419,
+    "judge": 34044
   },
   "chains": [
     {
       "beat_id": "bt-000222-high_turnover_chance",
       "verdict": "verified",
-      "text": "Ashford Vale win it 7 m from goal and Bellamy-Cruz shoots 4 seconds later, a blocked 0.30 xG chance.",
+      "text": "Ashford Vale win the ball 7 m out and Bellamy-Cruz shoots 4 seconds later, a 0.30 xG chance that is blocked.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
@@ -64,12 +66,12 @@
     {
       "beat_id": "bt-000556-high_turnover_chance",
       "verdict": "verified",
-      "text": "Ashford Vale win the ball 15 metres out and Bellamy-Cruz shoots 2 s later, a 0.14 xG chance that flies wide.",
+      "text": "Ashford Vale shoot after a 2 s break in play, Bellamy-Cruz's attempt is wide from about 15 metres, a 0.14 xG chance.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
-        "fx-sequence-ev-000556-ball_won_distance",
         "fx-sequence-ev-000556-seconds",
+        "fx-sequence-ev-000556-ball_won_distance",
         "fx-shot-ev-000556-xg",
         "fx-shot-ev-000556-outcome",
         "fx-shot-ev-000556-shooter"
@@ -78,41 +80,28 @@
     },
     {
       "beat_id": "bt-000993-territorial_spell",
-      "verdict": "blocked",
-      "text": "Rivermouth press and spend most of the spell forward, with 61 per cent possession and 73 touches in the opposition half.",
-      "draft_text": "Rivermouth flood Ashford's half and keep the ball there, with 61 per cent possession and 73 touches in the opponent half.",
-      "reason": "Judge (overclaim): The verb 'press' implies a style/behavior (pressing) not stated in the facts, which only give possession and touches in the opposition half.",
-      "fact_ids": [
-        "fx-possession_share-home-last-11m-to-t3103-99",
-        "fx-touches_in_opponent_half-home-last-11m-to-t3103-99"
-      ],
-      "first_check_reasons": [
-        "Judge (overclaim): 'flood Ashford's half and keep the ball there' overstates facts — possession percentage and touches in opponent half don't prove they 'keep the ball there' or 'flood' the half."
-      ]
-    },
-    {
-      "beat_id": "bt-000993-territorial_spell",
       "verdict": "rephrased",
-      "text": "That spell produces four Rivermouth shots and two high turnovers won high up the pitch.",
-      "draft_text": "That territorial pressure yields four shots and two high turnovers won high up the pitch.",
-      "reason": "Judge (unsupported_cause): The sentence attributes the shots and turnovers to 'territorial pressure' which is a causal claim not stated in the cited facts.",
+      "text": "Rivermouth press at 75% and have 61% possession in this spell, producing four shots.",
+      "draft_text": "Rivermouth press at 75% and dominate territory, with 61% possession and four shots in this spell.",
+      "reason": "Judge (overclaim): 'dominate territory' is a claim about control/territorial dominance not stated by the cited stats.",
       "fact_ids": [
-        "fx-shots-home-last-11m-to-t3103-99",
-        "fx-high_turnovers-home-last-11m-to-t3103-99"
+        "fx-press_rate-home-last-11m-to-t3103-99",
+        "fx-possession_share-home-last-11m-to-t3103-99",
+        "fx-shots-home-last-11m-to-t3103-99"
       ],
       "first_check_reasons": [
-        "Judge (unsupported_cause): The sentence attributes the shots and turnovers to 'territorial pressure' which is a causal claim not stated in the cited facts."
+        "Judge (overclaim): 'dominate territory' is a claim about control/territorial dominance not stated by the cited stats."
       ]
     },
     {
       "beat_id": "bt-000993-territorial_spell",
       "verdict": "verified",
-      "text": "Ashford are pinned back: 39 per cent possession, one shot and 29 touches in Rivermouth's half.",
+      "text": "Ashford manage just one shot and 39% possession while touching the opposition half 29 times.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
-        "fx-possession_share-away-last-11m-to-t3103-99",
         "fx-shots-away-last-11m-to-t3103-99",
+        "fx-possession_share-away-last-11m-to-t3103-99",
         "fx-touches_in_opponent_half-away-last-11m-to-t3103-99"
       ],
       "first_check_reasons": []
@@ -120,10 +109,11 @@
     {
       "beat_id": "bt-001484-card",
       "verdict": "verified",
-      "text": "Ashford see a player shown a second yellow and sent off (63′).",
+      "text": "Okafor-Lind is shown a second yellow and is sent off for Ashford Vale in the 63′.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
+        "fx-card-ev-001484-player",
         "fx-card-ev-001484-kind",
         "fx-card-ev-001484-minute"
       ],
@@ -132,7 +122,7 @@
     {
       "beat_id": "bt-001484-card",
       "verdict": "verified",
-      "text": "They are down to 10.",
+      "text": "Ashford Vale are down to 10 after the red.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
@@ -143,22 +133,23 @@
     {
       "beat_id": "bt-001484-card",
       "verdict": "verified",
-      "text": "At the ball there are three defenders around it, none of them between the ball and the goal.",
+      "text": "At the moment of the card there are three defenders around the ball and no attackers ahead of it.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
         "fx-freeze_frame-ev-001484-zone_defenders",
-        "fx-freeze_frame-ev-001484-defenders_between_ball_and_goal"
+        "fx-freeze_frame-ev-001484-attackers_ahead_of_ball"
       ],
       "first_check_reasons": []
     },
     {
       "beat_id": "bt-001670-open_play_goal",
       "verdict": "verified",
-      "text": "Rivermouth move it through four passes and Pryce finishes the 16 s move with a goal, a 0.10 xG strike.",
+      "text": "Rivermouth's move starts 73 metres out, builds through four passes and Pryce finishes after 16 seconds for a 0.10 xG goal.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
+        "fx-sequence-ev-001670-ball_won_distance",
         "fx-sequence-ev-001670-passes",
         "fx-sequence-ev-001670-seconds",
         "fx-shot-ev-001670-xg",
@@ -170,7 +161,7 @@
     {
       "beat_id": "bt-001796-high_turnover_chance",
       "verdict": "verified",
-      "text": "Rivermouth win the ball 32 metres out and Marchetti-Roe fires after a 7 s move, the shot cannoning back off the post, a 0.06 xG chance.",
+      "text": "Rivermouth win the ball 32 metres out and Marchetti-Roe fires after a 7-second, one-pass move that clips the post, a 0.06 xG chance.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
@@ -178,6 +169,7 @@
         "fx-sequence-ev-001796-seconds",
         "fx-shot-ev-001796-outcome",
         "fx-shot-ev-001796-xg",
+        "fx-sequence-ev-001796-passes",
         "fx-shot-ev-001796-shooter"
       ],
       "first_check_reasons": []
@@ -185,104 +177,107 @@
     {
       "beat_id": "bt-001484-momentum_swing",
       "verdict": "verified",
-      "text": "Ashford Vale have the ball more since the red card, holding 54 per cent possession and tightening into a 730 square metre shape.",
+      "text": "Ashford Vale drop their back line to 25 metres after the red card, 9 m deeper than before.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
-        "fx-possession_share-away-since-ev-001484-to-t4671-00",
-        "fx-compactness-away-since-ev-001484-to-t4671-00"
+        "fx-back_line_height-away-since-ev-001484-to-t4671-00",
+        "fx-back_line_change-away-ev-001484-to-t4671-00"
       ],
       "first_check_reasons": []
     },
     {
       "beat_id": "bt-001484-momentum_swing",
-      "verdict": "blocked",
-      "text": "Ashford Vale have pulled their back line 9 metres deeper since the red card, compressing the space behind for Rivermouth.",
-      "draft_text": "Their back line has dropped 9 metres deeper after the sending-off, shrinking the space Rivermouth can exploit.",
-      "reason": "Judge (unsupported_cause): The sentence says this compresses space behind for Rivermouth (a causal effect) which the fact does not state.",
-      "fact_ids": [
-        "fx-back_line_change-away-ev-001484-to-t4671-00"
-      ],
-      "first_check_reasons": [
-        "Judge (wrong_entity): The fact says Ashford Vale’s back line dropped; sentence says ‘their’ but then refers to Rivermouth as affected—this names the wrong team as the one whose back line dropped."
-      ]
-    },
-    {
-      "beat_id": "bt-001997-open_play_goal",
       "verdict": "verified",
-      "text": "Pryce scores for Rivermouth, a tidy finish after a 6-second move that included 3 passes and registers as a 0.14 xG chance.",
+      "text": "Their shape tightens to 730 square metres, a 204 m² shrinkage since the red card.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
-        "fx-shot-ev-001997-shooter",
-        "fx-shot-ev-001997-outcome",
-        "fx-sequence-ev-001997-seconds",
-        "fx-sequence-ev-001997-passes",
-        "fx-shot-ev-001997-xg"
+        "fx-compactness-away-since-ev-001484-to-t4671-00",
+        "fx-compactness_change-away-ev-001484-to-t4671-00"
       ],
       "first_check_reasons": []
     },
     {
-      "beat_id": "bt-001670-momentum_swing",
+      "beat_id": "bt-001997-open_play_goal",
       "verdict": "verified",
-      "text": "Rivermouth push their share of possession to 57% after the goal, tightening their back line to 30 metres.",
+      "text": "Rivermouth's Pryce finishes a 6-second move to score, a tidy 0.14 xG strike in the 86′.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
-        "fx-possession_share-home-since-ev-001670-to-t5128-00",
-        "fx-back_line_height-home-since-ev-001670-to-t5128-00"
+        "fx-sequence-ev-001997-seconds",
+        "fx-shot-ev-001997-xg",
+        "fx-shot-ev-001997-minute",
+        "fx-shot-ev-001997-shooter",
+        "fx-shot-ev-001997-outcome"
       ],
       "first_check_reasons": []
     },
     {
       "beat_id": "bt-001670-momentum_swing",
       "verdict": "rephrased",
-      "text": "Ashford Vale push 53% of their play into the opposition half and tighten to 740 square metres since Rivermouth's goal.",
-      "draft_text": "Ashford Vale sit higher but far tighter, their compactness shrinking to 740 square metres since Rivermouth scored.",
-      "reason": "Judge (overclaim): 'sit higher' claims a positional/territorial advantage beyond the provided 53% share in opposition half, which is not strictly 'sit higher' as an adjective for position.",
+      "text": "Rivermouth's share in the opposition half falls to 46 per cent, down from 57 per cent before the goal.",
+      "draft_text": "Rivermouth push their play into the final third less since the goal, their share in the opposition half dropping to 46 per cent from 57.",
+      "reason": "Judge (motive): Says Rivermouth 'push their play' (implying intent) which is a motive not supported by the facts.",
+      "fact_ids": [
+        "fx-territory-home-since-ev-001670-to-t5128-00",
+        "fx-territory-home-before-ev-001670"
+      ],
+      "first_check_reasons": [
+        "Judge (motive): Says Rivermouth 'push their play' (implying intent) which is a motive not supported by the facts."
+      ]
+    },
+    {
+      "beat_id": "bt-001670-momentum_swing",
+      "verdict": "rephrased",
+      "text": "Ashford Vale move to 53 per cent in the opposition half and tighten their shape to 740 square metres.",
+      "draft_text": "Ashford Vale regain territory and compress their shape after the goal, moving to 53 per cent in the opposition half and tightening to 740 square metres.",
+      "reason": "Judge (unsupported_cause): Saying they regain territory and compress their shape 'after the goal' implies the goal caused the change, which the facts do not state.",
       "fact_ids": [
         "fx-territory-away-since-ev-001670-to-t5128-00",
         "fx-compactness-away-since-ev-001670-to-t5128-00"
       ],
       "first_check_reasons": [
-        "Judge (overclaim): 'sit higher' claims a positional/territorial advantage beyond the provided 53% share in opposition half, which is not strictly 'sit higher' as an adjective for position."
+        "Judge (unsupported_cause): Saying they regain territory and compress their shape 'after the goal' implies the goal caused the change, which the facts do not state."
       ]
     },
     {
       "beat_id": "bt-002282-high_turnover_chance",
-      "verdict": "verified",
-      "text": "Ashford Vale win the ball 6 m out and Bellamy-Cruz fires a blocked 0.30 xG shot after 3 s.",
-      "draft_text": null,
-      "reason": null,
+      "verdict": "rephrased",
+      "text": "Ashford Vale win it 6 m from goal and shoot 3 s later, a 0.30 xG effort that is blocked.",
+      "draft_text": "Ashford Vale win it 6 m from goal and Bellamy-Cruz shoots 3 s later, a 0.30 xG effort that is blocked.",
+      "reason": "The player \"Bellamy-Cruz\" is not named by any cited fact.",
       "fact_ids": [
         "fx-sequence-ev-002282-ball_won_distance",
-        "fx-shot-ev-002282-shooter",
-        "fx-shot-ev-002282-xg",
         "fx-sequence-ev-002282-seconds",
+        "fx-shot-ev-002282-xg",
         "fx-shot-ev-002282-outcome"
       ],
-      "first_check_reasons": []
+      "first_check_reasons": [
+        "The player \"Bellamy-Cruz\" is not named by any cited fact."
+      ]
     },
     {
       "beat_id": "bt-001997-momentum_swing",
       "verdict": "verified",
-      "text": "Ashford push their back line 4 metres higher after Rivermouth's goal, while their shape spreads by 82 square metres.",
+      "text": "Ashford Vale's back line sits 29 metres from goal since Rivermouth's strike, 4 metres higher than before.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
-        "fx-back_line_change-away-ev-001997-to-t5884-30",
-        "fx-compactness_change-away-ev-001997-to-t5884-30"
+        "fx-back_line_height-away-since-ev-001997-to-t5884-30",
+        "fx-back_line_change-away-ev-001997-to-t5884-30"
       ],
       "first_check_reasons": []
     },
     {
       "beat_id": "bt-001997-momentum_swing",
       "verdict": "verified",
-      "text": "Rivermouth keep a slightly tighter shape, their compactness improving by 1 square metre since the goal.",
+      "text": "Their shape has spread to 803 square metres since the goal, 82 square metres larger than before.",
       "draft_text": null,
       "reason": null,
       "fact_ids": [
-        "fx-compactness_change-home-ev-001997-to-t5884-30"
+        "fx-compactness-away-since-ev-001997-to-t5884-30",
+        "fx-compactness_change-away-ev-001997-to-t5884-30"
       ],
       "first_check_reasons": []
     }

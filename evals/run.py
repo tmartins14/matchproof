@@ -27,7 +27,14 @@ from intel.labels import LabelContext, labels_for
 from mcp_match import InMemoryMatchStore
 
 from .golden import build_store
-from .pick import RULE_TEXT, Score, pick_judge, set_active_judge
+from .pick import (
+    BAD_TOTAL,
+    GOOD_TOTAL,
+    RULE_TEXT,
+    Score,
+    pick_judge,
+    set_active_judge,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 CLAIMS_PATH = ROOT / "evals" / "adversarial" / "claims.yaml"
@@ -186,7 +193,7 @@ def write_report(report: Report) -> Path:
 
 def bakeoff_table(reports: list[Report]) -> str:
     head = (
-        "| Judge | Bad caught (of 30) | by code | by judge | Good wrongly blocked (of 10) | "
+        f"| Judge | Bad caught (of {BAD_TOTAL}) | by code | by judge | Good wrongly blocked (of {GOOD_TOTAL}) | "
         "Judge unavailable | p50 | p90 | Tokens per claim |\n"
         "| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n"
     )
@@ -242,10 +249,11 @@ def main() -> None:
         write_report(reports[-1])
     scores = [Score(r.deployment, r.caught, r.good_blocked, r.p90_ms) for r in reports]
     pick = pick_judge(scores)
-    if pick.fallback:
-        print(pick.deployment, flush=True)
-        reports.append(run_judge(pick.deployment, claims, stores))
-        write_report(reports[-1])
+    # The fallback is always measured too, so the table shows what the pick is up against.
+    fallback = models["judge_fallback"]["deployment"]
+    print(fallback, flush=True)
+    reports.append(run_judge(fallback, claims, stores))
+    write_report(reports[-1])
     set_active_judge(MODELS_PATH, pick.deployment)
     print(write_bakeoff(reports, pick.deployment, pick.reason, pick.fallback))
     print(bakeoff_table(reports))

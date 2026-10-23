@@ -117,7 +117,10 @@ def test_red_card_follow_up_bundle_has_every_cited_fact() -> None:
                 s, "get_beat_bundle", match_id=match_id, beat_id=beat["id"]
             )
             assert bundle["beat"] == beat
-            assert [f["id"] for f in bundle["facts"]] == beat["fact_ids"]
+            # The bundle holds the beat's facts, minus changes under the beat's own thresholds.
+            ids = [f["id"] for f in bundle["facts"]]
+            assert ids == [i for i in beat["fact_ids"] if i in ids]
+            assert 0 < len(ids) < len(beat["fact_ids"])
             for f in bundle["facts"]:
                 label = f.pop(
                     "label"
@@ -358,3 +361,29 @@ def test_public_server_hides_beats_past_the_playback_position() -> None:
             assert len(done) == len(store.beats(match_id))
 
     run(scenario())
+
+
+def test_follow_up_bundles_keep_only_changes_that_meet_the_beat_threshold() -> None:
+    store, match_id = finished()
+
+    async def bundle(beat_id: str) -> list[dict[str, Any]]:
+        async with client_for(store, False) as s:
+            out = await call(s, "get_beat_bundle", match_id=match_id, beat_id=beat_id)
+            return list(out["facts"])
+
+    red = {f["name"]: f for f in run(bundle("bt-001484-momentum_swing"))}
+    # Ashford Vale (ten men) dropped 9 m: kept, with the before and since pair it comes from.
+    assert red["back_line_change(away, ev-001484, to t4671.00)"]["value"] == 9.0
+    assert "back_line_height(away, before ev-001484)" in red
+    assert "back_line_height(away, since ev-001484 to t4671.00)" in red
+    # Rivermouth's 2 m back line change is under the 4 m threshold: left out.
+    assert "back_line_change(home, ev-001484, to t4671.00)" not in red
+    assert "compactness_change(home, ev-001484, to t4671.00)" not in red
+
+    late = run(bundle("bt-001997-momentum_swing"))
+    small = [
+        f
+        for f in late
+        if f["name"].startswith("compactness_change(") and f["value"] < 5
+    ]
+    assert small == []

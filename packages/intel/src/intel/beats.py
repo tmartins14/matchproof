@@ -539,6 +539,56 @@ def _swing(made: Sequence[Fact]) -> _Swing:
     return _Swing(ratio, keep)
 
 
+def swing_fact_ids(facts: Sequence[Fact]) -> set[str]:
+    """Ids of the facts in a momentum-swing beat that meet the beat's own thresholds, with the
+    before and since pair each change is measured from. A side's change that stays under its
+    threshold (a back line 2 m deeper, a shape 1 m\u00b2 tighter) is left out."""
+    named: dict[tuple[str, str, str], Fact] = {}
+    for f in facts:
+        m = FACT_NAME.match(f.name)
+        if m is None or not isinstance(f.value, int | float):
+            continue
+        rest = m["rest"]
+        phase = (
+            "before"
+            if rest.startswith("before ")
+            else "since"
+            if rest.startswith("since ")
+            else "change"
+        )
+        named[(m["metric"], m["side"], phase)] = f
+    keep: set[str] = set()
+
+    def add(*parts: Fact | None) -> None:
+        keep.update(p.id.root for p in parts if p is not None)
+
+    for side in SIDES:
+        before, since = (
+            named.get(("back_line_height", side, p)) for p in ("before", "since")
+        )
+        change = named.get(("back_line_change", side, "change"))
+        if change is not None and float(change.value) >= SWING_BACK_LINE_M:
+            add(change, before, since)
+        before, since = (
+            named.get(("compactness", side, p)) for p in ("before", "since")
+        )
+        change = named.get(("compactness_change", side, "change"))
+        if before is not None and since is not None and float(before.value) > 0:
+            moved = abs(float(since.value) - float(before.value)) / float(before.value)
+            if moved >= SWING_COMPACTNESS:
+                add(change, before, since)
+        for metric, points in (
+            ("possession_share", SWING_POSSESSION_PTS),
+            ("territory", SWING_TERRITORY_PTS),
+        ):
+            before, since = (named.get((metric, side, p)) for p in ("before", "since"))
+            if before is not None and since is not None:
+                moved = abs(float(since.value) - float(before.value)) * 100.0
+                if moved >= points:
+                    add(before, since)
+    return keep
+
+
 def merge_stream(
     events: Iterable[Event],
     frames: Iterable[PositionFrame],

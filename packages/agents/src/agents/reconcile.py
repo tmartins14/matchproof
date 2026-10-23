@@ -8,9 +8,19 @@ import re
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
 from decimal import Decimal
+from functools import lru_cache
+from pathlib import Path
 
+import yaml
 from contracts.models import Fact
 from intel.voice_lint import numbers_in
+
+COMPARATIVES_PATH = Path(__file__).resolve().parents[4] / "voice" / "comparatives.yaml"
+COMPARISON_FACTS = (
+    "change",
+    "before",
+)  # a fact whose name has one of these holds a comparison
+SCORE_FACTS = ("score_after(", "lead(")
 
 _PART_RE = re.compile(r"(\d+(?:[.,]\d+)*)\s*(%|′|'|per cent|[^\W\d_]+)?", re.IGNORECASE)
 _UNIT_ALIASES = {
@@ -88,6 +98,34 @@ def _matches(token_at: str, token: Reading, rendering: str) -> bool:
     return any(_compatible(token, shown) for shown in readings(rendering))
 
 
+@lru_cache(maxsize=1)
+def comparatives() -> tuple[re.Pattern[str], ...]:
+    """One whole-word pattern per comparison word or phrase in voice/comparatives.yaml."""
+    words: list[str] = yaml.safe_load(COMPARATIVES_PATH.read_text(encoding="utf-8"))
+    return tuple(
+        re.compile(
+            rf"(?<![\w-]){re.escape(w).replace(r'\ ', r'\s+')}(?![\w-])", re.IGNORECASE
+        )
+        for w in words
+    )
+
+
+def comparison_words(text: str) -> list[str]:
+    """The comparison words in `text`, as written, once each in order of appearance."""
+    found = sorted(
+        (m.start(), m.group(0).lower())
+        for pattern in comparatives()
+        for m in pattern.finditer(text)
+    )
+    return list(dict.fromkeys(word for _, word in found))
+
+
+def holds_comparison(fact: Fact) -> bool:
+    return fact.name.startswith(SCORE_FACTS) or any(
+        word in fact.name for word in COMPARISON_FACTS
+    )
+
+
 def reconcile(
     text: str,
     fact_ids: list[str],
@@ -125,6 +163,10 @@ def reconcile(
             )
         else:
             matched.append(NumberMatch(token, found.id.root))
+    words = comparison_words(text)
+    if words and not any(holds_comparison(f) for f in cited):
+        for word in words[:3]:
+            reasons.append(f"'{word}' compares, but no before or change fact is cited.")
     named = {f.value for f in cited if isinstance(f.value, str)}
     for name in sorted(names):
         if (

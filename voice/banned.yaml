@@ -202,7 +202,7 @@
   why: "More than three numbers in one claim reads like a stat sheet."
 
 - id: evaluative-adjective
-  pattern: '\b(?:brilliant|tidy|superb|clinical|stunning|sublime|wonderful)\b'
+  pattern: '\b(?:brilliant|tidy|superb|clinical|stunning|sublime|wonderful|composed|assured|emphatic|confident|classy)\b'
   severity: error
   applies_to: [narration]
   why: "A judgement the data cannot support; say what happened."

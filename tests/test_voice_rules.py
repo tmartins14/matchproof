@@ -26,6 +26,8 @@ BAD = [
         "evaluative-adjective",
         "error",
     ),
+    ("Pryce scores, a composed finish.", "evaluative-adjective", "error"),
+    ("An assured, emphatic, confident, classy goal.", "evaluative-adjective", "error"),
     ("Ashford Vale are shielding their goal.", "shielding", "error"),
     ("The move has 0 passes.", "zero-count", "warn"),
     ("A 4 second move, 7 m out, worth 0.30 xG at 9′.", "many-numbers", "warn"),

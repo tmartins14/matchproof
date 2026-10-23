@@ -29,6 +29,9 @@ Where the numbers come from:
   fact's "write as" gives it.
 - Do not state how long a spell lasted, and do not read a direction into a change that a label or
   a fact does not give.
+- A comparison word ("tighter", "deeper", "more", "level", "edge in front", "take the lead") needs a
+  fact that holds the comparison among the ones you cite: a "before" or change fact, or the score or
+  who leads. If you cite none, say the value plainly without comparing.
 - Cite the ids of the facts you used in `fact_ids`, copied exactly.
 
 Never write: an internal id for a player or an event, words joined by underscores, "freeze frame",

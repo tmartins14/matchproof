@@ -2,6 +2,7 @@ import asyncio
 import gc
 import hashlib
 import os
+import secrets
 from collections import Counter, OrderedDict
 from collections.abc import AsyncGenerator, AsyncIterator, Callable
 from contextlib import asynccontextmanager
@@ -9,8 +10,9 @@ from functools import lru_cache
 from importlib.metadata import version
 from typing import Annotated, Any
 
-from agents.budget import budget
-from agents.llm_client import LlmClient, LlmError, client_for, from_env
+from agents.budget import MeteredClient, budget
+from agents.composer import compose
+from agents.llm_client import ChatClient, LlmClient, LlmError, client_for, from_env
 from contracts.models import Fact, MatchBrief, StreamMessage
 from fastapi import Body, FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
@@ -22,7 +24,14 @@ from mcp.shared.memory import create_connected_server_and_client_session
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from pydantic import ValidationError
 from sim import generate
-from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, STORYLINES, make_brief
+from sim.brief import (
+    DEFAULT_AWAY,
+    DEFAULT_HOME,
+    STORYLINES,
+    make_brief,
+    random_brief,
+    validate_planted,
+)
 from sim.positions import iter_frames, iter_freeze_frames
 from starlette.background import BackgroundTask
 from starlette.routing import Route
@@ -39,7 +48,7 @@ from api.live import (
     run_live,
     teams_of,
 )
-from api.matchdata import PublicMcp, get_internal_server, store
+from api.matchdata import PublicMcp, RateLimiter, get_internal_server, store
 from api.telemetry import configure_telemetry
 
 MODEL_CHECK_PROMPT = "Reply with the single word: ready"
@@ -49,6 +58,8 @@ RETRY_AFTER_S = (
 )
 MAX_STREAMS_PER_CLIENT = 2  # concurrent streams one client address may hold open
 MAX_BRIEFS = 200  # briefs kept in memory; the oldest goes first
+COMPOSE_RPM_PER_CLIENT = 6  # /compose calls per minute per client address
+MAX_COMPOSE_CHARS = 600
 MAX_CACHED_REGISTRIES = 4  # full fact registries kept for fact lookups
 HEARTBEAT_LINE = (
     ": keep-alive\n\n"  # an SSE comment: ignored by the browser, keeps proxies open
@@ -186,7 +197,80 @@ def create_match(body: Annotated[dict[str, Any], Body()]) -> dict[str, str]:
         raise HTTPException(
             status_code=422, detail=exc.errors(include_url=False, include_context=False)
         ) from exc
+    problems = validate_planted(
+        [
+            (b.kind.value, b.side.value, b.minute_from, b.minute_to)
+            for b in brief.planted_beats
+        ]
+    )
+    if problems:
+        raise HTTPException(status_code=422, detail=problems)
     return {"match_id": store_brief(brief)}
+
+
+@app.post("/matches/random")
+def create_random_match(
+    body: Annotated[dict[str, Any] | None, Body()] = None,
+) -> dict[str, Any]:
+    """A random brief (formations, dials, a preset or custom moments). {seed} makes it repeatable."""
+    seed = (body or {}).get("seed", secrets.randbelow(1_000_000))
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0:
+        raise HTTPException(
+            status_code=422, detail="seed must be a non-negative integer"
+        )
+    brief = random_brief(seed)
+    brief = brief.model_copy(update={"match_id": store_brief(brief)})
+    return {
+        "match_id": brief.match_id,
+        "brief": brief.model_dump(mode="json", exclude_none=True),
+    }
+
+
+_compose_limiter = RateLimiter(COMPOSE_RPM_PER_CLIENT)
+make_composer_client: Callable[[], ChatClient] = lambda: MeteredClient(
+    client_for("composer"), "composer"
+)  # tests swap this for a fake
+
+
+@app.post("/compose")
+def compose_brief(
+    request: Request, body: Annotated[dict[str, Any], Body()]
+) -> JSONResponse:
+    """Free text to a validated brief: {brief, brief_text, warnings}. The caller posts the brief to
+    /matches to play it."""
+    text, seed = body.get("text"), body.get("seed", 0)
+    if not isinstance(text, str) or not text.strip():
+        raise HTTPException(status_code=422, detail="text must be a non-empty string")
+    if len(text) > MAX_COMPOSE_CHARS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"text must be at most {MAX_COMPOSE_CHARS} characters",
+        )
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0:
+        raise HTTPException(
+            status_code=422, detail="seed must be a non-negative integer"
+        )
+    client = request.client.host if request.client else "unknown"
+    wait = _compose_limiter.retry_after(client)
+    if wait is not None:
+        raise HTTPException(
+            status_code=429,
+            detail=f"rate limit: {COMPOSE_RPM_PER_CLIENT} compose requests per minute",
+            headers={"Retry-After": str(wait)},
+        )
+    try:
+        composed = compose(make_composer_client(), text, seed)
+    except LlmError as exc:
+        raise HTTPException(
+            status_code=503, detail=f"composer unavailable: {exc.cause_name}"
+        ) from exc
+    return JSONResponse(
+        {
+            "brief": composed.brief.model_dump(mode="json", exclude_none=True),
+            "brief_text": composed.brief_text,
+            "warnings": composed.warnings,
+        }
+    )
 
 
 @lru_cache(maxsize=MAX_CACHED_REGISTRIES)

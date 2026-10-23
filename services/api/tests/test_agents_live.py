@@ -18,6 +18,7 @@ from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, make_brief
 configure_telemetry()
 FINAL = {"verified", "rephrased", "blocked", "delayed"}
 SPEED = 6
+SHORT_MATCH_S = 12 * 60  # the live-agent tests play the first 12 match minutes, not 95
 SCALE = (
     1 / 100
 )  # real seconds per scheduled second: focus windows and holds still take a moment
@@ -37,6 +38,20 @@ class ScaledPacer:
         await asyncio.sleep(max(wait, 0.0))
 
 
+class QuiescentPacer(ScaledPacer):
+    """Playback does not pass a message's turn until the agents have no pending work: every claim
+    is settled before its beat airs, whatever the machine's speed."""
+
+    def __init__(self, run: MatchRun | DownRun) -> None:
+        super().__init__()
+        self._run = run
+
+    async def sleep_until(self, real_t: float) -> None:
+        await super().sleep_until(real_t)
+        if isinstance(self._run, MatchRun):
+            await self._run.quiesce()
+
+
 def brief() -> MatchBrief:
     return make_brief(DEFAULT_HOME, DEFAULT_AWAY, "red_card_flip", 3)
 
@@ -47,12 +62,21 @@ def dump(msg: StreamMessage) -> dict[str, Any]:
 
 
 async def play(
-    run: MatchRun | DownRun, store: Any, pacer: Any = None
+    run: MatchRun | DownRun,
+    store: Any,
+    pacer: Any = None,
+    until_s: float | None = SHORT_MATCH_S,
 ) -> list[dict[str, Any]]:
+    """The (short) match. The default pacer waits for the agents; pass a plain one to race them."""
     return [
         dump(m)
         async for m in run_live(
-            brief(), SPEED, pacer=pacer or ScaledPacer(), store=store, agents=run
+            brief(),
+            SPEED,
+            pacer=pacer or QuiescentPacer(run),
+            store=store,
+            agents=run,
+            until_s=until_s,
         )
     ]
 
@@ -120,7 +144,8 @@ def test_a_slow_judge_gives_checking_then_verdict() -> None:
             rt,
             store,
         ):
-            messages = await play(rt.match(brief()), store)
+            run = rt.match(brief())
+            messages = await play(run, store, ScaledPacer())
             checking = [
                 m
                 for m in claims_of(messages, "claim")
@@ -301,7 +326,12 @@ def test_an_audit_of_a_claim_on_screen_is_sent_as_a_verdict_with_the_same_verdic
 
             async def watch() -> None:
                 async for m in run_live(
-                    brief(), SPEED, pacer=ScaledPacer(), store=store, agents=run
+                    brief(),
+                    SPEED,
+                    pacer=ScaledPacer(),
+                    store=store,
+                    agents=run,
+                    until_s=SHORT_MATCH_S,
                 ):
                     out.append(dump(m))
                     if len(out) == 400:
@@ -392,5 +422,22 @@ def test_session_server_raises_on_a_tool_error() -> None:
             assert isinstance(rt.server, SessionServer)
             with pytest.raises(ValueError, match="Unknown match"):
                 await rt.server.call_tool("get_brief", {"match_id": "m-nope"})
+
+    asyncio.run(scenario())
+
+
+@pytest.mark.slow
+def test_the_full_match_ends_with_every_claim_settled() -> None:
+    async def scenario() -> None:
+        async with agent_runtime() as (rt, store):
+            run = rt.match(brief())
+            messages = await play(run, store, until_s=None)
+            states = [m["data"]["state"] for m in messages if m["type"] == "status"]
+            assert states[-1] == "full_time"
+            final: dict[str, str] = {}
+            for m in claims_of(messages, "claim", "verdict"):
+                final[m["data"]["id"]] = m["data"]["verdict"]
+            assert final and set(final.values()) <= FINAL
+            assert any(m["type"] == "beat" and m["t"] > SHORT_MATCH_S for m in messages)
 
     asyncio.run(scenario())

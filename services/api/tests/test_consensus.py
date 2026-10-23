@@ -52,6 +52,22 @@ def stream_validator() -> Draft202012Validator:
     )
 
 
+class AuditPacer(ScaledPacer):
+    """Once the audits are released, playback waits for the audits and corrections in flight, so
+    they land while the stream is still going, whatever the machine's speed."""
+
+    def __init__(self, run: MatchRun, gate: threading.Event) -> None:
+        super().__init__()
+        self._run, self._gate = run, gate
+
+    async def sleep_until(self, real_t: float) -> None:
+        await super().sleep_until(real_t)
+        for _ in range(400):
+            if not self._gate.is_set() or not self._run.ledger.pending:
+                return
+            await asyncio.sleep(0.05)
+
+
 async def play_with_audits(
     run: MatchRun, store: Any, gate: threading.Event
 ) -> list[dict[str, Any]]:

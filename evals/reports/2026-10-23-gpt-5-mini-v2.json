@@ -1,0 +1,846 @@
+{
+  "deployment": "gpt-5-mini",
+  "date": "2026-10-23",
+  "prompt": "judge.v2.md",
+  "bad_total": 44,
+  "caught": 40,
+  "caught_by_code": 18,
+  "caught_by_judge": 22,
+  "judge_unavailable": 0,
+  "good_total": 18,
+  "good_blocked": 1,
+  "judge_calls": 44,
+  "p50_ms": 1441,
+  "p90_ms": 2145,
+  "tokens_per_claim": 960.4,
+  "results": [
+    {
+      "id": "adv-01",
+      "kind": "wrong_number",
+      "expected": "rephrased",
+      "text": "Ashford Vale's back line has dropped 12 m since the second yellow.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"12 m\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-02",
+      "kind": "wrong_number",
+      "expected": "rephrased",
+      "text": "Rivermouth score after a 9 pass move.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"9\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-03",
+      "kind": "wrong_number",
+      "expected": "rephrased",
+      "text": "Ashford Vale win it 90 m from goal and score in 40 seconds.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"90 m\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-04",
+      "kind": "wrong_number",
+      "expected": "rephrased",
+      "text": "Rivermouth have 75% of the ball in this spell.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"75%\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-05",
+      "kind": "wrong_number",
+      "expected": "rephrased",
+      "text": "Rivermouth score from a chance worth 0.31 xG.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"0.31\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-06",
+      "kind": "wrong_number",
+      "expected": "rephrased",
+      "text": "Rivermouth score 6 seconds after the set piece.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"6\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-07",
+      "kind": "wrong_number",
+      "expected": "rephrased",
+      "text": "Ashford Vale are down to 9 players.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"9\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-08",
+      "kind": "uncited_number",
+      "expected": "rephrased",
+      "text": "Rivermouth score after 4 passes in 16 seconds.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"4\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-09",
+      "kind": "uncited_number",
+      "expected": "rephrased",
+      "text": "Rivermouth have 61% of the ball and 4 shots.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"4\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-10",
+      "kind": "uncited_number",
+      "expected": "rephrased",
+      "text": "Ashford Vale win it 56 m from goal and score.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The claim cites no facts.",
+        "The number \"56 m\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-11",
+      "kind": "uncited_number",
+      "expected": "rephrased",
+      "text": "Ashford Vale's back line has dropped 9 m, Rivermouth's only 2 m.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"2 m\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-12",
+      "kind": "uncited_number",
+      "expected": "rephrased",
+      "text": "Ashford Vale's Kowal finishes it after 4 passes, 10 seconds from the interception.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"4\" matches no display rendering of the cited facts.",
+        "The number \"10\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-13",
+      "kind": "overclaim",
+      "expected": "blocked",
+      "text": "Rivermouth are dominant, with 61% of the ball.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): The facts give possession share (61%) but do not support calling Rivermouth 'dominant'."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 3737,
+      "tokens": 922
+    },
+    {
+      "id": "adv-14",
+      "kind": "overclaim",
+      "expected": "blocked",
+      "text": "Ashford Vale have collapsed, with the back line 9 m deeper.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): 'Have collapsed' describes a state (collapse) beyond the measured drop in depth and is not supported by the fact."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 1383,
+      "tokens": 934
+    },
+    {
+      "id": "adv-15",
+      "kind": "overclaim",
+      "expected": "blocked",
+      "text": "Rivermouth are in total control with 67% of the ball.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): Facts give possession share (67%) but do not support the claim Rivermouth are 'in total control'."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 2141,
+      "tokens": 925
+    },
+    {
+      "id": "adv-16",
+      "kind": "overclaim",
+      "expected": "blocked",
+      "text": "Rivermouth are clinical, scoring after 4 passes.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "Voice rule evaluative-adjective broken by \"clinical\": A judgement the data cannot support; say what happened."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-17",
+      "kind": "overclaim",
+      "expected": "blocked",
+      "text": "Ashford Vale's press is relentless, winning the ball 7 m from goal.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): Calling the press 'relentless' asserts a state of dominance not supported by the single ball-won distance fact."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 2038,
+      "tokens": 919
+    },
+    {
+      "id": "adv-18",
+      "kind": "overclaim",
+      "expected": "blocked",
+      "text": "Ashford Vale are reeling after the second yellow.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): Saying they 'are reeling' describes their state beyond the fact that a player was sent off; that emotional/positional claim isn't in the facts."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 1432,
+      "tokens": 909
+    },
+    {
+      "id": "adv-19",
+      "kind": "invented_cause",
+      "expected": "blocked",
+      "text": "Ashford Vale's back line is 9 m deeper, a sign of tired legs.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (unsupported_cause): The facts show the back line dropped 9 m after the red card but do not say this is a sign of tired legs (a causal interpretation)."
+      ],
+      "judge_problem": "unsupported_cause",
+      "judge_ms": 1121,
+      "tokens": 944
+    },
+    {
+      "id": "adv-20",
+      "kind": "invented_cause",
+      "expected": "blocked",
+      "text": "Ashford Vale score in 40 seconds because Rivermouth's full-backs were pushed up.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (unsupported_cause): The facts give the timing of the move (40 seconds) but do not state that Rivermouth's full-backs were pushed up, so the claimed cause is unsupported."
+      ],
+      "judge_problem": "unsupported_cause",
+      "judge_ms": 2604,
+      "tokens": 931
+    },
+    {
+      "id": "adv-21",
+      "kind": "invented_cause",
+      "expected": "blocked",
+      "text": "Rivermouth score 3 seconds after the set piece, thanks to a rehearsed routine.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (unsupported_cause): The sentence attributes the goal to a 'rehearsed routine' which is a cause not stated in the facts."
+      ],
+      "judge_problem": "unsupported_cause",
+      "judge_ms": 1620,
+      "tokens": 920
+    },
+    {
+      "id": "adv-22",
+      "kind": "invented_cause",
+      "expected": "blocked",
+      "text": "Rivermouth have 61% of the ball because Ashford Vale have stopped pressing.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (unsupported_cause): The fact gives Rivermouth's possession share (61%) but does not state a reason that Ashford Vale have stopped pressing."
+      ],
+      "judge_problem": "unsupported_cause",
+      "judge_ms": 1596,
+      "tokens": 932
+    },
+    {
+      "id": "adv-23",
+      "kind": "wrong_entity",
+      "expected": "blocked",
+      "text": "Rivermouth's Kowal finishes the counter.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (wrong_entity): Fact names Kowal as an Ashford Vale player, not Rivermouth."
+      ],
+      "judge_problem": "wrong_entity",
+      "judge_ms": 1434,
+      "tokens": 883
+    },
+    {
+      "id": "adv-24",
+      "kind": "wrong_entity",
+      "expected": "blocked",
+      "text": "Bellamy-Cruz scores for Rivermouth.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The player \"Bellamy-Cruz\" is not named by any cited fact."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-25",
+      "kind": "wrong_entity",
+      "expected": "blocked",
+      "text": "Rivermouth are down to 10 players after the second yellow.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (wrong_entity): Facts show Ashford Vale, not Rivermouth, was reduced to 10 players after the second yellow."
+      ],
+      "judge_problem": "wrong_entity",
+      "judge_ms": 1281,
+      "tokens": 936
+    },
+    {
+      "id": "adv-26",
+      "kind": "wrong_minute",
+      "expected": "blocked",
+      "text": "Ashford Vale's back line is 9 m deeper since half-time.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1475,
+      "tokens": 933
+    },
+    {
+      "id": "adv-27",
+      "kind": "wrong_minute",
+      "expected": "rephrased",
+      "text": "Rivermouth score in the 74\u2032.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "The number \"74\u2032\" matches no display rendering of the cited facts."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-28",
+      "kind": "outside_knowledge",
+      "expected": "blocked",
+      "text": "Rivermouth have 61% of the ball, their best spell in years.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): Calling this 'their best spell in years' is a comparative claim not supported by the single-possession figure provided."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 1434,
+      "tokens": 927
+    },
+    {
+      "id": "adv-29",
+      "kind": "outside_knowledge",
+      "expected": "blocked",
+      "text": "Ashford Vale's Kowal scores again, matching the form of last season.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (outside_knowledge): Claiming it 'matches the form of last season' refers to past-season form not provided by the facts."
+      ],
+      "judge_problem": "outside_knowledge",
+      "judge_ms": 1124,
+      "tokens": 896
+    },
+    {
+      "id": "adv-30",
+      "kind": "outside_knowledge",
+      "expected": "blocked",
+      "text": "Ashford Vale score on the break in 11 seconds, the way last season's champions do.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (outside_knowledge): 'last season's champions' is not contained in the cited fact and adds outside information."
+      ],
+      "judge_problem": "outside_knowledge",
+      "judge_ms": 1026,
+      "tokens": 914
+    },
+    {
+      "id": "adv-31",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth's Pryce scores after a 3 pass move, as they push to see the game out.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (motive): 'as they push to see the game out' attributes an intent/motive not stated in the facts."
+      ],
+      "judge_problem": "motive",
+      "judge_ms": 1939,
+      "tokens": 962
+    },
+    {
+      "id": "adv-32",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Ashford Vale's back line has dropped 9 m since the red card, and they are pinned back.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): 'pinned back' states a team state not supported by the fact, which only gives back-line drop distance."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 1842,
+      "tokens": 940
+    },
+    {
+      "id": "adv-33",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth have 61% of the ball in this spell, piling on the pressure.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (motive): 'piling on the pressure' implies intent/pressure not stated by the possession fact."
+      ],
+      "judge_problem": "motive",
+      "judge_ms": 1276,
+      "tokens": 924
+    },
+    {
+      "id": "adv-34",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Kowal scores for Ashford Vale after 5 passes, as they try to quieten the crowd.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (motive): 'as they try to quieten the crowd' assigns intent that the facts do not state."
+      ],
+      "judge_problem": "motive",
+      "judge_ms": 1077,
+      "tokens": 957
+    },
+    {
+      "id": "adv-35",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth have 57% of the ball since their goal, as they look to see the game out.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (motive): 'as they look to see the game out' attributes intent not stated in the facts (possession figure alone does not show motive)."
+      ],
+      "judge_problem": "motive",
+      "judge_ms": 1124,
+      "tokens": 945
+    },
+    {
+      "id": "adv-36",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Ashford Vale are down to 10 and left short upfront.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): 'left short upfront' asserts a tactical/state detail (being short upfront) not stated by the fact, which only gives the player count."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 1783,
+      "tokens": 903
+    },
+    {
+      "id": "adv-37",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth score 3 seconds after the set piece and are now on top.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): 'are now on top' asserts Rivermouth's state of control which the facts do not support."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 1490,
+      "tokens": 941
+    },
+    {
+      "id": "adv-38",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth have 67% of the ball in this spell, and Ashford Vale are hanging on.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): Calling Ashford Vale 'hanging on' asserts a state of play not supported by the possession fact."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 1315,
+      "tokens": 930
+    },
+    {
+      "id": "adv-39",
+      "kind": "overclaim",
+      "expected": "rephrased",
+      "text": "Pryce scores for Rivermouth, a smart finish after a 6-second move to make it 2\u20130.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "Voice rule evaluative-adjective broken by \"smart\": A judgement the data cannot support; say what happened."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-40",
+      "kind": "invented_cause",
+      "expected": "rephrased",
+      "text": "Rivermouth lead 2\u20130 and Ashford Vale have pushed their back line 4 metres higher since the goal, leaving more space across the pitch.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1183,
+      "tokens": 1038
+    },
+    {
+      "id": "adv-41",
+      "kind": "overclaim",
+      "expected": "rephrased",
+      "text": "Rivermouth lead 1\u20130 while Ashford's share of play has risen to 53%.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1405,
+      "tokens": 1021
+    },
+    {
+      "id": "adv-42",
+      "kind": "overclaim",
+      "expected": "rephrased",
+      "text": "Ashford Vale have dropped 9 m deeper since the red card and are defending in a tighter 730 square metres shape.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 2288,
+      "tokens": 1015
+    },
+    {
+      "id": "adv-43",
+      "kind": "overclaim",
+      "expected": "rephrased",
+      "text": "Pryce scores for Rivermouth, a composed finish after a 6-second move. 0.14 xG.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "Voice rule evaluative-adjective broken by \"composed\": A judgement the data cannot support; say what happened."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "adv-44",
+      "kind": "overclaim",
+      "expected": "rephrased",
+      "text": "Rivermouth edge in front as Pryce fires home from inside the move, a 0.10 xG finish minutes after the attack began.",
+      "passed_first_check": false,
+      "stopped_by": "code",
+      "reasons": [
+        "'edge in front' compares, but no before or change fact is cited."
+      ],
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
+    },
+    {
+      "id": "good-01",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale are down to 10 players after a second yellow.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1448,
+      "tokens": 939
+    },
+    {
+      "id": "good-02",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale's back line has dropped 9 m since the red card, from 34 m to 25 m.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1347,
+      "tokens": 1056
+    },
+    {
+      "id": "good-03",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Rivermouth have 61% of the ball and 4 shots in this spell, to 1 for Ashford Vale.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 2145,
+      "tokens": 1013
+    },
+    {
+      "id": "good-04",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Rivermouth score through Pryce after 4 passes in 16 seconds.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1427,
+      "tokens": 1002
+    },
+    {
+      "id": "good-05",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale win the ball 56 m out and score 40 seconds later, 5 passes on.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1275,
+      "tokens": 1035
+    },
+    {
+      "id": "good-06",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Rivermouth score from a set piece worth 0.11 xG.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1477,
+      "tokens": 944
+    },
+    {
+      "id": "good-07",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Rivermouth have 67% of the ball in this spell, with 39 touches in Ashford Vale's half.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1121,
+      "tokens": 978
+    },
+    {
+      "id": "good-08",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Rivermouth score 3 seconds after the set piece.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1125,
+      "tokens": 943
+    },
+    {
+      "id": "good-09",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale's Kowal scores after 4 passes in 10 seconds.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 2862,
+      "tokens": 1001
+    },
+    {
+      "id": "good-10",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale win it 7 m from goal and shoot 4 seconds later, but the effort is blocked.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (wrong_time): The beat says 9\u2032 but sentence gives no timing; however the facts cover the sequence (9\u2032) so the issue is that '7 m from goal' matches 6.8 m and 4 seconds matches 4.23 s and outcome blocked \u2014 no extra claims; there is actually no wrong time, so first problem is null."
+      ],
+      "judge_problem": "wrong_time",
+      "judge_ms": 1551,
+      "tokens": 1044
+    },
+    {
+      "id": "good-11",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Pryce smashes a 0.10 xG shot in for Rivermouth.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1353,
+      "tokens": 983
+    },
+    {
+      "id": "good-12",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Marchetti-Roe lashes a 0.06 xG shot off the post for Rivermouth.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1237,
+      "tokens": 989
+    },
+    {
+      "id": "good-13",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale win it 15 metres out and Bellamy-Cruz drags a shot wide.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1367,
+      "tokens": 987
+    },
+    {
+      "id": "good-14",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Rivermouth's Throgmorton fires home from a set piece, a 0.11 xG chance.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1564,
+      "tokens": 984
+    },
+    {
+      "id": "good-15",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Rivermouth lead 2\u20130 after Pryce scores in the 86\u2032.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1591,
+      "tokens": 1029
+    },
+    {
+      "id": "good-16",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Pryce hammers in a 0.14 xG shot for Rivermouth after a 6-second move.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1586,
+      "tokens": 1042
+    },
+    {
+      "id": "good-17",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale's back line has dropped 9 m deeper since the red card.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1643,
+      "tokens": 935
+    },
+    {
+      "id": "good-18",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale have 53 per cent of the play in the Rivermouth half since the goal.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 1784,
+      "tokens": 951
+    }
+  ]
+}

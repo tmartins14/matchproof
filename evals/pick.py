@@ -7,9 +7,9 @@ from typing import Any
 
 import yaml
 
-BAD_TOTAL = 38  # bad claims in evals/adversarial/claims.yaml
-GOOD_TOTAL = 14  # good claims in the same file
-MIN_CAUGHT = 35  # of BAD_TOTAL
+BAD_TOTAL = 44  # bad claims in evals/adversarial/claims.yaml
+GOOD_TOTAL = 18  # good claims in the same file
+MIN_CAUGHT = 41  # of BAD_TOTAL
 MAX_GOOD_BLOCKED = 1  # of GOOD_TOTAL
 MAX_P90_MS = 4000
 FALLBACK_DEPLOYMENT = "gpt-5-mini"

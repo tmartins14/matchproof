@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://matchproof.tylermartins.com/schemas/stream_message.schema.json",
   "title": "StreamMessage",
-  "description": "One message on the live SSE stream (ADR 0003). The data shape depends on type. claim and verdict carry a claim. A claim is sent when its beat airs, with its final verdict if the Checker has finished or `checking` if not; a verdict follows when it finishes, and again when the auditor has a result, with the same verdict plus `audit`. seq is the order of sending; a reconnect resumes by seq only on a stream with no agent messages.",
+  "description": "One message on the live SSE stream (ADR 0003). The data shape depends on type. claim and verdict carry a claim. A claim is sent when its beat airs, with its final verdict if the Checker has finished or `checking` if not; a verdict follows when it finishes, and again when the auditor has a result, with the same verdict plus `audit`. When the auditor disagrees and the inline judge, asked again, agrees, a last verdict follows with the new verdict and text and a `correction` carrying the previous text. seq is the order of sending; a reconnect resumes by seq only on a stream with no agent messages.",
   "type": "object",
   "additionalProperties": false,
   "required": ["seq", "type", "t", "data"],

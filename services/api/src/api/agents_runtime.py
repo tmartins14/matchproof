@@ -20,6 +20,7 @@ from typing import Any
 
 from agents.auditor import MAX_CONCURRENT_AUDITS, Auditor, summarize_audits
 from agents.budget import MeteredClient, budget, current_match
+from agents.consensus import Consensus
 from agents.llm_client import ChatClient
 from agents.pipeline import BeatRun, Deps, ToolServer
 from agents.producer import Decision, Producer
@@ -65,6 +66,12 @@ class BeatTrack:
 @dataclass
 class AuditLedger:
     audited: list[tuple[Claim, Audit, str]] = field(default_factory=list)
+    corrections: list[Claim] = field(
+        default_factory=list
+    )  # corrected or blocked, as now stored
+    unresolved: list[tuple[Claim, str]] = field(
+        default_factory=list
+    )  # claim, judge on re-check
     skipped: int = 0
     pending: int = 0
 
@@ -85,6 +92,10 @@ class MatchRun:
         self._tickets = 0
         self._tasks: set[asyncio.Task[Any]] = set()
         self._listeners: list[Callable[[Claim, str | None], None]] = []
+        self._correction_listeners: list[Callable[[Claim, str | None], None]] = []
+        self._corrected: set[str] = (
+            set()
+        )  # claims already reviewed: one correction at most
         self._spans: dict[str, str] = {}
         self.ledger = AuditLedger()
         self.down = False
@@ -212,6 +223,17 @@ class MatchRun:
             self._listeners.remove(listener) if listener in self._listeners else None
         )
 
+    def subscribe_corrections(
+        self, listener: Callable[[Claim, str | None], None]
+    ) -> Callable[[], None]:
+        """Be told when a claim is corrected or blocked by consensus. Returns the unsubscribe."""
+        self._correction_listeners.append(listener)
+        return lambda: (
+            self._correction_listeners.remove(listener)
+            if listener in self._correction_listeners
+            else None
+        )
+
     async def drain(self, timeout_s: float) -> None:
         """Wait for the beats still in the workflow (not the audits)."""
         pending = [t.done for t in self._tracks.values() if not t.done.done()]
@@ -259,10 +281,60 @@ class MatchRun:
             )
         for listener in list(self._listeners):
             listener(audited, self._spans.get(claim.beat_id.root))
+        if result.outcome.value == "disagree" and claim.verdict.value in SETTLED:
+            await self._correct(claim, result)
+
+    # ---- corrections by consensus --------------------------------------------------------------
+    async def _correct(self, claim: Claim, audit: Audit) -> None:
+        """Ask the inline judge again; if it agrees with the auditor, rewrite or block the claim."""
+        consensus = self._runtime.consensus
+        claim_id = claim.id.root
+        if consensus is None or claim_id in self._corrected or budget.auditing_stopped:
+            return
+        self._corrected.add(claim_id)
+        self.ledger.pending += 1
+        try:
+            at_t = self._runtime.clock(self.match_id)
+            outcome = await consensus.review(self.match_id, claim, audit, at_t)
+            if outcome.kind == "unresolved" or outcome.claim is None:
+                self.ledger.unresolved.append((claim, outcome.recheck_reason))
+                self.producer.note_audit(outcome.note)
+                return
+            try:
+                await self._runtime.server.call_tool(
+                    "put_correction",
+                    {
+                        "match_id": self.match_id,
+                        "claim": outcome.claim.model_dump(
+                            mode="json", by_alias=True, exclude_none=True
+                        ),
+                    },
+                )
+            except (OSError, ValueError) as exc:
+                self.producer.note_audit(
+                    f"{claim_id} could not be corrected: {type(exc).__name__}."
+                )
+                return
+            beat_id = claim.beat_id.root
+            self._claims[beat_id] = [
+                outcome.claim if c.id.root == claim_id else c
+                for c in self._claims.get(beat_id, [])
+            ]
+            self.ledger.corrections.append(outcome.claim)
+            self.producer.note_audit(outcome.note)
+            for listener in list(self._correction_listeners):
+                listener(outcome.claim, self._spans.get(beat_id))
+        finally:
+            self.ledger.pending -= 1
 
     def audit_summary(self) -> dict[str, Any]:
         return {
-            **summarize_audits(self.match_id, self.ledger.audited),
+            **summarize_audits(
+                self.match_id,
+                self.ledger.audited,
+                self.ledger.corrections,
+                self.ledger.unresolved,
+            ),
             "skipped_for_token_cap": self.ledger.skipped,
             "pending": self.ledger.pending,
         }
@@ -286,13 +358,22 @@ class AgentRuntime:
         judge: ChatClient,
         producer: ChatClient,
         auditor: ChatClient | None,
+        clock: Callable[[str], float] = lambda _: 0.0,
     ) -> None:
         self.server = server
+        self.clock = (
+            clock  # match time viewers have reached, for the time of a correction
+        )
         self.narrator: ChatClient = MeteredClient(narrator, "narrator")
         self.judge: ChatClient = MeteredClient(judge, "judge")
         self.producer_client: ChatClient = MeteredClient(producer, "producer")
         self.auditor = (
             Auditor(MeteredClient(auditor, "auditor"), server) if auditor else None
+        )
+        self.consensus = (
+            Consensus(self.judge, self.narrator, server)
+            if auditor is not None
+            else None
         )
         self.tracer = trace.get_tracer("matchproof.match")
         self._runs: OrderedDict[str, MatchRun] = OrderedDict()
@@ -337,6 +418,11 @@ class DownRun:
         return []
 
     def subscribe(
+        self, listener: Callable[[Claim, str | None], None]
+    ) -> Callable[[], None]:
+        return lambda: None
+
+    def subscribe_corrections(
         self, listener: Callable[[Claim, str | None], None]
     ) -> Callable[[], None]:
         return lambda: None

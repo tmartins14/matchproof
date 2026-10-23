@@ -70,6 +70,10 @@ class MatchStore(Protocol):
 
     def put_audit(self, match_id: str, claim_id: str, audit: Audit) -> bool: ...
 
+    def replace_claim(self, match_id: str, claim: Claim) -> bool: ...
+
+    def last_playback(self, match_id: str) -> float: ...
+
 
 class InMemoryMatchStore:
     """Matches by id, least recently used out first. Safe to share between the pipeline's worker
@@ -201,6 +205,21 @@ class InMemoryMatchStore:
                         claims[i] = claim.model_copy(update={"audit": audit})
                         return True
             return False
+
+    def replace_claim(self, match_id: str, claim: Claim) -> bool:
+        """Swap a stored claim for its corrected version (same id). False if it is not there."""
+        with self._lock:
+            claims = self._get(match_id).claims.get(claim.beat_id.root, [])
+            for i, old in enumerate(claims):
+                if old.id.root == claim.id.root:
+                    claims[i] = claim
+                    return True
+            return False
+
+    def last_playback(self, match_id: str) -> float:
+        """The match time viewers last reached, kept after full time too."""
+        with self._lock:
+            return self._get(match_id).playback_t
 
     def __contains__(self, match_id: str) -> bool:
         with self._lock:

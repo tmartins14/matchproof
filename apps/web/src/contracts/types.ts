@@ -12,7 +12,7 @@ export type Claim = Claim1
  */
 export type Point = [number, number]
 /**
- * One message on the live SSE stream (ADR 0003). The data shape depends on type. claim and verdict carry a claim. A claim is sent when its beat airs, with its final verdict if the Checker has finished or `checking` if not; a verdict follows when it finishes, and again when the auditor has a result, with the same verdict plus `audit`. seq is the order of sending; a reconnect resumes by seq only on a stream with no agent messages.
+ * One message on the live SSE stream (ADR 0003). The data shape depends on type. claim and verdict carry a claim. A claim is sent when its beat airs, with its final verdict if the Checker has finished or `checking` if not; a verdict follows when it finishes, and again when the auditor has a result, with the same verdict plus `audit`. When the auditor disagrees and the inline judge, asked again, agrees, a last verdict follows with the new verdict and text and a `correction` carrying the previous text. seq is the order of sending; a reconnect resumes by seq only on a stream with no agent messages.
  */
 export type StreamMessage = StreamMessage1
 
@@ -108,6 +108,24 @@ retries?: number
 model?: string
 latency_ms?: number
 trace_id?: string
+}
+/**
+ * Present when a claim already published was changed or blocked after the auditor disagreed and the inline judge, asked again, agreed with it. The text before the change is always here, so a correction is never a silent rewrite.
+ */
+correction?: {
+/**
+ * Match time in seconds when the correction was made.
+ */
+at_t: number
+previous_text: string
+/**
+ * The auditor's reason.
+ */
+reason: string
+/**
+ * The two models that agreed: the auditor, then the inline judge.
+ */
+by: string[]
 }
 /**
  * A second-vendor check run after the Checker settled the claim. Log-only: it never changes the verdict.

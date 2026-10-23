@@ -10,9 +10,13 @@
 # The runner counts a bad claim as caught when the first check does not pass it, so rephrased and
 # blocked are scored the same. `kind` says what is wrong with a bad claim.
 #
-# Bad mix: 7 wrong_number, 5 uncited_number, 6 overclaim, 4 invented_cause, 3 wrong_entity,
+# Bad mix: 7 wrong_number, 5 uncited_number, 11 overclaim, 5 invented_cause, 3 wrong_entity,
 # 2 wrong_minute, 3 outside_knowledge, 8 motive (a correct statement plus a motive or team-state
-# clause). 14 good, the last 4 with vivid action verbs on supported events.
+# clause). 18 good: good-11 to good-14 have vivid action verbs on supported events, good-15 to
+# good-18 are near misses of the auditor disagreements below.
+# adv-39 to adv-44 are claims the inline judge verified on a live run and the independent auditor
+# (judge-grok) disagreed with, rebuilt on the real beats with the facts they cited. Every auditor
+# disagreement becomes an eval case (evals/from_audit.py).
 
 # ---------------------------------------------------------------- wrong number (7)
 - id: adv-01
@@ -296,6 +300,71 @@
   fact_ids: [fx-possession_share-home-last-6m-to-t2534-01]
   expected: rephrased
 
+
+# ---------------------------------------------------------------- from the auditor (6)
+- id: adv-39
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001997-open_play_goal
+  text: "Pryce scores for Rivermouth, a smart finish after a 6-second move to make it 2–0."
+  fact_ids:
+    - fx-shot-ev-001997-shooter
+    - fx-shot-ev-001997-outcome
+    - fx-sequence-ev-001997-seconds
+    - fx-score_after-ev-001997
+  expected: rephrased
+- id: adv-40
+  kind: invented_cause
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001997-momentum_swing
+  text: "Rivermouth lead 2–0 and Ashford Vale have pushed their back line 4 metres higher since the goal, leaving more space across the pitch."
+  fact_ids:
+    - fx-score_after-ev-001997
+    - fx-lead-ev-001997
+    - fx-back_line_change-away-ev-001997-to-t5884-30
+  expected: rephrased
+- id: adv-41
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-momentum_swing
+  text: "Rivermouth lead 1–0 while Ashford's share of play has risen to 53%."
+  fact_ids:
+    - fx-score_after-ev-001670
+    - fx-lead-ev-001670
+    - fx-territory-away-since-ev-001670-to-t5128-00
+  expected: rephrased
+- id: adv-42
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale have dropped 9 m deeper since the red card and are defending in a tighter 730 square metres shape."
+  fact_ids:
+    - fx-back_line_change-away-ev-001484-to-t4671-00
+    - fx-compactness-away-since-ev-001484-to-t4671-00
+  expected: rephrased
+- id: adv-43
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001997-open_play_goal
+  text: "Pryce scores for Rivermouth, a composed finish after a 6-second move. 0.14 xG."
+  fact_ids:
+    - fx-shot-ev-001997-shooter
+    - fx-shot-ev-001997-outcome
+    - fx-sequence-ev-001997-seconds
+    - fx-shot-ev-001997-xg
+  expected: rephrased
+- id: adv-44
+  kind: overclaim
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-open_play_goal
+  text: "Rivermouth edge in front as Pryce fires home from inside the move, a 0.10 xG finish minutes after the attack began."
+  fact_ids:
+    - fx-shot-ev-001670-shooter
+    - fx-shot-ev-001670-outcome
+    - fx-shot-ev-001670-xg
+    - fx-sequence-ev-001670-start_clock
+  expected: rephrased
+
 # ---------------------------------------------------------------- good claims (14)
 - id: good-01
   kind: good
@@ -420,4 +489,41 @@
   beat_id: bt-000937-set_piece_goal
   text: "Rivermouth's Throgmorton fires home from a set piece, a 0.11 xG chance."
   fact_ids: [fx-shot-ev-000937-shooter, fx-shot-ev-000937-xg, fx-shot-ev-000937-outcome]
+  expected: verified
+- id: good-15
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001997-open_play_goal
+  text: "Rivermouth lead 2–0 after Pryce scores in the 86′."
+  fact_ids:
+    - fx-score_after-ev-001997
+    - fx-lead-ev-001997
+    - fx-shot-ev-001997-minute
+    - fx-shot-ev-001997-shooter
+    - fx-shot-ev-001997-outcome
+  expected: verified
+- id: good-16
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001997-open_play_goal
+  text: "Pryce hammers in a 0.14 xG shot for Rivermouth after a 6-second move."
+  fact_ids:
+    - fx-shot-ev-001997-shooter
+    - fx-shot-ev-001997-xg
+    - fx-shot-ev-001997-outcome
+    - fx-sequence-ev-001997-seconds
+  expected: verified
+- id: good-17
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001484-momentum_swing
+  text: "Ashford Vale's back line has dropped 9 m deeper since the red card."
+  fact_ids: [fx-back_line_change-away-ev-001484-to-t4671-00]
+  expected: verified
+- id: good-18
+  kind: good
+  match: { story: red_card_flip, seed: 3 }
+  beat_id: bt-001670-momentum_swing
+  text: "Ashford Vale have 53 per cent of the play in the Rivermouth half since the goal."
+  fact_ids: [fx-territory-away-since-ev-001670-to-t5128-00]
   expected: verified

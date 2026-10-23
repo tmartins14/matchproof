@@ -40,6 +40,10 @@ The verdict enum in `claim.schema.json` does not change. These are display label
 | `blocked` | OVERTURNED | The claim is withdrawn; the reason is shown |
 | `delayed` | HELD | Evidence not in yet; the claim waits |
 
+### Corrections
+
+A claim that was corrected after it aired reads as a correction, never as a quiet edit. It carries a **CORRECTED** label next to its verdict label (AMENDED for a rewrite, OVERTURNED when it could not be fixed), the previous text stays below it struck through, and the reason follows in one plain line, the second reviewer's reason as written. The label is the only extra emphasis: no colour beyond the verdict colour, no apology, no "oops". The reason is product text and follows the rules above, and the words "AI", "agent" and "model" stay out of it as everywhere in the live desk.
+
 ## Visual rules
 
 No sparkle or magic icons, no gradients, no glow, no typing or streaming-cursor animation, no chat bubbles, no "Thinking…" spinners. While a claim is checking, show the evidence on the pitch instead of a spinner.

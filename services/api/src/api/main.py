@@ -77,6 +77,7 @@ public_mcp = PublicMcp()
 agent_runtime: AgentRuntime | None = (
     None  # the agent workflow, once the lifespan has built it
 )
+agents_error: str | None = None  # why the agent runtime did not start, if it did not
 agents_configured = (
     False  # models are configured; if the runtime is missing, it failed to start
 )
@@ -90,12 +91,13 @@ def build_agent_runtime(session: ClientSession) -> AgentRuntime:
         judge=client_for("judge"),
         producer=client_for("producer"),
         auditor=client_for("auditor"),
+        clock=store.last_playback,
     )
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    global agent_runtime, agents_configured
+    global agent_runtime, agents_configured, agents_error
     server = public_mcp.start(store)
     async with server.session_manager.run():
         agents_configured = bool(os.environ.get("MODEL_BASE_URL"))
@@ -115,9 +117,11 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
                     )
                 )
                 agent_runtime = build_agent_runtime(session)
-            except Exception:
+                agents_error = None
+            except Exception as exc:
                 log.exception("agent runtime did not start; serving without agents")
                 agent_runtime = None
+                agents_error = f"{type(exc).__name__}: {exc}"[:200]
             try:
                 yield
             finally:
@@ -134,9 +138,20 @@ def get_llm_client() -> LlmClient:
     return from_env()
 
 
+def agents_status() -> str:
+    """ "ready", or "unavailable: <reason>". The API is up either way."""
+    if agent_runtime is not None:
+        return "ready"
+    return f"unavailable: {agents_error or 'no model configured'}"
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": version("matchproof-api")}
+    return {
+        "status": "ok",
+        "version": version("matchproof-api"),
+        "agents": agents_status(),
+    }
 
 
 @app.get("/health/model", response_model=None)

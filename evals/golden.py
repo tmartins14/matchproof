@@ -6,9 +6,10 @@ Generation is cached on disk by the intel tests' helper (.cache/matches), so a s
 import sys
 from pathlib import Path
 
-from contracts.models import Event, MatchBrief, PositionFrame
+from contracts.models import Beat, Event, MatchBrief, PositionFrame
 from intel.beats import BeatDetector
 from intel.engine import FactEngine
+from intel.registry import FactRegistry
 from mcp_match import InMemoryMatchStore
 from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, make_brief
 
@@ -50,3 +51,18 @@ def build_store(
         store.add_beat(brief.match_id, beat)
     store.finish(brief.match_id)
     return store, brief.match_id
+
+
+def bundle_fact_ids(registry: "FactRegistry", beat: "Beat") -> list[str]:
+    """The ids of the facts in a beat's bundle: the ones it cites, plus the score and lead facts of
+    the event it is anchored on (a goal, or a spell after it), as the MCP bundle adds them."""
+    ids = [f.root for f in beat.fact_ids]
+    for name in (
+        f"score_after({beat.anchor_event_id.root})",
+        f"lead({beat.anchor_event_id.root})",
+    ):
+        if registry.has_name(name):
+            fid = registry.by_name(name).id.root
+            if fid not in ids:
+                ids.append(fid)
+    return ids

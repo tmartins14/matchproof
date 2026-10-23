@@ -40,6 +40,24 @@
         "trace_id": { "type": "string" }
       }
     },
+    "correction": {
+      "type": "object",
+      "description": "Present when a claim already published was changed or blocked after the auditor disagreed and the inline judge, asked again, agreed with it. The text before the change is always here, so a correction is never a silent rewrite.",
+      "additionalProperties": false,
+      "required": ["at_t", "previous_text", "reason", "by"],
+      "properties": {
+        "at_t": { "type": "number", "minimum": 0, "description": "Match time in seconds when the correction was made." },
+        "previous_text": { "type": "string", "maxLength": 280 },
+        "reason": { "type": "string", "maxLength": 400, "description": "The auditor's reason." },
+        "by": {
+          "type": "array",
+          "description": "The two models that agreed: the auditor, then the inline judge.",
+          "items": { "type": "string" },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
     "audit": {
       "type": "object",
       "description": "A second-vendor check run after the Checker settled the claim. Log-only: it never changes the verdict.",

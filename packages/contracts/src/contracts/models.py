@@ -358,6 +358,7 @@ class Id(StrEnum):
     red_card_flip = 'red_card_flip'
     smash_and_grab = 'smash_and_grab'
     end_to_end = 'end_to_end'
+    custom = 'custom'
 
 
 class Storyline(BaseModel):

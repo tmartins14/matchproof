@@ -1,6 +1,7 @@
 import itertools
 import json
 import math
+import random
 import time
 from dataclasses import replace
 from functools import cache
@@ -14,7 +15,16 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 from sim import generate, iter_events
-from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, STORYLINES, make_brief
+from sim.brief import (
+    DEFAULT_AWAY,
+    DEFAULT_HOME,
+    STORYLINES,
+    final_score,
+    make_brief,
+    random_brief,
+    random_moments,
+    validate_planted,
+)
 from sim.engine import clock_minute, distance_to_goal, is_progressive
 from sim.tactics import FORMATIONS, role_of, slot_anchor
 
@@ -397,3 +407,43 @@ def test_summary_possession_is_completed_pass_share() -> None:
     }
     expected = round(100 * done["home"] / (done["home"] + done["away"]))
     assert f"possession{expected:>11}%" in summarize(brief, ev)
+
+
+# ---- custom moments --------------------------------------------------------------------------
+def custom_events(brief: MatchBrief) -> list[Event]:
+    return generate(brief)
+
+
+def check_planted(brief: MatchBrief, ev: list[Event]) -> None:
+    p2_start = next(
+        e.t.root for e in ev if e.type.value == "period_start" and e.period == 2
+    )
+    for pb in brief.planted_beats:
+        tagged = [e for e in ev if e.planted_beat_id == pb.id]
+        assert tagged, pb.id
+        for e in tagged:
+            m = clock_minute(e.period, e.t.root, p2_start)
+            assert pb.minute_from <= m <= pb.minute_to, (pb, m)
+    expected = final_score([planted_spec(pb) for pb in brief.planted_beats])
+    assert (goals(ev, "home"), goals(ev, "away")) == expected
+
+
+def planted_spec(pb: Any) -> tuple[str, str, int, int]:
+    return (pb.kind.value, pb.side.value, pb.minute_from, pb.minute_to)
+
+
+@pytest.mark.parametrize("seed", range(1, 21))
+def test_random_custom_moments_happen_in_window(seed: int) -> None:
+    rng = random.Random(seed)
+    beats = random_moments(rng, rng.randint(1, 6))
+    brief = make_brief(storyline_id="custom", seed=seed, planted=beats)
+    assert brief.storyline.id.value == "custom"
+    check_planted(brief, custom_events(brief))
+
+
+@pytest.mark.parametrize("seed", range(1, 21))
+def test_random_brief_matches_its_moments(seed: int) -> None:
+    brief = random_brief(seed)
+    assert brief == random_brief(seed)
+    assert not validate_planted([planted_spec(pb) for pb in brief.planted_beats])
+    check_planted(brief, custom_events(brief))

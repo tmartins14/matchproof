@@ -19,6 +19,14 @@ BAD = [
     ("The freeze frame shows one defender.", "freeze-frame", "error"),
     ("There are 3 zone defenders in the box.", "zone-players", "error"),
     ("They shoot 3 seconds after the ball was won at 97:22.", "clock-time", "error"),
+    ("Rivermouth finish with a brilliant strike.", "evaluative-adjective", "error"),
+    ("A tidy finish from Rivermouth.", "evaluative-adjective", "error"),
+    (
+        "A clinical, stunning, sublime, superb, wonderful goal.",
+        "evaluative-adjective",
+        "error",
+    ),
+    ("Ashford Vale are shielding their goal.", "shielding", "error"),
     ("The move has 0 passes.", "zero-count", "warn"),
     ("A 4 second move, 7 m out, worth 0.30 xG at 9′.", "many-numbers", "warn"),
 ]

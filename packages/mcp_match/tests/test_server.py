@@ -137,6 +137,29 @@ def test_red_card_follow_up_bundle_has_every_cited_fact() -> None:
     run(scenario())
 
 
+def test_card_bundles_carry_no_freeze_frame_facts() -> None:
+    store, match_id = finished()
+
+    async def scenario() -> list[dict[str, Any]]:
+        async with client_for(store, False) as s:
+            beats = (await call(s, "list_beats", match_id=match_id))["beats"]
+            card = next(b for b in beats if b["kind"] == "card")
+            out = await call(
+                s, "get_beat_bundle", match_id=match_id, beat_id=card["id"]
+            )
+            return list(out["facts"])
+
+    names = [f["name"] for f in run(scenario())]
+    assert names
+    assert all(n.startswith("card(") for n in names), names
+    assert {n.split(").")[1] for n in names} >= {
+        "kind",
+        "player",
+        "players_after",
+        "minute",
+    }
+
+
 def test_put_claims() -> None:
     store = InMemoryMatchStore()
     match_id = fill(store, "red_card_flip", 3)

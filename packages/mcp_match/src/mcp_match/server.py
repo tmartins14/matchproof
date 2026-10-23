@@ -302,6 +302,10 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
             # Only the changes big enough to be the story; a 1 m\u00b2 drift is not narrated.
             keep = swing_fact_ids(facts)
             facts = [f for f in facts if f.id.root in keep] or facts
+        if beat.kind.value == "card":
+            # The card, who, when and how many are left. The foul's freeze-frame counts are not the
+            # story, and the Narrator turned them into "defenders in the box at the set piece".
+            facts = [f for f in facts if f.name.startswith("card(")] or facts
         brief = store.brief(match_id)
         ctx = LabelContext(
             {"home": brief.home.name, "away": brief.away.name},

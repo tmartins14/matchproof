@@ -22,7 +22,10 @@ CLAIMS: list[dict[str, Any]] = yaml.safe_load(
 )
 # Bad claims the code checks must stop; every other bad claim must reach the judge.
 CODE_KINDS = {"wrong_number", "uncited_number"}
-CODE_IDS = {"adv-27"}  # a wrong minute written as a number
+CODE_IDS = {
+    "adv-27",  # a wrong minute written as a number
+    "adv-16",  # "clinical": the evaluative-adjective voice rule now stops it before the judge
+}
 
 
 def test_mix_is_38_bad_and_14_good() -> None:

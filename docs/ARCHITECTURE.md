@@ -48,15 +48,15 @@ All agents read and write one match store through the `match-data` MCP server. T
 
 Per claim: the reconciler matches every number to a cited fact's display rendering, the voice lint runs, and only a claim that passes both reaches the judge. The judge sees the claim and its cited facts only and answers `supported`, `problem` and `reason`. Any failure sends the beat's failed claims back to the Narrator once with the reasons; a pass after that is `rephrased`, a second failure is `blocked`, and a judge that does not answer within 6 s leaves the claim `delayed`.
 
-The judge was chosen by measurement (`make bakeoff`, 2026-10-22): 30 bad and 10 good claims in `evals/adversarial/claims.yaml`. Rule, applied in `evals/pick.py`: at least 28 of 30 caught, at most 1 of 10 good blocked, judge p90 at most 4 s; highest catch count wins, then lower p90.
+The judge was chosen by measurement (`make bakeoff`, 2026-10-22, judge prompt v2): 38 bad and 14 good claims in `evals/adversarial/claims.yaml`. Rule, applied in `evals/pick.py`: at least 35 of 38 caught, at most 1 of 14 good blocked, judge p90 at most 4 s; highest catch count wins, then lower p90. `judge.v2.md` allows verbs that describe the action and requires a fact for team state, motive, cause, comparison and uncovered periods.
 
-| Judge | Bad caught (of 30) | by code | by judge | Good blocked (of 10) | Judge unavailable | p50 | p90 | Tokens per claim |
+| Judge | Bad caught (of 38) | by code | by judge | Good blocked (of 14) | Judge unavailable | p50 | p90 | Tokens per claim |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| judge-mai (MAI-Thinking-1) | 25 | 13 | 12 | 0 | 12 | 22.5 s | 25.0 s | 1310 |
-| judge-grok (grok-4.7) | 13 | 13 | 0 | 0 | 27 | 0.3 s | 30.3 s | 0 |
-| gpt-5-mini (fallback) | 29 | 13 | 16 | 0 | 0 | 1.7 s | 2.1 s | 658 |
+| judge-mai (MAI-Thinking-1) | 32 | 14 | 18 | 0 | 11 | 19.3 s | 25.3 s | 1634 |
+| judge-grok (grok-4.7) | 38 | 14 | 24 | 0 | 1 | 7.8 s | 22.6 s | 959 |
+| gpt-5-mini (fallback) | 37 | 14 | 23 | 0 | 0 | 1.3 s | 1.7 s | 950 |
 
-Neither candidate qualified, so the fallback judge is active. Full report: `evals/reports/bakeoff.md`.
+Neither candidate met the p90 limit, so the fallback judge is active. Full report: `evals/reports/bakeoff.md`.
 
 ## Tactics and the brief
 

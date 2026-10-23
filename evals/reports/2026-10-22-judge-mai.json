@@ -1,17 +1,17 @@
 {
   "deployment": "judge-mai",
   "date": "2026-10-22",
-  "bad_total": 30,
-  "caught": 25,
-  "caught_by_code": 13,
-  "caught_by_judge": 12,
-  "judge_unavailable": 12,
-  "good_total": 10,
+  "bad_total": 38,
+  "caught": 32,
+  "caught_by_code": 14,
+  "caught_by_judge": 18,
+  "judge_unavailable": 11,
+  "good_total": 14,
   "good_blocked": 0,
-  "judge_calls": 27,
-  "p50_ms": 22527,
-  "p90_ms": 24985,
-  "tokens_per_claim": 1310.3,
+  "judge_calls": 38,
+  "p50_ms": 19348,
+  "p90_ms": 25334,
+  "tokens_per_claim": 1634.3,
   "results": [
     {
       "id": "adv-01",
@@ -172,7 +172,7 @@
       "id": "adv-12",
       "kind": "uncited_number",
       "expected": "rephrased",
-      "text": "Ashford Vale's away-09 finishes it after 4 passes, 10 seconds from the interception.",
+      "text": "Ashford Vale's Kowal finishes it after 4 passes, 10 seconds from the interception.",
       "passed_first_check": false,
       "stopped_by": "code",
       "reasons": [
@@ -191,11 +191,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): The term 'dominant' is not supported by possession share alone."
+        "Judge (overclaim): The term 'dominant' goes beyond the measured 61% possession."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 21400,
-      "tokens": 2737
+      "judge_ms": 17322,
+      "tokens": 1591
     },
     {
       "id": "adv-14",
@@ -203,13 +203,13 @@
       "expected": "blocked",
       "text": "Ashford Vale have collapsed, with the back line 9 m deeper.",
       "passed_first_check": false,
-      "stopped_by": "judge_unavailable",
+      "stopped_by": "judge",
       "reasons": [
-        "Judge did not answer: StructuredOutputError."
+        "Judge (overclaim): \"Collapsed\" implies a loss of control, which is not measured by the cited 9 m drop."
       ],
-      "judge_problem": null,
-      "judge_ms": 22500,
-      "tokens": 0
+      "judge_problem": "overclaim",
+      "judge_ms": 11046,
+      "tokens": 1592
     },
     {
       "id": "adv-15",
@@ -219,11 +219,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): \"In total control\" goes beyond the possession share stated."
+        "Judge (overclaim): \"In total control\" goes beyond the measured 67% possession share."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 10855,
-      "tokens": 1410
+      "judge_ms": 10949,
+      "tokens": 1559
     },
     {
       "id": "adv-16",
@@ -231,13 +231,13 @@
       "expected": "blocked",
       "text": "Rivermouth are clinical, scoring after 4 passes.",
       "passed_first_check": false,
-      "stopped_by": "judge",
+      "stopped_by": "judge_unavailable",
       "reasons": [
-        "Judge (overclaim): The term 'clinical' goes beyond the fact that only 4 passes were made."
+        "Judge did not answer: StructuredOutputError."
       ],
-      "judge_problem": "overclaim",
-      "judge_ms": 22552,
-      "tokens": 2803
+      "judge_problem": null,
+      "judge_ms": 26290,
+      "tokens": 0
     },
     {
       "id": "adv-17",
@@ -245,13 +245,13 @@
       "expected": "blocked",
       "text": "Ashford Vale's press is relentless, winning the ball 7 m from goal.",
       "passed_first_check": false,
-      "stopped_by": "judge",
+      "stopped_by": "judge_unavailable",
       "reasons": [
-        "Judge (overclaim): The term 'relentless' is not supported by the cited ball win fact."
+        "Judge did not answer: StructuredOutputError."
       ],
-      "judge_problem": "overclaim",
-      "judge_ms": 22097,
-      "tokens": 2921
+      "judge_problem": null,
+      "judge_ms": 26154,
+      "tokens": 0
     },
     {
       "id": "adv-18",
@@ -259,13 +259,13 @@
       "expected": "blocked",
       "text": "Ashford Vale are reeling after the second yellow.",
       "passed_first_check": false,
-      "stopped_by": "judge_unavailable",
+      "stopped_by": "judge",
       "reasons": [
-        "Judge did not answer: StructuredOutputError."
+        "Judge (overclaim): \"Reeling\" describes a team state not supported by the cited fact."
       ],
-      "judge_problem": null,
-      "judge_ms": 30777,
-      "tokens": 0
+      "judge_problem": "overclaim",
+      "judge_ms": 10089,
+      "tokens": 1567
     },
     {
       "id": "adv-19",
@@ -273,13 +273,13 @@
       "expected": "blocked",
       "text": "Ashford Vale's back line is 9 m deeper, a sign of tired legs.",
       "passed_first_check": false,
-      "stopped_by": "judge_unavailable",
+      "stopped_by": "judge",
       "reasons": [
-        "Judge did not answer: StructuredOutputError."
+        "Judge (unsupported_cause): The cited fact states the drop of 9 m, but not that it was due to tired legs."
       ],
-      "judge_problem": null,
-      "judge_ms": 24776,
-      "tokens": 0
+      "judge_problem": "unsupported_cause",
+      "judge_ms": 20616,
+      "tokens": 3311
     },
     {
       "id": "adv-20",
@@ -292,7 +292,7 @@
         "Judge did not answer: StructuredOutputError."
       ],
       "judge_problem": null,
-      "judge_ms": 22644,
+      "judge_ms": 23562,
       "tokens": 0
     },
     {
@@ -303,11 +303,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): \"Thanks to a rehearsed routine\" is not stated in the cited facts."
+        "Judge (unsupported_cause): The phrase 'thanks to a rehearsed routine' gives a cause not stated in the cited facts."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 20841,
-      "tokens": 2794
+      "judge_ms": 19171,
+      "tokens": 3147
     },
     {
       "id": "adv-22",
@@ -320,36 +320,36 @@
         "Judge (unsupported_cause): No cited fact states that Ashford Vale have stopped pressing."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 11059,
-      "tokens": 1389
+      "judge_ms": 19590,
+      "tokens": 3330
     },
     {
       "id": "adv-23",
       "kind": "wrong_entity",
       "expected": "blocked",
-      "text": "Rivermouth's away-09 finishes the counter.",
+      "text": "Rivermouth's Kowal finishes the counter.",
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (wrong_entity): away-09 is an Ashford Vale player, not Rivermouth."
+        "Judge (wrong_entity): Kowal is listed as on Ashford Vale, not Rivermouth."
       ],
       "judge_problem": "wrong_entity",
-      "judge_ms": 21602,
-      "tokens": 2852
+      "judge_ms": 11157,
+      "tokens": 1579
     },
     {
       "id": "adv-24",
       "kind": "wrong_entity",
       "expected": "blocked",
-      "text": "away-10 scores for Rivermouth.",
+      "text": "Bellamy-Cruz scores for Rivermouth.",
       "passed_first_check": false,
-      "stopped_by": "judge",
+      "stopped_by": "code",
       "reasons": [
-        "Judge (wrong_entity): The facts state home-10 scored, not away-10."
+        "The player \"Bellamy-Cruz\" is not named by any cited fact."
       ],
-      "judge_problem": "wrong_entity",
-      "judge_ms": 19154,
-      "tokens": 2712
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
     },
     {
       "id": "adv-25",
@@ -359,11 +359,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (wrong_entity): The second yellow card was shown to Ashford Vale (away), not Rivermouth (home)."
+        "Judge (wrong_entity): The second yellow was given to an Ashford Vale player, not Rivermouth."
       ],
       "judge_problem": "wrong_entity",
-      "judge_ms": 21885,
-      "tokens": 2869
+      "judge_ms": 9742,
+      "tokens": 1632
     },
     {
       "id": "adv-26",
@@ -371,13 +371,13 @@
       "expected": "blocked",
       "text": "Ashford Vale's back line is 9 m deeper since half-time.",
       "passed_first_check": false,
-      "stopped_by": "judge_unavailable",
+      "stopped_by": "judge",
       "reasons": [
-        "Judge did not answer: StructuredOutputError."
+        "Judge (wrong_time): The cited fact states the change occurred since the red card (63\u2032), not since half-time."
       ],
-      "judge_problem": null,
-      "judge_ms": 24193,
-      "tokens": 0
+      "judge_problem": "wrong_time",
+      "judge_ms": 17362,
+      "tokens": 3237
     },
     {
       "id": "adv-27",
@@ -401,25 +401,25 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (outside_knowledge): \"Their best spell in years\" is not stated in the cited facts."
+        "Judge (outside_knowledge): \"Their best spell in years\" is not supported by the cited facts."
       ],
       "judge_problem": "outside_knowledge",
-      "judge_ms": 23246,
-      "tokens": 2859
+      "judge_ms": 10075,
+      "tokens": 1637
     },
     {
       "id": "adv-29",
       "kind": "outside_knowledge",
       "expected": "blocked",
-      "text": "Ashford Vale's away-09 scores again, matching the form of last season.",
+      "text": "Ashford Vale's Kowal scores again, matching the form of last season.",
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (outside_knowledge): The phrase 'matching the form of last season' is not stated in the cited facts."
+        "Judge (outside_knowledge): The reference to last season's form is not supported by the cited facts."
       ],
       "judge_problem": "outside_knowledge",
-      "judge_ms": 19659,
-      "tokens": 2625
+      "judge_ms": 7177,
+      "tokens": 1434
     },
     {
       "id": "adv-30",
@@ -429,38 +429,148 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (outside_knowledge): The phrase 'the way last season's champions do' is not supported by the cited facts."
+        "Judge (outside_knowledge): The phrase 'the way last season's champions do' refers to historical context not provided in the cited facts."
       ],
       "judge_problem": "outside_knowledge",
-      "judge_ms": 11582,
-      "tokens": 1399
+      "judge_ms": 19524,
+      "tokens": 3266
+    },
+    {
+      "id": "adv-31",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth's Pryce scores after a 3 pass move, as they push to see the game out.",
+      "passed_first_check": false,
+      "stopped_by": "judge_unavailable",
+      "reasons": [
+        "Judge did not answer: StructuredOutputError."
+      ],
+      "judge_problem": null,
+      "judge_ms": 22995,
+      "tokens": 0
+    },
+    {
+      "id": "adv-32",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Ashford Vale's back line has dropped 9 m since the red card, and they are pinned back.",
+      "passed_first_check": false,
+      "stopped_by": "judge_unavailable",
+      "reasons": [
+        "Judge did not answer: StructuredOutputError."
+      ],
+      "judge_problem": null,
+      "judge_ms": 22790,
+      "tokens": 0
+    },
+    {
+      "id": "adv-33",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth have 61% of the ball in this spell, piling on the pressure.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (motive): \"Piling on the pressure\" implies intent, which is not supported by the cited facts."
+      ],
+      "judge_problem": "motive",
+      "judge_ms": 9489,
+      "tokens": 1604
+    },
+    {
+      "id": "adv-34",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Kowal scores for Ashford Vale after 5 passes, as they try to quieten the crowd.",
+      "passed_first_check": false,
+      "stopped_by": "judge_unavailable",
+      "reasons": [
+        "Judge did not answer: StructuredOutputError."
+      ],
+      "judge_problem": null,
+      "judge_ms": 24621,
+      "tokens": 0
+    },
+    {
+      "id": "adv-35",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth have 57% of the ball since their goal, as they look to see the game out.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (motive): The phrase 'as they look to see the game out' attributes intent to Rivermouth, which is not supported by the cited facts."
+      ],
+      "judge_problem": "motive",
+      "judge_ms": 11264,
+      "tokens": 1697
+    },
+    {
+      "id": "adv-36",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Ashford Vale are down to 10 and left short upfront.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): \"Left short upfront\" is an unsupported description of the team's state."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 11148,
+      "tokens": 1643
+    },
+    {
+      "id": "adv-37",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth score 3 seconds after the set piece and are now on top.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): The phrase 'are now on top' claims team control, which is not supported by the cited facts."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 22017,
+      "tokens": 3335
+    },
+    {
+      "id": "adv-38",
+      "kind": "motive",
+      "expected": "rephrased",
+      "text": "Rivermouth have 67% of the ball in this spell, and Ashford Vale are hanging on.",
+      "passed_first_check": false,
+      "stopped_by": "judge",
+      "reasons": [
+        "Judge (overclaim): The phrase 'hanging on' implies a state of control not supported by the cited possession fact."
+      ],
+      "judge_problem": "overclaim",
+      "judge_ms": 11324,
+      "tokens": 1621
     },
     {
       "id": "good-01",
       "kind": "good",
       "expected": "verified",
       "text": "Ashford Vale are down to 10 players after a second yellow.",
-      "passed_first_check": false,
-      "stopped_by": "judge_unavailable",
-      "reasons": [
-        "Judge did not answer: StructuredOutputError."
-      ],
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
       "judge_problem": null,
-      "judge_ms": 26914,
-      "tokens": 0
+      "judge_ms": 8560,
+      "tokens": 1518
     },
     {
       "id": "good-02",
       "kind": "good",
       "expected": "verified",
-      "text": "Ashford Vale's back line has dropped 9 m since the second yellow, from 34 m to 25 m.",
+      "text": "Ashford Vale's back line has dropped 9 m since the red card, from 34 m to 25 m.",
       "passed_first_check": false,
       "stopped_by": "judge_unavailable",
       "reasons": [
         "Judge did not answer: StructuredOutputError."
       ],
       "judge_problem": null,
-      "judge_ms": 23177,
+      "judge_ms": 25188,
       "tokens": 0
     },
     {
@@ -472,22 +582,20 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 10666,
-      "tokens": 1505
+      "judge_ms": 10137,
+      "tokens": 1684
     },
     {
       "id": "good-04",
       "kind": "good",
       "expected": "verified",
-      "text": "Rivermouth score through home-10 after 4 passes in 16 seconds.",
-      "passed_first_check": false,
-      "stopped_by": "judge_unavailable",
-      "reasons": [
-        "Judge did not answer: StructuredOutputError."
-      ],
+      "text": "Rivermouth score through Pryce after 4 passes in 16 seconds.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
       "judge_problem": null,
-      "judge_ms": 23605,
-      "tokens": 0
+      "judge_ms": 8784,
+      "tokens": 1533
     },
     {
       "id": "good-05",
@@ -500,7 +608,7 @@
         "Judge did not answer: StructuredOutputError."
       ],
       "judge_problem": null,
-      "judge_ms": 22527,
+      "judge_ms": 23313,
       "tokens": 0
     },
     {
@@ -514,7 +622,7 @@
         "Judge did not answer: StructuredOutputError."
       ],
       "judge_problem": null,
-      "judge_ms": 24985,
+      "judge_ms": 27880,
       "tokens": 0
     },
     {
@@ -526,36 +634,32 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 23449,
-      "tokens": 3002
+      "judge_ms": 11252,
+      "tokens": 1711
     },
     {
       "id": "good-08",
       "kind": "good",
       "expected": "verified",
       "text": "Rivermouth score 3 seconds after the set piece.",
-      "passed_first_check": false,
-      "stopped_by": "judge_unavailable",
-      "reasons": [
-        "Judge did not answer: StructuredOutputError."
-      ],
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
       "judge_problem": null,
-      "judge_ms": 24579,
-      "tokens": 0
+      "judge_ms": 23538,
+      "tokens": 3305
     },
     {
       "id": "good-09",
       "kind": "good",
       "expected": "verified",
-      "text": "Ashford Vale's away-09 scores after 4 passes in 10 seconds.",
-      "passed_first_check": false,
-      "stopped_by": "judge_unavailable",
-      "reasons": [
-        "Judge did not answer: StructuredOutputError."
-      ],
+      "text": "Ashford Vale's Kowal scores after 4 passes in 10 seconds.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
       "judge_problem": null,
-      "judge_ms": 24652,
-      "tokens": 0
+      "judge_ms": 20825,
+      "tokens": 3360
     },
     {
       "id": "good-10",
@@ -566,8 +670,60 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 11286,
-      "tokens": 1502
+      "judge_ms": 18673,
+      "tokens": 3264
+    },
+    {
+      "id": "good-11",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Pryce smashes a 0.10 xG shot in for Rivermouth.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 21395,
+      "tokens": 3365
+    },
+    {
+      "id": "good-12",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Marchetti-Roe lashes a 0.06 xG shot off the post for Rivermouth.",
+      "passed_first_check": true,
+      "stopped_by": "none",
+      "reasons": [],
+      "judge_problem": null,
+      "judge_ms": 23768,
+      "tokens": 3581
+    },
+    {
+      "id": "good-13",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Ashford Vale win it 15 metres out and Bellamy-Cruz drags a shot wide.",
+      "passed_first_check": false,
+      "stopped_by": "judge_unavailable",
+      "reasons": [
+        "Judge did not answer: StructuredOutputError."
+      ],
+      "judge_problem": null,
+      "judge_ms": 24991,
+      "tokens": 0
+    },
+    {
+      "id": "good-14",
+      "kind": "good",
+      "expected": "verified",
+      "text": "Rivermouth's Throgmorton fires home from a set piece, a 0.11 xG chance.",
+      "passed_first_check": false,
+      "stopped_by": "judge_unavailable",
+      "reasons": [
+        "Judge did not answer: StructuredOutputError."
+      ],
+      "judge_problem": null,
+      "judge_ms": 25334,
+      "tokens": 0
     }
   ]
 }

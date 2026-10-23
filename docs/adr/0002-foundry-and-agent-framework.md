@@ -44,3 +44,18 @@ Stage One judging checks that entries "reasonably apply the required technologie
 - **Winner: `gpt-5-mini` (fallback judge, own prompt `judge.v1.md`):** caught 29/30 (13 by code, 16 by the judge), blocked 0/10 good, p50 1.7 s, p90 2.1 s, 658 tokens per judged claim. The one miss is a wrong "since half-time" on a back-line change that is measured from the red card. `models.yaml` now has it as the active judge.
 - **Not independent:** the Narrator and the judge are now the same model, which the 2026-10-19 entry avoided. The judge has a different prompt and sees only the claim and its cited facts, but it is not a different vendor. Revisit when the Claude deployment works, and re-run `make bakeoff` then (and for `judge-grok` once its capacity recovers).
 
+### 2026-10-22 (evening): judge v2 and a second bake-off
+
+- **Why:** on the end-to-end run the v1 judge amended action verbs ("smashes", "lashes", "Rivermouth press", "sit higher") and passed motive and team-state clauses ("as they push for a response", "pinned back", "left short upfront").
+- **Change:** `judge.v2.md` states the rubric. Verbs that describe the action are allowed when the event and outcome match the facts. Team state, motive, cause, comparison and anything about an uncovered period need a fact. A `motive` problem category is added. 12 claims were added to the eval set (8 bad with a motive or state clause, 4 good with vivid verbs): 38 bad and 14 good. The pick rule scales to at least 35 of 38 caught, at most 1 of 14 good blocked, p90 at most 4 s.
+- **Result (v2, all three on the 52-claim set):**
+
+| Judge | Bad caught (of 38) | by code | by judge | Good blocked (of 14) | Unavailable | p50 | p90 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| judge-mai | 32 | 14 | 18 | 0 | 11 | 19.3 s | 25.3 s |
+| judge-grok | 38 | 14 | 24 | 0 | 1 | 7.8 s | 22.6 s |
+| gpt-5-mini (fallback) | 37 | 14 | 23 | 0 | 0 | 1.3 s | 1.7 s |
+
+- **Decision: `gpt-5-mini` stays the judge.** `judge-grok` was accurate this time (38 of 38, no 429s) but far too slow for a per-claim check, p50 7.8 s against a 4 s p90 limit; `judge-mai` is slow and unavailable on 11 claims. The only claim `gpt-5-mini` missed is "since half-time" on a change measured from the red card.
+- **Still the same model as the Narrator.** The judge passes some adjectives that no fact measures ("brilliant", "tidy") and a few flourishes ("shielding their goal"); motive and state clauses are now caught. Revisit when the Claude deployment works.
+

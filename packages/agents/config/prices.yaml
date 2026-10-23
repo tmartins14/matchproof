@@ -1,26 +1,34 @@
 # Model prices per million tokens, by deployment name (the names in models.yaml).
-# Fill these in from the Azure pricing pages. Until a deployment has all of input_per_million,
-# output_per_million and currency, cost reports say "prices not set"; nothing is guessed.
+# Until a deployment has all of input_per_million, output_per_million and currency, cost reports
+# say "prices not set"; nothing is guessed.
 #
-# source:   the pricing page URL the numbers came from
+# source:   where the numbers came from
 # as_of:    the date (YYYY-MM-DD) they were read
-# currency: ISO code, for example CAD
+# currency: ISO code
+#
+# Prices are list (pay-as-you-go) rates for Global deployments in USD. Cached-input rates are
+# lower (gpt-5-mini 0.03, grok-4.7 0.50) but are not used here, so costs are slight overestimates.
+# Azure bills this subscription in CAD; the USD figures are converted on the invoice.
 
 gpt-5-mini:
-  input_per_million: null
-  output_per_million: null
-  currency: null
-  source: null
-  as_of: null
+  input_per_million: 0.25
+  output_per_million: 2.00
+  currency: USD
+  source: "https://azure.microsoft.com/en-us/pricing/details/azure-openai/ (GPT-5-mini Global, region East US)"
+  as_of: "2026-10-23"
 
 judge-grok:
-  input_per_million: null
-  output_per_million: null
-  currency: null
-  source: null
-  as_of: null
+  # grok-4.7 is not yet on the Foundry Models pricing page; these are the Azure Retail Prices API
+  # meters "4.7 Inp glbl" and "4.7 Outp glbl" for eastus2 (product "Azure Grok Models").
+  # The "L" meters (4 / 12 USD) are the long-context tier and do not apply to our short prompts.
+  input_per_million: 2.00
+  output_per_million: 6.00
+  currency: USD
+  source: "https://prices.azure.com/api/retail/prices?$filter=contains(productName,'Grok') (meters 4.7 Inp glbl, 4.7 Outp glbl, eastus2)"
+  as_of: "2026-10-23"
 
 judge-mai:
+  # Not in use (bake-off only). Left unset.
   input_per_million: null
   output_per_million: null
   currency: null

@@ -539,7 +539,8 @@ def _claim_data(claim: Claim) -> dict[str, Any]:
 async def _air_beat(msg: StreamMessage, track: _AgentTrack) -> list[StreamMessage]:
     """The beat message with the Producer's rank, then any notice the beat calls for. Starts the
     beat's claims on their way."""
-    beat_id = msg.data.root.id.root  # type: ignore[union-attr]
+    assert isinstance(msg.data, Beat)
+    beat_id = msg.data.id.root
     decision = await track.run.decision(beat_id, PRODUCER_WAIT_S)
     out: list[StreamMessage] = []
     if decision is not None and decision.rank is not None:

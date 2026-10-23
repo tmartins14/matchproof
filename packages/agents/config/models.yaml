@@ -43,7 +43,7 @@ auditor:
   temperature: 0
 
 # The judge prompt file in agents/prompts/. v1 is kept for the record.
-judge_prompt: judge.v2.md
+judge_prompt: judge.v3.md
 
 judge:
   deployment: gpt-5-mini

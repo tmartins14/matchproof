@@ -26,7 +26,7 @@ from contracts.models import Fact
 from intel.labels import LabelContext, labels_for
 from mcp_match import InMemoryMatchStore
 
-from .golden import build_store
+from .golden import build_store, bundle_fact_ids
 from .pick import (
     BAD_TOTAL,
     GOOD_TOTAL,
@@ -59,6 +59,7 @@ class ClaimResult:
 class Report:
     deployment: str
     date: str
+    prompt: str = ""
     bad_total: int = 0
     caught: int = 0
     caught_by_code: int = 0
@@ -103,7 +104,7 @@ def bundle_for(
 ) -> tuple[dict[str, Fact], str, str, dict[str, str], dict[str, str]]:
     beat = next(b for b in store.beats(match_id) if b.id.root == beat_id)
     registry = store.registry(match_id)
-    facts = {f.root: registry.get(f.root) for f in beat.fact_ids}
+    facts = {fid: registry.get(fid) for fid in bundle_fact_ids(registry, beat)}
     brief = store.brief(match_id)
     teams = {"home": brief.home.name, "away": brief.away.name}
     ctx = LabelContext(teams, {e.id.root: e for e in store.events(match_id)}, registry)
@@ -114,10 +115,17 @@ def run_judge(
     deployment: str,
     claims: list[dict[str, Any]],
     stores: dict[tuple[str, int], tuple[InMemoryMatchStore, str]],
+    prompt_file: str | None = None,
 ) -> Report:
     client = client_for("judge", deployment=deployment)
-    checker = Checker(client, timeout_s=client.settings.timeout_s)
-    report = Report(deployment=deployment, date=date.today().isoformat())
+    checker = Checker(
+        client, timeout_s=client.settings.timeout_s, prompt_file=prompt_file
+    )
+    report = Report(
+        deployment=deployment,
+        date=date.today().isoformat(),
+        prompt=prompt_file or str(load_models()["judge_prompt"]),
+    )
     latencies: list[int] = []
     tokens: list[int] = []
     for c in claims:
@@ -186,7 +194,8 @@ def run_judge(
 
 def write_report(report: Report) -> Path:
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    path = REPORTS_DIR / f"{report.date}-{report.deployment}.json"
+    suffix = f"-{report.prompt.removesuffix('.md').split('.')[-1]}"
+    path = REPORTS_DIR / f"{report.date}-{report.deployment}{suffix}.json"
     path.write_text(json.dumps(asdict(report), indent=2) + "\n", "utf-8")
     return path
 
@@ -216,7 +225,7 @@ def write_bakeoff(
     )
     path.write_text(
         f"# Judge bake-off, {reports[0].date}\n\n"
-        f"Rule: {RULE_TEXT}. Pick made by `evals/pick.py`.\n\n"
+        f"Rule: {RULE_TEXT}. Pick made by `evals/pick.py`. Judge prompt: `{reports[0].prompt}`.\n\n"
         f"{bakeoff_table(reports)}\n"
         f"Winner: **{winner}**. {reason}.{note}\n"
         "Bad claims are caught by code (reconciler or voice lint, no model call) or by the judge. "
@@ -233,26 +242,37 @@ def main() -> None:
     group.add_argument(
         "--bakeoff", action="store_true", help="every candidate, then pick"
     )
+    parser.add_argument(
+        "--prompt", help="judge prompt file in agents/prompts, e.g. judge.v3.md"
+    )
+    parser.add_argument(
+        "--skip",
+        action="append",
+        default=[],
+        help="a candidate to leave out of the bake-off",
+    )
     args = parser.parse_args()
     claims = load_claims()
     stores = stores_for(claims)
     models = load_models()
     if args.judge:
-        report = run_judge(args.judge, claims, stores)
+        report = run_judge(args.judge, claims, stores, args.prompt)
         print(write_report(report))
         print(bakeoff_table([report]))
         return
     reports: list[Report] = []
     for entry in models["judge_candidates"]:
+        if entry["deployment"] in args.skip:
+            continue
         print(entry["deployment"], flush=True)
-        reports.append(run_judge(entry["deployment"], claims, stores))
+        reports.append(run_judge(entry["deployment"], claims, stores, args.prompt))
         write_report(reports[-1])
     scores = [Score(r.deployment, r.caught, r.good_blocked, r.p90_ms) for r in reports]
     pick = pick_judge(scores)
     # The fallback is always measured too, so the table shows what the pick is up against.
     fallback = models["judge_fallback"]["deployment"]
     print(fallback, flush=True)
-    reports.append(run_judge(fallback, claims, stores))
+    reports.append(run_judge(fallback, claims, stores, args.prompt))
     write_report(reports[-1])
     set_active_judge(MODELS_PATH, pick.deployment)
     print(write_bakeoff(reports, pick.deployment, pick.reason, pick.fallback))

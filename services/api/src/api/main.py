@@ -323,6 +323,8 @@ async def stream_match(
             ):
                 yield chunk
         finally:
+            if agents is not None:
+                agents.close()  # ends the match's root span; a reconnect's spans still nest under it
             release()
 
     return StreamingResponse(

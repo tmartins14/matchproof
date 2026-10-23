@@ -7,6 +7,7 @@ the trace and the per-match audit summary.
 
 import asyncio
 import time
+from collections.abc import Sequence
 from typing import Any
 
 from contracts.models import Audit, Claim, Fact
@@ -139,3 +140,37 @@ class Auditor:
                 reason=answer.reason[:REASON_CHARS],
             )
         return done("unavailable")  # unreachable: the second attempt always returns
+
+
+def summarize_audits(
+    match_id: str, rows: Sequence[tuple[Claim, Audit, str]]
+) -> dict[str, Any]:
+    """How the auditor did on a match: claims audited, agreement rate, each disagreement with both
+    judges' reasons (`rows` are the claim, its audit and what the inline judge said), and how many
+    audits had no answer."""
+    agreed = sum(1 for _, a, _ in rows if a.outcome.value == "agree")
+    disagreed = [(c, a, r) for c, a, r in rows if a.outcome.value == "disagree"]
+    audited = agreed + len(disagreed)
+    return {
+        "match_id": match_id,
+        "claims_audited": audited,
+        "agreement_rate": round(agreed / audited, 3) if audited else None,
+        "disagreements": [
+            {
+                "claim_id": c.id.root,
+                "text": c.text,
+                "verdict": c.verdict.value,
+                "checker": {
+                    "deployment": c.checker.model if c.checker else None,
+                    "reason": r,
+                },
+                "auditor": {
+                    "deployment": a.deployment,
+                    "problem": a.problem,
+                    "reason": a.reason,
+                },
+            }
+            for c, a, r in disagreed
+        ],
+        "unavailable": sum(1 for _, a, _ in rows if a.outcome.value == "unavailable"),
+    }

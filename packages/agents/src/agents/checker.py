@@ -16,8 +16,8 @@ from typing import Literal
 
 from contracts.models import Claim, Fact
 from intel.labels import say
-from opentelemetry import trace
 from intel.voice_lint import Rule, lint, load_rules
+from opentelemetry import trace
 from pydantic import BaseModel
 
 from .llm_client import ChatClient, LlmError, load_models

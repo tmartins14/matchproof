@@ -11,7 +11,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from contracts.models import Claim, Fact
+from contracts.models import Claim
 
 from .checker import CheckedClaim
 from .llm_client import ChatClient

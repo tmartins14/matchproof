@@ -51,6 +51,7 @@ def comparable(claims: list[Claim]) -> list[dict[str, Any]]:
     for c in claims:
         d = c.model_dump(mode="json", by_alias=True, exclude_none=True)
         d["checker"].pop("latency_ms", None)
+        d["checker"].pop("trace_id", None)  # only the workflow runs inside a trace
         out.append(d)
     return out
 
@@ -173,7 +174,7 @@ def test_a_narrator_that_fails_gives_a_beat_with_no_claims() -> None:
 def test_agents_never_import_the_store_or_the_registry() -> None:
     root = Path(agents.__file__).parent
     pattern = re.compile(
-        r"^\s*(?:from|import)\s+(?:mcp_match\.store|intel\.registry)\b", re.M
+        r"^\s*(?:from|import)\s+(?:mcp_match\.store|intel\.registry)\b", re.MULTILINE
     )
     for path in root.glob("*.py"):
         assert not pattern.search(path.read_text("utf-8")), path.name

@@ -18,7 +18,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
-from agents.auditor import MAX_CONCURRENT_AUDITS, Auditor
+from agents.auditor import MAX_CONCURRENT_AUDITS, Auditor, summarize_audits
 from agents.budget import MeteredClient, budget
 from agents.llm_client import ChatClient
 from agents.pipeline import BeatRun, Deps, ToolServer
@@ -247,33 +247,8 @@ class MatchRun:
             listener(audited, self._spans.get(claim.beat_id.root))
 
     def audit_summary(self) -> dict[str, Any]:
-        done = self.ledger.audited
-        agreed = sum(1 for _, a, _ in done if a.outcome.value == "agree")
-        disagreed = [(c, a, r) for c, a, r in done if a.outcome.value == "disagree"]
-        unavailable = sum(1 for _, a, _ in done if a.outcome.value == "unavailable")
-        audited = agreed + len(disagreed)
         return {
-            "match_id": self.match_id,
-            "claims_audited": audited,
-            "agreement_rate": round(agreed / audited, 3) if audited else None,
-            "disagreements": [
-                {
-                    "claim_id": c.id.root,
-                    "text": c.text,
-                    "verdict": c.verdict.value,
-                    "checker": {
-                        "deployment": c.checker.model if c.checker else None,
-                        "reason": r,
-                    },
-                    "auditor": {
-                        "deployment": a.deployment,
-                        "problem": a.problem,
-                        "reason": a.reason,
-                    },
-                }
-                for c, a, r in disagreed
-            ],
-            "unavailable": unavailable,
+            **summarize_audits(self.match_id, self.ledger.audited),
             "skipped_for_token_cap": self.ledger.skipped,
             "pending": self.ledger.pending,
         }
@@ -328,6 +303,9 @@ class DownRun:
     claims and the stream says verification is unavailable."""
 
     down = True
+
+    def close(self) -> None:
+        return None
 
     def submit(self, beat: Beat) -> None:
         return None

@@ -17,7 +17,7 @@ No agent imports the store or the fact registry.
 import asyncio
 import time
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Never
 
 from agent_framework import (
     Executor,
@@ -30,7 +30,6 @@ from contracts.models import Claim, Fact
 from opentelemetry import trace
 from opentelemetry.context import Context
 from pydantic import ValidationError
-from typing_extensions import Never
 
 from .checker import CheckedClaim, Checker, ClaimCheck
 from .llm_client import LlmError

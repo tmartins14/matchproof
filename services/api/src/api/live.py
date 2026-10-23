@@ -135,6 +135,10 @@ def roster_of(brief: MatchBrief) -> dict[str, str]:
     }
 
 
+def teams_of(brief: MatchBrief) -> dict[str, str]:
+    return {"home": brief.home.name, "away": brief.away.name}
+
+
 def is_window_fact(f: Fact) -> bool:
     """Window facts cite exactly one window; half and match facts cite several."""
     return len(f.source_ids) == 1 and f.source_ids[0].root.startswith("win-")
@@ -158,7 +162,7 @@ def pipeline(
     Pass `engine` to keep hold of its registry while the match runs. `until_s` ends the match early
     with a full-time status once play passes that match second; tests use it to play a short match.
     """
-    engine = engine or FactEngine(roster_of(brief))
+    engine = engine or FactEngine(roster_of(brief), teams_of(brief))
     detector = BeatDetector()
     sent: set[str] = set()
     clock = 0.0
@@ -289,7 +293,7 @@ def _produce(
 ) -> None:
     """Thread body: feed the pipeline's entries to the player, never too far ahead of it.
     `on_beat` is called on the event loop for each beat as it is found."""
-    engine = FactEngine(roster_of(brief))
+    engine = FactEngine(roster_of(brief), teams_of(brief))
     if store is not None:
         store.begin(brief, engine.registry)
     try:

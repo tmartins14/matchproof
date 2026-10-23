@@ -15,12 +15,21 @@ def test_health_budget_reports_tokens_against_the_cap(
 ) -> None:
     monkeypatch.setenv("DAILY_TOKEN_CAP", "5000")
     budget._used.clear()
-    budget.add("narrator", 120)
+    budget.add(
+        "narrator", 120, deployment="gpt-5-mini", input_tokens=100, output_tokens=20
+    )
     budget.add("auditor", 30)
     try:
         body = TestClient(app).get("/health/budget").json()
     finally:
         budget._used.clear()
+        budget._split.clear()
     assert body["cap"] == 5000 and body["used"] == 150
     assert body["by_role"] == {"narrator": 120, "auditor": 30}
     assert body["narration_paused"] is False and body["auditing_stopped"] is False
+    assert body["usage"]["narrator"] == {
+        "deployment": "gpt-5-mini",
+        "input": 100,
+        "output": 20,
+    }
+    assert body["cost"] == "prices not set"

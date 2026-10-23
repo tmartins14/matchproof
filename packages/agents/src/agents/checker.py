@@ -185,13 +185,22 @@ class Checker:
         try:
             with _tracer.start_as_current_span(
                 "judge", attributes={"gen_ai.request.model": self._judge.deployment}
-            ):
+            ) as judge_span:
                 reply = complete_structured(
                     self._judge,
                     JudgeAnswer,
                     prompt,
                     max_tokens=JUDGE_MAX_TOKENS,
                     timeout_s=self._timeout_s,
+                )
+                judge_span.set_attribute(
+                    "gen_ai.usage.input_tokens", reply.input_tokens
+                )
+                judge_span.set_attribute(
+                    "gen_ai.usage.output_tokens", reply.output_tokens
+                )
+                judge_span.set_attribute(
+                    "matchproof.judge.supported", reply.value.supported
                 )
         except (LlmError, StructuredOutputError) as exc:
             result.delayed = True
@@ -235,10 +244,12 @@ class Checker:
                 names=names,
             )
 
+        # Each task runs in its own copy of the caller's context, taken here: a pool thread's own
+        # context is empty, so its spans would start new traces instead of nesting under `check`.
+        contexts = [contextvars.copy_context() for _ in drafts]
         with ThreadPoolExecutor(max_workers=self._workers) as pool:
-            # Each task runs in a copy of this context, so its spans nest under the caller's.
             return list(
-                pool.map(lambda d: contextvars.copy_context().run(check, d), drafts)
+                pool.map(lambda cd: cd[0].run(check, cd[1]), zip(contexts, drafts))
             )
 
     @staticmethod

@@ -5,6 +5,9 @@ from typing import Any
 
 from agents.llm_client import LlmError, LlmReply, ResponseFormat
 from contracts.models import Fact
+from opentelemetry import trace
+
+_tracer = trace.get_tracer(__name__)
 
 
 class FakeChat:
@@ -27,10 +30,14 @@ class FakeChat:
     ) -> LlmReply:
         self.prompts.append(prompt)
         reply = self.replies.pop(0)
-        if isinstance(reply, Exception):
-            raise reply
-        text = reply if isinstance(reply, str) else json.dumps(reply)
-        return LlmReply(text, self.deployment, 5, 10, 4)
+        # Like the real client: one `chat <deployment>` span per call, with token usage.
+        with _tracer.start_as_current_span(f"chat {self.deployment}") as span:
+            if isinstance(reply, Exception):
+                raise reply
+            text = reply if isinstance(reply, str) else json.dumps(reply)
+            span.set_attribute("gen_ai.usage.input_tokens", 10)
+            span.set_attribute("gen_ai.usage.output_tokens", 4)
+            return LlmReply(text, self.deployment, 5, 10, 4)
 
 
 def timeout() -> LlmError:
@@ -38,12 +45,16 @@ def timeout() -> LlmError:
 
 
 def fact(
-    fact_id: str, *display: str, side: str | None = None, value: float = 1
+    fact_id: str,
+    *display: str,
+    side: str | None = None,
+    value: float = 1,
+    name: str | None = None,
 ) -> Fact:
     return Fact.model_validate(
         {
             "id": fact_id,
-            "name": f"test({fact_id})",
+            "name": name or f"test({fact_id})",
             "value": value,
             "display": {"en": list(display)},
             "scope": {"side": side} if side else None,

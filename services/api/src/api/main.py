@@ -37,6 +37,7 @@ from api.live import (
     RealPacer,
     roster_of,
     run_live,
+    teams_of,
 )
 from api.matchdata import PublicMcp, get_internal_server, store
 from api.telemetry import configure_telemetry
@@ -197,7 +198,9 @@ def match_registry(match_id: str) -> FactRegistry:
     try:
         frames = list(iter_frames(brief, events))
         freeze = list(iter_freeze_frames(brief, events))
-        registry = extract_all(events, frames, freeze, roster_of(brief))
+        registry = extract_all(
+            events, frames, freeze, roster_of(brief), teams_of(brief)
+        )
         detect_all(events, frames, freeze, registry)
     finally:
         gc.enable()

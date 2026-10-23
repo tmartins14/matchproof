@@ -36,6 +36,12 @@ def load_roster(base: Path) -> dict[str, str]:
     }
 
 
+def load_teams(base: Path) -> dict[str, str]:
+    """Side to club name from <match_id>.brief.json."""
+    brief = json.loads(base.with_name(base.name + ".brief.json").read_text("utf-8"))
+    return {side: brief[side]["name"] for side in ("home", "away")}
+
+
 def write_facts(base: Path, registry: FactRegistry) -> tuple[Path, list[Fact]]:
     facts = registry.all()
     out = base.with_name(base.name + ".facts.jsonl")
@@ -76,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     base: Path = a.match
     gc.disable()  # tens of thousands of frame models; the cyclic collector would crawl over them
     events, frames, freeze = load_match(base)
-    registry = extract_all(events, frames, freeze, load_roster(base))
+    registry = extract_all(events, frames, freeze, load_roster(base), load_teams(base))
     if a.cmd == "beats":
         return print_beats(base, detect_all(events, frames, freeze, registry), registry)
     out, facts = write_facts(base, registry)

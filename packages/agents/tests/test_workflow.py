@@ -13,6 +13,10 @@ from contracts.models import Claim, Fact
 from fakes import FakeChat
 from helpers import fill
 from mcp_match import InMemoryMatchStore, build_server
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 GOOD = {"supported": True, "problem": None, "reason": "Matches."}
 
@@ -181,3 +185,68 @@ def test_agents_never_import_the_store_or_the_registry() -> None:
     imported = "\n".join(p.read_text("utf-8") for p in root.glob("*.py"))
     assert "InMemoryMatchStore" not in imported
     assert "FactRegistry" not in imported
+
+
+def exported_spans() -> tuple[InMemorySpanExporter, Any]:
+    provider = trace.get_tracer_provider()
+    if not isinstance(provider, TracerProvider):
+        provider = TracerProvider()
+        trace.set_tracer_provider(provider)
+    exporter = InMemorySpanExporter()
+    processor = SimpleSpanProcessor(exporter)
+    provider.add_span_processor(processor)
+    return exporter, processor
+
+
+def test_every_model_call_and_check_step_is_a_span_in_the_beats_trace() -> None:
+    store, match_id, beat_id, fact_id = setup()
+    shown = shown_of(store, match_id, fact_id)
+    deps = Deps(
+        build_server(store, writable=True),
+        FakeChat(replies(fact_id, shown, True), "fake-narrator"),
+        FakeChat([GOOD, GOOD], "fake-judge"),
+    )
+    exporter, _ = exported_spans()
+    asyncio.run(run_beat_workflow(match_id, beat_id, "fan", deps=deps))
+    spans = exporter.get_finished_spans()
+    by_id = {s.context.span_id: s for s in spans}
+
+    def ancestors(s: Any) -> list[str]:
+        out = []
+        while s.parent is not None and s.parent.span_id in by_id:
+            s = by_id[s.parent.span_id]
+            out.append(s.name)
+        return out
+
+    mine = [
+        s
+        for s in spans
+        if s.name == "beat" and s.attributes["matchproof.beat_id"] == beat_id
+    ]
+    assert len(mine) == 1
+    tid = mine[0].context.trace_id
+    spans = [s for s in spans if s.context.trace_id == tid]
+    by_id = {s.context.span_id: s for s in spans}
+    names = {s.name for s in spans}
+    assert {
+        "beat",
+        "producer",
+        "narrate",
+        "check",
+        "reconcile",
+        "lint",
+        "judge",
+        "retry",
+        "put_claims",
+    } <= names
+    for name in ("reconcile", "lint", "judge"):
+        assert all(ancestors(s)[0] == "check" for s in spans if s.name == name)
+    judge_chats = [s for s in spans if s.name == "chat fake-judge"]
+    assert judge_chats and all(ancestors(s)[0] == "judge" for s in judge_chats)
+    narrator_chats = [s for s in spans if s.name == "chat fake-narrator"]
+    assert len(narrator_chats) == 2  # the draft and the retry
+    assert all("beat" in ancestors(s) for s in judge_chats + narrator_chats)
+    for s in spans:
+        if s.name in ("judge", "chat fake-judge", "chat fake-narrator"):
+            assert s.attributes["gen_ai.usage.input_tokens"] == 10
+            assert s.attributes["gen_ai.usage.output_tokens"] == 4

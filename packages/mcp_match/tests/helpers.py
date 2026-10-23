@@ -25,7 +25,10 @@ ROOT = Path(__file__).resolve().parents[3]
 def fill(store: MatchStore, story: str, seed: int) -> str:
     """Run a match through the engine and detector into `store`; returns its match id."""
     brief = make_brief(DEFAULT_HOME, DEFAULT_AWAY, story, seed)
-    engine, detector = FactEngine(), BeatDetector()
+    engine, detector = (
+        FactEngine(None, {"home": brief.home.name, "away": brief.away.name}),
+        BeatDetector(),
+    )
     store.begin(brief, engine.registry)
     for _, item in read_stream(brief):
         if isinstance(item, Event):

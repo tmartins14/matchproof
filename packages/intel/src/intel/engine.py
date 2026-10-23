@@ -67,8 +67,10 @@ def extract_all(
     frames: Iterable[PositionFrame],
     freeze_frames: Iterable[PositionFrame],
     roster: Mapping[str, str] | None = None,
+    teams: Mapping[str, str] | None = None,
 ) -> FactRegistry:
-    """Every precomputed fact for a finished match. `roster` maps player ids to names."""
+    """Every precomputed fact for a finished match. `roster` maps player ids to names, `teams` sides
+    to club names."""
     evs = list(events)
     registry = new_registry()
     bounds = period_bounds(evs)
@@ -109,7 +111,7 @@ def extract_all(
         for f in position_facts(every_sample, span):
             registry.add(f)
 
-    observer = EventObserver(roster)
+    observer = EventObserver(roster, teams)
     for e in evs:
         for f in observer.observe(e):
             registry.add(f)
@@ -130,9 +132,13 @@ class FactEngine:
     the freeze frame, which follows its event. Feed `finish()` for a match that stops early.
     """
 
-    def __init__(self, roster: Mapping[str, str] | None = None) -> None:
+    def __init__(
+        self,
+        roster: Mapping[str, str] | None = None,
+        teams: Mapping[str, str] | None = None,
+    ) -> None:
         self.registry = new_registry()
-        self._observer = EventObserver(roster)
+        self._observer = EventObserver(roster, teams)
         self._period_start: dict[int, float] = {}
         self._period_end: dict[int, float] = {}
         self._p2_start: float | None = None

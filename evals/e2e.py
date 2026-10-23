@@ -13,6 +13,7 @@ from datetime import date
 from typing import Any
 
 from agents.auditor import MAX_CONCURRENT_AUDITS, Auditor, summarize_audits
+from agents.budget import MeteredClient, TokenBudget
 from agents.llm_client import client_for
 from agents.pipeline import Deps, run_beat
 from intel.voice_lint import lint, numbers_in
@@ -50,10 +51,10 @@ def readability(texts: list[str], beats: int, latencies: list[int]) -> dict[str,
 
 
 async def audit_claims(
-    server: Any, match_id: str, checked: list[Any]
+    server: Any, match_id: str, checked: list[Any], client: Any = None
 ) -> dict[str, Any]:
     """The second model's check of every claim the Checker settled, as the live stream does it."""
-    auditor = Auditor(client_for("auditor"), server)
+    auditor = Auditor(client or client_for("auditor"), server)
     gate = asyncio.Semaphore(MAX_CONCURRENT_AUDITS)
 
     async def one(c: Any) -> tuple[Any, Any, str]:
@@ -69,7 +70,13 @@ async def audit_claims(
 async def main_async(story: str, seed: int, mode: str) -> dict[str, Any]:
     store, match_id = build_store(story, seed)
     server = build_server(store, writable=True)
-    deps = Deps(server, client_for("narrator"), client_for("judge"))
+    # A match's own counter, so the report has tokens and cost for this run only.
+    counter = TokenBudget()
+    deps = Deps(
+        server,
+        MeteredClient(client_for("narrator"), "narrator", counter=counter),
+        MeteredClient(client_for("judge"), "judge", counter=counter),
+    )
     runs = []
     for beat in store.beats(match_id):
         run = await run_beat(match_id, beat.id.root, mode, deps=deps)  # type: ignore[arg-type]
@@ -82,8 +89,12 @@ async def main_async(story: str, seed: int, mode: str) -> dict[str, Any]:
             flush=True,
         )
     audit = await audit_claims(
-        server, match_id, [c for _, r in runs for c in r.checked]
+        server,
+        match_id,
+        [c for _, r in runs for c in r.checked],
+        MeteredClient(client_for("auditor"), "auditor", counter=counter),
     )
+    spent = counter.snapshot()
     latencies = [r.latency_ms for _, r in runs]
     verdicts = Counter(c.verdict.value for _, r in runs for c in r.claims)
     chains = [
@@ -119,6 +130,8 @@ async def main_async(story: str, seed: int, mode: str) -> dict[str, Any]:
             "narrator": sum(r.narrator_tokens for _, r in runs),
             "judge": sum(r.judge_tokens for _, r in runs),
         },
+        "usage": spent["usage"],  # tokens in and out, by role
+        "cost": spent["cost"],  # from config/prices.yaml, or "prices not set"
         "audit": audit,
         "chains": chains,
     }

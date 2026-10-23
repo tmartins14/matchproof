@@ -1,0 +1,46 @@
+# Words and phrases that compare: the claim says something changed or differs from another value.
+# A claim that uses one must cite a fact that holds the comparison: a before or change fact, or a
+# score_after or lead fact (agents.reconcile). A "since" fact alone gives one value, not a change.
+# Matched as whole words, case-insensitive. Add inflections as separate entries.
+- tighter
+- deeper
+- higher
+- lower
+- wider
+- narrower
+- closer
+- further
+- more
+- less
+- fewer
+- up from
+- down from
+- rising
+- rises
+- rose
+- falling
+- falls
+- fell
+- dropped
+- drops
+- edge in front
+- edges in front
+- edge ahead
+- edges ahead
+- take the lead
+- takes the lead
+- took the lead
+- go ahead
+- goes ahead
+- went ahead
+- level
+- levels
+- extend
+- extends
+- extended
+- pull back
+- pulls back
+- pulled back
+- restore
+- restores
+- restored

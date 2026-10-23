@@ -306,11 +306,23 @@ def build_server(store: MatchStore, writable: bool) -> FastMCP:
             # The card, who, when and how many are left. The foul's freeze-frame counts are not the
             # story, and the Narrator turned them into "defenders in the box at the set piece".
             facts = [f for f in facts if f.name.startswith("card(")] or facts
+        # A beat anchored on a goal (the goal itself, or a spell after it) carries the score.
+        registry = store.registry(match_id)
+        have = {f.id.root for f in facts}
+        for name in (
+            f"score_after({beat.anchor_event_id.root})",
+            f"lead({beat.anchor_event_id.root})",
+        ):
+            if (
+                registry.has_name(name)
+                and (fact := registry.by_name(name)).id.root not in have
+            ):
+                facts.append(fact)
         brief = store.brief(match_id)
         ctx = LabelContext(
             {"home": brief.home.name, "away": brief.away.name},
             {e.id.root: e for e in store.events(match_id)},
-            store.registry(match_id),
+            registry,
         )
         # `label` is not part of the Fact schema: it is added here, by code, for the Narrator.
         return {

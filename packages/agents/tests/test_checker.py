@@ -2,7 +2,13 @@ from agents.checker import Checker
 from agents.narrator import DraftClaim, Revision
 from fakes import TEAMS, FakeChat, bundle_of, fact, timeout
 
-DROP = fact("fx-drop", "8 m", "8 metres", side="home")
+DROP = fact(
+    "fx-drop",
+    "8 m",
+    "8 metres",
+    side="home",
+    name="back_line_change(home, ev-000001, to t10.00)",  # a change fact: "deeper" compares
+)
 BUNDLE = bundle_of(DROP)
 GOOD = {"supported": True, "problem": None, "reason": "Matches."}
 BAD = {

@@ -10,6 +10,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from .llm_client import ChatClient, LlmError, LlmReply
+from .prices import cost_of
 
 DAILY_TOKEN_CAP = 2_000_000
 CAP_ENV = "DAILY_TOKEN_CAP"
@@ -24,6 +25,7 @@ class TokenBudget:
         self._lock = threading.Lock()
         self._day = self._today()
         self._used: dict[str, int] = {}
+        self._split: dict[str, dict[str, Any]] = {}  # role: {deployment, input, output}
 
     @staticmethod
     def _today() -> str:
@@ -38,12 +40,27 @@ class TokenBudget:
     def _roll(self) -> None:
         today = self._today()
         if today != self._day:
-            self._day, self._used = today, {}
+            self._day, self._used, self._split = today, {}, {}
 
-    def add(self, role: str, tokens: int) -> None:
+    def add(
+        self,
+        role: str,
+        tokens: int,
+        *,
+        deployment: str | None = None,
+        input_tokens: int = 0,
+        output_tokens: int = 0,
+    ) -> None:
+        """Count tokens for a role. With the deployment and the input/output split, cost can follow."""
         with self._lock:
             self._roll()
             self._used[role] = self._used.get(role, 0) + tokens
+            if deployment is not None:
+                u = self._split.setdefault(
+                    role, {"deployment": deployment, "input": 0, "output": 0}
+                )
+                u["input"] += input_tokens
+                u["output"] += output_tokens
 
     @property
     def used(self) -> int:
@@ -68,6 +85,8 @@ class TokenBudget:
                 "cap": self.cap,
                 "used": used,
                 "by_role": dict(self._used),
+                "usage": {r: dict(u) for r, u in self._split.items()},
+                "cost": cost_of(self._split),
                 "narration_paused": used >= self.cap,
                 "auditing_stopped": used >= self.cap * AUDIT_STOP_FRACTION,
             }
@@ -100,5 +119,11 @@ class MeteredClient:
         if stopped:
             raise LlmError("DailyTokenCap")
         reply = self._inner.complete(prompt, **kwargs)
-        self._budget.add(self._role, reply.input_tokens + reply.output_tokens)
+        self._budget.add(
+            self._role,
+            reply.input_tokens + reply.output_tokens,
+            deployment=self.deployment,
+            input_tokens=reply.input_tokens,
+            output_tokens=reply.output_tokens,
+        )
         return reply

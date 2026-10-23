@@ -12,6 +12,7 @@ from collections import Counter
 from datetime import date
 from typing import Any
 
+from agents.auditor import MAX_CONCURRENT_AUDITS, Auditor, summarize_audits
 from agents.llm_client import client_for
 from agents.pipeline import Deps, run_beat
 from intel.voice_lint import lint, numbers_in
@@ -48,6 +49,23 @@ def readability(texts: list[str], beats: int, latencies: list[int]) -> dict[str,
     }
 
 
+async def audit_claims(
+    server: Any, match_id: str, checked: list[Any]
+) -> dict[str, Any]:
+    """The second model's check of every claim the Checker settled, as the live stream does it."""
+    auditor = Auditor(client_for("auditor"), server)
+    gate = asyncio.Semaphore(MAX_CONCURRENT_AUDITS)
+
+    async def one(c: Any) -> tuple[Any, Any, str]:
+        async with gate:
+            return c.claim, await auditor.audit(match_id, c.claim), c.final.judge_reason
+
+    rows = await asyncio.gather(
+        *(one(c) for c in checked if c.claim.verdict.value in ("verified", "rephrased"))
+    )
+    return summarize_audits(match_id, rows)
+
+
 async def main_async(story: str, seed: int, mode: str) -> dict[str, Any]:
     store, match_id = build_store(story, seed)
     server = build_server(store, writable=True)
@@ -63,6 +81,9 @@ async def main_async(story: str, seed: int, mode: str) -> dict[str, Any]:
             "ms",
             flush=True,
         )
+    audit = await audit_claims(
+        server, match_id, [c for _, r in runs for c in r.checked]
+    )
     latencies = [r.latency_ms for _, r in runs]
     verdicts = Counter(c.verdict.value for _, r in runs for c in r.claims)
     chains = [
@@ -98,6 +119,7 @@ async def main_async(story: str, seed: int, mode: str) -> dict[str, Any]:
             "narrator": sum(r.narrator_tokens for _, r in runs),
             "judge": sum(r.judge_tokens for _, r in runs),
         },
+        "audit": audit,
         "chains": chains,
     }
 

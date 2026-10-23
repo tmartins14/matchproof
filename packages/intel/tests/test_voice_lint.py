@@ -53,6 +53,16 @@ CASES: list[tuple[str, str, str]] = [
         "A 4 second move, 7 m out, worth 0.30 xG at 9′.",
         "A 4 second move, 7 m out, at 9′.",
     ),
+    (
+        "evaluative-adjective",
+        "Rivermouth score a brilliant goal.",
+        "Rivermouth score from 7 m out.",
+    ),
+    (
+        "shielding",
+        "Ashford Vale are shielding their goal.",
+        "Ashford Vale have two defenders near their goal.",
+    ),
 ]
 
 

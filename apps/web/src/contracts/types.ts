@@ -12,7 +12,7 @@ export type Claim = Claim1
  */
 export type Point = [number, number]
 /**
- * One message on the live SSE stream (ADR 0003). The data shape depends on type. claim and verdict are reserved for the agents and carry a claim.
+ * One message on the live SSE stream (ADR 0003). The data shape depends on type. claim and verdict carry a claim. A claim is sent when its beat airs, with its final verdict if the Checker has finished or `checking` if not; a verdict follows when it finishes, and again when the auditor has a result, with the same verdict plus `audit`. seq is the order of sending; a reconnect resumes by seq only on a stream with no agent messages.
  */
 export type StreamMessage = StreamMessage1
 
@@ -108,6 +108,19 @@ retries?: number
 model?: string
 latency_ms?: number
 trace_id?: string
+}
+/**
+ * A second-vendor check run after the Checker settled the claim. Log-only: it never changes the verdict.
+ */
+audit?: {
+deployment: string
+outcome: ("agree" | "disagree" | "unavailable")
+/**
+ * The auditor's problem category, on a disagreement.
+ */
+problem?: string
+reason?: string
+latency_ms?: number
 }
 }
 /**
@@ -365,13 +378,17 @@ type: ("status" | "event" | "frame" | "fact" | "beat" | "claim" | "verdict")
  * Seconds since kickoff on the match clock, stoppage time included.
  */
 t: number
+/**
+ * On claim and verdict messages: the id of the beat's span in the match's trace.
+ */
+span_id?: string
 data: (Status | Event | PositionFrame | Fact | Beat | Claim)
 }
 export interface Status {
 /**
- * focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it.
+ * focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it. notice: a message for the viewer (narration paused, verification unavailable) that changes nothing about playback.
  */
-state: ("pre_match" | "live" | "half_time" | "full_time" | "error" | "focus" | "freeze")
+state: ("pre_match" | "live" | "half_time" | "full_time" | "error" | "focus" | "freeze" | "notice")
 /**
  * Match minutes per real second while cruising. Absent in focus and freeze.
  */

@@ -200,3 +200,15 @@
   severity: warn
   applies_to: [narration]
   why: "More than three numbers in one claim reads like a stat sheet."
+
+- id: evaluative-adjective
+  pattern: '\b(?:brilliant|tidy|superb|clinical|stunning|sublime|wonderful)\b'
+  severity: error
+  applies_to: [narration]
+  why: "A judgement the data cannot support; say what happened."
+
+- id: shielding
+  pattern: '\bshielding\b'
+  severity: error
+  applies_to: [narration]
+  why: "Implies intent the data cannot support."

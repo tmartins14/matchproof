@@ -40,7 +40,7 @@ def test_read_only_server_has_no_write_tool_and_internal_one_has() -> None:
             return {t.name for t in (await s.list_tools()).tools}
 
     assert run(names(False)) == READ_TOOLS
-    assert run(names(True)) == READ_TOOLS | {"put_claims"}
+    assert run(names(True)) == READ_TOOLS | {"put_claims", "put_audit"}
 
 
 def test_every_tool_validates_against_its_schema() -> None:
@@ -137,6 +137,29 @@ def test_red_card_follow_up_bundle_has_every_cited_fact() -> None:
     run(scenario())
 
 
+def test_card_bundles_carry_no_freeze_frame_facts() -> None:
+    store, match_id = finished()
+
+    async def scenario() -> list[dict[str, Any]]:
+        async with client_for(store, False) as s:
+            beats = (await call(s, "list_beats", match_id=match_id))["beats"]
+            card = next(b for b in beats if b["kind"] == "card")
+            out = await call(
+                s, "get_beat_bundle", match_id=match_id, beat_id=card["id"]
+            )
+            return list(out["facts"])
+
+    names = [f["name"] for f in run(scenario())]
+    assert names
+    assert all(n.startswith("card(") for n in names), names
+    assert {n.split(").")[1] for n in names} >= {
+        "kind",
+        "player",
+        "players_after",
+        "minute",
+    }
+
+
 def test_put_claims() -> None:
     store = InMemoryMatchStore()
     match_id = fill(store, "red_card_flip", 3)
@@ -223,6 +246,53 @@ def test_put_claims() -> None:
             assert unknown.isError
             assert "Unknown beat bt-999999-card" in str(unknown.content)
             assert len(store.claims(match_id)[beat["id"]]) == 2
+
+    run(scenario())
+
+
+def test_put_audit_attaches_to_a_stored_claim_and_leaves_the_verdict() -> None:
+    store = InMemoryMatchStore()
+    match_id = fill(store, "red_card_flip", 3)
+
+    async def scenario() -> None:
+        async with client_for(store, True) as s:
+            beats = (await call(s, "list_beats", match_id=match_id))["beats"]
+            beat = red_card_follow_up(beats)
+            claim = {
+                "id": "cl-001-01",
+                "beat_id": beat["id"],
+                "lang": "en",
+                "text": "Ten men drop deeper.",
+                "fact_ids": [beat["fact_ids"][0]],
+                "numbers": [],
+                "verdict": "verified",
+            }
+            await call(
+                s, "put_claims", match_id=match_id, beat_id=beat["id"], claims=[claim]
+            )
+            audit = {
+                "deployment": "judge-grok",
+                "outcome": "disagree",
+                "problem": "overclaim",
+                "reason": "Drop deeper needs a fact.",
+                "latency_ms": 4100,
+            }
+            out = await call(
+                s, "put_audit", match_id=match_id, claim_id="cl-001-01", audit=audit
+            )
+            assert out["stored"]
+            stored = store.claims(match_id)[beat["id"]][0]
+            assert stored.verdict.value == "verified"
+            validator("claim").validate(
+                stored.model_dump(mode="json", by_alias=True, exclude_none=True)
+            )
+            assert stored.audit is not None and stored.audit.outcome.value == "disagree"
+            for bad in (
+                {"claim_id": "cl-404-01", "audit": audit},
+                {"claim_id": "cl-001-01", "audit": {"outcome": "maybe"}},
+            ):
+                res = await s.call_tool("put_audit", {"match_id": match_id, **bad})
+                assert res.isError
 
     run(scenario())
 

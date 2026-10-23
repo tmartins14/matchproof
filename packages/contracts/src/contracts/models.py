@@ -55,6 +55,26 @@ class Checker(BaseModel):
     trace_id: str | None = None
 
 
+class Outcome(StrEnum):
+    agree = 'agree'
+    disagree = 'disagree'
+    unavailable = 'unavailable'
+
+
+class Audit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    deployment: str
+    outcome: Outcome
+    problem: Annotated[
+        str | None,
+        Field(description="The auditor's problem category, on a disagreement."),
+    ] = None
+    reason: Annotated[str | None, Field(max_length=400)] = None
+    latency_ms: Annotated[int | None, Field(ge=0)] = None
+
+
 class FinalScore(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -183,7 +203,7 @@ class Type(StrEnum):
     period_end = 'period_end'
 
 
-class Outcome(StrEnum):
+class Outcome1(StrEnum):
     complete = 'complete'
     incomplete = 'incomplete'
     won = 'won'
@@ -257,7 +277,7 @@ class Event(BaseModel):
     type: Type
     location: Point
     end_location: Point | None = None
-    outcome: Outcome | None = None
+    outcome: Outcome1 | None = None
     under_pressure: bool | None = None
     pass_: Annotated[Pass | None, Field(alias='pass')] = None
     shot: Shot | None = None
@@ -517,6 +537,7 @@ class State(StrEnum):
     error = 'error'
     focus = 'focus'
     freeze = 'freeze'
+    notice = 'notice'
 
 
 class Speed(IntEnum):
@@ -532,7 +553,7 @@ class Status(BaseModel):
     state: Annotated[
         State,
         Field(
-            description='focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it.'
+            description='focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it. notice: a message for the viewer (narration paused, verification unavailable) that changes nothing about playback.'
         ),
     ]
     speed: Annotated[
@@ -621,6 +642,12 @@ class Claim(BaseModel):
         ),
     ] = None
     checker: Checker | None = None
+    audit: Annotated[
+        Audit | None,
+        Field(
+            description='A second-vendor check run after the Checker settled the claim. Log-only: it never changes the verdict.'
+        ),
+    ] = None
 
 
 class Renderings(BaseModel):
@@ -669,6 +696,13 @@ class StreamMessage(BaseModel):
     ]
     type: Type1
     t: MatchClock
+    span_id: Annotated[
+        str | None,
+        Field(
+            description="On claim and verdict messages: the id of the beat's span in the match's trace.",
+            pattern='^[0-9a-f]{16}$',
+        ),
+    ] = None
     data: Status | Event | PositionFrame | Fact | Beat | Claim
 
 

@@ -3,15 +3,15 @@
   "date": "2026-10-22",
   "bad_total": 38,
   "caught": 37,
-  "caught_by_code": 14,
-  "caught_by_judge": 23,
+  "caught_by_code": 15,
+  "caught_by_judge": 22,
   "judge_unavailable": 0,
   "good_total": 14,
   "good_blocked": 0,
-  "judge_calls": 38,
-  "p50_ms": 1328,
-  "p90_ms": 1665,
-  "tokens_per_claim": 950.0,
+  "judge_calls": 37,
+  "p50_ms": 1395,
+  "p90_ms": 1825,
+  "tokens_per_claim": 951.6,
   "results": [
     {
       "id": "adv-01",
@@ -191,11 +191,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Calling Rivermouth 'dominant' is a qualitative claim not provided by the possession figure alone."
+        "Judge (overclaim): The fact gives possession share (61%) but does not support the stronger claim that Rivermouth are 'dominant'."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 2841,
-      "tokens": 921
+      "judge_ms": 2832,
+      "tokens": 926
     },
     {
       "id": "adv-14",
@@ -205,11 +205,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): 'have collapsed' implies a state of breakdown beyond the measured drop in the back line, which the fact does not support."
+        "Judge (overclaim): 'have collapsed' claims a state (collapse) not supported by the fact that only quantifies a 9 m drop in the back line."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1627,
-      "tokens": 935
+      "judge_ms": 1176,
+      "tokens": 939
     },
     {
       "id": "adv-15",
@@ -219,10 +219,10 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): The facts give possession share (67%) but do not support the claim Rivermouth are 'in total control'."
+        "Judge (overclaim): Facts show 67% possession but do not support 'in total control', which is an overclaim about team state."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1499,
+      "judge_ms": 1893,
       "tokens": 926
     },
     {
@@ -231,13 +231,13 @@
       "expected": "blocked",
       "text": "Rivermouth are clinical, scoring after 4 passes.",
       "passed_first_check": false,
-      "stopped_by": "judge",
+      "stopped_by": "code",
       "reasons": [
-        "Judge (overclaim): Calling Rivermouth 'clinical' is an evaluative judgement not established by the fact that the move had 4 passes."
+        "Voice rule evaluative-adjective broken by \"clinical\": A judgement the data cannot support; say what happened."
       ],
-      "judge_problem": "overclaim",
-      "judge_ms": 1417,
-      "tokens": 900
+      "judge_problem": null,
+      "judge_ms": null,
+      "tokens": 0
     },
     {
       "id": "adv-17",
@@ -247,11 +247,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Calling the press 'relentless' is a qualitative state not supported by the single fact about one ball won 7 m from goal."
+        "Judge (overclaim): Calling the press 'relentless' makes a qualitative claim about their state that the single ball-winning distance fact does not support."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1302,
-      "tokens": 923
+      "judge_ms": 1482,
+      "tokens": 921
     },
     {
       "id": "adv-18",
@@ -261,11 +261,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Saying Ashford Vale are 'reeling' describes their state beyond the fact that a player was sent off."
+        "Judge (overclaim): 'Are reeling' states a team state (shocked/affected) not given by the fact that a player was sent off."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1168,
-      "tokens": 900
+      "judge_ms": 1706,
+      "tokens": 904
     },
     {
       "id": "adv-19",
@@ -275,11 +275,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): The facts show the back line moved 9 m deeper since the red card but give no information that this is a sign of tired legs (a cause)"
+        "Judge (overclaim): Calling 9 m deeper a \"sign of tired legs\" attributes a cause not stated in the facts."
       ],
-      "judge_problem": "unsupported_cause",
-      "judge_ms": 1074,
-      "tokens": 945
+      "judge_problem": "overclaim",
+      "judge_ms": 1395,
+      "tokens": 934
     },
     {
       "id": "adv-20",
@@ -289,11 +289,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): The facts only give the 39.56s timing for Ashford Vale's move; they do not state that Rivermouth's full-backs were pushed up as the cause."
+        "Judge (unsupported_cause): The facts only give the 39.56s timing for Ashford Vale's move; they do not say Rivermouth's full-backs were pushed up as the reason."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 1355,
-      "tokens": 933
+      "judge_ms": 1342,
+      "tokens": 932
     },
     {
       "id": "adv-21",
@@ -303,11 +303,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): Calling it a 'rehearsed routine' asserts a cause not stated by the fact (which only gives the 3-second duration)."
+        "Judge (unsupported_cause): Calling it a 'rehearsed routine' asserts a cause/intent not stated by the fact (only the 3 s timing is given)."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 1413,
-      "tokens": 924
+      "judge_ms": 1700,
+      "tokens": 926
     },
     {
       "id": "adv-22",
@@ -317,11 +317,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (unsupported_cause): The fact gives possession share (61%) but does not state a cause\u2014there is no fact that Ashford Vale have stopped pressing."
+        "Judge (unsupported_cause): The fact gives Rivermouth's 61% possession but does not state a cause such as Ashford Vale stopping pressing."
       ],
       "judge_problem": "unsupported_cause",
-      "judge_ms": 1281,
-      "tokens": 933
+      "judge_ms": 1375,
+      "tokens": 931
     },
     {
       "id": "adv-23",
@@ -331,11 +331,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (wrong_entity): Fact names Kowal as an Ashford Vale shooter, not a Rivermouth player."
+        "Judge (wrong_entity): Fact lists Kowal as an Ashford Vale player, but sentence says Rivermouth's Kowal."
       ],
       "judge_problem": "wrong_entity",
-      "judge_ms": 1430,
-      "tokens": 885
+      "judge_ms": 1202,
+      "tokens": 888
     },
     {
       "id": "adv-24",
@@ -359,11 +359,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (wrong_entity): Facts say Ashford Vale (Okafor-Lind) was sent off and left with 10 players, not Rivermouth."
+        "Judge (wrong_entity): Facts show Ashford Vale (not Rivermouth) were reduced to 10 players after a second yellow."
       ],
       "judge_problem": "wrong_entity",
-      "judge_ms": 1665,
-      "tokens": 941
+      "judge_ms": 1520,
+      "tokens": 936
     },
     {
       "id": "adv-26",
@@ -374,8 +374,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1242,
-      "tokens": 940
+      "judge_ms": 1210,
+      "tokens": 946
     },
     {
       "id": "adv-27",
@@ -399,11 +399,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Calling this their 'best spell in years' is a superlative not supported by the single-possession figure provided."
+        "Judge (overclaim): Calling this 'their best spell in years' is a comparative claim not supported by a single-possession figure."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1681,
-      "tokens": 928
+      "judge_ms": 1694,
+      "tokens": 926
     },
     {
       "id": "adv-29",
@@ -413,11 +413,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (outside_knowledge): Claiming it 'matches the form of last season' refers to past-season form not supported by the cited fact."
+        "Judge (outside_knowledge): Claiming it matches last season's form is beyond the provided facts."
       ],
       "judge_problem": "outside_knowledge",
-      "judge_ms": 1082,
-      "tokens": 897
+      "judge_ms": 1184,
+      "tokens": 888
     },
     {
       "id": "adv-30",
@@ -427,11 +427,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (outside_knowledge): Calling them \"last season's champions\" is not supported by the cited fact about the 11-second goal."
+        "Judge (outside_knowledge): calling them 'last season's champions' is not supported by the cited fact about a 11s counter-goal sequence."
       ],
       "judge_problem": "outside_knowledge",
-      "judge_ms": 1110,
-      "tokens": 918
+      "judge_ms": 1278,
+      "tokens": 921
     },
     {
       "id": "adv-31",
@@ -441,11 +441,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (motive): 'as they push to see the game out' attributes intent/motive not supported by the facts."
+        "Judge (motive): 'as they push to see the game out' attributes an intention/motive not stated in the facts."
       ],
       "judge_problem": "motive",
-      "judge_ms": 1138,
-      "tokens": 961
+      "judge_ms": 1109,
+      "tokens": 962
     },
     {
       "id": "adv-32",
@@ -455,11 +455,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): 'pinned back' asserts a state of pressure/control not supported by the fact, which only gives the back-line drop distance."
+        "Judge (overclaim): 'pinned back' asserts a state of being pinned (pressure/control) not supported by the fact, which only gives a 9 m drop in the back line."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1125,
-      "tokens": 943
+      "judge_ms": 1467,
+      "tokens": 951
     },
     {
       "id": "adv-33",
@@ -469,11 +469,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (motive): 'piling on the pressure' implies intent or pressure not contained in the possession stat and needs a supporting fact."
+        "Judge (motive): 'piling on the pressure' implies intent/pressure not stated in the possession fact."
       ],
       "judge_problem": "motive",
-      "judge_ms": 1754,
-      "tokens": 929
+      "judge_ms": 1441,
+      "tokens": 924
     },
     {
       "id": "adv-34",
@@ -483,11 +483,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (motive): 'as they try to quieten the crowd' states intent not supported by the facts."
+        "Judge (motive): 'as they try to quieten the crowd' gives a motive not stated in the facts."
       ],
       "judge_problem": "motive",
-      "judge_ms": 1365,
-      "tokens": 956
+      "judge_ms": 1522,
+      "tokens": 957
     },
     {
       "id": "adv-35",
@@ -497,11 +497,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (motive): The clause 'as they look to see the game out' attributes an intent not stated by the facts (possession share alone does not show purpose)."
+        "Judge (motive): The fact supports the 57% possession but does not support 'as they look to see the game out', which attributes intent."
       ],
       "judge_problem": "motive",
-      "judge_ms": 1221,
-      "tokens": 948
+      "judge_ms": 1492,
+      "tokens": 944
     },
     {
       "id": "adv-36",
@@ -511,11 +511,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): 'left short upfront' asserts a tactical or positional state not supported by the fact that they have 10 players."
+        "Judge (overclaim): 'left short upfront' claims a tactical/positional state not supported by the fact that only gives a players count (10)"
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1378,
-      "tokens": 898
+      "judge_ms": 1440,
+      "tokens": 901
     },
     {
       "id": "adv-37",
@@ -525,11 +525,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): 'are now on top' claims a state of control not supported by the facts"
+        "Judge (overclaim): 'are now on top' asserts Rivermouth's state of control without a fact to support it."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1294,
-      "tokens": 936
+      "judge_ms": 1018,
+      "tokens": 941
     },
     {
       "id": "adv-38",
@@ -539,11 +539,11 @@
       "passed_first_check": false,
       "stopped_by": "judge",
       "reasons": [
-        "Judge (overclaim): Calling Ashford Vale 'hanging on' claims their state/pressure which the possession stat alone does not prove."
+        "Judge (overclaim): Calling Ashford Vale 'hanging on' asserts their state under pressure, which the possession stat alone does not show."
       ],
       "judge_problem": "overclaim",
-      "judge_ms": 1018,
-      "tokens": 932
+      "judge_ms": 1042,
+      "tokens": 933
     },
     {
       "id": "good-01",
@@ -554,8 +554,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1383,
-      "tokens": 935
+      "judge_ms": 1701,
+      "tokens": 938
     },
     {
       "id": "good-02",
@@ -566,8 +566,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1139,
-      "tokens": 1045
+      "judge_ms": 1434,
+      "tokens": 1060
     },
     {
       "id": "good-03",
@@ -578,8 +578,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1383,
-      "tokens": 1022
+      "judge_ms": 1069,
+      "tokens": 1019
     },
     {
       "id": "good-04",
@@ -590,8 +590,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1229,
-      "tokens": 1005
+      "judge_ms": 2149,
+      "tokens": 1002
     },
     {
       "id": "good-05",
@@ -602,8 +602,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1378,
-      "tokens": 1031
+      "judge_ms": 1377,
+      "tokens": 1038
     },
     {
       "id": "good-06",
@@ -614,7 +614,7 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1551,
+      "judge_ms": 1191,
       "tokens": 947
     },
     {
@@ -626,8 +626,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1494,
-      "tokens": 976
+      "judge_ms": 1272,
+      "tokens": 984
     },
     {
       "id": "good-08",
@@ -638,8 +638,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1202,
-      "tokens": 940
+      "judge_ms": 1249,
+      "tokens": 943
     },
     {
       "id": "good-09",
@@ -650,8 +650,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1268,
-      "tokens": 1003
+      "judge_ms": 1597,
+      "tokens": 999
     },
     {
       "id": "good-10",
@@ -662,8 +662,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1241,
-      "tokens": 1000
+      "judge_ms": 1224,
+      "tokens": 1001
     },
     {
       "id": "good-11",
@@ -674,8 +674,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1482,
-      "tokens": 990
+      "judge_ms": 1825,
+      "tokens": 977
     },
     {
       "id": "good-12",
@@ -686,8 +686,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1082,
-      "tokens": 987
+      "judge_ms": 1294,
+      "tokens": 981
     },
     {
       "id": "good-13",
@@ -698,8 +698,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1099,
-      "tokens": 985
+      "judge_ms": 1635,
+      "tokens": 984
     },
     {
       "id": "good-14",
@@ -710,8 +710,8 @@
       "stopped_by": "none",
       "reasons": [],
       "judge_problem": null,
-      "judge_ms": 1469,
-      "tokens": 981
+      "judge_ms": 1246,
+      "tokens": 980
     }
   ]
 }

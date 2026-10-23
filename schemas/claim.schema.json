@@ -39,6 +39,19 @@
         "latency_ms": { "type": "integer", "minimum": 0 },
         "trace_id": { "type": "string" }
       }
+    },
+    "audit": {
+      "type": "object",
+      "description": "A second-vendor check run after the Checker settled the claim. Log-only: it never changes the verdict.",
+      "additionalProperties": false,
+      "required": ["deployment", "outcome"],
+      "properties": {
+        "deployment": { "type": "string" },
+        "outcome": { "type": "string", "enum": ["agree", "disagree", "unavailable"] },
+        "problem": { "type": "string", "description": "The auditor's problem category, on a disagreement." },
+        "reason": { "type": "string", "maxLength": 400 },
+        "latency_ms": { "type": "integer", "minimum": 0 }
+      }
     }
   },
   "allOf": [

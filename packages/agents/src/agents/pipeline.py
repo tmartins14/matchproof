@@ -1,27 +1,23 @@
-"""One beat through Narrator and Checker, and the claims written back.
+"""One beat through the workflow, and the claims written back.
 
-A plain async function so the live stream and the Agent Framework workflow can call it. The
-agents reach the match only through the internal MCP server (ADR 0008): the bundle comes from
-`get_beat_bundle` and the claims go back through `put_claims`.
+`run_beat` and `narrate_and_check` are thin wrappers over the Agent Framework workflow in
+`workflow.py` (Producer, Narrator, Checker), with a Producer that narrates every beat, so the evals
+and scripts keep their one-call interface. The agents reach the match only through the internal MCP
+server (ADR 0008): the bundle comes from `get_beat_bundle` and the claims go back through `put_claims`.
 """
 
-import asyncio
 import json
-import time
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from contracts.models import Claim, Fact
-from opentelemetry import trace
-from opentelemetry.trace import Span
+from contracts.models import Claim
 
-from .checker import CheckedClaim, Checker
+from .checker import CheckedClaim
 from .llm_client import ChatClient
-from .narrator import DraftClaim, Mode, NarratorOutput, Revision, narrate
+from .narrator import Mode, NarratorOutput
+from .producer import Decision, Producer
 from .structured import Structured
-
-_tracer = trace.get_tracer(__name__)
 
 
 class ToolServer(Protocol):
@@ -30,11 +26,27 @@ class ToolServer(Protocol):
     async def call_tool(self, name: str, arguments: dict[str, Any]) -> Any: ...
 
 
+class Observer(Protocol):
+    """Told how a beat is getting on, so the live stream can show claims as `checking` and then
+    their verdicts. Called on the event loop."""
+
+    def decided(self, beat_id: str, decision: Decision) -> None: ...
+
+    def drafted(self, beat_id: str, previews: list[Claim]) -> None: ...
+
+    def settled(self, beat_id: str, run: "BeatRun") -> None: ...
+
+
 @dataclass
 class Deps:
     server: ToolServer
     narrator: ChatClient
     judge: ChatClient
+    producer: Producer | None = None  # None: every beat is narrated
+    observer: Observer | None = None
+    paused: Callable[[], bool] = lambda: (
+        False
+    )  # true when the daily token cap has tripped
 
 
 @dataclass
@@ -45,6 +57,10 @@ class BeatRun:
     narrator_tokens: int = 0
     judge_tokens: int = 0
     narrator_calls: list[Structured[NarratorOutput]] = field(default_factory=list)
+    decision: Decision | None = None
+    error: str | None = None  # why a narrated beat has no claims
+    trace_id: str | None = None
+    span_id: str | None = None
 
 
 def tool_result(raw: Any) -> dict[str, Any]:
@@ -58,127 +74,11 @@ def tool_result(raw: Any) -> dict[str, Any]:
     return parsed
 
 
-def _span_attrs(span: Span, **attrs: str | float) -> None:
-    for key, value in attrs.items():
-        span.set_attribute(key, value)
-
-
 async def run_beat(match_id: str, beat_id: str, mode: Mode, *, deps: Deps) -> BeatRun:
-    started = time.perf_counter()
-    with _tracer.start_as_current_span(
-        "invoke_agent narrate_and_check",
-        attributes={
-            "gen_ai.operation.name": "invoke_agent",
-            "gen_ai.agent.name": "narrate_and_check",
-            "matchproof.match_id": match_id,
-            "matchproof.beat_id": beat_id,
-            "matchproof.mode": mode,
-        },
-    ) as root:
-        with _tracer.start_as_current_span("fetch_bundle"):
-            bundle = tool_result(
-                await deps.server.call_tool(
-                    "get_beat_bundle", {"match_id": match_id, "beat_id": beat_id}
-                )
-            )
-            brief = tool_result(
-                await deps.server.call_tool("get_brief", {"match_id": match_id})
-            )
-        teams = {"home": brief["home"]["name"], "away": brief["away"]["name"]}
-        names = {p["name"] for side in ("home", "away") for p in brief[side]["players"]}
-        labels = {f["id"]: f["label"] for f in bundle["facts"]}
-        facts = {
-            f["id"]: Fact.model_validate({k: v for k, v in f.items() if k != "label"})
-            for f in bundle["facts"]
-        }
-        beat = bundle["beat"]
-        calls: list[Structured[NarratorOutput]] = []
+    """Narrate and check one beat through the workflow, with every beat narrated."""
+    from .workflow import run_beat_workflow  # the workflow imports this module's types
 
-        def draft(revision: Revision | None) -> list[DraftClaim]:
-            with _tracer.start_as_current_span(
-                "narrate",
-                attributes={
-                    "gen_ai.operation.name": "chat",
-                    "gen_ai.request.model": deps.narrator.deployment,
-                    "matchproof.retry": revision is not None,
-                },
-            ) as span:
-                out = narrate(deps.narrator, bundle, mode, teams=teams, revise=revision)
-                _span_attrs(
-                    span,
-                    **{
-                        "gen_ai.usage.input_tokens": out.input_tokens,
-                        "gen_ai.usage.output_tokens": out.output_tokens,
-                    },
-                )
-            calls.append(out)
-            return out.value.claims
-
-        drafts = await asyncio.to_thread(draft, None)
-        checker = Checker(deps.judge)
-
-        def check() -> list[CheckedClaim]:
-            with _tracer.start_as_current_span(
-                "check",
-                attributes={"gen_ai.request.model": deps.judge.deployment},
-            ) as span:
-                result = checker.check_beat(
-                    drafts,
-                    facts,
-                    beat_id=beat_id,
-                    lang="en",
-                    teams=teams,
-                    beat_kind=beat["kind"],
-                    beat_label=beat["label"],
-                    labels=labels,
-                    names=names,
-                    renarrate=lambda rev: draft(rev),
-                )
-                _span_attrs(
-                    span,
-                    **{
-                        "matchproof.verdicts": ",".join(
-                            c.claim.verdict.value for c in result
-                        )
-                    },
-                )
-            return result
-
-        checked = await asyncio.to_thread(check)
-        claims = [c.claim for c in checked]
-        with _tracer.start_as_current_span("put_claims"):
-            written = tool_result(
-                await deps.server.call_tool(
-                    "put_claims",
-                    {
-                        "match_id": match_id,
-                        "beat_id": beat_id,
-                        "claims": [
-                            c.model_dump(mode="json", by_alias=True, exclude_none=True)
-                            for c in claims
-                        ],
-                    },
-                )
-            )
-        rejected = [r for r in written["results"] if not r["accepted"]]
-        if rejected:
-            raise ValueError(f"put_claims rejected claims: {rejected}")
-        latency_ms = round((time.perf_counter() - started) * 1000)
-        _span_attrs(root, **{"matchproof.beat.latency_ms": latency_ms})
-    return BeatRun(
-        claims=claims,
-        checked=checked,
-        latency_ms=latency_ms,
-        narrator_tokens=sum(c.input_tokens + c.output_tokens for c in calls),
-        judge_tokens=sum(
-            c.final.input_tokens
-            + c.first.input_tokens
-            + c.final.output_tokens
-            + c.first.output_tokens
-            for c in checked
-        ),
-        narrator_calls=calls,
-    )
+    return await run_beat_workflow(match_id, beat_id, mode, deps=deps)
 
 
 async def narrate_and_check(

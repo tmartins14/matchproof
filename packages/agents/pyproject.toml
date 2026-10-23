@@ -6,6 +6,7 @@ dependencies = [
     "azure-identity>=1.26.0",
     "matchproof-contracts",
     "matchproof-intel",
+    "matchproof-sim",
     "pydantic>=2",
     "pyyaml",
     "openai>=3.35.1",
@@ -23,3 +24,4 @@ packages = ["src/agents"]
 [tool.uv.sources]
 matchproof-contracts = { workspace = true }
 matchproof-intel = { workspace = true }
+matchproof-sim = { workspace = true }

@@ -25,6 +25,14 @@ producer:
   response_format: json_schema
   reasoning_effort: minimal
 
+# The Composer turns a free-text brief into tactics and planted moments; code validates its output.
+composer:
+  deployment: gpt-5-mini
+  max_output_tokens: 700
+  timeout_s: 20
+  response_format: json_schema
+  reasoning_effort: minimal
+
 # The independent auditor: a second vendor runs the judge rubric on settled claims, log-only.
 # judge-grok was accurate on the v2 bake-off (38 of 38) but too slow for the inline check (p50 7.8 s).
 auditor:

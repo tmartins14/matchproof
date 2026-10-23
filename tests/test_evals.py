@@ -11,6 +11,7 @@ import yaml
 from agents.reconcile import reconcile
 from intel.voice_lint import lint
 
+from evals.golden import bundle_fact_ids
 from evals.pick import Score, pick_judge, set_active_judge
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,21 +26,24 @@ CODE_KINDS = {"wrong_number", "uncited_number"}
 CODE_IDS = {
     "adv-27",  # a wrong minute written as a number
     "adv-16",  # "clinical": the evaluative-adjective voice rule now stops it before the judge
+    "adv-39",  # "smart": the same rule
+    "adv-43",  # "composed": the same rule
+    "adv-44",  # "edge in front" with no score or lead fact cited
 }
 
 
-def test_mix_is_38_bad_and_14_good() -> None:
+def test_mix_is_44_bad_and_18_good() -> None:
     counts = Counter(c["kind"] for c in CLAIMS)
     assert counts == {
         "wrong_number": 7,
         "uncited_number": 5,
-        "overclaim": 6,
-        "invented_cause": 4,
+        "overclaim": 11,
+        "invented_cause": 5,
         "wrong_entity": 3,
         "wrong_minute": 2,
         "outside_knowledge": 3,
         "motive": 8,
-        "good": 14,
+        "good": 18,
     }
     assert {c["expected"] for c in CLAIMS if c["kind"] == "good"} == {"verified"}
     assert {c["expected"] for c in CLAIMS if c["kind"] != "good"} <= {
@@ -54,7 +58,7 @@ def test_code_checks_stop_exactly_the_claims_meant_for_them(
 ) -> None:
     m = lean(claim["match"]["story"], claim["match"]["seed"])
     beat = next(b for b in m.beats if b.id.root == claim["beat_id"])
-    in_bundle = {f.root for f in beat.fact_ids}
+    in_bundle = set(bundle_fact_ids(m.registry, beat))
     assert set(claim["fact_ids"]) <= in_bundle
     facts = {fid: m.registry.get(fid) for fid in in_bundle}
     rec = reconcile(claim["text"], claim["fact_ids"], facts)
@@ -70,20 +74,20 @@ def test_code_checks_stop_exactly_the_claims_meant_for_them(
 
 def test_pick_takes_most_caught_then_lower_p90() -> None:
     pick = pick_judge(
-        [Score("a", 35, 0, 3000), Score("b", 36, 1, 3900), Score("c", 36, 1, 3500)]
+        [Score("a", 41, 0, 3000), Score("b", 42, 1, 3900), Score("c", 42, 1, 3500)]
     )
     assert (pick.deployment, pick.fallback) == ("c", False)
 
 
 def test_pick_skips_candidates_that_miss_any_threshold() -> None:
     scores = [
-        Score("few", 34, 0, 1000),
-        Score("blocks", 38, 2, 1000),
-        Score("slow", 38, 0, 4001),
+        Score("few", 40, 0, 1000),
+        Score("blocks", 44, 2, 1000),
+        Score("slow", 44, 0, 4001),
     ]
     pick = pick_judge(scores)
     assert pick.fallback and pick.deployment == "gpt-5-mini"
-    assert pick_judge([Score("edge", 35, 1, 4000)]).deployment == "edge"
+    assert pick_judge([Score("edge", 41, 1, 4000)]).deployment == "edge"
 
 
 def test_set_active_judge_rewrites_only_the_judge_block(tmp_path: Path) -> None:
@@ -120,7 +124,7 @@ def test_the_file_counts_match_the_pick_rule_denominators() -> None:
 
     bad = [c for c in CLAIMS if c["kind"] != "good"]
     assert (len(bad), len(CLAIMS) - len(bad)) == (BAD_TOTAL, GOOD_TOTAL)
-    assert (MIN_CAUGHT, MAX_GOOD_BLOCKED) == (35, 1)
+    assert (MIN_CAUGHT, MAX_GOOD_BLOCKED) == (41, 1)
 
 
 def test_the_card_label_names_the_player_from_the_roster() -> None:
@@ -140,3 +144,54 @@ def test_the_card_label_names_the_player_from_the_roster() -> None:
     assert label_for(registry.by_name("card(ev-001484).kind"), ctx) == (
         f"{player.value}, second yellow, sent off"
     )
+
+
+def test_from_audit_turns_a_disagreement_into_a_valid_eval_entry() -> None:
+    from evals.from_audit import entries
+
+    audit = {
+        "match_id": "m-red-card-flip-3",
+        "disagreements": [
+            {
+                "claim_id": "cl-001997-open_play_goal-01",
+                "beat_id": "bt-001997-open_play_goal",
+                "fact_ids": ["fx-shot-ev-001997-shooter", "fx-shot-ev-001997-outcome"],
+                "text": 'Pryce scores, a "smart" finish.',
+                "verdict": "verified",
+                "checker": {"deployment": "gpt-5-mini", "reason": "Matches."},
+                "auditor": {
+                    "deployment": "judge-grok",
+                    "problem": "overclaim",
+                    "reason": "Smart is evaluative.",
+                },
+            },
+            {
+                "claim_id": "cl-001484-momentum_swing-01",
+                "beat_id": "bt-001484-momentum_swing",
+                "fact_ids": ["fx-a"],
+                "text": "Cause claim.",
+                "verdict": "rephrased",
+                "checker": {"deployment": "gpt-5-mini", "reason": ""},
+                "auditor": {
+                    "deployment": "judge-grok",
+                    "problem": "unsupported_cause",
+                    "reason": "No cause fact.",
+                },
+            },
+        ],
+    }
+    text = entries(audit, 45)
+    parsed = yaml.safe_load(text)
+    assert [c["id"] for c in parsed] == ["adv-45", "adv-46"]
+    first = parsed[0]
+    assert first["kind"] == "overclaim" and first["expected"] == "rephrased"
+    assert first["match"] == {"story": "red_card_flip", "seed": 3}
+    assert first["beat_id"] == "bt-001997-open_play_goal"
+    assert first["fact_ids"] == [
+        "fx-shot-ev-001997-shooter",
+        "fx-shot-ev-001997-outcome",
+    ]
+    assert first["text"] == 'Pryce scores, a "smart" finish.'
+    assert parsed[1]["kind"] == "invented_cause"
+    keys = {"id", "kind", "match", "beat_id", "text", "fact_ids", "expected"}
+    assert all(set(c) == keys for c in parsed)

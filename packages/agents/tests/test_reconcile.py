@@ -1,3 +1,4 @@
+import pytest
 from agents.reconcile import reconcile
 from fakes import bundle_of, fact
 
@@ -128,3 +129,39 @@ def test_text_without_a_comparison_needs_no_comparison_fact() -> None:
 def test_comparison_words_match_whole_words_only() -> None:
     assert reconcile("Ashford Vale are the moreish side.", ["fx-goal"], COMPARING).ok
     assert not reconcile("Ashford Vale have more.", ["fx-goal"], COMPARING).ok
+
+
+SHARE = fact(
+    "fx-share",
+    "53%",
+    "53 per cent",
+    name="territory(away, since ev-001670 to t5128.00)",
+)
+SHARE_BUNDLE = bundle_of(SHARE, GOAL)
+
+
+def test_a_share_that_has_risen_needs_a_before_or_change_fact() -> None:
+    text = "Ashford's share of play has risen to 53%."
+    r = reconcile(text, ["fx-share"], SHARE_BUNDLE)
+    assert not r.ok
+    assert r.reasons == ["'risen' compares, but no before or change fact is cited."]
+
+
+@pytest.mark.parametrize(
+    "word",
+    [
+        "risen",
+        "rose",
+        "fallen",
+        "fell",
+        "increased",
+        "decreased",
+        "grown",
+        "shrunk",
+        "more space",
+        "less space",
+    ],
+)
+def test_change_words_are_comparisons(word: str) -> None:
+    r = reconcile(f"Ashford have {word} to 53%.", ["fx-share"], SHARE_BUNDLE)
+    assert not r.ok and "compares" in r.reasons[0]

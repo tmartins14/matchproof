@@ -12,7 +12,10 @@ FROM python:3.12-slim
 RUN useradd --system --uid 10001 --no-create-home app
 WORKDIR /app
 COPY --from=build /app/.venv /app/.venv
-ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1
+# Runtime files the installed packages read through MATCHPROOF_ROOT (contracts.paths).
+COPY voice ./voice
+COPY packages/agents/config ./packages/agents/config
+ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1 MATCHPROOF_ROOT=/app
 USER app
 EXPOSE 8000
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

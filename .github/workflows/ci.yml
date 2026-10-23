@@ -41,3 +41,11 @@ jobs:
       - name: Build web
         run: npm run build
         working-directory: apps/web
+
+  container-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the API image and start it with no model environment
+        run: scripts/container_smoke.sh

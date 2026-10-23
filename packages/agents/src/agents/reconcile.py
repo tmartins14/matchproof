@@ -9,13 +9,13 @@ from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
 from decimal import Decimal
 from functools import lru_cache
-from pathlib import Path
 
 import yaml
 from contracts.models import Fact
+from contracts.paths import runtime_root
 from intel.voice_lint import numbers_in
 
-COMPARATIVES_PATH = Path(__file__).resolve().parents[4] / "voice" / "comparatives.yaml"
+COMPARATIVES_PATH = runtime_root() / "voice" / "comparatives.yaml"
 COMPARISON_FACTS = (
     "change",
     "before",

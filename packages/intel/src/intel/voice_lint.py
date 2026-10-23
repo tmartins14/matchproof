@@ -12,11 +12,12 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
+from contracts.paths import runtime_root
 
 Scope = Literal["narration", "ui"]
 Severity = Literal["error", "warn"]
 
-DEFAULT_RULES_PATH = Path(__file__).resolve().parents[4] / "voice" / "banned.yaml"
+DEFAULT_RULES_PATH = runtime_root() / "voice" / "banned.yaml"
 
 _NUMBER_RE = re.compile(r"\d+(?:[.,]\d+)*(?:[′']|%| ?(?:km|m)\b)?")
 

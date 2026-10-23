@@ -34,3 +34,19 @@ def test_health_budget_reports_tokens_against_the_cap(
         "output": 20,
     }
     assert body["cost"] == "prices not set"
+
+
+def test_the_api_starts_without_agents_when_the_runtime_cannot_be_built(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    from api import main
+
+    def broken(_: object) -> None:
+        raise FileNotFoundError("models.yaml")
+
+    monkeypatch.setenv("MODEL_BASE_URL", "https://models.invalid/openai/v1/")
+    monkeypatch.setattr(main, "build_agent_runtime", broken)
+    with TestClient(main.app) as client:
+        assert client.get("/health").status_code == 200
+        assert main.agent_runtime is None and main.agents_configured is True
+    assert "agent runtime did not start" in caplog.text

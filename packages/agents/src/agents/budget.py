@@ -6,6 +6,8 @@ UTC day. Every model call made through `MeteredClient` is counted, whichever age
 
 import os
 import threading
+from collections import OrderedDict
+from contextvars import ContextVar
 from datetime import UTC, datetime
 from typing import Any
 
@@ -19,6 +21,12 @@ AUDIT_STOP_FRACTION = (
 )
 
 
+# The match whose work a model call belongs to. MatchRun sets it around the tasks it starts; the
+# tasks and the threads they use inherit it, so usage can be told per match.
+current_match: ContextVar[str | None] = ContextVar("current_match", default=None)
+MAX_TRACKED_MATCHES = 50
+
+
 class TokenBudget:
     def __init__(self, cap: int | None = None) -> None:
         self._cap = cap
@@ -26,6 +34,7 @@ class TokenBudget:
         self._day = self._today()
         self._used: dict[str, int] = {}
         self._split: dict[str, dict[str, Any]] = {}  # role: {deployment, input, output}
+        self._by_match: OrderedDict[str, dict[str, dict[str, Any]]] = OrderedDict()
 
     @staticmethod
     def _today() -> str:
@@ -61,6 +70,23 @@ class TokenBudget:
                 )
                 u["input"] += input_tokens
                 u["output"] += output_tokens
+                match_id = current_match.get()
+                if match_id is not None:
+                    per = self._by_match.setdefault(match_id, {})
+                    self._by_match.move_to_end(match_id)
+                    m = per.setdefault(
+                        role, {"deployment": deployment, "input": 0, "output": 0}
+                    )
+                    m["input"] += input_tokens
+                    m["output"] += output_tokens
+                    while len(self._by_match) > MAX_TRACKED_MATCHES:
+                        self._by_match.popitem(last=False)
+
+    def match_usage(self, match_id: str) -> dict[str, Any]:
+        """Tokens and cost for one match: {usage: {role: {deployment, input, output}}, cost}."""
+        with self._lock:
+            usage = {r: dict(u) for r, u in self._by_match.get(match_id, {}).items()}
+        return {"match_id": match_id, "usage": usage, "cost": cost_of(usage)}
 
     @property
     def used(self) -> int:

@@ -1,8 +1,9 @@
 """The match store: everything the agents may ask about a match, in one place.
 
 A running match is registered when its stream starts and filled in as the pipeline advances, so a
-query mid-match sees only what has been computed so far. Blob persistence is Friday; the protocol is
-kept small enough to back with Blob later.
+query mid-match sees only what has been computed so far. With an archive, a match that is not in
+memory (evicted, or from before a restart) is loaded from it on first use; eviction applies to
+memory only.
 """
 
 import threading
@@ -12,6 +13,8 @@ from typing import Protocol
 
 from contracts.models import Audit, Beat, Claim, Event, MatchBrief, PositionFrame
 from intel.registry import FactRegistry
+
+from .persist import ArchiveMissing, MatchArchive, load_record
 
 MAX_MATCHES = 6  # matches held at once; the least recently used goes first
 
@@ -72,8 +75,11 @@ class InMemoryMatchStore:
     """Matches by id, least recently used out first. Safe to share between the pipeline's worker
     thread and the event loop: every access takes the lock and hands back copies of the lists."""
 
-    def __init__(self, max_matches: int = MAX_MATCHES) -> None:
+    def __init__(
+        self, max_matches: int = MAX_MATCHES, archive: MatchArchive | None = None
+    ) -> None:
         self._max = max_matches
+        self.archive = archive
         self._records: OrderedDict[str, MatchRecord] = OrderedDict()
         self._lock = threading.RLock()
 
@@ -82,9 +88,37 @@ class InMemoryMatchStore:
         with self._lock:
             record = self._records.get(match_id)
             if record is None:
-                raise UnknownMatch(match_id)
+                record = self._load(match_id)
             self._records.move_to_end(match_id)
             return record
+
+    def _load(self, match_id: str) -> MatchRecord:
+        """Bring an archived match into memory (the lock is held)."""
+        if self.archive is None:
+            raise UnknownMatch(match_id)
+        try:
+            record = load_record(self.archive, match_id)
+        except ArchiveMissing as exc:
+            raise UnknownMatch(match_id) from exc
+        self._records[match_id] = record
+        while len(self._records) > self._max:
+            self._records.popitem(last=False)
+        return record
+
+    def record(self, match_id: str) -> MatchRecord:
+        """A copy of the match's record, safe to read while the pipeline keeps writing."""
+        with self._lock:
+            r = self._get(match_id)
+            return MatchRecord(
+                r.brief,
+                r.registry,
+                list(r.events),
+                dict(r.freeze_frames),
+                list(r.beats),
+                {k: list(v) for k, v in r.claims.items()},
+                r.finished,
+                r.playback_t,
+            )
 
     def begin(self, brief: MatchBrief, registry: FactRegistry) -> None:
         """Register a match, or start it afresh (a reconnect regenerates it); claims are kept."""

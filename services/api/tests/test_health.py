@@ -15,6 +15,7 @@ def test_health_budget_reports_tokens_against_the_cap(
 ) -> None:
     monkeypatch.setenv("DAILY_TOKEN_CAP", "5000")
     budget._used.clear()
+    budget._split.clear()  # other tests in this worker leave their own usage behind
     budget.add(
         "narrator", 120, deployment="gpt-5-mini", input_tokens=100, output_tokens=20
     )

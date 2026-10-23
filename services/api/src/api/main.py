@@ -2,6 +2,7 @@ import asyncio
 import gc
 import hashlib
 import os
+import secrets
 from collections import Counter, OrderedDict
 from collections.abc import AsyncGenerator, AsyncIterator, Callable
 from contextlib import asynccontextmanager
@@ -9,8 +10,9 @@ from functools import lru_cache
 from importlib.metadata import version
 from typing import Annotated, Any
 
-from agents.budget import budget
-from agents.llm_client import LlmClient, LlmError, client_for, from_env
+from agents.budget import MeteredClient, budget
+from agents.composer import compose
+from agents.llm_client import ChatClient, LlmClient, LlmError, client_for, from_env
 from contracts.models import Fact, MatchBrief, StreamMessage
 from fastapi import Body, FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
@@ -19,15 +21,26 @@ from intel.engine import extract_all
 from intel.registry import FactRegistry
 from mcp import ClientSession
 from mcp.shared.memory import create_connected_server_and_client_session
+from mcp_match import ArchiveMissing
+from mcp_match.persist import AUDIT, PRODUCER_LOG, list_manifests, load_json
+from mcp_match.store import UnknownMatch
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from pydantic import ValidationError
 from sim import generate
-from sim.brief import DEFAULT_AWAY, DEFAULT_HOME, STORYLINES, make_brief
+from sim.brief import (
+    DEFAULT_AWAY,
+    DEFAULT_HOME,
+    STORYLINES,
+    make_brief,
+    random_brief,
+    validate_planted,
+)
 from sim.positions import iter_frames, iter_freeze_frames
 from starlette.background import BackgroundTask
 from starlette.routing import Route
 
 from api.agents_runtime import AgentRuntime, DownRun, MatchRun, SessionServer
+from api.archiving import schedule_save
 from api.live import (
     HEARTBEAT_S,
     MAX_LIVE_STREAMS,
@@ -39,7 +52,7 @@ from api.live import (
     run_live,
     teams_of,
 )
-from api.matchdata import PublicMcp, get_internal_server, store
+from api.matchdata import PublicMcp, RateLimiter, get_internal_server, store
 from api.telemetry import configure_telemetry
 
 MODEL_CHECK_PROMPT = "Reply with the single word: ready"
@@ -49,6 +62,8 @@ RETRY_AFTER_S = (
 )
 MAX_STREAMS_PER_CLIENT = 2  # concurrent streams one client address may hold open
 MAX_BRIEFS = 200  # briefs kept in memory; the oldest goes first
+COMPOSE_RPM_PER_CLIENT = 6  # /compose calls per minute per client address
+MAX_COMPOSE_CHARS = 600
 MAX_CACHED_REGISTRIES = 4  # full fact registries kept for fact lookups
 HEARTBEAT_LINE = (
     ": keep-alive\n\n"  # an SSE comment: ignored by the browser, keeps proxies open
@@ -160,10 +175,33 @@ def store_brief(brief: MatchBrief) -> str:
 
 
 def brief_of(match_id: str) -> MatchBrief:
+    """A brief posted since the process started, or one from an archived match."""
     brief = _briefs.get(match_id)
     if brief is None:
-        raise HTTPException(status_code=404, detail=f"unknown match {match_id}")
+        try:
+            brief = store.brief(match_id)
+        except UnknownMatch as exc:
+            raise HTTPException(
+                status_code=404, detail=f"unknown match {match_id}"
+            ) from exc
     return brief
+
+
+@app.get("/matches")
+def list_matches() -> list[dict[str, Any]]:
+    """Archived matches, newest first, from their manifests."""
+    if store.archive is None:
+        return []
+    return [
+        {
+            "match_id": m["match_id"],
+            "storyline": m["storyline"],
+            "score": m["final_score"],
+            "created_at": m["created_at"],
+            "claims": m["claims"],
+        }
+        for m in list_manifests(store.archive)
+    ]
 
 
 @app.post("/matches")
@@ -186,13 +224,89 @@ def create_match(body: Annotated[dict[str, Any], Body()]) -> dict[str, str]:
         raise HTTPException(
             status_code=422, detail=exc.errors(include_url=False, include_context=False)
         ) from exc
+    problems = validate_planted(
+        [
+            (b.kind.value, b.side.value, b.minute_from, b.minute_to)
+            for b in brief.planted_beats
+        ]
+    )
+    if problems:
+        raise HTTPException(status_code=422, detail=problems)
     return {"match_id": store_brief(brief)}
+
+
+@app.post("/matches/random")
+def create_random_match(
+    body: Annotated[dict[str, Any] | None, Body()] = None,
+) -> dict[str, Any]:
+    """A random brief (formations, dials, a preset or custom moments). {seed} makes it repeatable."""
+    seed = (body or {}).get("seed", secrets.randbelow(1_000_000))
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0:
+        raise HTTPException(
+            status_code=422, detail="seed must be a non-negative integer"
+        )
+    brief = random_brief(seed)
+    brief = brief.model_copy(update={"match_id": store_brief(brief)})
+    return {
+        "match_id": brief.match_id,
+        "brief": brief.model_dump(mode="json", exclude_none=True),
+    }
+
+
+_compose_limiter = RateLimiter(COMPOSE_RPM_PER_CLIENT)
+make_composer_client: Callable[[], ChatClient] = lambda: MeteredClient(
+    client_for("composer"), "composer"
+)  # tests swap this for a fake
+
+
+@app.post("/compose")
+def compose_brief(
+    request: Request, body: Annotated[dict[str, Any], Body()]
+) -> JSONResponse:
+    """Free text to a validated brief: {brief, brief_text, warnings}. The caller posts the brief to
+    /matches to play it."""
+    text, seed = body.get("text"), body.get("seed", 0)
+    if not isinstance(text, str) or not text.strip():
+        raise HTTPException(status_code=422, detail="text must be a non-empty string")
+    if len(text) > MAX_COMPOSE_CHARS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"text must be at most {MAX_COMPOSE_CHARS} characters",
+        )
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0:
+        raise HTTPException(
+            status_code=422, detail="seed must be a non-negative integer"
+        )
+    client = request.client.host if request.client else "unknown"
+    wait = _compose_limiter.retry_after(client)
+    if wait is not None:
+        raise HTTPException(
+            status_code=429,
+            detail=f"rate limit: {COMPOSE_RPM_PER_CLIENT} compose requests per minute",
+            headers={"Retry-After": str(wait)},
+        )
+    try:
+        composed = compose(make_composer_client(), text, seed)
+    except LlmError as exc:
+        raise HTTPException(
+            status_code=503, detail=f"composer unavailable: {exc.cause_name}"
+        ) from exc
+    return JSONResponse(
+        {
+            "brief": composed.brief.model_dump(mode="json", exclude_none=True),
+            "brief_text": composed.brief_text,
+            "warnings": composed.warnings,
+        }
+    )
 
 
 @lru_cache(maxsize=MAX_CACHED_REGISTRIES)
 def match_registry(match_id: str) -> FactRegistry:
-    """Every fact of a match, on-demand beat facts included, for lookups by id."""
+    """Every fact of a match, on-demand beat facts included, for lookups by id. An archived match
+    comes from the archive; any other is generated again."""
     brief = brief_of(match_id)
+    if store.archive is not None and match_id in store.archive.matches():
+        return store.registry(match_id)
     events = generate(brief)
     gc.disable()  # tens of thousands of frame models; the cyclic collector would crawl over them
     try:
@@ -226,16 +340,34 @@ def run_of(match_id: str) -> MatchRun:
     return run
 
 
+def archived_json(match_id: str, name: str) -> Any:
+    """audit.json or producer_log.json of an archived match; 404 if it is not archived."""
+    if store.archive is not None:
+        try:
+            return load_json(store.archive, match_id, name)
+        except ArchiveMissing:
+            pass
+    raise HTTPException(status_code=404, detail=f"no agent run for {match_id}")
+
+
 @app.get("/matches/{match_id}/audit")
 def get_audit(match_id: str) -> dict[str, Any]:
     """The second model's check of this match's claims: how many, how often it agreed, and why not."""
-    return run_of(match_id).audit_summary()
+    brief_of(match_id)
+    if agent_runtime is not None and agent_runtime.existing(match_id) is not None:
+        return run_of(match_id).audit_summary()
+    audit: dict[str, Any] = archived_json(match_id, AUDIT)
+    return audit
 
 
 @app.get("/matches/{match_id}/producer-log")
 def get_producer_log(match_id: str) -> list[dict[str, Any]]:
     """Which beats the Producer put on the feed and which it left off, with a line each."""
-    return run_of(match_id).producer_log()
+    brief_of(match_id)
+    if agent_runtime is not None and agent_runtime.existing(match_id) is not None:
+        return run_of(match_id).producer_log()
+    log: list[dict[str, Any]] = archived_json(match_id, PRODUCER_LOG)
+    return log
 
 
 def sse(msg: StreamMessage) -> str:
@@ -313,6 +445,7 @@ async def stream_match(
         agents = DownRun()  # models are configured but the workflow did not start
 
     async def body() -> AsyncIterator[str]:
+        completed = False
         try:
             async for chunk in sse_with_heartbeat(
                 run_live(
@@ -325,7 +458,12 @@ async def stream_match(
                 )
             ):
                 yield chunk
+            completed = True
         finally:
+            if completed:
+                schedule_save(
+                    store, brief, agents
+                )  # full time: archive in the background
             if agents is not None:
                 agents.close()  # ends the match's root span; a reconnect's spans still nest under it
             release()

@@ -26,7 +26,7 @@ DEFAULT_TIMEOUT_S = 15.0
 MODELS_PATH = Path(__file__).resolve().parents[2] / "config" / "models.yaml"
 JUDGE_DEPLOYMENT_ENV = "JUDGE_DEPLOYMENT"
 
-Role = Literal["narrator", "judge", "producer", "auditor"]
+Role = Literal["narrator", "judge", "producer", "auditor", "composer"]
 # How a deployment returns JSON: a response_format JSON schema, JSON mode, or only by prompt.
 ResponseFormat = Literal["json_schema", "json_object", "none"]
 

@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from agents.auditor import MAX_CONCURRENT_AUDITS, Auditor, summarize_audits
-from agents.budget import MeteredClient, budget
+from agents.budget import MeteredClient, budget, current_match
 from agents.llm_client import ChatClient
 from agents.pipeline import BeatRun, Deps, ToolServer
 from agents.producer import Decision, Producer
@@ -115,7 +115,13 @@ class MatchRun:
         self._spawn(self._run_beat(beat_id, ticket))
 
     def _spawn(self, coro: Any) -> None:
-        task = asyncio.ensure_future(coro)
+        token = current_match.set(
+            self.match_id
+        )  # the task copies this; calls inside are ours
+        try:
+            task = asyncio.ensure_future(coro)
+        finally:
+            current_match.reset(token)
         self._tasks.add(task)
         task.add_done_callback(self._tasks.discard)
 

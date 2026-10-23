@@ -161,7 +161,7 @@ brief_text?: string
 home: Team
 away: Team
 storyline: {
-id: ("late_comeback" | "red_card_flip" | "smash_and_grab" | "end_to_end")
+id: ("late_comeback" | "red_card_flip" | "smash_and_grab" | "end_to_end" | "custom")
 text: string
 }
 /**

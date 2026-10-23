@@ -72,6 +72,7 @@ resource api 'Microsoft.App/containerApps@2025-07-01' = {
             { name: 'MODEL_BASE_URL', value: modelBaseUrl }
             { name: 'MODEL_DEPLOYMENT_NAME', value: modelDeploymentName }
             { name: 'AZURE_STORAGE_ACCOUNT', value: storageAccountName }
+            { name: 'MATCH_ARCHIVE', value: 'blob' }
             { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: appInsightsConnectionString }
             { name: 'OTEL_SERVICE_NAME', value: 'matchproof-api' }
             { name: 'MCP_ALLOWED_HOSTS', value: apiHost }

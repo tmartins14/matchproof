@@ -75,6 +75,19 @@ union dependencies, requests, traces
 
 The `match` span is the root. Each `beat` span has `producer`, `narrate`, `check` (with `reconcile`, `lint` and `judge`), `retry` and `put_claims` children. An `audit` span sits under the match and links to the beat span it audits.
 
+## List archived matches
+
+Finished matches are saved to the `matches` container of the storage account (`MATCH_ARCHIVE=blob` is set on the container app). A match is complete when its `manifest.json` is there.
+
+```bash
+ACCOUNT="$(azd env get-value AZURE_STORAGE_ACCOUNT)"
+az storage blob list --account-name "$ACCOUNT" --container-name matches --auth-mode login \
+  --query "[?ends_with(name, '/manifest.json')].{match:name, size:properties.contentLength, modified:properties.lastModified}" -o table
+az storage blob list --account-name "$ACCOUNT" --container-name matches --prefix "<match_id>/" --auth-mode login -o table
+```
+
+Your own user needs `Storage Blob Data Reader` on the container for `--auth-mode login`. `GET /matches` on the API lists the same matches with their scores and claim counts. Locally the files are under `data/archive/`.
+
 ## Tear down
 
 ```bash

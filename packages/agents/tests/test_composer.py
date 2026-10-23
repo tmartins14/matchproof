@@ -90,7 +90,7 @@ def test_second_failure_returns_a_valid_partial_with_warnings() -> None:
     assert out.brief.home.press.root == 1.0
     assert any("formation" in w for w in out.warnings)
     assert any("press" in w for w in out.warnings)
-    assert sum("Left out moment" in w for w in out.warnings) == 6
+    assert sum("Left out:" in w for w in out.warnings) == 6
     assert validate_planted(planted(out)) == []
 
 

@@ -12,7 +12,8 @@ For each team give:
   Use about 0.5 for anything the brief does not mention. "Sit deep and hit on the break" is low press,
   high directness, low line_height. "Press high" is press near 1 and a high line.
 
-Then choose one of:
+Then choose one of (a preset only when the brief clearly describes that story; if it says nothing about
+results or moments, use custom with an empty moments list):
 - storyline: one of {{storylines}}, with an empty moments list.
   - late_comeback: away score first on the break, home equalise from a set piece and win it late.
   - red_card_flip: goalless first half, a red card for away on the hour, home score twice.

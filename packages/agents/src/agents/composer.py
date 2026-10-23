@@ -158,9 +158,9 @@ def repair(answer: ComposerAnswer, seed: int) -> tuple[MatchBrief, list[str]]:
             continue
         problems = validate_planted([*kept, spec])
         if problems:
-            warnings.append(
-                f"Left out moment {i} ({m.kind.replace('_', ' ')}, {m.side}, {m.minute_from}–{m.minute_to}′): {problems[0]}"
-            )
+            # The validator numbers the candidate after the moments already kept; say its own number.
+            reason = problems[0].replace(f"Moment {len(kept) + 1} ", f"Moment {i} ", 1)
+            warnings.append(f"Left out: {reason}")
             continue
         kept.append(spec)
     return make_brief(home, away, "custom", seed, kept), warnings

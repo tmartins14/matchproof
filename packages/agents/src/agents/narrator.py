@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
+from contracts.paths import runtime_root
 from intel.labels import say
 from intel.voice_lint import lint, load_rules
 from pydantic import BaseModel, Field, field_validator
@@ -23,7 +24,7 @@ Mode = Literal["fan", "analyst", "producer"]
 PROMPT_PATH = (
     Path(__file__).parent / "prompts" / "narrator.v2.md"
 )  # v1 is kept for the record
-EXAMPLES_PATH = Path(__file__).resolve().parents[4] / "voice" / "examples.yaml"
+EXAMPLES_PATH = runtime_root() / "voice" / "examples.yaml"
 MAX_WORDS = 30
 MIN_CLAIMS, MAX_CLAIMS = 1, 3
 MIN_EXAMPLES, MAX_EXAMPLES = 4, 6

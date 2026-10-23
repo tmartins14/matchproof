@@ -1,11 +1,12 @@
 import asyncio
 import gc
 import hashlib
+import logging
 import os
 import secrets
 from collections import Counter, OrderedDict
 from collections.abc import AsyncGenerator, AsyncIterator, Callable
-from contextlib import asynccontextmanager
+from contextlib import AsyncExitStack, asynccontextmanager
 from functools import lru_cache
 from importlib.metadata import version
 from typing import Annotated, Any
@@ -70,6 +71,7 @@ HEARTBEAT_LINE = (
 )
 
 configure_telemetry()
+log = logging.getLogger(__name__)
 
 public_mcp = PublicMcp()
 agent_runtime: AgentRuntime | None = (
@@ -102,13 +104,19 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
             return
         # The internal server (with put_claims and put_audit) is reached in process, over a memory
         # transport. It is never mounted and nothing listens for it (ADR 0008).
-        internal = get_internal_server(store)
-        async with create_connected_server_and_client_session(
-            internal._mcp_server
-        ) as session:
+        # Degrade, don't fail: whatever stops the agents from starting (missing config, an
+        # unreachable model) is logged, and the API starts without them. Streams then say that
+        # verification is unavailable.
+        async with AsyncExitStack() as stack:
             try:
+                session = await stack.enter_async_context(
+                    create_connected_server_and_client_session(
+                        get_internal_server(store)._mcp_server
+                    )
+                )
                 agent_runtime = build_agent_runtime(session)
-            except LlmError:
+            except Exception:
+                log.exception("agent runtime did not start; serving without agents")
                 agent_runtime = None
             try:
                 yield

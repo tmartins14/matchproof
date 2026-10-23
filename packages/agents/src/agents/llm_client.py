@@ -16,6 +16,7 @@ import yaml
 from azure.core.credentials import TokenCredential
 from azure.core.exceptions import AzureError
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from contracts.paths import runtime_root
 from openai import OpenAI, OpenAIError
 from opentelemetry import trace
 from opentelemetry.trace import SpanKind, Status, StatusCode
@@ -23,7 +24,7 @@ from opentelemetry.trace import SpanKind, Status, StatusCode
 TOKEN_SCOPE = "https://ai.azure.com/.default"
 DEFAULT_TIMEOUT_S = 15.0
 
-MODELS_PATH = Path(__file__).resolve().parents[2] / "config" / "models.yaml"
+MODELS_PATH = runtime_root() / "packages" / "agents" / "config" / "models.yaml"
 JUDGE_DEPLOYMENT_ENV = "JUDGE_DEPLOYMENT"
 
 Role = Literal["narrator", "judge", "producer", "auditor", "composer"]

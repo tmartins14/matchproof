@@ -9,12 +9,13 @@ from statistics import mean
 
 import yaml
 from contracts.models import Event, MatchBrief, PositionFrame
+from contracts.paths import runtime_root
 
 from . import generate, geometry
 from .brief import STORYLINES, make_brief
 from .positions import iter_frames
 
-TARGETS_PATH = Path(__file__).resolve().parents[2] / "calibration" / "targets.yaml"
+TARGETS_PATH = runtime_root() / "packages" / "sim" / "calibration" / "targets.yaml"
 # Without a match band, a single run may sit outside the band by at most this share of the band width.
 RUN_TOLERANCE = 0.15
 # Where a reference mean is set, the mean across runs must be within this share of it.

@@ -3,12 +3,12 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
 from typing import Any
 
 import yaml
+from contracts.paths import runtime_root
 
-PRICES_PATH = Path(__file__).resolve().parents[2] / "config" / "prices.yaml"
+PRICES_PATH = runtime_root() / "packages" / "agents" / "config" / "prices.yaml"
 NOT_SET = "prices not set"
 
 

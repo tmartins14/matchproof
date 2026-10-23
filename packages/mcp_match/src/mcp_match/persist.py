@@ -237,9 +237,9 @@ def save_match(
         EVENTS: _lines((_dump(e) for e in record.events), True),
         FACTS: _lines([header, *(_dump(f) for f in record.registry.all())], True),
         BEATS: _lines((_dump(b) for b in record.beats), False),
-        CLAIM_GRAPH: graph.model_dump_json(
-            by_alias=True, exclude_none=True, indent=1
-        ).encode("utf-8"),
+        CLAIM_GRAPH: graph.model_dump_json(by_alias=True, exclude_none=True).encode(
+            "utf-8"
+        ),
         AUDIT: _json(audit),
         PRODUCER_LOG: _json(producer_log),
         USAGE: _json(usage),

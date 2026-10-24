@@ -354,7 +354,11 @@ def test_an_audit_of_a_claim_on_screen_is_sent_as_a_verdict_with_the_same_verdic
     asyncio.run(scenario())
 
 
-def test_audits_never_delay_a_claim() -> None:
+def test_audits_never_delay_a_claim(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "api.live.FULL_TIME_HOLD_S", 0.2
+    )  # a stalled auditor holds full time
+
     async def scenario() -> None:
         gate = threading.Event()  # the auditor answers only when released
         auditor = FakeModel("judge-grok", gate=gate)

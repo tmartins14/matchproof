@@ -20,10 +20,12 @@ Two files, one prototype:
 - Player positions use the version 1 shape model. The real version 2 movement replaces it (ADR 0005).
 - Checker latency is a fixed 2.6 s delay.
 - Calibration numbers are placeholders.
-- Broadcast theme colours and type are placeholders until the design pass on Sat Oct 24.
+- The prototype still has an Editorial toggle; the build ships Broadcast only.
 
 ## Changed since the prototype (Oct 19)
 
+- Oct 23 design pass: Broadcast is now Floodlight (`docs/DESIGN.md`); the match setup collapses to one bar and expands on Edit; Editorial deferred.
+- `prototype.html` predates the design pass. `Main.dc.html` and `reference/` are authoritative.
 - **Verdict labels:** the build uses CHECKING, STANDS, AMENDED, OVERTURNED and HELD (`docs/VOICE.md`), not Verified, Rephrased and Blocked. AMENDED shows the old wording struck through above the new.
 - **Checking state:** the pitch highlights the players or zone the claim is about. No spinner.
 - **No AI-coded UI:** no sparkle icons, gradients, glow, typing animation or chat bubbles; the words "AI" and "agent" stay out of the live desk (the Producer agent log stays in the dev panel).

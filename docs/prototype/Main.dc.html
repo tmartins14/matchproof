@@ -8,7 +8,7 @@
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Fraunces:opsz,wght@9..144,600;9..144,900&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&amp;family=Archivo:wght@400;500;600;800&amp;family=Fraunces:opsz,wght@9..144,600;9..144,900&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap">
 <style>
 body{margin:0}
 button,textarea{font:inherit}
@@ -19,12 +19,18 @@ button:disabled{cursor:not-allowed;opacity:.45}
 @media (prefers-reduced-motion: reduce){.pulse{animation:none}}
 </style>
 </helmet>
-<div style="min-height: 100vh; background: {{c.bg}}; color: {{c.text}}; font-family: {{c.body}}; font-size: 15px; line-height: 1.45; transition: background .25s ease, color .25s ease">
+<div style="position: relative; overflow: hidden; min-height: 100vh; background: {{c.bg}}; color: {{c.text}}; font-family: {{c.body}}; font-size: 15px; line-height: 1.45; transition: background .25s ease, color .25s ease">
 <style>{{focusCss}}</style>
+<sc-if value="{{c.decor}}" hint-placeholder-val="{{false}}">
+<div aria-hidden="true" style="position: absolute; right: -40px; top: 0; width: 560px; height: 100%; pointer-events: none; background: {{c.bandA}}; clip-path: polygon(40% 0, 62% 0, 100% 50%, 62% 100%, 40% 100%, 78% 50%)"></div>
+<div aria-hidden="true" style="position: absolute; right: -40px; top: 0; width: 560px; height: 100%; pointer-events: none; background: {{c.bandB}}; clip-path: polygon(66% 0, 70% 0, 100% 42%, 100% 50%)"></div>
+<div aria-hidden="true" style="position: absolute; left: 0; bottom: 0; width: 100%; height: 220px; pointer-events: none; background: {{c.bandC}}; clip-path: polygon(0 55%, 100% 0, 100% 100%, 0 100%)"></div>
+</sc-if>
 
-<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 12px 20px; border-bottom: 1px solid {{c.line}}">
-<div style="font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 26px; line-height: 1">Matchproof</div>
-<div role="group" aria-label="{{t.scoreAria}}" style="display: flex; align-items: stretch; border-radius: 6px; overflow: hidden; background: {{c.surface}}; border: 1px solid {{c.line}}; font-family: {{c.display}}; font-variant-numeric: tabular-nums">
+<header style="position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 12px 20px; border-bottom: 1px solid {{c.line}}">
+<sc-if value="{{c.plainMark}}" hint-placeholder-val="{{false}}"><div style="font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 26px; line-height: 1">Matchproof</div></sc-if>
+<sc-if value="{{c.decor}}" hint-placeholder-val="{{true}}"><div style="display: flex; align-items: stretch; font-family: {{c.display}}; font-weight: 700; font-size: 26px; line-height: 1; text-transform: uppercase; filter: drop-shadow({{c.chipShadow}})"><span style="padding: 8px 22px 8px 12px; background: {{c.thirdBg}}; color: {{c.ink}}; clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%)">Matchproof</span><span style="margin-left: -6px; padding: 8px 18px; background: {{c.bandB}}; color: {{c.verifiedInk}}; clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)">Live desk</span></div></sc-if>
+<div role="group" aria-label="{{t.scoreAria}}" style="display: flex; align-items: stretch; border-radius: {{c.r6}}; box-shadow: {{c.chipShadow}}; overflow: hidden; background: {{c.surface}}; border: 1px solid {{c.line}}; font-family: {{c.display}}; font-variant-numeric: tabular-nums">
 <span style="display: flex; align-items: center; padding: 0 10px; background: {{c.riv}}; color: {{c.rivChip}}; font-weight: 700; font-size: 17px">RIV</span>
 <span style="display: flex; align-items: center; padding: 4px 12px; font-weight: {{c.dw}}; font-size: 24px; gap: 8px">{{scoreHome}}<span style="color: {{c.muted}}; font-weight: 500">–</span>{{scoreAway}}</span>
 <span style="display: flex; align-items: center; padding: 0 10px; background: {{c.ash}}; color: {{c.ashChip}}; font-weight: 700; font-size: 17px">ASH</span>
@@ -53,16 +59,16 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </header>
 
 <sc-if value="{{isMatchView}}" hint-placeholder-val="{{true}}">
-<section aria-label="{{t.briefLabel}}" style="display: flex; flex-wrap: wrap; gap: 16px 28px; padding: 16px 20px; background: {{c.surface}}; border-bottom: 1px solid {{c.line}}">
-<div style="flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
-<label for="mr-brief" style="font-weight: 600; font-size: 15px">{{t.briefLabel}}</label>
-<textarea id="mr-brief" rows="2" value="{{brief}}" onChange="{{onBrief}}" disabled="{{locked}}" style="width: 100%; box-sizing: border-box; resize: vertical; padding: 10px 12px; background: {{c.input}}; color: {{c.text}}; border: 1px solid {{c.line}}; border-radius: 6px; font-size: 16px; line-height: 1.4"></textarea>
+<section aria-label="{{t.setupLabel}}" style="position: relative; display: flex; flex-direction: column; gap: 14px; padding: 12px 20px; background: {{c.surface}}; border-bottom: 1px solid {{c.line}}">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px">
+<span style="font-weight: 600; font-size: 15px; white-space: nowrap; {{c.hChipSm}}">{{t.setupLabel}}</span>
+<p title="{{setupSummary}}" style="margin: 0; flex: 999 1 320px; min-width: 0; font-size: 15px; color: {{c.text2}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{setupSummary}}</p>
 <div style="display: flex; flex-wrap: wrap; gap: 8px">
-<button type="button" onClick="{{randomize}}" disabled="{{locked}}" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">
+<button type="button" onClick="{{toggleSetup}}" disabled="{{locked}}" aria-expanded="{{showSetup}}" aria-controls="mr-setup" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: {{c.r6}}; font-weight: 500">{{setupToggleLabel}}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="{{setupChevron}}"><path d="M6 9l6 6 6-6"></path></svg></button>
+<button type="button" onClick="{{randomize}}" disabled="{{locked}}" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: {{c.r6}}; font-weight: 500">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.2"></circle><circle cx="15.5" cy="15.5" r="1.2"></circle><circle cx="15.5" cy="8.5" r="1.2"></circle><circle cx="8.5" cy="15.5" r="1.2"></circle></svg>{{t.randomize}}</button>
-<button type="button" onClick="{{readBrief}}" disabled="{{locked}}" style="min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">{{t.readBrief}}</button>
 <sc-if value="{{notLive}}" hint-placeholder-val="{{true}}">
-<button type="button" onClick="{{kickOff}}" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; background: {{c.primaryBg}}; color: {{c.primaryText}}; border: 0; border-radius: 6px; font-weight: 600"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{c.liveDot}}"></span>{{t.kickoff}}</button>
+<button type="button" onClick="{{kickOff}}" style="{{c.segCut}} display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; background: {{c.primaryBg}}; color: {{c.primaryText}}; border: 0; border-radius: 6px; font-weight: 600"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{c.liveDot}}"></span>{{t.kickoff}}</button>
 <button type="button" onClick="{{loadReplay}}" style="min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">{{t.cached}}</button>
 </sc-if>
 <sc-if value="{{isLive}}" hint-placeholder-val="{{false}}">
@@ -72,7 +78,14 @@ button:disabled{cursor:not-allowed;opacity:.45}
 <button type="button" onClick="{{newMatch}}" style="min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">{{t.newMatch}}</button>
 </sc-if>
 </div>
+</div>
 <sc-if value="{{showReadNote}}" hint-placeholder-val="{{false}}"><p role="status" style="margin: 0; font-size: 14px; color: {{c.text2}}">{{readNote}}</p></sc-if>
+<sc-if value="{{showSetup}}" hint-placeholder-val="{{false}}">
+<div id="mr-setup" style="display: flex; flex-wrap: wrap; gap: 16px 28px; padding-top: 14px; border-top: 1px solid {{c.line}}">
+<div style="flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+<label for="mr-brief" style="font-weight: 600; font-size: 15px">{{t.briefLabel}}</label>
+<textarea id="mr-brief" rows="3" value="{{brief}}" onChange="{{onBrief}}" disabled="{{locked}}" style="width: 100%; box-sizing: border-box; resize: vertical; padding: 10px 12px; background: {{c.input}}; color: {{c.text}}; border: 1px solid {{c.line}}; border-radius: {{c.r6}}; font-size: 16px; line-height: 1.4"></textarea>
+<div style="display: flex; flex-wrap: wrap; gap: 8px"><button type="button" onClick="{{readBrief}}" disabled="{{locked}}" style="min-height: 44px; padding: 0 16px; background: transparent; color: {{c.text}}; border: 1px solid {{c.strong}}; border-radius: {{c.r6}}; font-weight: 500">{{t.readBrief}}</button></div>
 <p style="margin: 0; font-size: 13px; color: {{c.muted}}">{{t.protoNote}}</p>
 </div>
 <fieldset disabled="{{locked}}" style="flex: 1 1 380px; min-width: 0; margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 12px">
@@ -102,9 +115,11 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </select>
 </div>
 </fieldset>
+</div>
+</sc-if>
 </section>
 
-<section aria-label="{{t.pipelineAria}}" style="display: flex; flex-wrap: wrap; border-bottom: 1px solid {{c.line}}">
+<section aria-label="{{t.pipelineAria}}" style="position: relative; display: flex; flex-wrap: wrap; gap: {{c.stageGap}}; padding: {{c.stagePad}}; border-bottom: 1px solid {{c.line}}">
 <sc-for list="{{stages}}" as="sg" hint-placeholder-count="5">
 <div style="{{sg.style}}">
 <span style="font-size: 13px; color: {{c.muted}}">{{sg.name}}</span>
@@ -114,16 +129,16 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </sc-for>
 </section>
 
-<main style="display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; align-items: flex-start">
+<main style="position: relative; display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; align-items: flex-start">
 
 <section aria-label="{{t.pitchAria}}" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
 <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; min-height: 40px">
-<h1 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 34px; line-height: 1.05">{{pitchTitle}}</h1>
+<h1 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 34px; line-height: 1.05; {{c.hChip}}">{{pitchTitle}}</h1>
 <sc-if value="{{showFollow}}" hint-placeholder-val="{{false}}">
 <button type="button" onClick="{{follow}}" style="min-height: 40px; padding: 0 14px; background: transparent; color: {{c.liveText}}; border: 1px solid {{c.strong}}; border-radius: 6px; font-weight: 500">{{t.follow}}</button>
 </sc-if>
 </div>
-<div role="img" aria-label="{{pitchAria}}" style="position: relative; width: 100%; aspect-ratio: 3 / 2; background: {{c.pitch}}; border: 1px solid {{c.pitchBorder}}; border-radius: 10px; overflow: hidden; box-sizing: border-box">
+<div role="img" aria-label="{{pitchAria}}" style="position: relative; width: 100%; aspect-ratio: 3 / 2; background: {{c.pitch}}; border: {{c.pitchBw}} solid {{c.pitchBorder}}; border-radius: {{c.r10}}; box-shadow: {{c.panelShadow}}; overflow: hidden; box-sizing: border-box">
 <svg viewBox="0 0 120 80" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
 <g fill="none" stroke="{{c.pitchLine}}" stroke-opacity="{{c.pitchOp}}" stroke-width="0.35">
 <rect x="0.5" y="0.5" width="119" height="79"></rect>
@@ -163,7 +178,7 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </div>
 
 <div style="display: flex; flex-wrap: wrap; gap: 14px">
-<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 10px">
+<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: {{c.r10}}; box-shadow: {{c.panelShadow}}">
 <sc-for list="{{stats}}" as="st" hint-placeholder-count="3">
 <div style="display: flex; flex-direction: column; gap: 5px">
 <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: baseline; font-variant-numeric: tabular-nums">
@@ -175,8 +190,8 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </div>
 </sc-for>
 </div>
-<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 10px">
-<span style="font-weight: 600">{{t.ticker}}</span>
+<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: {{c.r10}}; box-shadow: {{c.panelShadow}}">
+<span style="font-weight: 600; {{c.hChipSm}}">{{t.ticker}}</span>
 <sc-if value="{{tickerEmpty}}" hint-placeholder-val="{{false}}"><span style="font-size: 14px; color: {{c.muted}}">{{t.tickerEmpty}}</span></sc-if>
 <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px">
 <sc-for list="{{ticker}}" as="tk" hint-placeholder-count="4">
@@ -186,8 +201,8 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </div>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 10px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: 10px">
-<span style="font-weight: 600">{{t.momentum}}</span>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 10px; background: {{c.surface}}; border: 1px solid {{c.line}}; border-radius: {{c.r10}}; box-shadow: {{c.panelShadow}}">
+<span style="font-weight: 600; {{c.hChipSm}}">{{t.momentum}}</span>
 <div aria-hidden="true" style="position: relative; display: flex; gap: 3px; height: 60px">
 <div style="position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid {{c.line}}"></div>
 <sc-for list="{{bars}}" as="r" hint-placeholder-count="19"><div style="flex: 1; position: relative; height: 100%"><div style="{{r.style}}"></div></div></sc-for>
@@ -200,14 +215,14 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </section>
 
 <section aria-label="{{t.feed}}" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
-<h2 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 24px">{{t.feed}}</h2>
+<h2 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 24px; {{c.hChip}}">{{t.feed}}</h2>
 <sc-if value="{{feedEmpty}}" hint-placeholder-val="{{false}}"><p style="margin: 0; color: {{c.muted}}">{{feedEmptyText}}</p></sc-if>
 <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
 <sc-for list="{{feed}}" as="b" hint-placeholder-count="3">
 <li style="{{b.cardStyle}}">
-<button type="button" onClick="{{b.pick}}" aria-expanded="{{b.active}}" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; width: 100%; min-height: 48px; padding: 12px 14px; border: 0; background: transparent; color: inherit; text-align: left">
-<span style="font-family: {{c.display}}; font-weight: 600; font-size: 17px; color: {{c.muted}}; min-width: 52px; font-variant-numeric: tabular-nums">{{b.label}}</span>
-<span style="flex: 1 1 140px; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 21px; line-height: 1.15">{{b.headline}}</span>
+<button type="button" onClick="{{b.pick}}" aria-expanded="{{b.active}}" style="{{b.headStyle}}">
+<span style="font-family: {{c.display}}; font-weight: 600; font-size: 17px; color: {{c.muted}}; min-width: 52px; font-variant-numeric: tabular-nums; {{b.labelStyle}}">{{b.label}}</span>
+<span style="flex: 1 1 140px; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 21px; line-height: 1.15; text-transform: {{c.caps}}; padding: 6px 0">{{b.headline}}</span>
 <span class="{{b.stampClass}}" style="{{b.stampStyle}}">{{b.stampText}}</span>
 </button>
 <sc-if value="{{b.active}}" hint-placeholder-val="{{false}}">
@@ -234,9 +249,9 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </section>
 
 <sc-if value="{{showRail}}" hint-placeholder-val="{{true}}">
-<aside aria-label="{{t.receipts}}" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 18px; background: {{c.surface}}; border: 1px solid {{c.strong}}; border-radius: 10px">
+<aside aria-label="{{t.receipts}}" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 18px; background: {{c.surface}}; border: 1px solid {{c.strong}}; border-radius: {{c.r10}}; box-shadow: {{c.panelShadow}}">
 <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
-<h2 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 24px">{{t.receipts}}</h2>
+<h2 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 24px; {{c.hChip}}">{{t.receipts}}</h2>
 <span style="font-family: {{c.mono}}; font-size: 12px; color: {{c.muted}}">{{railId}}</span>
 </div>
 <sc-if value="{{railEmpty}}" hint-placeholder-val="{{false}}"><p style="margin: 0; color: {{c.muted}}">{{t.railEmpty}}</p></sc-if>
@@ -286,7 +301,7 @@ button:disabled{cursor:not-allowed;opacity:.45}
 </sc-if>
 
 <sc-if value="{{isCalib}}" hint-placeholder-val="{{false}}">
-<main style="display: flex; flex-direction: column; gap: 20px; padding: 32px 20px 48px; max-width: 1040px">
+<main style="position: relative; display: flex; flex-direction: column; gap: 20px; padding: 32px 20px 48px; max-width: 1040px">
 <h1 style="margin: 0; font-family: {{c.display}}; font-weight: {{c.dw}}; font-size: 38px; line-height: 1.05">{{t.calTitle}}</h1>
 <p style="margin: 0; font-size: 16px; max-width: 680px; color: {{c.text2}}">{{t.calIntro}}</p>
 <p style="margin: 0; padding: 10px 14px; background: {{c.warnBg}}; color: {{c.warnText}}; border-radius: 6px; font-size: 14px; max-width: 680px">{{t.calPlaceholder}}</p>
@@ -344,21 +359,36 @@ class Component extends DCLogic {
       checking: "#5C5C5C", checkingBorder: "#8A8578", verified: "#1E6B52", rephrased: "#8A5A00", blocked: "#B42318",
       stageOn: "#B42318", hot: "#9F1239", zone: "rgba(159,18,57,0.09)",
       warnBg: "#FBE7EC", warnText: "#7A0E2C", realBand: "#DCE4EE", focus: "#9F1239", ball: "#171717",
-      display: "'Fraunces', Georgia, serif", dw: 900, body: "'Geist', system-ui, sans-serif", mono: "'Geist Mono', ui-monospace, monospace"
+      display: "'Fraunces', Georgia, serif", dw: 900, body: "'Geist', system-ui, sans-serif", mono: "'Geist Mono', ui-monospace, monospace",
+      r10: "10px", r6: "6px", segCut: "", panelShadow: "none", pitchBw: "1px", caps: "none",
+      stampFill: false, verifiedInk: "#FFFDF8", rephrasedInk: "#FFFDF8", blockedInk: "#FFFDF8",
+      decor: false, plainMark: true, chipShadow: "none", hChip: "", hChipSm: "", feedLabel: "",
+      stageExtra: "", stageGap: "0px", stagePad: "0px", lowerThird: false, thirdBg: "#FFFDF8", ink: "#171717",
+      bandA: "#F3EEE3", bandB: "#F3EEE3", bandC: "#F3EEE3"
     };
+    // Broadcast: "Floodlight" (Ocean field + Lime). Lime is reserved for live and STANDS.
     return {
-      bg: "#0E1620", surface: "#16212D", raised: "#1F2C3A", input: "#0E1620", code: "#0E1620",
-      line: "#2A3A4C", line2: "#22303F", strong: "#3A4D63", track: "#24313F",
-      text: "#EEF2F6", text2: "#C9D3DE", muted: "#9DAABB",
-      riv: "#F0506E", ash: "#6FB4FF", rivText: "#F7A3B4", ashText: "#A9D2FF", rivChip: "#1A0710", ashChip: "#071526",
-      pitch: "#10261A", pitchBorder: "#10261A", pitchLine: "#FFFFFF", pitchOp: "0.24", pitchText: "#C9D3DE", goalRing: "#10261A", attack: "#FFC2CD",
-      liveBg: "#3A1218", liveText: "#FFB3B3", liveDot: "#FF3B3B",
-      primaryBg: "#EEF2F6", primaryText: "#0E1620", segOnBg: "#EEF2F6", segOnText: "#0E1620", segOff: "#9DAABB",
-      selBg: "#1F2C3A", selBorder: "#6FB4FF", cardActive: "#16212D", cardBorderActive: "#3A4D63", cardBorder: "#22303F", claimBg: "#0E1620", claimBorder: "#22303F",
-      checking: "#C9D3DE", checkingBorder: "#6C7A8C", verified: "#3FD6A6", rephrased: "#F6C445", blocked: "#FF6B4A",
-      stageOn: "#FF3B3B", hot: "#FFB3B3", zone: "rgba(240,80,110,0.12)",
-      warnBg: "#3A2A10", warnText: "#F6D58A", realBand: "#24405E", focus: "#6FB4FF", ball: "#FFFFFF",
-      display: "'Barlow Condensed', 'Arial Narrow', sans-serif", dw: 700, body: "'Barlow', system-ui, sans-serif", mono: "'IBM Plex Mono', ui-monospace, monospace"
+      bg: "#0B4F8A", surface: "#073A69", raised: "#0E5D9F", input: "#042848", code: "#042848",
+      line: "#3C7CB5", line2: "#1B5C94", strong: "#6A9CC9", track: "#0E5D9F",
+      text: "#FFFFFF", text2: "#E6F0FA", muted: "#D3E5F7",
+      riv: "#FFFFFF", ash: "#7CC4FF", rivText: "#FFFFFF", ashText: "#A8D8FF", rivChip: "#0A2540", ashChip: "#0A2540",
+      pitch: "#0F5A38", pitchBorder: "#FFFFFF", pitchLine: "#FFFFFF", pitchOp: "0.55", pitchText: "#FFFFFF", goalRing: "#0F5A38", attack: "#D7F35B",
+      liveBg: "#D7F35B", liveText: "#14200F", liveDot: "#14200F",
+      primaryBg: "#D7F35B", primaryText: "#14200F", segOnBg: "#FFFFFF", segOnText: "#0A2540", segOff: "#D3E5F7",
+      selBg: "#0E5D9F", selBorder: "#D7F35B", cardActive: "#073A69", cardBorderActive: "#D7F35B", cardBorder: "#1B5C94", claimBg: "#042848", claimBorder: "#1B5C94",
+      checking: "#FFFFFF", checkingBorder: "#D3E5F7", verified: "#D7F35B", rephrased: "#FF9A3C", blocked: "#FF5A4E",
+      stageOn: "#D7F35B", hot: "#D7F35B", zone: "rgba(215,243,91,0.16)",
+      warnBg: "#042848", warnText: "#FFD8A8", realBand: "#1B5C94", focus: "#D7F35B", ball: "#D7F35B",
+      display: "'Archivo Narrow', 'Arial Narrow', sans-serif", dw: 700, body: "'Archivo', system-ui, sans-serif", mono: "'Geist Mono', ui-monospace, monospace",
+      r10: "0px", r6: "0px", segCut: "clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);", panelShadow: "8px 8px 0 #042848", pitchBw: "4px", caps: "uppercase",
+      stampFill: true, verifiedInk: "#14200F", rephrasedInk: "#2E1A00", blockedInk: "#2E0A06",
+      decor: true, plainMark: false, chipShadow: "5px 5px 0 #042848",
+      hChip: "align-self:flex-start;padding:6px 30px 6px 14px;background:#FFFFFF;color:#0A2540;clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%);",
+      hChipSm: "align-self:flex-start;padding:3px 24px 3px 10px;background:#FFFFFF;color:#0A2540;text-transform:uppercase;font-family:'Archivo Narrow',sans-serif;font-weight:700;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%);",
+      feedLabel: "align-self:stretch;display:flex;align-items:center;padding:0 20px 0 12px;background:#073A69;color:#FFFFFF;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%);",
+      stageExtra: "background:#073A69;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);border-right:0;padding:10px 28px;",
+      stageGap: "4px", stagePad: "14px 20px 0", lowerThird: true, thirdBg: "#FFFFFF", ink: "#0A2540",
+      bandA: "#0E5D9F", bandB: "#D7F35B", bandC: "#09457A"
     };
   }
 
@@ -480,10 +510,11 @@ class Component extends DCLogic {
     var self = this, D = this.data(), s = this.state, es = s.lang === "es", C = this.tokens(s.theme);
     function L(o) { return es ? o.es : o.en; }
     function col(tm) { return tm === "RIV" ? C.riv : (tm === "ASH" ? C.ash : C.muted); }
-    function seg(active) { return "border:0;border-radius:6px;padding:0 14px;min-height:40px;font-size:15px;font-weight:500;" + (active ? "background:" + C.segOnBg + ";color:" + C.segOnText + ";" : "background:transparent;color:" + C.segOff + ";"); }
+    function seg(active) { return C.segCut + "border:0;border-radius:" + C.r6 + ";padding:0 14px;min-height:40px;font-size:15px;font-weight:500;" + (active ? "background:" + C.segOnBg + ";color:" + C.segOnText + ";" : "background:transparent;color:" + C.segOff + ";"); }
     var t = es ? {
       scoreAria: "Marcador", themeAria: "Estilo", modeAria: "Modo de visualización", langAria: "Idioma", viewAria: "Vista", speedAria: "Velocidad", pipelineAria: "Estado del pipeline", pitchAria: "Campo",
       live: "En directo", replay: "Repetición",
+      setupLabel: "Configuración", editSetup: "Editar táctica y guion", hideSetup: "Ocultar", customBrief: "Guion propio: ", pressW: "presión", lineW: "línea",
       briefLabel: "Guion del partido", randomize: "Aleatorio", kickoff: "Empezar en directo", cached: "Ver repetición guardada", newMatch: "Nuevo partido",
       protoNote: "Prototipo: la forma en el campo sigue tu táctica, pero los eventos vienen siempre de un mismo partido de ejemplo. En la versión real, el agente compositor lee el guion y el generador crea un partido nuevo con esta táctica.",
       follow: "Seguir en directo", pitchEmpty: "Empieza un partido en directo para ver llegar los eventos, o abre la repetición guardada.", waiting: "Esperando el primer momento clave",
@@ -501,13 +532,14 @@ class Component extends DCLogic {
       calTitle: "¿Es realista el partido sintético?", calIntro: "Distribuciones del generador en 4 semillas frente a rangos de partidos reales. Si las barras del generador caen dentro de las bandas reales, el partido pasa la prueba.",
       calPlaceholder: "Valores de ejemplo: solo muestran el diseño. Los números reales saldrán de la ejecución de calibración.", calReal: "Rango real", calGen: "Generador, 4 semillas",
       dialNames: ["Presión", "Verticalidad", "Altura de línea"], dialNamesAway: ["Presión", "Verticalidad", "Profundidad"],
-      verdict: { checking: "Verificando", verified: "Verificada", rephrased: "Reformulada", blocked: "Bloqueada", corrected: "Corregida" },
+      verdict: { checking: "COMPROBANDO", verified: "VÁLIDO", rephrased: "CORREGIDO", blocked: "ANULADO", corrected: "CORREGIDO" },
       stats: ["Posesión", "Tiros", "xG"],
       lgPlayer: "Jugador", lgGk: "Portero", livePlay: "Juego en directo", kickoffShape: "Formación inicial",
       tactics: "Táctica", formation: "Sistema", storyline: "Argumento", readBrief: "Leer guion", rewritten: "Guion reescrito a partir de la táctica."
     } : {
       scoreAria: "Score", themeAria: "Style", modeAria: "Viewer mode", langAria: "Language", viewAria: "View", speedAria: "Playback speed", pipelineAria: "Pipeline status", pitchAria: "Pitch",
       live: "Live", replay: "Replay",
+      setupLabel: "Match setup", editSetup: "Edit tactics and brief", hideSetup: "Hide setup", customBrief: "Custom brief: ", pressW: "press", lineW: "line",
       briefLabel: "Match brief", randomize: "Randomize", kickoff: "Kick off live", cached: "Watch cached replay", newMatch: "New match",
       protoNote: "Prototype: the shape on the pitch follows your tactics, but the events always come from one sample match. In the real build, the Composer agent reads the brief and the generator builds a new match from these tactics.",
       follow: "Follow live", pitchEmpty: "Kick off a live match to watch events stream in, or open the cached replay.", waiting: "Waiting for the first key moment",
@@ -525,7 +557,7 @@ class Component extends DCLogic {
       calTitle: "Is the synthetic match football-realistic?", calIntro: "Generator distributions across 4 seeds against real-match ranges. If the generator bars sit inside the real-match bands, the match passes.",
       calPlaceholder: "Placeholder values: these show the layout only. Real numbers come from the calibration run.", calReal: "Real-match range", calGen: "Generator, 4 seeds",
       dialNames: ["Press intensity", "Directness", "Line height"], dialNamesAway: ["Press intensity", "Directness", "Block depth"],
-      verdict: { checking: "Checking", verified: "Verified", rephrased: "Rephrased", blocked: "Blocked", corrected: "Corrected" },
+      verdict: { checking: "CHECKING", verified: "STANDS", rephrased: "AMENDED", blocked: "OVERTURNED", corrected: "AMENDED" },
       stats: ["Possession", "Shots", "xG"],
       lgPlayer: "Player", lgGk: "Goalkeeper", livePlay: "Live play", kickoffShape: "Starting shape",
       tactics: "Tactics", formation: "Formation", storyline: "Storyline", readBrief: "Read brief", rewritten: "Brief rewritten from the tactics."
@@ -533,6 +565,13 @@ class Component extends DCLogic {
 
     function stamp(v) {
       var base = "display:inline-flex;align-items:center;gap:5px;font-family:" + C.display + ";font-weight:600;font-size:15px;letter-spacing:.02em;padding:1px 8px;border-radius:3px;white-space:nowrap;";
+      if (C.stampFill) {
+        var fb = "display:inline-flex;align-items:center;font-family:" + C.display + ";font-weight:700;font-size:15px;letter-spacing:.03em;padding:3px 14px;white-space:nowrap;" + C.segCut;
+        if (v === "checking") return { text: t.verdict.checking, cls: "pulse", style: fb.replace(C.segCut, "") + "color:" + C.checking + ";outline:1.5px dashed " + C.checkingBorder + ";outline-offset:-1.5px;" };
+        if (v === "verified") return { text: t.verdict.verified, cls: "", style: fb + "background:" + C.verified + ";color:" + C.verifiedInk + ";" };
+        if (v === "rephrased" || v === "corrected") return { text: t.verdict[v], cls: "", style: fb + "background:" + C.rephrased + ";color:" + C.rephrasedInk + ";" };
+        return { text: t.verdict.blocked, cls: "", style: fb + "background:" + C.blocked + ";color:" + C.blockedInk + ";" };
+      }
       if (v === "checking") return { text: t.verdict.checking, cls: "pulse", style: base + "color:" + C.checking + ";border:1.5px dashed " + C.checkingBorder + ";" };
       if (v === "verified") return { text: "✓ " + t.verdict.verified, cls: "", style: base + "color:" + C.verified + ";border:1.5px solid " + C.verified + ";transform:rotate(-2deg);" };
       if (v === "rephrased" || v === "corrected") return { text: "≈ " + t.verdict[v], cls: "", style: base + "color:" + C.rephrased + ";border:1.5px solid " + C.rephrased + ";transform:rotate(-2deg);" };
@@ -583,6 +622,11 @@ class Component extends DCLogic {
     }
     var composed = teamLine("Rivermouth", s.tac.home, true) + " " + teamLine("Ashford Vale", s.tac.away, false) + " " + L(D.stories[s.tac.story]);
     var briefText = s.brief !== null ? s.brief : composed;
+    function teamShort(code, side) {
+      var d = side.d;
+      return code + " " + side.form + ", " + (es ? t.pressW + " " + dialWord(0, d[0]) : dialWord(0, d[0]) + " " + t.pressW) + ", " + dialWord(1, d[1]) + ", " + (es ? t.lineW + " " + dialWord(2, d[2]) : dialWord(2, d[2]) + " " + t.lineW);
+    }
+    var setupSummary = s.brief !== null ? t.customBrief + s.brief : teamShort("RIV", s.tac.home) + "  v  " + teamShort("ASH", s.tac.away) + "  ·  " + L(D.stories[s.tac.story]);
 
     function readBriefText(text) {
       var nt = JSON.parse(JSON.stringify(s.tac)), found = 0, lower = text.toLowerCase();
@@ -689,7 +733,7 @@ class Component extends DCLogic {
     revIdx.forEach(function (i) { D.beats[i].claims.forEach(function (cl, j) { drafted++; var st = statusOf(i, j, cl); if (st === "checking") nc++; else if (st === "verified") nv++; else if (st === "rephrased") nr++; else nb++; }); });
     var running = isLive && m < 96;
     function stage(name, value, detail, active) {
-      return { name: name, value: value, detail: detail, style: "flex:1 1 170px;display:flex;flex-direction:column;gap:2px;padding:10px 20px;border-right:1px solid " + C.line + ";border-top:3px solid " + (active ? C.stageOn : "transparent") + ";" };
+      return { name: name, value: value, detail: detail, style: "flex:1 1 170px;display:flex;flex-direction:column;gap:2px;padding:10px 20px;border-right:1px solid " + C.line + ";border-top:3px solid " + (active ? C.stageOn : "transparent") + ";" + C.stageExtra };
     }
     var stages = [
       stage(t.stIngest, Math.round(f * D.TOTAL_EVENTS).toLocaleString("en-US"), pre ? t.idle : (running ? t.stIngestD : t.done), running),
@@ -715,7 +759,9 @@ class Component extends DCLogic {
         fanText: checking ? t.fanWait : L(b.fan),
         showRemoved: !isProducer && removed > 0 && !checking,
         removedText: removed === 1 ? t.removed1 : removed + t.removedN,
-        cardStyle: "border-radius:10px;" + (active ? "background:" + C.cardActive + ";border:1px solid " + C.cardBorderActive + ";" : "background:transparent;border:1px solid " + C.cardBorder + ";"),
+        cardStyle: "border-radius:" + C.r10 + ";overflow:hidden;" + (C.lowerThird && !checking ? "box-shadow:" + C.chipShadow + ";" : "") + (active ? "background:" + C.cardActive + ";border:1px solid " + C.cardBorderActive + ";" : "background:" + (C.lowerThird ? C.surface : "transparent") + ";border:1px solid " + C.cardBorder + ";"),
+        headStyle: "display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;width:100%;min-height:48px;border:0;text-align:left;" + (C.lowerThird ? (checking ? "padding:0 14px 0 0;background:transparent;color:inherit;outline:2px dashed " + C.checkingBorder + ";outline-offset:-2px;" : "padding:0 12px 0 0;align-items:stretch;background:" + C.thirdBg + ";color:" + C.ink + ";") : "padding:12px 14px;background:transparent;color:inherit;"),
+        labelStyle: C.feedLabel,
         claims: visibleClaims(i).map(function (x) {
           var on = sel && sel.c.id === x.c.id, blocked = x.st === "blocked", sp = stamp(x.st);
           return {
@@ -826,7 +872,7 @@ class Component extends DCLogic {
 
     return {
       c: C, t: t,
-      focusCss: "button:focus-visible,textarea:focus-visible{outline:2px solid " + C.focus + ";outline-offset:2px}",
+      focusCss: "button:focus-visible,textarea:focus-visible{outline:2px solid " + C.focus + ";outline-offset:2px}h1,h2{text-transform:" + C.caps + "}",
       scoreHome: String(home), scoreAway: String(away), clock: self.mmss(m),
       isLive: isLive, isReplay: phase === "replay", notLive: !isLive, locked: isLive,
       themes: themes, modes: modes, langs: langs, views: views, speeds: speeds,
@@ -839,7 +885,11 @@ class Component extends DCLogic {
         function pickForm() { return fn[Math.floor(Math.random() * fn.length)]; }
         self.setState({ tac: { home: { form: pickForm(), d: [r2(), r2(), r2()] }, away: { form: pickForm(), d: [r2(), r2(), r2()] }, story: Math.floor(Math.random() * D.stories.length) }, brief: null, readNote: t.rewritten });
       },
-      kickOff: function () { self.setState({ phase: "live", minute: 0, revealed: {}, sel: null, claim: null, now: Date.now() }); self.start(); },
+      setupSummary: setupSummary, showSetup: !!s.setupOpen && !isLive,
+      setupToggleLabel: s.setupOpen && !isLive ? t.hideSetup : t.editSetup,
+      setupChevron: "transition:transform .2s ease;" + (s.setupOpen && !isLive ? "transform:rotate(180deg);" : ""),
+      toggleSetup: function () { self.setState({ setupOpen: !self.state.setupOpen }); },
+      kickOff: function () { self.setState({ setupOpen: false, phase: "live", minute: 0, revealed: {}, sel: null, claim: null, now: Date.now() }); self.start(); },
       loadReplay: function () {
         self.stop();
         var rev = {}; D.beats.forEach(function (b, i) { rev[i] = 0; });
@@ -850,7 +900,7 @@ class Component extends DCLogic {
       showFollow: isLive && s.sel !== null,
       players: players,
       pitchChip: frozen ? (es ? "Imagen congelada, " : "Freeze frame, ") + frozen.anchor.at : (running ? t.live : (pre ? t.kickoffShape : t.replay)),
-      pitchChipStyle: "position:absolute;left:12px;top:10px;padding:2px 8px;border-radius:4px;font-size:13px;font-weight:600;background:" + (running && !frozen ? C.liveBg : C.surface) + ";color:" + (running && !frozen ? C.liveText : C.text) + ";",
+      pitchChipStyle: C.lowerThird ? "position:absolute;left:50%;bottom:18px;transform:translateX(-50%);white-space:nowrap;padding:7px 24px;font-family:" + C.display + ";font-weight:700;font-size:18px;text-transform:uppercase;box-shadow:" + C.chipShadow + ";" + C.segCut + "background:" + (running && !frozen ? C.liveBg : C.thirdBg) + ";color:" + (running && !frozen ? C.liveText : C.ink) + ";" : "position:absolute;left:12px;top:10px;padding:2px 8px;border-radius:4px;font-size:13px;font-weight:600;background:" + (running && !frozen ? C.liveBg : C.surface) + ";color:" + (running && !frozen ? C.liveText : C.text) + ";",
       teams: teams, stages: stages,
       formations: D.formNames.map(function (f) { return { v: f }; }),
       storyIdx: String(s.tac.story),

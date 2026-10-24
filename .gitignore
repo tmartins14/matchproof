@@ -30,5 +30,6 @@ next-env.d.ts
 data/
 
 # Test caches
-apps/web/test-results/
+playwright-report/
+test-results/
 .cache/

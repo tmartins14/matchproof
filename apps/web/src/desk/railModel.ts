@@ -43,7 +43,9 @@ export function metricKey(name: string): string {
 export function windowLabel(fact: Fact, c: Copy): string | undefined {
   const scope = fact.scope;
   if (scope?.t_from === undefined || scope.t_to === undefined) return undefined;
-  return fill(c.stats.window, { from: formatMinute(scope.t_from), to: formatMinute(scope.t_to) });
+  const from = formatMinute(scope.t_from);
+  const to = formatMinute(scope.t_to);
+  return from === to ? undefined : fill(c.stats.window, { from, to });
 }
 
 function metricLabel(fact: Fact, c: Copy, sideFallback?: "home" | "away"): string {
@@ -51,6 +53,13 @@ function metricLabel(fact: Fact, c: Copy, sideFallback?: "home" | "away"): strin
   const label = c.metric[key] ?? key;
   const side = fact.scope?.side ?? sideFallback;
   return side ? `${label} · ${c.side[side]}` : label;
+}
+
+const isHeadline = (f: Fact): boolean => f.unit === "m" || f.unit === "count" || f.name.startsWith("score_after");
+
+/** The claim's first number a viewer reads as the point: a distance, count or score before a duration. */
+export function pickLead(facts: Fact[]): Fact | undefined {
+  return facts.find(isHeadline) ?? facts.find((f) => f.unit !== "s") ?? facts[0];
 }
 
 export function buildRail(fx: DeskFixture, claimFactIds: string[], numberFactIds: string[], lang: Lang, c: Copy, side?: "home" | "away"): RailView {
@@ -74,7 +83,7 @@ export function buildRail(fx: DeskFixture, claimFactIds: string[], numberFactIds
     return { id, label: c.rail.aggregate, who: source?.kind === "aggregate" ? source.description : "", time: "" };
   });
 
-  const lead = numberFactIds.map((id) => factById.get(id)).find((f) => f !== undefined);
+  const lead = pickLead(numberFactIds.flatMap((id) => factById.get(id) ?? []));
   const statCard = lead
     ? { value: shortDisplayOf(lead, lang), metric: metricLabel(lead, c, side), factId: lead.id, window: windowLabel(lead, c) }
     : undefined;

@@ -1,5 +1,6 @@
 import type { Copy } from "@/desk/copy";
 import type { ClaimView } from "@/desk/model";
+import { displayReason } from "@/desk/reason";
 import { VerdictStamp } from "./VerdictStamp";
 
 interface ClaimItemProps {
@@ -19,12 +20,12 @@ export function ClaimItem({ copy, view, onPick }: ClaimItemProps) {
         <span className={overturned ? "mp-struck" : undefined} style={{ fontWeight: 500, lineHeight: 1.35 }}>
           {overturned ? (claim.draft_text ?? claim.text) : claim.text}
         </span>
-        {overturned && claim.reason ? <span className="mp-note">{claim.reason}</span> : null}
+        {overturned && claim.reason ? <span className="mp-note">{displayReason(claim.reason, copy)}</span> : null}
         <span style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "6px 10px" }}>
           <span className="mono mp-muted" style={{ fontSize: 12 }}>
             {claim.fact_ids[0]}
           </span>
-          <VerdictStamp verdict={verdict} copy={copy} reason={claim.reason} />
+          <VerdictStamp verdict={verdict} copy={copy} reason={claim.reason ? displayReason(claim.reason, copy) : undefined} />
         </span>
       </button>
     </li>

@@ -11,9 +11,9 @@ export function StatCard({ view }: StatCardProps) {
         <span className="mp-card-value num">{view.value}</span>
         <span className="mp-card-label">
           <b>{view.metric}</b>
-          <span className="mono" style={{ fontSize: 12 }}>
+          {view.window ? <span className="num">{view.window}</span> : null}
+          <span className="mono mp-card-id" title={view.factId}>
             {view.factId}
-            {view.window ? ` · ${view.window}` : ""}
           </span>
         </span>
       </div>

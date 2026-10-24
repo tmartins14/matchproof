@@ -21,6 +21,10 @@ test("full-page desk shots", async ({ page }) => {
   await page.screenshot({ path: `${OUT}/setup-open-1440.png`, fullPage: true });
   await open(page, "?mode=fan");
   await page.screenshot({ path: `${OUT}/fan-1440.png`, fullPage: true });
+  await open(page, "?mode=producer&beat=bt-000993-territorial_spell");
+  await page.screenshot({ path: `${OUT}/producer-1440.png`, fullPage: true });
+  await open(page, "?beat=bt-000993-territorial_spell");
+  await page.screenshot({ path: `${OUT}/analyst-overturned-1440.png`, fullPage: true });
   await open(page, "?lang=es");
   await page.screenshot({ path: `${OUT}/es-1440.png`, fullPage: true });
   await open(page, "", PHONE);
@@ -33,7 +37,7 @@ const STAMPS: [string, string, string][] = [
   ["checking", "", "CHECKING"],
   ["verified", "?beat=bt-001484-card", "STANDS"],
   ["rephrased", "?claim=cl-001670-open_play_goal-01&stamp=rephrased", "AMENDED"],
-  ["blocked", "?mode=producer&beat=bt-000993-territorial_spell", "OVERTURNED"],
+  ["blocked", "?beat=bt-000993-territorial_spell", "OVERTURNED"],
   ["delayed", "?stamp=delayed", "HELD"],
 ];
 

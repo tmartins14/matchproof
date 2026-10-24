@@ -15,7 +15,10 @@ export interface BeatView {
   headlineKey: string;
   verdict: Verdict;
   claims: ClaimView[];
+  /** Claims the checker overturned in this beat, whether or not the mode shows them. */
   removed: number;
+  /** Every claim verdict in the beat, shown or not. */
+  verdicts: Verdict[];
   selected: boolean;
 }
 
@@ -39,7 +42,7 @@ export function beatVerdict(verdicts: Verdict[]): Verdict {
 }
 
 function showsBlocked(mode: Mode): boolean {
-  return mode === "producer";
+  return mode !== "fan";
 }
 
 export function buildModel(fx: DeskFixture, state: ReviewState): DeskModel {
@@ -62,13 +65,14 @@ export function buildModel(fx: DeskFixture, state: ReviewState): DeskModel {
   const feed = [...revealed].reverse().map((beat): BeatView => {
     const all = claimsOf(beat).map((claim) => ({ claim, verdict: verdictOf(claim, beat), selected: claim.id === wanted }));
     const shown = all.filter((c) => showsBlocked(state.mode) || c.verdict !== "blocked");
-    const removed = all.length - shown.length;
+    const removed = all.filter((c) => c.verdict === "blocked").length;
     return {
       beat,
       headlineKey: beat.kind,
       verdict: beatVerdict(all.map((c) => c.verdict)),
       claims: shown,
       removed,
+      verdicts: all.map((c) => c.verdict),
       selected: beat.id === selectedBeat?.id,
     };
   });

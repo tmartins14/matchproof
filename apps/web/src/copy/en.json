@@ -231,6 +231,13 @@
     "substitution": "Substitution"
   },
   "feedExtra": {
-    "producerRemoved": "{n} removed by the checker, shown struck through."
+    "producerRemoved": "Removed by the checker: {n}"
+  },
+  "reasonCategory": {
+    "overclaim": "Overclaim",
+    "evaluative-adjective": "Unsupported adjective",
+    "comparative": "Unsupported comparison",
+    "unsupported": "Not in the facts",
+    "other": "Wording"
   }
 }

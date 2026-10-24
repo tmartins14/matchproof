@@ -151,13 +151,15 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 .mp-card-value { white-space: nowrap; padding: 6px 24px 6px 14px; background: var(--mp-lime); color: var(--mp-limeInk); clip-path: var(--mp-cutTab); font-family: var(--mp-display); font-weight: 700; font-size: 44px; line-height: 1; display: flex; align-items: center; }
 .mp-card-label { flex: 1 1 auto; min-width: 0; margin-left: -12px; padding: 6px 14px 6px 24px; background: var(--mp-chip); color: var(--mp-ink); display: flex; flex-direction: column; justify-content: center; font-size: 13px; }
 .mp-card-label b { font-family: var(--mp-display); font-size: 17px; text-transform: uppercase; }
+.mp-card-id { font-size: 12px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mp-step { display: flex; flex-direction: column; gap: 6px; }
 .mp-step > span:first-child { font-size: 13px; color: var(--mp-muted); }
 .mp-code { display: block; padding: 10px 12px; background: var(--mp-code); font-family: var(--mp-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
 .mp-events { border: 1px solid var(--mp-line); }
 .mp-events > div { display: grid; grid-template-columns: 82px minmax(0, 1fr) 52px; gap: 8px; align-items: center; padding: 7px 10px; border-bottom: 1px solid var(--mp-line2); font-size: 13px; }
 .mp-events > div:last-child { border-bottom: 0; }
-.mp-events .mono { font-size: 12px; }
+.mp-events .mono { font-size: 12px; overflow-wrap: anywhere; }
+.mp-rail-id { min-width: 0; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 @media (max-width: 600px) {

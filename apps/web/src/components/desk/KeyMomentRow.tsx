@@ -18,7 +18,7 @@ export function KeyMomentRow({ copy, mode, row, headline, onBeat, onClaim }: Key
   const checking = row.verdict === "checking";
   const fan = mode === "fan";
   const removedText =
-    row.removed === 0 || checking
+    row.removed === 0 || checking || mode === "analyst"
       ? undefined
       : mode === "producer"
         ? fill(copy.feedExtra.producerRemoved, { n: row.removed })

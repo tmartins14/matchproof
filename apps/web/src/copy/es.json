@@ -231,6 +231,13 @@
     "substitution": "Cambio"
   },
   "feedExtra": {
-    "producerRemoved": "{n} eliminadas por el verificador, tachadas."
+    "producerRemoved": "Eliminadas por el verificador: {n}"
+  },
+  "reasonCategory": {
+    "overclaim": "Afirmación excesiva",
+    "evaluative-adjective": "Adjetivo sin respaldo",
+    "comparative": "Comparación sin respaldo",
+    "unsupported": "No está en los datos",
+    "other": "Redacción"
   }
 }

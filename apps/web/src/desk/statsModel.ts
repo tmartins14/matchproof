@@ -80,17 +80,16 @@ export function scoreAt(fx: DeskFixture, clock: number): { home: number; away: n
 
 export function buildPipeline(fx: DeskFixture, model: DeskModel): PipelineView {
   const counts = fx.count_timeline[model.minute] ?? { events: 0, facts: 0 };
-  const verdicts = model.feed.flatMap((row) => row.claims.map((c) => c.verdict));
+  const verdicts = model.feed.flatMap((row) => row.verdicts);
   const tally = (v: string): number => verdicts.filter((x) => x === v).length;
-  const removed = model.feed.reduce((sum, row) => sum + row.removed, 0);
   return {
     events: counts.events,
     facts: counts.facts,
     beats: model.revealed.length,
-    claims: verdicts.length + removed,
+    claims: verdicts.length,
     stand: tally("verified"),
     amended: tally("rephrased"),
-    overturned: tally("blocked") + removed,
+    overturned: tally("blocked"),
     checking: tally("checking"),
   };
 }

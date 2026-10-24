@@ -1,6 +1,7 @@
 import type { Copy } from "@/desk/copy";
 import type { ClaimView } from "@/desk/model";
 import type { RailView } from "@/desk/railModel";
+import { displayReason } from "@/desk/reason";
 import { SectionTab } from "./SectionTab";
 import { StatCard } from "./StatCard";
 import { VerdictStamp } from "./VerdictStamp";
@@ -14,13 +15,13 @@ interface EvidenceRailProps {
 export function EvidenceRail({ copy, claim, rail }: EvidenceRailProps) {
   const r = copy.rail;
   const verdict = claim?.verdict;
-  const note = verdict === "checking" || verdict === "verified" || verdict === "delayed" ? copy.verdictNote[verdict] : claim?.claim.reason;
+  const note = verdict === "checking" || verdict === "verified" || verdict === "delayed" ? copy.verdictNote[verdict] : claim?.claim.reason ? displayReason(claim.claim.reason, copy) : undefined;
   return (
     <aside className="mp-col-rail mp-above" aria-label={r.title}>
       <div className="mp-rail">
         <div className="mp-rail-head">
           <SectionTab size="md">{r.title}</SectionTab>
-          <span className="mono mp-muted" style={{ fontSize: 12 }}>{claim?.claim.id}</span>
+          <span className="mono mp-muted mp-rail-id" title={claim?.claim.id}>{claim?.claim.id}</span>
         </div>
         {!claim || !rail ? <p className="mp-muted">{r.empty}</p> : null}
         {claim && rail ? (

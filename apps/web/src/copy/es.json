@@ -161,7 +161,9 @@
   "claim": {
     "was": "Decía",
     "corrected": "CORREGIDO",
-    "reasonLabel": "Motivo"
+    "reasonLabel": "Motivo",
+    "firstDraft": "Primer borrador",
+    "rewrite": "Reescritura"
   },
   "rail": {
     "title": "Pruebas",

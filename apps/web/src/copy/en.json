@@ -161,7 +161,9 @@
   "claim": {
     "was": "Was",
     "corrected": "CORRECTED",
-    "reasonLabel": "Reason"
+    "reasonLabel": "Reason",
+    "firstDraft": "First draft",
+    "rewrite": "Rewrite"
   },
   "rail": {
     "title": "Receipts",

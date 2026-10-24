@@ -1,6 +1,7 @@
 import type { Copy } from "@/desk/copy";
 import type { ClaimView } from "@/desk/model";
 import { displayReason } from "@/desk/reason";
+import { OverturnedLines } from "./OverturnedLines";
 import { VerdictStamp } from "./VerdictStamp";
 
 interface ClaimItemProps {
@@ -17,9 +18,11 @@ export function ClaimItem({ copy, view, onPick }: ClaimItemProps) {
     <li>
       <button type="button" className="mp-claim" aria-pressed={selected} onClick={() => onPick(claim.id)}>
         {amended ? <span className="mp-struck" style={{ fontSize: 14 }}>{claim.draft_text}</span> : null}
-        <span className={overturned ? "mp-struck" : undefined} style={{ fontWeight: 500, lineHeight: 1.35 }}>
-          {overturned ? (claim.draft_text ?? claim.text) : claim.text}
-        </span>
+        {overturned ? (
+          <OverturnedLines claim={claim} copy={copy} />
+        ) : (
+          <span style={{ fontWeight: 500, lineHeight: 1.35 }}>{claim.text}</span>
+        )}
         {overturned && claim.reason ? <span className="mp-note">{displayReason(claim.reason, copy)}</span> : null}
         <span style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "6px 10px" }}>
           <span className="mono mp-muted" style={{ fontSize: 12 }}>

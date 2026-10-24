@@ -2,6 +2,7 @@ import type { Copy } from "@/desk/copy";
 import type { ClaimView } from "@/desk/model";
 import type { RailView } from "@/desk/railModel";
 import { displayReason } from "@/desk/reason";
+import { OverturnedLines } from "./OverturnedLines";
 import { SectionTab } from "./SectionTab";
 import { StatCard } from "./StatCard";
 import { VerdictStamp } from "./VerdictStamp";
@@ -29,9 +30,13 @@ export function EvidenceRail({ copy, claim, rail }: EvidenceRailProps) {
             {rail.statCard ? <StatCard view={rail.statCard} /> : null}
             <div className="mp-step">
               <span>{r.claim}</span>
-              <span className={`display${verdict === "blocked" ? " mp-struck" : ""}`} style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.25 }}>
-                {claim.claim.text}
-              </span>
+              {verdict === "blocked" ? (
+                <OverturnedLines claim={claim.claim} copy={copy} display />
+              ) : (
+                <span className="display" style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.25 }}>
+                  {claim.claim.text}
+                </span>
+              )}
             </div>
             <div className="mp-step">
               <span>{r.fact}</span>

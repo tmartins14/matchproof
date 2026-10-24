@@ -44,6 +44,8 @@ from contracts.models import (
     Fact,
     MatchBrief,
     PositionFrame,
+    State,
+    Status,
     StreamMessage,
 )
 from intel.beats import BeatDetector
@@ -92,6 +94,10 @@ PRODUCER_WAIT_S = 15.0  # real seconds a beat waits at air for the Producer's de
 DRAIN_TIMEOUT_S = (
     60.0  # real seconds after full time the stream waits for checks still running
 )
+FULL_TIME_HOLD_S = (
+    30.0  # real seconds full time waits for audits and corrections still running
+)
+HOLD_POLL_S = 0.05  # how often the hold looks at the ledger when nothing lands
 PAUSED_TEXT = "Narration is paused for today."
 UNAVAILABLE_TEXT = "Verification is unavailable right now."
 
@@ -584,6 +590,23 @@ async def _air_beat(msg: StreamMessage, track: _AgentTrack) -> list[StreamMessag
     return out
 
 
+async def _hold_for_checks(track: _AgentTrack) -> AsyncGenerator[StreamMessage, None]:
+    """Before full time, wait for the audits and corrections still running (up to FULL_TIME_HOLD_S),
+    sending what lands. The SSE layer sends a heartbeat for every HEARTBEAT_S of silence."""
+    run = track.run
+    if not isinstance(run, MatchRun):
+        return
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + FULL_TIME_HOLD_S
+    while run.ledger.pending > 0 and loop.time() < deadline:
+        getter = asyncio.ensure_future(track.late.get())
+        await asyncio.wait({getter}, timeout=min(HOLD_POLL_S, deadline - loop.time()))
+        if not getter.cancel():  # it finished first: the message is ours to send
+            yield track.from_late(getter.result())
+    for late_msg in track.drain():
+        yield late_msg
+
+
 async def run_live(
     brief: MatchBrief,
     speed: int = SPEED_FAST,
@@ -662,6 +685,9 @@ async def run_live(
                 for sent in await _air_beat(msg, track):
                     yield sent
             else:
+                if isinstance(msg.data, Status) and msg.data.state == State.full_time:
+                    async for held in _hold_for_checks(track):
+                        yield held
                 yield track.number(msg)
         if track is not None:
             # Full time: let the checks still running finish and be sent. Audits are not waited for.

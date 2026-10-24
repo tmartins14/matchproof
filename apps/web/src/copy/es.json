@@ -5,5 +5,241 @@
     "rephrased": "CORREGIDO",
     "blocked": "ANULADO",
     "delayed": "EN ESPERA"
+  },
+  "verdictNote": {
+    "checking": "Cotejando cada número con el registro de datos.",
+    "verified": "Cada número remite a un campo calculado y la redacción no va más allá del dato.",
+    "delayed": "Aún no hay pruebas. La afirmación espera."
+  },
+  "wordmark": {
+    "first": "Matchproof",
+    "second": "Mesa en directo"
+  },
+  "header": {
+    "score": "Marcador",
+    "mode": "Modo de visualización",
+    "lang": "Idioma",
+    "live": "En directo",
+    "fullTime": "FIN",
+    "modes": {
+      "fan": "Aficionado",
+      "analyst": "Analista",
+      "producer": "Productor"
+    },
+    "langs": {
+      "en": "EN",
+      "es": "ES"
+    }
+  },
+  "setup": {
+    "label": "Configuración",
+    "edit": "Editar táctica y guion",
+    "hide": "Ocultar",
+    "randomize": "Aleatorio",
+    "kickoff": "Empezar en directo",
+    "cached": "Ver repetición guardada",
+    "briefLabel": "Guion del partido",
+    "readBrief": "Leer guion",
+    "tactics": "Táctica",
+    "formation": "Sistema",
+    "storyline": "Argumento",
+    "rewritten": "Guion reescrito a partir de la táctica.",
+    "versus": "v",
+    "press": "presión",
+    "line": "línea",
+    "dials": [
+      "Presión",
+      "Verticalidad",
+      "Altura de línea"
+    ],
+    "dialsAway": [
+      "Presión",
+      "Verticalidad",
+      "Profundidad"
+    ],
+    "words": {
+      "press": [
+        "alta",
+        "media",
+        "baja"
+      ],
+      "directness": [
+        "directo",
+        "mixto",
+        "paciente"
+      ],
+      "line": [
+        "alta",
+        "media",
+        "baja"
+      ]
+    },
+    "phrases": {
+      "press": [
+        "presionan arriba",
+        "presionan en zona media",
+        "esperan replegados"
+      ],
+      "directness": [
+        "juegan directo",
+        "combinan juego corto y largo",
+        "tienen el balón con paciencia"
+      ],
+      "lineHome": [
+        "defienden con la línea alta",
+        "defienden con la línea media",
+        "defienden atrás"
+      ],
+      "lineAway": [
+        "defienden en bloque alto",
+        "se colocan en bloque medio",
+        "se colocan en bloque bajo"
+      ],
+      "and": "y"
+    },
+    "storylines": {
+      "late_comeback": "Ashford marca primero a la contra; Rivermouth empata a balón parado y gana al final.",
+      "red_card_flip": "Primera parte sin goles; una roja en el 60′ le da la vuelta al partido.",
+      "smash_and_grab": "Rivermouth domina el balón pero pierde 1–0 por una sola contra.",
+      "end_to_end": "Ida y vuelta, 3–3, con un empate en el descuento.",
+      "custom": "Guion propio"
+    }
+  },
+  "pipeline": {
+    "label": "Estado del pipeline",
+    "events": "Eventos recibidos",
+    "facts": "Datos calculados",
+    "beats": "Momentos clave",
+    "claims": "Afirmaciones redactadas",
+    "checker": "Verificador",
+    "eventsDetail": "flujo del generador",
+    "factsDetail": "con ID de evento",
+    "beatsDetail": "detectados",
+    "claimsDetail": "solo a partir de datos",
+    "checkerSummary": "{stand} válidas · {amended} corregidas · {overturned} anuladas",
+    "checkerChecking": "{n} en curso"
+  },
+  "pitch": {
+    "label": "Campo",
+    "aria": "{headline}, {n} jugadores y el balón",
+    "attack": "Rivermouth ataca hacia la derecha",
+    "freeze": "Imagen congelada, {clock}",
+    "livePlay": "Juego en directo",
+    "waiting": "Esperando el primer momento clave",
+    "legend": {
+      "pressure": "Presión",
+      "won": "Recuperación",
+      "pass": "Pase",
+      "carry": "Conducción",
+      "shot": "Tiro, tamaño según xG",
+      "player": "Jugador",
+      "goalkeeper": "Portero"
+    }
+  },
+  "stats": {
+    "possession": "Posesión",
+    "shots": "Tiros",
+    "xg": "xG",
+    "tilt": "Dominio del campo",
+    "window": "{from}–{to}′"
+  },
+  "ticker": {
+    "title": "Últimos eventos",
+    "empty": "Los eventos aparecen aquí al empezar el partido."
+  },
+  "momentum": {
+    "title": "Dinámica, dominio del campo por tramo",
+    "pin": "{headline}, {label}"
+  },
+  "feed": {
+    "title": "Momentos clave",
+    "empty": "Los momentos clave aparecen aquí en cuanto el detector los encuentra.",
+    "fanChecking": "Verificando antes de publicar.",
+    "removedOne": "El verificador eliminó 1 afirmación. Cambia a Productor para ver por qué.",
+    "removedMany": "{n} afirmaciones eliminadas por el verificador. Cambia a Productor para ver por qué."
+  },
+  "claim": {
+    "was": "Decía",
+    "corrected": "CORREGIDO",
+    "reasonLabel": "Motivo",
+    "firstDraft": "Primer borrador",
+    "rewrite": "Reescritura"
+  },
+  "rail": {
+    "title": "Pruebas",
+    "empty": "Selecciona una afirmación para ver los datos y eventos que la respaldan.",
+    "claim": "Afirmación",
+    "fact": "Dato calculado",
+    "events": "Eventos de origen",
+    "verdict": "Veredicto",
+    "noEvents": "Ningún evento respalda esta afirmación.",
+    "freezeFrame": "imagen congelada",
+    "window": "tramo",
+    "aggregate": "agregado"
+  },
+  "metric": {
+    "xg": "xG",
+    "shots": "Tiros",
+    "possession_share": "Posesión",
+    "territory": "Territorio",
+    "back_line_change": "Cambio de línea defensiva",
+    "compactness": "Área de la formación",
+    "sequence.seconds": "Duración de la jugada",
+    "sequence.ball_won_distance": "Recuperación, a distancia de la portería",
+    "freeze_frame.zone_defenders": "Defensores alrededor del área",
+    "card.players_after": "Jugadores restantes",
+    "card.player": "Jugador",
+    "card.kind": "Tarjeta",
+    "shot.shooter": "Tirador",
+    "shot.outcome": "Resultado",
+    "shot.xg": "xG",
+    "score_after": "Marcador",
+    "lead": "Ventaja"
+  },
+  "side": {
+    "home": "Rivermouth",
+    "away": "Ashford Vale"
+  },
+  "eventType": {
+    "pass": "pase",
+    "carry": "conducción",
+    "shot": "tiro",
+    "pressure": "presión",
+    "interception": "intercepción",
+    "tackle": "entrada",
+    "duel": "duelo",
+    "clearance": "despeje",
+    "foul": "falta",
+    "card": "tarjeta",
+    "corner": "córner",
+    "free_kick": "tiro libre",
+    "throw_in": "saque de banda",
+    "goal_kick": "saque de puerta",
+    "substitution": "cambio",
+    "kick_off": "saque inicial",
+    "period_start": "inicio del periodo",
+    "period_end": "fin del periodo"
+  },
+  "beatKind": {
+    "high_turnover_chance": "Recuperación alta, con ocasión",
+    "counter_goal": "Gol a la contra",
+    "set_piece_goal": "Gol a balón parado",
+    "high_turnover_goal": "Recuperación alta, con gol",
+    "open_play_goal": "Gol en juego abierto",
+    "territorial_spell": "Instalados en su campo",
+    "momentum_swing": "El partido cambia",
+    "big_chance": "Gran ocasión",
+    "card": "Expulsión",
+    "substitution": "Cambio"
+  },
+  "feedExtra": {
+    "producerRemoved": "Eliminadas por el verificador: {n}"
+  },
+  "reasonCategory": {
+    "overclaim": "Afirmación excesiva",
+    "evaluative-adjective": "Adjetivo sin respaldo",
+    "comparative": "Comparación sin respaldo",
+    "unsupported": "No está en los datos",
+    "other": "Redacción"
   }
 }

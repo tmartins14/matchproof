@@ -1,14 +1,12 @@
-import type { Event } from "@/contracts/types";
-import { getTokens } from "@/theme/tokens";
+import { Desk } from "@/components/desk/Desk";
+import { fixture } from "@/desk/fixture";
+import { parseReviewParams } from "@/desk/reviewParams";
 
-// Proves the generated-types wiring: this fails to compile if the event schema drops "home".
-const side: Event["side"] = "home";
+interface PageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
 
-export default function Home() {
-  const tokens = getTokens("broadcast");
-  return (
-    <main style={{ background: tokens.bg, color: tokens.text }} data-side={side}>
-      <h1>Matchproof</h1>
-    </main>
-  );
+export default async function Home({ searchParams }: PageProps) {
+  const initial = parseReviewParams(await searchParams);
+  return <Desk fixture={fixture} initial={initial} />;
 }

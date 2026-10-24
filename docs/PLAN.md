@@ -177,6 +177,8 @@ Model-calling evals run on PRs that touch prompts or agents and nightly, not on 
 
 ### Design process
 
+Oct 23: design pass done on Friday. One theme, Floodlight; see `docs/DESIGN.md`. Editorial deferred (ADR 0006 addendum).
+
 The product ships two themes the viewer switches between, replacing light and dark mode: Broadcast (dark, condensed type, built for overlays on footage) and Editorial (your brand: cream, Fraunces, crimson and navy). Both read from one token file, so every component is built once. The prototype's Broadcast pass is a placeholder until this process runs on Saturday Oct 24; Editorial reuses your existing palette and type.
 
 1. **References first (Friday, train).** Screenshot 5 to 10 you like: Sky Sports or ESPN on-screen graphics, The Athletic, FotMob, Opta graphics, F1 TV timing towers. Study them for structure, never copy palettes, marks or the Premier League's own package.

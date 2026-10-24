@@ -5,5 +5,241 @@
     "rephrased": "AMENDED",
     "blocked": "OVERTURNED",
     "delayed": "HELD"
+  },
+  "verdictNote": {
+    "checking": "Matching every number against the fact registry.",
+    "verified": "Every number traces to a computed field, and the wording stays inside the fact.",
+    "delayed": "Evidence not in yet. The claim waits."
+  },
+  "wordmark": {
+    "first": "Matchproof",
+    "second": "Live desk"
+  },
+  "header": {
+    "score": "Score",
+    "mode": "Viewer mode",
+    "lang": "Language",
+    "live": "Live",
+    "fullTime": "FT",
+    "modes": {
+      "fan": "Fan",
+      "analyst": "Analyst",
+      "producer": "Producer"
+    },
+    "langs": {
+      "en": "EN",
+      "es": "ES"
+    }
+  },
+  "setup": {
+    "label": "Match setup",
+    "edit": "Edit tactics and brief",
+    "hide": "Hide setup",
+    "randomize": "Randomize",
+    "kickoff": "Kick off live",
+    "cached": "Watch cached replay",
+    "briefLabel": "Match brief",
+    "readBrief": "Read brief",
+    "tactics": "Tactics",
+    "formation": "Formation",
+    "storyline": "Storyline",
+    "rewritten": "Brief rewritten from the tactics.",
+    "versus": "v",
+    "press": "press",
+    "line": "line",
+    "dials": [
+      "Press intensity",
+      "Directness",
+      "Line height"
+    ],
+    "dialsAway": [
+      "Press intensity",
+      "Directness",
+      "Block depth"
+    ],
+    "words": {
+      "press": [
+        "high",
+        "mid",
+        "low"
+      ],
+      "directness": [
+        "direct",
+        "mixed",
+        "patient"
+      ],
+      "line": [
+        "high",
+        "mid",
+        "deep"
+      ]
+    },
+    "phrases": {
+      "press": [
+        "press high",
+        "press from a mid shape",
+        "drop off and wait"
+      ],
+      "directness": [
+        "play direct",
+        "mix short and long",
+        "keep the ball patiently"
+      ],
+      "lineHome": [
+        "hold a high line",
+        "hold a mid line",
+        "defend deep"
+      ],
+      "lineAway": [
+        "defend in a high block",
+        "sit in a mid shape",
+        "sit in a low block"
+      ],
+      "and": "and"
+    },
+    "storylines": {
+      "late_comeback": "Ashford score first on the break; Rivermouth equalise from a set piece and win it late.",
+      "red_card_flip": "A goalless first half, then a red card on the hour flips the game.",
+      "smash_and_grab": "Rivermouth dominate the ball but lose 1–0 to a single counter.",
+      "end_to_end": "End to end, 3–3, with an equaliser in stoppage time.",
+      "custom": "Custom brief"
+    }
+  },
+  "pipeline": {
+    "label": "Pipeline status",
+    "events": "Events in",
+    "facts": "Facts computed",
+    "beats": "Key moments",
+    "claims": "Claims drafted",
+    "checker": "Checker",
+    "eventsDetail": "from the generator stream",
+    "factsDetail": "each with event IDs",
+    "beatsDetail": "detected",
+    "claimsDetail": "from facts only",
+    "checkerSummary": "{stand} stand · {amended} amended · {overturned} overturned",
+    "checkerChecking": "{n} checking"
+  },
+  "pitch": {
+    "label": "Pitch",
+    "aria": "{headline}, {n} players and the ball",
+    "attack": "Rivermouth attack to the right",
+    "freeze": "Freeze frame, {clock}",
+    "livePlay": "Live play",
+    "waiting": "Waiting for the first key moment",
+    "legend": {
+      "pressure": "Pressure",
+      "won": "Ball won",
+      "pass": "Pass",
+      "carry": "Carry",
+      "shot": "Shot, sized by xG",
+      "player": "Player",
+      "goalkeeper": "Goalkeeper"
+    }
+  },
+  "stats": {
+    "possession": "Possession",
+    "shots": "Shots",
+    "xg": "xG",
+    "tilt": "Field tilt",
+    "window": "{from}–{to}′"
+  },
+  "ticker": {
+    "title": "Latest events",
+    "empty": "Events appear here once the match kicks off."
+  },
+  "momentum": {
+    "title": "Momentum, field tilt per window",
+    "pin": "{headline}, {label}"
+  },
+  "feed": {
+    "title": "Key moments",
+    "empty": "Key moments appear here as soon as the detector finds them.",
+    "fanChecking": "Checking before it goes out.",
+    "removedOne": "The checker removed 1 claim. Switch to Producer to see why.",
+    "removedMany": "{n} claims removed by the checker. Switch to Producer to see why."
+  },
+  "claim": {
+    "was": "Was",
+    "corrected": "CORRECTED",
+    "reasonLabel": "Reason",
+    "firstDraft": "First draft",
+    "rewrite": "Rewrite"
+  },
+  "rail": {
+    "title": "Receipts",
+    "empty": "Select a claim to see the facts and events behind it.",
+    "claim": "Claim",
+    "fact": "Computed fact",
+    "events": "Source events",
+    "verdict": "Verdict",
+    "noEvents": "No event supports this claim.",
+    "freezeFrame": "freeze frame",
+    "window": "window",
+    "aggregate": "aggregate"
+  },
+  "metric": {
+    "xg": "xG",
+    "shots": "Shots",
+    "possession_share": "Possession",
+    "territory": "Territory",
+    "back_line_change": "Back line change",
+    "compactness": "Shape area",
+    "sequence.seconds": "Move length",
+    "sequence.ball_won_distance": "Ball won, from goal",
+    "freeze_frame.zone_defenders": "Defenders around the box",
+    "card.players_after": "Players left",
+    "card.player": "Player",
+    "card.kind": "Card",
+    "shot.shooter": "Shooter",
+    "shot.outcome": "Outcome",
+    "shot.xg": "xG",
+    "score_after": "Score",
+    "lead": "Lead"
+  },
+  "side": {
+    "home": "Rivermouth",
+    "away": "Ashford Vale"
+  },
+  "eventType": {
+    "pass": "pass",
+    "carry": "carry",
+    "shot": "shot",
+    "pressure": "pressure",
+    "interception": "interception",
+    "tackle": "tackle",
+    "duel": "duel",
+    "clearance": "clearance",
+    "foul": "foul",
+    "card": "card",
+    "corner": "corner",
+    "free_kick": "free kick",
+    "throw_in": "throw-in",
+    "goal_kick": "goal kick",
+    "substitution": "substitution",
+    "kick_off": "kick-off",
+    "period_start": "period start",
+    "period_end": "period end"
+  },
+  "beatKind": {
+    "high_turnover_chance": "High turnover, a chance",
+    "counter_goal": "Counter-attack goal",
+    "set_piece_goal": "Set-piece goal",
+    "high_turnover_goal": "High turnover, a goal",
+    "open_play_goal": "Open-play goal",
+    "territorial_spell": "Camped in their half",
+    "momentum_swing": "The game shifts",
+    "big_chance": "Big chance",
+    "card": "Sent off",
+    "substitution": "Substitution"
+  },
+  "feedExtra": {
+    "producerRemoved": "Removed by the checker: {n}"
+  },
+  "reasonCategory": {
+    "overclaim": "Overclaim",
+    "evaluative-adjective": "Unsupported adjective",
+    "comparative": "Unsupported comparison",
+    "unsupported": "Not in the facts",
+    "other": "Wording"
   }
 }

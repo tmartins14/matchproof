@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "gen:types": "node ../../scripts/gen_types.mjs"
+    "gen:types": "node ../../scripts/gen_types.mjs",
+    "test": "vitest run",
+    "shots": "next build && playwright test e2e/shots.spec.ts --config playwright.config.ts",
+    "axe": "playwright test e2e/a11y.spec.ts --config playwright.config.ts"
   },
   "dependencies": {
     "next": "^16.4.2",
@@ -16,12 +19,15 @@
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.2",
     "json-schema-to-typescript": "^16.0.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
   }
 }

@@ -23,7 +23,7 @@ AI can already write match commentary, recaps and "why it mattered" explanations
 3. Streams it live at 1×, 3× or 6× speed, or plays a cached run.
 4. Detects key moments, narrates them from computed facts, and checks every claim before it is shown.
 5. Shows the pitch with live players, freeze frames and overlays; a narrative feed; and an evidence rail tracing claim → fact → events → verdict. While a claim is checking, the pitch highlights the players or zone it is about.
-6. Personalises by mode (fan, analyst, producer), language (EN, ES, more if time), club and player focus, and theme (Broadcast, Editorial).
+6. Personalises by mode (fan, analyst, producer), language (EN, ES, more if time), club and player focus.
 
 ## Success criteria (measured, not asserted)
 
@@ -52,5 +52,5 @@ AI can already write match commentary, recaps and "why it mattered" explanations
 | Technological Implementation | Calibrated generator with 22-player positions; schema-first contracts; tests and CI; IaC; managed identity |
 | Agentic Design & Innovation | Five agents with distinct roles over one shared match store via MCP; Checker → Narrator retry; live verification |
 | Real-World Impact | Overlay JSON a graphics operator can key; claims a producer can trust on air |
-| UX & Presentation | Live desk with evidence rail and on-screen review states, three modes, two themes, two languages; product text follows `docs/VOICE.md` |
+| UX & Presentation | Live desk with evidence rail and on-screen review states, three modes, two languages; product text follows `docs/VOICE.md` |
 | Category Adherence (Best Enterprise Solution) | Transparency, controls, audit trail, graceful degradation, cost guards |

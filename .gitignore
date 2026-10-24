@@ -30,4 +30,5 @@ next-env.d.ts
 data/
 
 # Test caches
+apps/web/test-results/
 .cache/

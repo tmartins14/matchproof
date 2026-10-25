@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { copy } from "./copy";
 import { fixture } from "./fixture";
-import { buildRail, pickLead } from "./railModel";
+import type { Fact } from "@/contracts/types";
+import metricFamilies from "../../fixtures/metric-families.json";
+import { buildRail, metricName, pickLead, statCardView } from "./railModel";
 import { displayReason, reasonLines } from "./reason";
 
 describe("displayReason", () => {
@@ -69,5 +71,33 @@ describe("stat card", () => {
     const claim = fixture.claims.find((c) => c.id === "cl-001670-open_play_goal-01");
     const rail = buildRail(fixture, claim?.fact_ids ?? [], (claim?.numbers ?? []).map((n) => n.fact_id), "en", copy.en);
     expect(rail.statCard?.window).toBeUndefined();
+  });
+});
+
+describe("metric names", () => {
+  const families = metricFamilies as unknown as Fact[];
+  const familyOf = (name: string): string => name.replace(/\([^)]*\)/, "");
+
+  it("has copy in both languages for every family the registry emits", () => {
+    expect(families.length).toBeGreaterThanOrEqual(50);
+    for (const lang of ["en", "es"] as const) {
+      const have = Object.keys(copy[lang].metric);
+      for (const fact of families) expect(have, `${lang} ${familyOf(fact.name)}`).toContain(familyOf(fact.name));
+    }
+  });
+  it("never shows a raw key or an underscore on the stat card", () => {
+    for (const lang of ["en", "es"] as const) {
+      for (const fact of families) {
+        const view = statCardView(fact, lang, copy[lang], fact.scope?.side);
+        expect(view.metric, fact.name).not.toMatch(/[_.]/);
+      }
+    }
+  });
+  it("falls back to the fact's label before its first parenthesis, at most 40 characters at a word boundary", () => {
+    const fact = { ...families[0]!, name: "brand_new_metric(home, ev-000001)", label: "Rivermouth have been unusually patient on the ball, before the red card (63′)" } as Fact;
+    const name = metricName(fact, copy.en);
+    expect(name).toBe("Rivermouth have been unusually patient");
+    expect(name.length).toBeLessThanOrEqual(40);
+    expect(metricName({ ...fact, label: undefined }, copy.en)).toBe("brand new metric");
   });
 });

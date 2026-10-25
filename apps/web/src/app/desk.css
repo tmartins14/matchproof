@@ -175,10 +175,10 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 /* Rail */
 .mp-rail { display: flex; flex-direction: column; gap: 16px; padding: 18px; background: var(--mp-surface); box-shadow: var(--mp-shadowPanel); border: 1px solid var(--mp-strong); }
 .mp-rail-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.mp-card { display: flex; align-items: stretch; }
+.mp-card { display: flex; align-items: stretch; min-width: 0; }
 .mp-card-value { white-space: nowrap; padding: 6px 24px 6px 14px; background: var(--mp-lime); color: var(--mp-limeInk); clip-path: var(--mp-cutTab); font-family: var(--mp-display); font-weight: 700; font-size: 44px; line-height: 1; display: flex; align-items: center; }
 .mp-card-label { flex: 1 1 auto; min-width: 0; margin-left: -12px; padding: 6px 14px 6px 24px; background: var(--mp-chip); color: var(--mp-ink); display: flex; flex-direction: column; justify-content: center; font-size: 13px; }
-.mp-card-label b { font-family: var(--mp-display); font-size: 17px; text-transform: uppercase; }
+.mp-card-label b { font-family: var(--mp-display); font-size: 17px; text-transform: uppercase; overflow-wrap: anywhere; }
 .mp-card-id { font-size: 12px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mp-step { display: flex; flex-direction: column; gap: 6px; }
 .mp-step > span:first-child { font-size: 13px; color: var(--mp-muted); }

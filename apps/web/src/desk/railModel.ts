@@ -57,11 +57,33 @@ export function windowLabel(fact: Fact, c: Copy): string | undefined {
   return from === to ? undefined : fill(c.stats.window, { from, to });
 }
 
+const METRIC_CAP = 40;
+
+/** At most `cap` characters, cut at a word boundary. */
+export function capAtWord(text: string, cap = METRIC_CAP): string {
+  if (text.length <= cap) return text;
+  const cut = text.slice(0, cap + 1);
+  const space = cut.lastIndexOf(" ");
+  return (space > 0 ? cut.slice(0, space) : text.slice(0, cap)).trimEnd();
+}
+
+/** The metric's name from copy; for a family copy lacks, the fact's own label up to its first " (". Never a raw key. */
+export function metricName(fact: Fact, c: Copy): string {
+  const known = (c.metric as Record<string, string>)[metricKey(fact.name)];
+  if (known) return known;
+  const fromLabel = (fact.label ?? "").split(" (")[0]?.trim() ?? "";
+  const text = fromLabel || metricKey(fact.name);
+  return capAtWord(text.replace(/[_.]+/g, " ").trim());
+}
+
 function metricLabel(fact: Fact, c: Copy, sideFallback?: "home" | "away"): string {
-  const key = metricKey(fact.name) as keyof Copy["metric"];
-  const label = c.metric[key] ?? key;
+  const label = metricName(fact, c);
   const side = fact.scope?.side ?? sideFallback;
   return side ? `${label} · ${c.side[side]}` : label;
+}
+
+export function statCardView(fact: Fact, lang: Lang, c: Copy, side?: "home" | "away"): StatCardView {
+  return { value: shortDisplayOf(fact, lang), metric: metricLabel(fact, c, side), factId: fact.id, window: windowLabel(fact, c) };
 }
 
 const isHeadline = (f: Fact): boolean => f.unit === "m" || f.unit === "count" || f.name.startsWith("score_after");
@@ -93,9 +115,7 @@ export function buildRail(fx: DeskData, claimFactIds: string[], numberFactIds: s
   });
 
   const lead = pickLead(numberFactIds.flatMap((id) => factById.get(id) ?? []));
-  const statCard = lead
-    ? { value: shortDisplayOf(lead, lang), metric: metricLabel(lead, c, side), factId: lead.id, window: windowLabel(lead, c) }
-    : undefined;
+  const statCard = lead ? statCardView(lead, lang, c, side) : undefined;
   return { factLines, events, statCard };
 }
 

@@ -9,6 +9,16 @@ from collections.abc import Iterable, Mapping
 
 from contracts.models import Event, Fact, PositionFrame
 
+from .desk import (
+    BUCKETS_PER_PERIOD,
+    bucket_bounds,
+    bucket_number,
+    bucket_period,
+    covered_windows,
+    is_last_in_period,
+    momentum_facts,
+    running_facts,
+)
 from .extract_events import EventObserver, Span, span_facts
 from .extract_positions import (
     AGG_POSITION_SAMPLES,
@@ -111,6 +121,21 @@ def extract_all(
         for f in position_facts(every_sample, span):
             registry.add(f)
 
+    by_bucket: dict[int, list[Event]] = defaultdict(list)
+    for e in evs:
+        by_bucket[bucket_number(e.period.value, e.t.root)].append(e)
+    starts = {p: s for p, (s, _) in bounds.items()}
+    ends = {p: e for p, (_, e) in bounds.items()}
+    for period, (start, end) in sorted(bounds.items()):
+        first = (period - 1) * BUCKETS_PER_PERIOD + 1
+        for number in range(first, first + BUCKETS_PER_PERIOD):
+            t_from, t_to = bucket_bounds(number, start, end)
+            so_far = [e for n in range(1, number + 1) for e in by_bucket[n]]
+            for f in running_facts(
+                registry, so_far, number, t_to, covered_windows(t_to, starts, ends)
+            ) + momentum_facts(registry, by_bucket[number], number, t_from, t_to):
+                registry.add(f)
+
     observer = EventObserver(roster, teams)
     for e in evs:
         for f in observer.observe(e):
@@ -128,7 +153,8 @@ class FactEngine:
     """Takes the match in time order and emits each fact as soon as its span has closed.
 
     Window facts appear when the window closes, half facts at the half's period_end, match facts at
-    the second half's. Sequence, shot and card facts appear with their event, freeze-frame facts with
+    the second half's. The 5-minute running totals and momentum (see desk.py) appear when their
+    bucket closes, the last bucket of a half at its period_end. Sequence, shot and card facts appear with their event, freeze-frame facts with
     the freeze frame, which follows its event. Feed `finish()` for a match that stops early.
     """
 
@@ -144,6 +170,9 @@ class FactEngine:
         self._p2_start: float | None = None
         self._open = 1
         self._closed: set[int] = set()
+        self._bucket_open = 1
+        self._buckets_closed: set[int] = set()
+        self._bucket_events: dict[int, list[Event]] = defaultdict(list)
         self._events: dict[int, list[Event]] = defaultdict(list)
         self._samples: dict[int, list[Sample]] = defaultdict(list)
         self._pending: dict[str, Event] = {}
@@ -163,6 +192,9 @@ class FactEngine:
             number = event_window_number(period, t, self._p2_start)
             out += self._advance(number)
             self._events[number].append(item)
+            bucket = bucket_number(period, t)
+            out += self._advance_buckets(bucket)
+            self._bucket_events[bucket].append(item)
             if item.type.value in FREEZE_FACT_TYPES:
                 self._pending[item.id.root] = item
             out += self._take(self._observer.observe(item))
@@ -203,6 +235,36 @@ class FactEngine:
             self._open += 1
         return out
 
+    def _advance_buckets(self, number: int) -> list[Fact]:
+        out: list[Fact] = []
+        while self._bucket_open < number:
+            # A half's last bucket waits for its period_end, like its last window.
+            if not is_last_in_period(self._bucket_open):
+                out += self._close_bucket(self._bucket_open)
+            self._bucket_open += 1
+        return out
+
+    def _close_bucket(self, number: int) -> list[Fact]:
+        if number in self._buckets_closed:
+            return []
+        self._buckets_closed.add(number)
+        period = bucket_period(number)
+        start = self._period_start.get(period, 0.0)
+        t_from, t_to = bucket_bounds(number, start, self._period_end.get(period))
+        so_far = [e for n in range(1, number + 1) for e in self._bucket_events[n]]
+        return self._take(
+            running_facts(
+                self.registry,
+                so_far,
+                number,
+                t_to,
+                covered_windows(t_to, self._period_start, self._period_end),
+            )
+            + momentum_facts(
+                self.registry, self._bucket_events[number], number, t_from, t_to
+            )
+        )
+
     def _close_window(self, number: int) -> list[Fact]:
         if number in self._closed:
             return []
@@ -223,6 +285,10 @@ class FactEngine:
         for number in range(first, first + WINDOWS_PER_PERIOD):
             out += self._close_window(number)
         self._open = max(self._open, first + WINDOWS_PER_PERIOD)
+        first_bucket = (period - 1) * BUCKETS_PER_PERIOD + 1
+        for number in range(first_bucket, first_bucket + BUCKETS_PER_PERIOD):
+            out += self._close_bucket(number)
+        self._bucket_open = max(self._bucket_open, first_bucket + BUCKETS_PER_PERIOD)
         start = self._period_start.get(period, 0.0)
         in_period = [
             e for n in range(first, first + WINDOWS_PER_PERIOD) for e in self._events[n]

@@ -10,6 +10,15 @@ export interface RailEvent {
   who: string;
   time: string;
   side?: "home" | "away";
+  /** an event shows its id; a window, aggregate or freeze frame shows what it covers, with the id in the title */
+  isEvent: boolean;
+}
+
+export interface FactLine {
+  factId: string;
+  label: string;
+  value: string;
+  name: string;
 }
 
 export interface StatCardView {
@@ -20,7 +29,7 @@ export interface StatCardView {
 }
 
 export interface RailView {
-  factLines: string[];
+  factLines: FactLine[];
   events: RailEvent[];
   statCard?: StatCardView;
 }
@@ -65,7 +74,7 @@ export function pickLead(facts: Fact[]): Fact | undefined {
 export function buildRail(fx: DeskFixture, claimFactIds: string[], numberFactIds: string[], lang: Lang, c: Copy, side?: "home" | "away"): RailView {
   const factById = new Map(fx.facts.map((f) => [f.id, f]));
   const facts = [...new Set([...claimFactIds, ...numberFactIds])].flatMap((id) => factById.get(id) ?? []);
-  const factLines = facts.map((f) => `${f.name} = ${displayOf(f, lang)}`);
+  const factLines = facts.map((f) => ({ factId: f.id, label: f.label ?? f.name, value: displayOf(f, lang), name: f.name }));
 
   const eventById = new Map(fx.events.map((e) => [e.id, e]));
   const sourceIds = [...new Set(facts.flatMap((f) => f.source_ids))];
@@ -73,14 +82,14 @@ export function buildRail(fx: DeskFixture, claimFactIds: string[], numberFactIds
     const event = eventById.get(id);
     if (event) {
       const name = event.player_id ? (fx.players[event.player_id]?.name ?? event.player_id) : "";
-      return { id, label: c.eventType[event.type], who: name, time: formatClock(event.t), side: event.side };
+      return { id, label: c.eventType[event.type], who: name, time: formatClock(event.t), side: event.side, isEvent: true };
     }
     const source = fx.sources[id];
     if (source?.kind === "window") {
-      return { id, label: c.rail.window, who: fill(c.stats.window, { from: formatMinute(source.t_from), to: formatMinute(source.t_to) }), time: "" };
+      return { id, label: c.rail.window, who: `${formatClock(source.t_from)}–${formatClock(source.t_to)}`, time: "", isEvent: false };
     }
-    if (source?.kind === "freeze_frame") return { id, label: c.rail.freezeFrame, who: source.event_id, time: "" };
-    return { id, label: c.rail.aggregate, who: source?.kind === "aggregate" ? source.description : "", time: "" };
+    if (source?.kind === "freeze_frame") return { id, label: c.rail.freezeFrame, who: source.event_id, time: "", isEvent: false };
+    return { id, label: c.rail.aggregate, who: source?.kind === "aggregate" ? source.description : "", time: "", isEvent: false };
   });
 
   const lead = pickLead(numberFactIds.flatMap((id) => factById.get(id) ?? []));

@@ -12,8 +12,12 @@
       "description": "Machine name in the form metric(args), e.g. field_tilt(home, 55-70) or freeze_frame(ev-000597).home_ahead_of_ball.",
       "type": "string"
     },
+    "label": {
+      "description": "Plain-English label from intel.labels; for display only.",
+      "type": "string"
+    },
     "value": { "type": ["number", "integer", "string", "boolean"] },
-    "unit": { "type": "string", "enum": ["", "m", "m2", "s", "pct", "xg", "count", "m_s"] },
+    "unit": { "type": "string", "enum": ["", "m", "m2", "s", "pct", "xg", "count", "m_s", "pp"] },
     "display": {
       "description": "How the number may be written in prose, e.g. 1.18 shown as 1.2. The reconciler accepts only these renderings.",
       "type": "object",

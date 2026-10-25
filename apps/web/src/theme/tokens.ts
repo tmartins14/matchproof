@@ -27,6 +27,8 @@ export const themes = {
     // Shape and depth
     radius: "0",
     cut: "polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)",
+    cutStart: "polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%)",
+    cutEnd: "polygon(8px 0, 100% 0, 100% 100%, 0 100%)",
     cutTab: "polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%)",
     shadowPanel: "8px 8px 0 var(--mp-shadow)",
     shadowChip: "5px 5px 0 var(--mp-shadow)",

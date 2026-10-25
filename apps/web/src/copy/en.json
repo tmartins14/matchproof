@@ -39,6 +39,7 @@
     "kickoff": "Kick off live",
     "cached": "Watch cached replay",
     "briefLabel": "Match brief",
+    "customBrief": "Custom brief",
     "readBrief": "Read brief",
     "tactics": "Tactics",
     "formation": "Formation",
@@ -139,7 +140,9 @@
   "stats": {
     "possession": "Possession",
     "shots": "Shots",
+    "shotsOnTarget": "Shots on target",
     "xg": "xG",
+    "toMinute": "Match · to {minute}′",
     "tilt": "Field tilt",
     "window": "{from}–{to}′"
   },
@@ -148,7 +151,7 @@
     "empty": "Events appear here once the match kicks off."
   },
   "momentum": {
-    "title": "Momentum, field tilt per window",
+    "title": "Momentum, per 5 minutes",
     "pin": "{headline}, {label}"
   },
   "feed": {
@@ -178,6 +181,7 @@
     "aggregate": "aggregate"
   },
   "metric": {
+    "shots_on_target": "Shots on target",
     "xg": "xG",
     "shots": "Shots",
     "possession_share": "Possession",

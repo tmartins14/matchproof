@@ -39,6 +39,7 @@
     "kickoff": "Empezar en directo",
     "cached": "Ver repetición guardada",
     "briefLabel": "Guion del partido",
+    "customBrief": "Brief propio",
     "readBrief": "Leer guion",
     "tactics": "Táctica",
     "formation": "Sistema",
@@ -139,7 +140,9 @@
   "stats": {
     "possession": "Posesión",
     "shots": "Tiros",
+    "shotsOnTarget": "Tiros a puerta",
     "xg": "xG",
+    "toMinute": "Partido · hasta el {minute}′",
     "tilt": "Dominio del campo",
     "window": "{from}–{to}′"
   },
@@ -148,7 +151,7 @@
     "empty": "Los eventos aparecen aquí al empezar el partido."
   },
   "momentum": {
-    "title": "Dinámica, dominio del campo por tramo",
+    "title": "Dinámica, por tramos de 5 minutos",
     "pin": "{headline}, {label}"
   },
   "feed": {
@@ -178,6 +181,7 @@
     "aggregate": "agregado"
   },
   "metric": {
+    "shots_on_target": "Tiros a puerta",
     "xg": "xG",
     "shots": "Tiros",
     "possession_share": "Posesión",

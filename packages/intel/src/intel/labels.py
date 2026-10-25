@@ -13,16 +13,19 @@ from dataclasses import dataclass
 
 from contracts.models import Event, Fact
 
-from .display import minute_text
+from .display import minute_text, render_clock
 from .registry import FactRegistry
 
 TEAM_FACT = re.compile(r"^(?P<metric>[a-z_]+)\((?P<side>home|away), (?P<rest>.*)\)$")
 EVENT_FACT = re.compile(r"^(?P<family>[a-z_]+)\((?P<ev>ev-\d{6})\)\.(?P<key>[a-z_]+)$")
 SCORE_FACT = re.compile(r"^(?P<kind>score_after|lead)\((?P<ev>ev-\d{6})\)$")
 EVENT_ID = re.compile(r"ev-\d{6}")
-SINCE = re.compile(r"^since (?P<ev>ev-\d{6}) to t[\d.]+$")
+SINCE = re.compile(r"^since (?P<ev>ev-\d{6}) to t(?P<t>[\d.]+)$")
+LAST = re.compile(r"^last [\d.]+m to t(?P<t>[\d.]+)$")
+RUNNING = re.compile(r"^to (?P<minute>\d+)′$")
+MOMENTUM_FACT = re.compile(r"^momentum\(min-(?P<number>\d{2})\)$")
 BEFORE = re.compile(r"^before (?P<ev>ev-\d{6})$")
-CHANGE = re.compile(r"^(?P<ev>ev-\d{6}), to t[\d.]+$")
+CHANGE = re.compile(r"^(?P<ev>ev-\d{6}), to t(?P<t>[\d.]+)$")
 PLAYER_ID = re.compile(r"^(?P<side>home|away)-(?P<number>\d{2})$")
 
 # What each team measure is called. {team} is the club name.
@@ -32,6 +35,7 @@ TEAM_METRICS: Mapping[str, str] = {
     "possession_share": "{team} share of possession",
     "territory": "{team} share of play in the opposition half",
     "shots": "{team} shots",
+    "shots_on_target": "{team} shots on target",
     "xg": "{team} chance quality (xG)",
     "goals": "{team} goals",
     "cards": "{team} cards",
@@ -59,10 +63,15 @@ SPANS: Mapping[str, str] = {
     "p1": "in the first half",
     "p2": "in the second half",
 }
-LAST_SPAN = "in the latest spell of play"
+LAST_SPAN = "in the latest spell of play (to {clock})"
+RUNNING_SPAN = "match so far (to {minute}′)"
+MOMENTUM_LABEL = (
+    "Momentum, {start}–{end}′ ({home} minus {away} share of attacking actions)"
+)
+BUCKET_MINUTES = 5  # minutes in a momentum bucket
 WINDOW_SPAN = "in one stretch of the {half} half"
 BEFORE_SPAN = "before {anchor}"
-SINCE_SPAN = "since {anchor}"
+SINCE_SPAN = "since {anchor} (to {clock})"
 
 # What each single-event measure is called.
 EVENT_METRICS: Mapping[str, str] = {
@@ -141,15 +150,24 @@ def anchor_phrase(event_id: str, ctx: LabelContext) -> str:
     )
 
 
+def broadcast_clock(seconds: str) -> str:
+    """A t-suffix from a machine name (3103.99) as the broadcast clock (51:43)."""
+    return render_clock(float(seconds), "en")[0]
+
+
 def _span_phrase(rest: str, scope_period: int | None, ctx: LabelContext) -> str:
     if rest in SPANS:
         return SPANS[rest]
     if m := BEFORE.match(rest):
         return BEFORE_SPAN.format(anchor=anchor_phrase(m["ev"], ctx))
     if m := SINCE.match(rest):
-        return SINCE_SPAN.format(anchor=anchor_phrase(m["ev"], ctx))
-    if rest.startswith("last "):
-        return LAST_SPAN
+        return SINCE_SPAN.format(
+            anchor=anchor_phrase(m["ev"], ctx), clock=broadcast_clock(m["t"])
+        )
+    if m := LAST.match(rest):
+        return LAST_SPAN.format(clock=broadcast_clock(m["t"]))
+    if m := RUNNING.match(rest):
+        return RUNNING_SPAN.format(minute=m["minute"])
     if rest.startswith("win-"):
         return WINDOW_SPAN.format(half="first" if scope_period == 1 else "second")
     return "in this spell"
@@ -168,7 +186,8 @@ def _change_label(metric: str, side: str, ev: str, ctx: LabelContext, rest: str)
         lower, higher, level = CHANGE_WORDS[base]
         word = lower if since < before else higher if since > before else level
     thing = "back line" if base == "back_line_height" else "shape"
-    return f"{team} {thing} {word} since {anchor_phrase(ev, ctx)} (size of the change)"
+    clock = broadcast_clock(re.sub(r"^t", "", t_part))
+    return f"{team} {thing} {word} since {anchor_phrase(ev, ctx)}, to {clock} (size of the change)"
 
 
 def _event_label(fact: Fact, m: re.Match[str], ctx: LabelContext) -> str:
@@ -192,6 +211,14 @@ def label_for(fact: Fact, ctx: LabelContext) -> str:
         return _event_label(fact, m, ctx)
     if m := SCORE_FACT.match(fact.name):
         return SCORE_LABELS[m["kind"]]
+    if m := MOMENTUM_FACT.match(fact.name):
+        end = int(m["number"]) * BUCKET_MINUTES
+        return MOMENTUM_LABEL.format(
+            start=end - BUCKET_MINUTES,
+            end=end,
+            home=ctx.teams["home"],
+            away=ctx.teams["away"],
+        )
     if m := TEAM_FACT.match(fact.name):
         metric, side, rest = m["metric"], m["side"], m["rest"]
         period = fact.scope.period.value if fact.scope and fact.scope.period else None

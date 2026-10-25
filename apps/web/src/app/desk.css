@@ -36,6 +36,8 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 /* Chips with hard offset shadows. The shadow sits on a wrapper because clip-path would cut it off. */
 .mp-lift { filter: drop-shadow(var(--mp-shadowChip)); }
 .mp-cut { clip-path: var(--mp-cut); }
+.mp-cut-start { clip-path: var(--mp-cutStart); }
+.mp-cut-end { clip-path: var(--mp-cutEnd); }
 .mp-cuttab { clip-path: var(--mp-cutTab); }
 .mp-tab { align-self: flex-start; padding: 6px 30px 6px 14px; background: var(--mp-chip); color: var(--mp-ink); clip-path: var(--mp-cutTab); font-family: var(--mp-display); font-weight: 700; text-transform: uppercase; line-height: 1.05; }
 .mp-tab--lg { font-size: 34px; }
@@ -58,16 +60,23 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 .mp-live i { width: 8px; height: 8px; border-radius: 50%; background: var(--mp-limeInk); }
 .mp-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
 .mp-seg { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--mp-line); background: var(--mp-surface); }
-.mp-seg button { min-height: 44px; min-width: 44px; padding: 0 14px; border: 0; background: transparent; color: var(--mp-muted); font-weight: 500; clip-path: var(--mp-cut); }
+.mp-seg button { min-height: 44px; min-width: 44px; padding: 0 14px; border: 0; background: transparent; color: var(--mp-muted); font-weight: 500; }
 .mp-seg button[aria-pressed="true"] { background: var(--mp-chip); color: var(--mp-ink); }
 
 /* Setup bar */
 .mp-setup { background: var(--mp-surface); border-bottom: 1px solid var(--mp-line); padding: 12px 20px; display: flex; flex-direction: column; gap: 14px; }
-.mp-setup-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
-.mp-setup-summary { flex: 999 1 320px; min-width: 0; color: var(--mp-text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mp-btns { display: flex; flex-wrap: wrap; gap: 8px; }
-.mp-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; background: transparent; border: 1px solid var(--mp-strong); font-weight: 500; }
-.mp-btn--primary { background: var(--mp-primary); color: var(--mp-limeInk); border: 0; font-weight: 600; clip-path: var(--mp-cut); padding: 0 22px; }
+.mp-setup-row { display: flex; align-items: flex-start; gap: 10px 16px; }
+.mp-setup-row > .mp-tab { flex: none; }
+.mp-setup-summary { flex: 1 1 0; min-width: 0; max-width: 760px; font-size: 15px; line-height: 1.45; color: var(--mp-text2); white-space: pre-line; }
+.mp-btns { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.mp-setup-row > .mp-btns { flex: none; margin-left: auto; }
+/* A cut button gets its depth from the .mp-lift wrapper: box-shadow would be clipped with it. */
+.mp-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; background: var(--mp-raised); color: var(--mp-text); border: 0; font-weight: 500; clip-path: var(--mp-cut); }
+.mp-btn:hover:not(:disabled) { outline: 2px solid var(--mp-text); outline-offset: -4px; }
+.mp-btn:focus-visible { outline: 2px solid var(--mp-focus); outline-offset: -3px; }
+.mp-btn--primary { background: var(--mp-primary); color: var(--mp-limeInk); font-weight: 600; padding: 0 24px; }
+.mp-btn--primary:hover:not(:disabled) { outline-color: var(--mp-limeInk); }
+.mp-btn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mp-limeInk); }
 .mp-chevron-icon { transition: transform 0.2s linear; }
 .mp-chevron-icon[data-open="true"] { transform: rotate(180deg); }
 .mp-setup-body { display: flex; flex-wrap: wrap; gap: 16px 28px; padding-top: 14px; border-top: 1px solid var(--mp-line); }
@@ -81,8 +90,8 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 
 /* Pipeline */
 .mp-pipeline { display: flex; flex-wrap: wrap; gap: 4px; padding: 14px 20px 0; border-bottom: 1px solid var(--mp-line); }
-.mp-stage { flex: 1 1 170px; display: flex; flex-direction: column; gap: 2px; padding: 10px 28px; background: var(--mp-surface); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); border-top: 3px solid transparent; }
-.mp-stage[data-active="true"] { border-top-color: var(--mp-stageOn); }
+.mp-stage { flex: 1 1 170px; display: flex; flex-direction: column; gap: 2px; padding: 10px 28px; background: var(--mp-surface); clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.mp-stage[data-active="true"] { box-shadow: inset 0 3px 0 var(--mp-stageOn); } /* a border would sit on a cut element */
 .mp-stage b { font-family: var(--mp-display); font-size: 26px; line-height: 1.1; font-weight: 700; }
 .mp-stage span { font-size: 13px; }
 
@@ -117,12 +126,21 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 .mp-stat-head b { font-family: var(--mp-display); font-size: 24px; font-weight: 700; }
 .mp-bar { display: flex; gap: 3px; height: 4px; }
 .mp-ticker li { display: grid; grid-template-columns: 50px minmax(0, 1fr) 72px; gap: 8px; font-size: 14px; color: var(--mp-text2); }
-.mp-moment { position: relative; display: flex; gap: 3px; height: 60px; }
+.mp-moment { position: relative; height: 72px; }
 .mp-moment::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--mp-line); }
-.mp-moment-col { position: relative; flex: 1; }
-.mp-pins { position: relative; height: 48px; }
-.mp-pin { position: absolute; top: 0; min-height: 44px; min-width: 44px; padding: 0 10px; font-family: var(--mp-display); font-weight: 600; font-size: 16px; white-space: nowrap; background: var(--mp-bg); border: 1px solid var(--mp-strong); clip-path: var(--mp-cut); }
-.mp-pin[aria-pressed="true"] { background: var(--mp-chip); color: var(--mp-ink); border-color: var(--mp-chip); }
+.mp-moment-bars { position: absolute; inset: 0; display: grid; gap: 3px; }
+.mp-moment-col { position: relative; }
+.mp-moment-bar { position: absolute; left: 0; right: 0; }
+.mp-moment-zero { position: absolute; left: 0; right: 0; top: calc(50% - 1px); height: 2px; background: var(--mp-muted); }
+.mp-moment-ticks { display: flex; justify-content: space-between; font-size: 12px; }
+/* Pins sit on the axis. The 44px-high button is the target; the chip inside is what is drawn. */
+.mp-pin { position: absolute; top: 50%; z-index: 1; display: flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; padding: 0; background: transparent; border: 0; transform: translate(-50%, -50%); }
+.mp-pin[data-edge="end"] { transform: translate(-100%, -50%); }
+.mp-pin-chip { display: flex; align-items: center; min-width: 10px; height: 18px; padding: 0 6px; background: var(--mp-chip); color: var(--mp-ink); clip-path: var(--mp-cut); font-family: var(--mp-display); font-weight: 600; font-size: 14px; white-space: nowrap; }
+.mp-pin-text { display: none; padding: 0 4px; }
+.mp-pin[aria-pressed="true"] .mp-pin-text, .mp-pin:hover .mp-pin-text, .mp-pin:focus-visible .mp-pin-text { display: inline; }
+.mp-pin[aria-pressed="true"], .mp-pin:hover, .mp-pin:focus-visible { z-index: 2; }
+.mp-pin:not([aria-pressed="true"]) .mp-pin-chip { opacity: 0.85; }
 
 /* Key moments */
 .mp-moment-row { display: flex; flex-direction: column; }
@@ -155,6 +173,9 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 .mp-step { display: flex; flex-direction: column; gap: 6px; }
 .mp-step > span:first-child { font-size: 13px; color: var(--mp-muted); }
 .mp-code { display: block; padding: 10px 12px; background: var(--mp-code); font-family: var(--mp-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.mp-facts { display: flex; flex-direction: column; gap: 10px; font-family: var(--mp-body); font-size: 15px; white-space: normal; }
+.mp-fact-label { display: block; }
+.mp-fact-name { display: block; margin-top: 2px; font-size: 12px; color: var(--mp-muted); overflow-wrap: anywhere; }
 .mp-events { border: 1px solid var(--mp-line); }
 .mp-events > div { display: grid; grid-template-columns: 82px minmax(0, 1fr) 52px; gap: 8px; align-items: center; padding: 7px 10px; border-bottom: 1px solid var(--mp-line2); font-size: 13px; }
 .mp-events > div:last-child { border-bottom: 0; }
@@ -163,6 +184,10 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 .mp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 @media (max-width: 600px) {
+  .mp-setup-row { flex-direction: column; }
+  .mp-setup-summary { flex: none; width: 100%; }
+  .mp-setup-row > .mp-btns { margin-left: 0; }
+  .mp-moment { height: 56px; }
   .mp-header, .mp-setup, .mp-pipeline, .mp-main { padding-left: 16px; padding-right: 16px; }
   .mp-chevron { right: -260px; }
   .mp-sweep { display: none; } /* the sweep would sit behind text at this width */

@@ -11,11 +11,13 @@ export interface Highlight {
   zone?: { x_from: number; x_to: number };
 }
 
-export interface StatWindow {
-  id: string;
-  t_from: number;
+export type RunningMetric = "possession_share" | "shots" | "shots_on_target" | "xg";
+
+/** The match-to-date facts at one 5-minute mark. */
+export interface RunningMark {
+  minute: number;
   t_to: number;
-  facts: Partial<Record<"possession_share" | "shots" | "xg" | "field_tilt", Partial<Record<"home" | "away", string>>>>;
+  facts: Partial<Record<RunningMetric, Partial<Record<"home" | "away", string>>>>;
 }
 
 export interface DeskFixture {
@@ -35,7 +37,9 @@ export interface DeskFixture {
   ticker_event_ids: string[];
   score_timeline: { t: number; home: number; away: number; fact_id: string }[];
   count_timeline: { minute: number; events: number; facts: number }[];
-  stat_windows: StatWindow[];
+  running: RunningMark[];
+  /** momentum(min-NN) fact ids in bucket order */
+  momentum: string[];
 }
 
 const VERDICTS = ["checking", "verified", "rephrased", "blocked", "delayed"];
@@ -59,6 +63,12 @@ export function validateFixture(value: unknown): DeskFixture {
       if (!factIds.has(id)) fail(`claim ${claim.id} cites unknown fact ${id}`);
     }
   }
+  for (const mark of fx.running) {
+    for (const sides of Object.values(mark.facts)) {
+      for (const id of Object.values(sides)) if (!factIds.has(id)) fail(`running mark ${mark.minute} cites unknown fact ${id}`);
+    }
+  }
+  for (const id of fx.momentum) if (!factIds.has(id)) fail(`momentum cites unknown fact ${id}`);
   for (const fact of fx.facts) {
     for (const source of fact.source_ids) {
       if (!eventIds.has(source) && !(source in fx.sources)) fail(`fact ${fact.id} cites unknown source ${source}`);

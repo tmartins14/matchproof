@@ -5,7 +5,7 @@ interface ScorebugProps {
   home: number;
   away: number;
   clock: string;
-  status: "live" | "fullTime";
+  status: "off" | "pre" | "live" | "halfTime" | "fullTime";
   statusText: string;
 }
 

@@ -8,11 +8,12 @@ incremental engine build a bucket's facts from the same events through the funct
 
 from collections.abc import Mapping, Sequence
 
-from contracts.models import Event, Fact
+from contracts.models import Beat, Event, Fact, Highlight, Zone
+from sim.geometry import PITCH_LENGTH
 
 from .display import display_value, render_clock
 from .extract_events import ON_TARGET, side_values
-from .football import SIDES, in_opponent_half, location
+from .football import HALFWAY_X, SIDES, in_opponent_half, location
 from .registry import FactRegistry, build_fact
 from .windows import WINDOW_S, WINDOWS_PER_PERIOD, window_id
 
@@ -209,3 +210,18 @@ def momentum_facts(
 def is_desk_fact(fact: Fact) -> bool:
     """Running totals and momentum: the facts the desk draws without a beat citing them."""
     return fact.extractor.name in (RUNNING_EXTRACTOR, MOMENTUM_EXTRACTOR)
+
+
+def highlight_for(beat: Beat, event: Event | None) -> Highlight | None:
+    """Evidence the pitch shows while a beat's claims are checking: the anchor player, or a half."""
+    player_ids = [event.player_id] if event is not None and event.player_id else None
+    zone = None
+    if beat.kind.value == "territorial_spell" and beat.side is not None:
+        zone = (
+            Zone(x_from=HALFWAY_X, x_to=PITCH_LENGTH)
+            if beat.side.value == "home"
+            else Zone(x_from=0.0, x_to=HALFWAY_X)
+        )
+    if player_ids is None and zone is None:
+        return None
+    return Highlight(player_ids=player_ids, zone=zone)

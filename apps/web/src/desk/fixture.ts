@@ -1,26 +1,9 @@
 import type { Beat, Claim, Event, Fact, MatchBrief, PositionFrame } from "@/contracts/types";
 import raw from "../../fixtures/desk.json";
+import { emptyDesk, type DeskData, type Highlight, type RunningMark, type SourceRef } from "./deskData";
 
-export type SourceRef =
-  | { kind: "aggregate"; description: string }
-  | { kind: "window"; t_from: number; t_to: number }
-  | { kind: "freeze_frame"; event_id: string };
-
-export interface Highlight {
-  player_ids?: string[];
-  zone?: { x_from: number; x_to: number };
-}
-
-export type RunningMetric = "possession_share" | "shots" | "shots_on_target" | "xg";
-
-/** The match-to-date facts at one 5-minute mark. */
-export interface RunningMark {
-  minute: number;
-  t_to: number;
-  facts: Partial<Record<RunningMetric, Partial<Record<"home" | "away", string>>>>;
-}
-
-export interface DeskFixture {
+/** What the fixture file holds: a snapshot of a finished match at one minute. */
+export interface FixtureFile {
   match_id: string;
   provenance: { archive: string; claims: string };
   brief: MatchBrief;
@@ -44,13 +27,15 @@ export interface DeskFixture {
 
 const VERDICTS = ["checking", "verified", "rephrased", "blocked", "delayed"];
 
+export type { Highlight, RunningMark, SourceRef };
+
 function fail(message: string): never {
   throw new Error(`desk fixture: ${message}`);
 }
 
 /** Checks the references the desk depends on; any dangling id fails the build. */
-export function validateFixture(value: unknown): DeskFixture {
-  const fx = value as DeskFixture;
+export function validateFixture(value: unknown): FixtureFile {
+  const fx = value as FixtureFile;
   if (!fx || typeof fx !== "object") fail("not an object");
   const beatIds = new Set(fx.beats.map((b) => b.id));
   const factIds = new Set(fx.facts.map((f) => f.id));
@@ -81,4 +66,29 @@ export function validateFixture(value: unknown): DeskFixture {
   return fx;
 }
 
-export const fixture: DeskFixture = validateFixture(raw);
+/** The fixture as desk data: a live match frozen at its snapshot minute. */
+export function fromFixture(fx: FixtureFile): DeskData {
+  const base = emptyDesk(fx.brief, "fixture");
+  const score = fx.score_timeline.filter((s) => s.t <= fx.snapshot.t).at(-1);
+  const counts = fx.count_timeline[fx.snapshot.minute] ?? { events: 0, facts: 0 };
+  return {
+    ...base,
+    match_id: fx.match_id,
+    beats: fx.beats,
+    claims: fx.claims,
+    facts: fx.facts,
+    events: fx.events,
+    sources: fx.sources,
+    frames: fx.frames,
+    highlights: fx.highlights,
+    ticker_event_ids: fx.ticker_event_ids,
+    running: fx.running,
+    momentum: fx.momentum,
+    phase: "live",
+    clock: fx.snapshot.t,
+    score: score ? { home: score.home, away: score.away } : { home: 0, away: 0 },
+    counts,
+  };
+}
+
+export const fixture: DeskData = fromFixture(validateFixture(raw));

@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { copy } from "./copy";
 import { fixture } from "./fixture";
-import { buildRail, pickLead } from "./railModel";
-import { displayReason } from "./reason";
+import type { Fact } from "@/contracts/types";
+import metricFamilies from "../../fixtures/metric-families.json";
+import { buildRail, metricName, pickLead, statCardView } from "./railModel";
+import { displayReason, reasonLines } from "./reason";
 
 describe("displayReason", () => {
   it("replaces the judge prefix with a category label", () => {
@@ -21,6 +23,43 @@ describe("displayReason", () => {
   });
 });
 
+describe("reconciler reasons", () => {
+  const OUTSIDE = "Cited fact fx-compactness_home-since-ev-001888-to-t5865-29 is not in the beat's fact bundle.";
+  const NUMBER = 'The number "808" matches no display rendering of the cited facts.';
+  const INTERNAL = /\b(?:fx|ev|agg|win|ff)-|\bt\d+|bundle|_/i;
+
+  it("maps the exact reason from the AMENDED claim, as two lines", () => {
+    const raw = `${OUTSIDE}; ${NUMBER}`;
+    expect(reasonLines(raw, copy.en)).toEqual(["Cites evidence from outside this moment", "Number not in the facts: 808"]);
+    expect(reasonLines(raw, copy.es)).toEqual(["Cita datos de fuera de este momento", "Cifra que no está en los datos: 808"]);
+  });
+  it("maps a reason joined from three parts, in order", () => {
+    const raw = `${OUTSIDE}; ${NUMBER}; The player "Pryce" is not named by any cited fact.`;
+    expect(reasonLines(raw, copy.en)).toEqual(["Cites evidence from outside this moment", "Number not in the facts: 808", "Name not in the facts: Pryce"]);
+  });
+  it("maps every other format the reconciler and the checker write", () => {
+    expect(reasonLines("The claim cites no facts.", copy.en)).toEqual(["Cites no facts"]);
+    expect(reasonLines("'tighter' compares, but no before or change fact is cited.", copy.en)).toEqual(["Compares with nothing before it: tighter"]);
+    expect(reasonLines("Judge did not answer: TimeoutError.", copy.en)).toEqual(["The check could not finish"]);
+  });
+  it("keeps a judge's sentence whole, even with a semicolon in it", () => {
+    expect(reasonLines("Judge (overclaim): Says more than the facts; it never says why.", copy.en)).toEqual(["Overclaim: Says more than the facts; it never says why."]);
+  });
+  it("falls back to the category label alone for anything it does not know", () => {
+    expect(reasonLines("Something new went wrong in fx-shot-ev-000123.", copy.en)).toEqual(["Wording"]);
+    expect(reasonLines("Judge (overclaim): fx-shot-ev-000123 is not what it says.", copy.en)).toEqual(["Overclaim"]);
+    expect(reasonLines("Judge (made-up): it is wrong.", copy.en)).toEqual(["Wording: it is wrong."]);
+  });
+  it("never lets an id, a clock token or the word bundle through", () => {
+    const raws = [OUTSIDE, NUMBER, `${OUTSIDE}; ${NUMBER}`, "Cited fact fx-a-ev-000001 is not in the beat's fact bundle.", ...fixture.claims.flatMap((c) => (c.reason ? [c.reason] : []))];
+    for (const raw of raws) {
+      for (const lang of ["en", "es"] as const) {
+        for (const line of reasonLines(raw, copy[lang])) expect(line, raw).not.toMatch(INTERNAL);
+      }
+    }
+  });
+});
+
 describe("stat card", () => {
   const byId = new Map(fixture.facts.map((f) => [f.id, f]));
   it("prefers a distance over a duration", () => {
@@ -32,5 +71,33 @@ describe("stat card", () => {
     const claim = fixture.claims.find((c) => c.id === "cl-001670-open_play_goal-01");
     const rail = buildRail(fixture, claim?.fact_ids ?? [], (claim?.numbers ?? []).map((n) => n.fact_id), "en", copy.en);
     expect(rail.statCard?.window).toBeUndefined();
+  });
+});
+
+describe("metric names", () => {
+  const families = metricFamilies as unknown as Fact[];
+  const familyOf = (name: string): string => name.replace(/\([^)]*\)/, "");
+
+  it("has copy in both languages for every family the registry emits", () => {
+    expect(families.length).toBeGreaterThanOrEqual(50);
+    for (const lang of ["en", "es"] as const) {
+      const have = Object.keys(copy[lang].metric);
+      for (const fact of families) expect(have, `${lang} ${familyOf(fact.name)}`).toContain(familyOf(fact.name));
+    }
+  });
+  it("never shows a raw key or an underscore on the stat card", () => {
+    for (const lang of ["en", "es"] as const) {
+      for (const fact of families) {
+        const view = statCardView(fact, lang, copy[lang], fact.scope?.side);
+        expect(view.metric, fact.name).not.toMatch(/[_.]/);
+      }
+    }
+  });
+  it("falls back to the fact's label before its first parenthesis, at most 40 characters at a word boundary", () => {
+    const fact = { ...families[0]!, name: "brand_new_metric(home, ev-000001)", label: "Rivermouth have been unusually patient on the ball, before the red card (63′)" } as Fact;
+    const name = metricName(fact, copy.en);
+    expect(name).toBe("Rivermouth have been unusually patient");
+    expect(name.length).toBeLessThanOrEqual(40);
+    expect(metricName({ ...fact, label: undefined }, copy.en)).toBe("brand new metric");
   });
 });

@@ -21,8 +21,8 @@ from pydantic import ValidationError
 from sim.positions import iter_frames
 
 from api.agents_runtime import MatchRun
+from api.live import POST_FULL_TIME_S
 
-AUDIT_WAIT_S = 60.0  # how long a save waits for audits still running
 AUDIT_POLL_S = 0.5
 log = logging.getLogger(__name__)
 _tasks: set["asyncio.Task[None]"] = set()  # strong references until each save is done
@@ -48,7 +48,9 @@ async def save_when_settled(
 ) -> None:
     waited = 0.0
     while (
-        isinstance(run, MatchRun) and run.ledger.pending > 0 and waited < AUDIT_WAIT_S
+        isinstance(run, MatchRun)
+        and run.ledger.pending > 0
+        and waited < POST_FULL_TIME_S
     ):
         await asyncio.sleep(AUDIT_POLL_S)
         waited += AUDIT_POLL_S

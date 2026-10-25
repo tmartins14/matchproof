@@ -97,6 +97,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 
 /* Main */
 .mp-main { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; align-items: flex-start; }
+.mp-pitch-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
 .mp-col-match { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .mp-col-feed { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
 .mp-col-rail { flex: 1 1 320px; min-width: 0; }
@@ -152,11 +153,13 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 
 /* Key moments */
 .mp-moment-row { display: flex; flex-direction: column; }
-.mp-bar-head { display: flex; align-items: stretch; width: 100%; min-height: 56px; padding: 0 12px 0 0; border: 0; background: var(--mp-chip); color: var(--mp-ink); text-align: left; gap: 12px; }
+.mp-bar-head { display: flex; align-items: stretch; width: 100%; min-height: 56px; padding: 0 12px 0 0; border: 0; background: var(--mp-chip); color: var(--mp-ink); text-align: left; gap: 6px 12px; flex-wrap: wrap; }
 .mp-bar-head[data-checking="true"] { background: var(--mp-surface); color: var(--mp-text); outline: 2px dashed var(--mp-checkingBorder); outline-offset: -2px; }
-.mp-minute { display: flex; align-items: center; white-space: nowrap; min-width: 64px; padding: 0 22px 0 12px; background: var(--mp-surface); color: var(--mp-text); clip-path: var(--mp-cutTab); font-family: var(--mp-display); font-weight: 600; font-size: 17px; }
-.mp-headline { flex: 1 1 120px; display: flex; align-items: center; padding: 6px 0; font-family: var(--mp-display); font-weight: 700; font-size: 21px; line-height: 1.15; text-transform: uppercase; }
-.mp-bar-stamp { display: flex; align-items: center; margin-left: auto; }
+.mp-minute { display: flex; flex: none; align-items: center; box-sizing: border-box; width: 96px; white-space: nowrap; padding: 0 22px 0 12px; background: var(--mp-surface); color: var(--mp-text); clip-path: var(--mp-cutTab); font-family: var(--mp-display); font-weight: 600; font-size: 17px; }
+.mp-minute--long { font-size: 15px; }
+.mp-headline { flex: 1 1 0; min-width: min-content; display: flex; align-items: center; padding: 6px 0; font-family: var(--mp-display); font-weight: 700; font-size: 21px; line-height: 1.15; text-transform: uppercase; hyphens: none; overflow-wrap: normal; word-break: normal; }
+.mp-headline--tight { font-size: 17px; }
+.mp-bar-stamp { display: flex; flex: none; align-items: center; margin-left: auto; padding: 6px 0; }
 .mp-claims { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 14px; background: var(--mp-surface); border: 1px solid var(--mp-line2); }
 .mp-claim { display: flex; flex-direction: column; gap: 6px; width: 100%; min-height: 44px; padding: 10px 12px; text-align: left; background: var(--mp-code); border: 1px solid var(--mp-line2); }
 .mp-claim[aria-pressed="true"] { background: var(--mp-raised); border-color: var(--mp-lime); }
@@ -173,10 +176,10 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 /* Rail */
 .mp-rail { display: flex; flex-direction: column; gap: 16px; padding: 18px; background: var(--mp-surface); box-shadow: var(--mp-shadowPanel); border: 1px solid var(--mp-strong); }
 .mp-rail-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.mp-card { display: flex; align-items: stretch; }
+.mp-card { display: flex; align-items: stretch; min-width: 0; }
 .mp-card-value { white-space: nowrap; padding: 6px 24px 6px 14px; background: var(--mp-lime); color: var(--mp-limeInk); clip-path: var(--mp-cutTab); font-family: var(--mp-display); font-weight: 700; font-size: 44px; line-height: 1; display: flex; align-items: center; }
 .mp-card-label { flex: 1 1 auto; min-width: 0; margin-left: -12px; padding: 6px 14px 6px 24px; background: var(--mp-chip); color: var(--mp-ink); display: flex; flex-direction: column; justify-content: center; font-size: 13px; }
-.mp-card-label b { font-family: var(--mp-display); font-size: 17px; text-transform: uppercase; }
+.mp-card-label b { font-family: var(--mp-display); font-size: 17px; text-transform: uppercase; overflow-wrap: anywhere; }
 .mp-card-id { font-size: 12px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mp-step { display: flex; flex-direction: column; gap: 6px; }
 .mp-step > span:first-child { font-size: 13px; color: var(--mp-muted); }
@@ -201,5 +204,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
   .mp-sweep { display: none; } /* the sweep would sit behind text at this width */
   .mp-dial { grid-template-columns: 90px minmax(0, 1fr) 56px; }
   .mp-tab--lg { font-size: 28px; }
+  .mp-minute { width: 80px; padding: 0 20px 0 10px; }
+  .mp-minute--long { font-size: 14px; }
   .mp-card-value { font-size: 36px; }
 }

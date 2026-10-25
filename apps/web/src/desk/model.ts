@@ -1,5 +1,5 @@
 import type { Beat, Claim } from "@/contracts/types";
-import type { DeskFixture } from "./fixture";
+import type { DeskData } from "./deskData";
 import type { Mode, ReviewState, StampState } from "./reviewParams";
 
 export type Verdict = StampState;
@@ -45,9 +45,14 @@ function showsBlocked(mode: Mode): boolean {
   return mode !== "fan";
 }
 
-export function buildModel(fx: DeskFixture, state: ReviewState): DeskModel {
-  const clock = fx.snapshot.t;
-  const revealed = fx.beats.filter((b) => b.t_detect <= clock);
+/** Live: a beat the Producer ranked, or one that already has claims. The rest stay off the feed. */
+function onFeed(fx: DeskData, beat: Beat): boolean {
+  return fx.source === "fixture" || beat.rank !== undefined || fx.claims.some((c) => c.beat_id === beat.id);
+}
+
+export function buildModel(fx: DeskData, state: ReviewState): DeskModel {
+  const clock = fx.clock;
+  const revealed = fx.beats.filter((b) => b.t_detect <= clock && onFeed(fx, b));
   const latest = revealed.at(-1);
   const byId = new Map(fx.beats.map((b) => [b.id, b]));
   const requested = state.beat ? byId.get(state.beat) : undefined;
@@ -59,7 +64,7 @@ export function buildModel(fx: DeskFixture, state: ReviewState): DeskModel {
 
   const verdictOf = (claim: Claim, beat: Beat): Verdict => {
     if (state.stamp && claim.id === wanted) return state.stamp;
-    return beat.id === latest?.id ? "checking" : claim.verdict;
+    return fx.source === "fixture" && beat.id === latest?.id ? "checking" : claim.verdict;
   };
 
   const feed = [...revealed].reverse().map((beat): BeatView => {
@@ -79,5 +84,5 @@ export function buildModel(fx: DeskFixture, state: ReviewState): DeskModel {
 
   const selectedRow = feed.find((row) => row.selected);
   const selectedClaim = selectedRow?.claims.find((c) => c.selected) ?? selectedRow?.claims[0];
-  return { clock, minute: fx.snapshot.minute, revealed, latest, selectedBeat, selectedClaim, feed };
+  return { clock, minute: Math.floor(clock / 60), revealed, latest, selectedBeat, selectedClaim, feed };
 }

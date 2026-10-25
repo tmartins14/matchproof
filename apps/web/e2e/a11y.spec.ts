@@ -14,7 +14,7 @@ for (const size of SIZES) {
   for (const query of QUERIES) {
     test(`axe ${size.name} ${query || "default"}`, async ({ page }) => {
       await page.setViewportSize(size);
-      await page.goto(`/${query}`);
+      await page.goto(`/${query}${query ? "&" : "?"}source=fixture`);
       const results = await new AxeBuilder({ page }).analyze();
       const blocking = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
       console.log(`axe ${size.name} ${query || "default"}: ${results.violations.length} violations, ${blocking.length} serious or critical`);

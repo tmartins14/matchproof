@@ -10,13 +10,13 @@ import { buildModel } from "./model";
 import { buildRail } from "./railModel";
 import { buildMomentum, buildStats } from "./statsModel";
 
-const SNAPSHOT_T = fixture.snapshot.t;
+const SNAPSHOT_T = fixture.clock;
 const factName = new Map(fixture.facts.map((f) => [f.id, f.name]));
 const textOf = (html: string): string => html.replace(/<[^>]*>/g, " ");
 
 describe("stats panel", () => {
   it("uses the to-date facts of the latest 5-minute mark at 71′", () => {
-    expect(fixture.snapshot.minute).toBe(71);
+    expect(Math.floor(fixture.clock / 60)).toBe(71);
     const view = buildStats(fixture, SNAPSHOT_T, "en", copy.en)!;
     expect(view.window).toBe("Match · to 70′");
     expect(view.rows.map((r) => r.label)).toEqual(["Possession", "Shots", "Shots on target", "xG"]);
@@ -62,11 +62,17 @@ describe("evidence rail", () => {
         const text = textOf(renderToStaticMarkup(createElement(EvidenceRail, { copy: copy[lang], claim: view, rail })));
         // The machine name stays under each label (it is the proof); only the aggregates' descriptions are checked here.
         const rows = rail.events.filter((e) => !e.isEvent).map((e) => e.who);
-        for (const who of rows) expect(who, claim.id).not.toMatch(/t\d+\.\d+|match time/);
+        for (const who of rows) expect(who, claim.id).not.toMatch(/t\d+\.\d+|match time|1 Hz|samples|seconds before|\bev-\d|\bagg-/);
         expect(text, claim.id).not.toContain("agg-");
         expect(text, claim.id).not.toMatch(/match time/);
       }
     }
+  });
+
+  it("describes every aggregate source in the viewer's words, from the server's label", () => {
+    const rows = fixture.claims.flatMap((claim) => buildRail(fixture, claim.fact_ids, claim.numbers.map((n) => n.fact_id), "en", copy.en).events.filter((e) => e.label === copy.en.rail.aggregate));
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) expect(row.who).toMatch(/^(Play |Where )/);
   });
 
   it("puts the label first and the machine name beneath", () => {

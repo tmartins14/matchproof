@@ -143,3 +143,31 @@ def test_no_label_or_aggregate_description_shows_raw_time(
     assert any(
         "(to " in desk_label_for(f, ctx) for f in reg.all() if ", last " in f.name
     )
+
+
+def test_a_change_label_has_one_parenthetical_with_the_clock_first() -> None:
+    m = lean("red_card_flip", 3)
+    reg = m.registry
+    red = next(
+        e
+        for e in m.events
+        if e.type.value == "card" and e.outcome is not None and e.outcome.value == "red"
+    )
+    since(red.id.root, reg, m.events, [])
+    ctx = LabelContext(TEAMS, {e.id.root: e for e in m.events}, reg)
+    changes = [
+        f
+        for f in reg.all()
+        if f.name.startswith(("back_line_change", "compactness_change"))
+    ]
+    assert changes
+    for f in changes:
+        desk = desk_label_for(f, ctx)
+        assert re.search(
+            r" since .+ \(\d+′\), to \d+:\d{2} \(size of the change\)$", desk
+        ), desk
+        assert desk.count("(") == 2  # the anchor's minute and the size of the change
+        # the Narrator's label is unchanged
+        assert re.search(
+            r" since .+ \(\d+′\) \(size of the change\)$", label_for(f, ctx)
+        )

@@ -1,7 +1,7 @@
 import type { Copy } from "@/desk/copy";
 import type { ClaimView } from "@/desk/model";
 import type { RailView } from "@/desk/railModel";
-import { displayReason } from "@/desk/reason";
+import { reasonLines } from "@/desk/reason";
 import { OverturnedLines } from "./OverturnedLines";
 import { SectionTab } from "./SectionTab";
 import { StatCard } from "./StatCard";
@@ -16,7 +16,7 @@ interface EvidenceRailProps {
 export function EvidenceRail({ copy, claim, rail }: EvidenceRailProps) {
   const r = copy.rail;
   const verdict = claim?.verdict;
-  const note = verdict === "checking" || verdict === "verified" || verdict === "delayed" ? copy.verdictNote[verdict] : claim?.claim.reason ? displayReason(claim.claim.reason, copy) : undefined;
+  const note: string[] | undefined = verdict === "checking" || verdict === "verified" || verdict === "delayed" ? [copy.verdictNote[verdict]] : claim?.claim.reason ? reasonLines(claim.claim.reason, copy) : undefined;
   return (
     <aside className="mp-col-rail mp-above" aria-label={r.title}>
       <div className="mp-rail">
@@ -70,7 +70,15 @@ export function EvidenceRail({ copy, claim, rail }: EvidenceRailProps) {
             <div className="mp-step" style={{ alignItems: "flex-start" }}>
               <span>{r.verdict}</span>
               {verdict ? <VerdictStamp verdict={verdict} copy={copy} /> : null}
-              {note ? <span className="mp-note">{note}</span> : null}
+              {note ? (
+                <span className="mp-note">
+                  {note.map((line) => (
+                    <span key={line} style={{ display: "block" }}>
+                      {line}
+                    </span>
+                  ))}
+                </span>
+              ) : null}
             </div>
           </>
         ) : null}

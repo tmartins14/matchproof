@@ -1,6 +1,7 @@
 import type { Copy } from "@/desk/copy";
 import type { Tactics } from "@/desk/tactics";
 import { SectionTab } from "./SectionTab";
+import { SegmentedControl } from "./SegmentedControl";
 import { TacticsFields } from "./TacticsFields";
 
 interface MatchSetupBarProps {
@@ -18,6 +19,26 @@ interface MatchSetupBarProps {
   onToggle: () => void;
   onBrief: (text: string) => void;
   onTactics: (next: Tactics) => void;
+  /** Present on the live desk; the fixture's controls do nothing. */
+  actions?: SetupActions;
+}
+
+export interface SetupActions {
+  /** a match is connecting or playing: the brief and the speed are fixed */
+  locked: boolean;
+  /** the match is over or the connection broke: New match is offered */
+  finished: boolean;
+  reading: boolean;
+  warnings: string[];
+  speed: 1 | 3 | 6;
+  /** the storylines the select offers, with their display text */
+  storylines: { id: string; text: string }[];
+  onSpeed: (speed: 1 | 3 | 6) => void;
+  onStoryline: (id: string) => void;
+  onRandomize: () => void;
+  onRead: () => void;
+  onKickoff: () => void;
+  onNewMatch: () => void;
 }
 
 interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "className"> {
@@ -36,7 +57,8 @@ function Button({ primary, children, ...rest }: ButtonProps) {
 }
 
 export function MatchSetupBar(props: MatchSetupBarProps) {
-  const { copy, summary, custom, brief, note, tactics, open } = props;
+  const { copy, summary, custom, brief, note, tactics, open, actions } = props;
+  const locked = actions?.locked ?? false;
   const s = copy.setup;
   const storylineText = s.storylines[props.storylineId as keyof typeof s.storylines] ?? s.storylines.custom;
   return (
@@ -56,12 +78,25 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
               <path d="M6 9l6 6 6-6" />
             </svg>
           </Button>
-          <Button>{s.randomize}</Button>
-          <Button primary>
-            <i className="mp-btn-dot" aria-hidden="true" />
-            {s.kickoff}
+          <Button onClick={actions?.onRandomize} disabled={locked}>
+            {s.randomize}
           </Button>
-          <Button>{s.cached}</Button>
+          {actions ? (
+            <SegmentedControl label={s.speed} value={String(actions.speed) as "1" | "3" | "6"} disabled={locked} onChange={(v) => actions.onSpeed(Number(v) as 1 | 3 | 6)} options={[{ value: "1", label: "1×" }, { value: "3", label: "3×" }, { value: "6", label: "6×" }]} />
+          ) : null}
+          {actions?.finished ? (
+            <Button primary onClick={actions.onNewMatch}>
+              {s.newMatch}
+            </Button>
+          ) : (
+            <Button primary onClick={actions?.onKickoff} disabled={locked}>
+              <i className="mp-btn-dot" aria-hidden="true" />
+              {s.kickoff}
+            </Button>
+          )}
+          <Button disabled title={s.cachedSoon}>
+            {s.cached}
+          </Button>
         </div>
       </div>
       {note ? (
@@ -75,12 +110,19 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
             <label htmlFor="mp-brief" style={{ fontWeight: 600 }}>
               {s.briefLabel}
             </label>
-            <textarea id="mp-brief" className="mp-input" rows={3} value={brief} onChange={(e) => props.onBrief(e.target.value)} />
+            <textarea id="mp-brief" className="mp-input" rows={3} value={brief} disabled={locked} onChange={(e) => props.onBrief(e.target.value)} />
             <div className="mp-btns">
-              <Button>{s.readBrief}</Button>
+              <Button onClick={actions?.onRead} disabled={locked || actions?.reading}>
+                {actions?.reading ? s.reading : s.readBrief}
+              </Button>
             </div>
+            {actions?.warnings.map((w) => (
+              <p key={w} className="mp-muted" style={{ fontSize: 13 }}>
+                {w}
+              </p>
+            ))}
           </div>
-          <fieldset style={{ flex: "1 1 380px", minWidth: 0, margin: 0, padding: 0, border: 0, display: "flex", flexDirection: "column", gap: 12 }}>
+          <fieldset disabled={locked} style={{ flex: "1 1 380px", minWidth: 0, margin: 0, padding: 0, border: 0, display: "flex", flexDirection: "column", gap: 12 }}>
             <legend style={{ padding: 0, marginBottom: 6, fontWeight: 600 }}>{s.tactics}</legend>
             <TacticsFields copy={copy} idPrefix="mp-home" name={props.homeName} home tactics={tactics.home} onChange={(next) => props.onTactics({ ...tactics, home: next })} />
             <TacticsFields copy={copy} idPrefix="mp-away" name={props.awayName} home={false} tactics={tactics.away} onChange={(next) => props.onTactics({ ...tactics, away: next })} />
@@ -88,8 +130,13 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
               <label htmlFor="mp-story" className="mp-muted" style={{ fontSize: 13 }}>
                 {s.storyline}
               </label>
-              <select id="mp-story" className="mp-select" style={{ flex: "1 1 220px", minWidth: 0 }} value={props.storylineId} disabled>
-                <option value={props.storylineId}>{storylineText}</option>
+              <select id="mp-story" className="mp-select" style={{ flex: "1 1 220px", minWidth: 0 }} value={props.storylineId} disabled={!actions || locked} onChange={(e) => actions?.onStoryline(e.target.value)}>
+                {actions?.storylines.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.text}
+                  </option>
+                ))}
+                {actions?.storylines.some((o) => o.id === props.storylineId) ? null : <option value={props.storylineId}>{storylineText}</option>}
               </select>
             </div>
           </fieldset>

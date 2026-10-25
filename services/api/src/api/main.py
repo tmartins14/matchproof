@@ -14,12 +14,16 @@ from typing import Annotated, Any
 from agents.budget import MeteredClient, budget
 from agents.composer import compose
 from agents.llm_client import ChatClient, LlmClient, LlmError, client_for, from_env
-from contracts.models import Fact, MatchBrief, StreamMessage
+from contracts.models import Event, Fact, MatchBrief, StreamMessage
 from fastapi import Body, FastAPI, Header, HTTPException, Query, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from intel.beats import detect_all
 from intel.engine import extract_all
+from intel.labels import LabelContext
 from intel.registry import FactRegistry
+from intel.sources import aggregate_label, freeze_frame_label, window_label
+from intel.windows import windows as window_table
 from mcp import ClientSession
 from mcp.shared.memory import create_connected_server_and_client_session
 from mcp_match import ArchiveMissing
@@ -129,6 +133,21 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Matchproof API", lifespan=lifespan)
+DEFAULT_WEB_ORIGIN = "http://localhost:3000"
+
+
+def web_origins() -> list[str]:
+    """Origins the browser app may call from: WEB_ORIGINS, comma-separated."""
+    raw = os.environ.get("WEB_ORIGINS", DEFAULT_WEB_ORIGIN)
+    return [o.strip() for o in raw.split(",") if o.strip()]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=web_origins(),
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Last-Event-ID"],
+)
 app.router.routes.append(Route("/mcp", endpoint=public_mcp))
 FastAPIInstrumentor.instrument_app(app)
 
@@ -186,6 +205,12 @@ def store_brief(brief: MatchBrief) -> str:
     """Keep a brief and return its match id. A different brief under a taken id gets a hash suffix."""
     match_id = brief.match_id
     held = _briefs.get(match_id)
+    if (
+        held is None
+        and store.archive is not None
+        and match_id in store.archive.matches()
+    ):
+        held = store.brief(match_id)
     if held is not None and held != brief:
         digest = hashlib.sha256(brief.model_dump_json().encode()).hexdigest()[:8]
         match_id = f"{match_id}-{digest}"
@@ -353,6 +378,50 @@ def get_fact(match_id: str, fact_id: str) -> dict[str, Any]:
         raise HTTPException(status_code=404, detail=f"unknown fact {fact_id}") from exc
     out: dict[str, Any] = fact.model_dump(mode="json", by_alias=True, exclude_none=True)
     return out
+
+
+@lru_cache(maxsize=MAX_CACHED_REGISTRIES)
+def match_events(match_id: str) -> list[Event]:
+    """Every event of a match: from the archive for an archived match, else generated again."""
+    brief = brief_of(match_id)
+    if store.archive is not None and match_id in store.archive.matches():
+        return store.events(match_id)
+    return list(generate(brief))
+
+
+@app.get("/matches/{match_id}/sources/{source_id}")
+def get_source(match_id: str, source_id: str) -> dict[str, Any]:
+    """What a non-event source id stands for: an aggregate, a window or a freeze frame. `label` is
+    for viewers; an aggregate's `description` says how it was measured, for the API and MCP."""
+    brief = brief_of(match_id)
+    aggregates = match_registry(match_id).aggregates
+    events = match_events(match_id)
+    ctx = LabelContext(
+        teams_of(brief), {e.id.root: e for e in events}, match_registry(match_id)
+    )
+    if source_id in aggregates:
+        return {
+            "kind": "aggregate",
+            "description": aggregates[source_id],
+            "label": aggregate_label(source_id, ctx),
+        }
+    windows = {w.id: w for w in window_table(events)}
+    if source_id in windows:
+        w = windows[source_id]
+        return {
+            "kind": "window",
+            "t_from": w.t_from,
+            "t_to": w.t_to,
+            "label": window_label(w.t_from, w.t_to),
+        }
+    if source_id.startswith("ff-"):
+        event_id = f"ev-{source_id[3:]}"
+        return {
+            "kind": "freeze_frame",
+            "event_id": event_id,
+            "label": freeze_frame_label(event_id, ctx),
+        }
+    raise HTTPException(status_code=404, detail=f"unknown source {source_id}")
 
 
 def run_of(match_id: str) -> MatchRun:

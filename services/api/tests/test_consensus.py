@@ -3,6 +3,7 @@
 import asyncio
 import json
 import threading
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -16,9 +17,11 @@ from agent_fakes import (
 )
 from agents.budget import budget
 from api.agents_runtime import MatchRun
+from api.archiving import save_now
 from api.live import run_live
 from contracts.models import Audit
 from jsonschema import Draft202012Validator
+from mcp_match import FileArchive
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 from test_agents_live import SHORT_MATCH_S, SPEED, ScaledPacer, brief, claims_of, dump
@@ -52,7 +55,9 @@ def stream_validator() -> Draft202012Validator:
     )
 
 
-CORRECTION_TIMEOUT_S = 30.0  # as long as the stream's own hold at full time
+CORRECTION_TIMEOUT_S = (
+    30.0  # well past the time the stream stays open after full time in these tests
+)
 
 
 class CorrectionWatch:
@@ -81,7 +86,8 @@ async def play_with_audits(
     run: MatchRun, store: Any, gate: threading.Event
 ) -> list[dict[str, Any]]:
     """The short match, with the audits held back until the stream is well under way. The stream
-    holds full time for the audits and corrections still running, so they are done when it ends."""
+    stays open after full time for the audits and corrections still running, so they are done when
+    it ends."""
     out: list[dict[str, Any]] = []
     async for m in run_live(
         brief(),
@@ -253,7 +259,8 @@ def test_a_correction_that_finishes_after_the_last_playback_tick_is_still_sent()
     None
 ):
     """The audits are held until playback reaches full time, so every audit, re-check and
-    correction finishes after the last tick. The stream must hold full time for them."""
+    correction finishes after the last tick. Full time goes out at once and the late correction
+    follows it on the same stream."""
     judge = ConsensusJudge(agrees_on_recheck=True, refuses_rewrite=True)
 
     async def go() -> None:
@@ -299,8 +306,105 @@ def test_a_correction_that_finishes_after_the_last_playback_tick_is_still_sent()
                 for i, m in enumerate(out)
                 if m["type"] == "status" and m["data"]["state"] == "full_time"
             )
-            assert all(out.index(m) < full_time for m in sent)
+            assert all(out.index(m) > full_time for m in sent)
             seqs = [m["seq"] for m in out]
             assert seqs == list(range(seqs[0], seqs[0] + len(seqs)))
+
+    asyncio.run(go())
+
+
+def test_a_correction_that_lands_late_after_full_time_reaches_the_stream(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The stream stays open for late verdicts for POST_FULL_TIME_S (60 s in service). Here that is
+    scaled to 8 s and the audits are released at three quarters of it, the same as 45 s of 60 s,
+    which is well past the 30 s the stream used to wait. The correction must reach the stream, and
+    the stream must end once nothing is pending, not run out the clock."""
+    post_full_time_s = 8.0
+    monkeypatch.setattr("api.live.POST_FULL_TIME_S", post_full_time_s)
+    judge = ConsensusJudge(agrees_on_recheck=True, refuses_rewrite=True)
+
+    async def go() -> None:
+        gate = threading.Event()
+        auditor = FakeModel("judge-grok", supported=False, gate=gate)
+        async with agent_runtime(
+            narrator=RewritingNarrator("fake-narrator"), judge=judge, auditor=auditor
+        ) as (rt, store):
+            run = rt.match(brief())
+            loop = asyncio.get_running_loop()
+            out: list[dict[str, Any]] = []
+            full_time_at: list[float] = []
+            async for m in run_live(
+                brief(),
+                SPEED,
+                pacer=ScaledPacer(),
+                store=store,
+                agents=run,
+                until_s=SHORT_MATCH_S,
+            ):
+                out.append(dump(m))
+                if m.type.value == "status" and m.data.state.value == "full_time":  # type: ignore[union-attr]
+                    full_time_at.append(loop.time())
+                    loop.call_later(0.75 * post_full_time_s, gate.set)
+            assert full_time_at, "no full_time status"
+            ended_after = loop.time() - full_time_at[0]
+            full_time_seq = next(
+                m["seq"]
+                for m in out
+                if m["type"] == "status" and m["data"]["state"] == "full_time"
+            )
+            late = [m for m in claims_of(out, "verdict") if "correction" in m["data"]]
+            assert late, "the correction landed after full time and was never sent"
+            assert all(m["seq"] > full_time_seq for m in late)
+            assert run.ledger.pending == 0
+            assert ended_after >= 0.75 * post_full_time_s
+            assert ended_after < post_full_time_s, "the stream ran out the clock"
+
+    asyncio.run(go())
+
+
+def test_the_archive_holds_the_verdicts_the_stream_ended_with(
+    archive_in_tmp: FileArchive,
+) -> None:
+    """The audits are released at full time, so corrections land after it. What the desk ends up
+    with (the last message per claim id) must be what the archive saves."""
+    judge = ConsensusJudge(agrees_on_recheck=True)
+
+    async def go() -> None:
+        gate = threading.Event()
+        auditor = FakeModel("judge-grok", supported=False, gate=gate)
+        async with agent_runtime(
+            narrator=RewritingNarrator("fake-narrator"), judge=judge, auditor=auditor
+        ) as (rt, store):
+            store.archive = archive_in_tmp
+            real_set_playback = store.set_playback
+
+            def release_at_full_time(match_id: str, t: float) -> None:
+                real_set_playback(match_id, t)
+                if t >= SHORT_MATCH_S:
+                    gate.set()
+
+            store.set_playback = release_at_full_time
+            run = rt.match(brief())
+            out = [
+                dump(m)
+                async for m in run_live(
+                    brief(),
+                    SPEED,
+                    pacer=ScaledPacer(),
+                    store=store,
+                    agents=run,
+                    until_s=SHORT_MATCH_S,
+                )
+            ]
+            assert run.ledger.corrections, "the scenario made no correction"
+            desk: dict[str, str] = {}
+            for m in claims_of(out, "claim", "verdict"):
+                desk[m["data"]["id"]] = m["data"]["verdict"]
+            save_now(store, brief(), run.audit_summary(), run.producer_log(), {})
+            graph = json.loads(archive_in_tmp.get(run.match_id, "claim_graph.json"))
+            archived = {c["id"]: c["verdict"] for c in graph["claims"]}
+            assert Counter(desk.values()) == Counter(archived.values())
+            assert desk == archived
 
     asyncio.run(go())

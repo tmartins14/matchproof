@@ -24,6 +24,7 @@ from api.live import (
     merge_windows,
     run_live,
 )
+from api.matchdata import store
 from contracts.models import MatchBrief, StreamMessage
 from fastapi.testclient import TestClient
 from intel.beats import detect_all
@@ -222,6 +223,9 @@ def test_resume_continues_after_the_last_seq() -> None:
 
 def test_endpoint_resumes_with_last_event_id(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(main, "make_pacer", NoPacer)
+    monkeypatch.setattr(
+        store, "archive", None
+    )  # an archived id answers 409; this is a mid-match resume
     client = TestClient(main.app)
     match_id = client.post(
         "/matches", json={"story": "red_card_flip", "seed": 1}

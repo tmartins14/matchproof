@@ -112,7 +112,7 @@ export function Desk({ data, initial, live }: DeskProps) {
 
   const phase = view.phase;
   const streaming = STREAMING.includes(phase);
-  const failureText = (reason: Failure): string => ({ rate_limit: c.setup.rateLimit, busy: c.setup.busy, rejected: c.setup.briefRejected, unreachable: c.setup.unreachable })[reason];
+  const failureText = (reason: Failure): string => ({ rate_limit: c.setup.rateLimit, busy: c.setup.busy, rejected: c.setup.briefRejected, finished: c.setup.finished, unreachable: c.setup.unreachable })[reason];
   const unpin = (): void => {
     setBeatId(undefined);
     setClaimId(undefined);

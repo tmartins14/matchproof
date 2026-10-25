@@ -50,6 +50,7 @@
     "connecting": "Conectando…",
     "connectionLost": "Conexión perdida.",
     "busy": "La mesa está llena ahora mismo. Inténtalo en un momento.",
+    "finished": "Este partido ya terminó. ¿Ver su repetición?",
     "rateLimit": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.",
     "unreachable": "No se pudo conectar con el servicio del partido.",
     "briefRejected": "No se pudo usar ese guion.",

@@ -50,6 +50,7 @@
     "connecting": "Connecting…",
     "connectionLost": "Connection lost.",
     "busy": "The desk is full right now. Try again in a moment.",
+    "finished": "This match has finished. Watch its replay?",
     "rateLimit": "Too many requests. Wait a moment and try again.",
     "unreachable": "The match service could not be reached.",
     "briefRejected": "That brief could not be used.",

@@ -36,7 +36,7 @@ from contracts.models import (
     MatchBrief,
     PositionFrame,
 )
-from intel.labels import LabelContext, label_for
+from intel.labels import LabelContext, desk_label_for
 from intel.registry import FactRegistry
 
 if TYPE_CHECKING:
@@ -206,7 +206,7 @@ def build_claim_graph(record: "MatchRecord", created_at: datetime) -> ClaimGraph
             "facts": [
                 {
                     **f.model_dump(mode="json", by_alias=True, exclude_none=True),
-                    "label": label_for(f, ctx),
+                    "label": desk_label_for(f, ctx),
                 }
                 for f in record.registry.all()
             ],

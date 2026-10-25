@@ -19,9 +19,16 @@ from typing import Any
 
 from contracts.models import Event, Fact, PositionFrame
 from intel.beats import detect_all
-from intel.desk import BUCKET_COUNT, RUNNING_METRICS, bucket_id, minute_mark
+from intel.desk import (
+    BUCKET_COUNT,
+    RUNNING_METRICS,
+    attacking_actions,
+    bucket_id,
+    bucket_number,
+    minute_mark,
+)
 from intel.engine import extract_all
-from intel.labels import LabelContext, label_for
+from intel.labels import LabelContext, desk_label_for
 from intel.registry import FactRegistry
 from intel.windows import windows as window_table
 
@@ -168,9 +175,22 @@ def rebuild_registry(
     return registry, LabelContext(teams, {e.id.root: e for e in events}, registry)
 
 
+def print_momentum(events: list[Event], by_name: dict[str, Fact]) -> None:
+    """Every bucket's home and away attacking actions beside the momentum fact made from them."""
+    buckets: dict[int, list[Event]] = {n: [] for n in range(1, BUCKET_COUNT + 1)}
+    for e in events:
+        buckets[bucket_number(e.period.value, e.t.root)].append(e)
+    print("bucket  home  away  momentum (pp)")
+    for number in range(1, BUCKET_COUNT + 1):
+        fact = by_name[f"momentum({bucket_id(number)})"]
+        home = attacking_actions(buckets[number], "home")
+        away = attacking_actions(buckets[number], "away")
+        print(f"{bucket_id(number)}  {home:4d}  {away:4d}  {float(fact.value):+.0f}")
+
+
 def fact_row(fact: Fact, ctx: LabelContext) -> Json:
     row: Json = json.loads(fact.model_dump_json(by_alias=True, exclude_none=True))
-    row["label"] = label_for(fact, ctx)
+    row["label"] = desk_label_for(fact, ctx)
     return row
 
 
@@ -223,6 +243,7 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
         key=lambda b: b["t_detect"],
     )
     by_name = {f.name: f for f in fact_models.values()}
+    print_momentum([Event.model_validate(e) for e in event_rows], by_name)
     running = running_totals(by_name)
     momentum = momentum_ids(by_name)
     desk_ids = {

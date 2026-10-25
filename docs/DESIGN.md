@@ -165,7 +165,7 @@ Shadows never have blur. The cut always slants the same way (top-left to bottom-
 - **Stats and momentum.**
   - `surface` panels. Home bar in `home`, away bar in `away`, with a 3px gap.
   - The stats panel is headed "Match · to 70′" and shows the latest match-to-date facts at the clock: possession, shots, shots on target, xG.
-  - Momentum is one thin bar per closed 5-minute bucket (18 slots, 3px gaps) diverging from a `line` axis: positive values rise in `home`, negative drop in `away`, zero is a 2px tick. Height is the fact's value over the largest absolute value so far, scaled to half the strip. Ticks 0′, 45′, 90′ sit below. Moment pins are 44px-high buttons on the axis drawing a 10px slanted `chip`; only the selected pin shows its label, the rest show it on hover and focus. The strip is 72px tall at 1440 and 56px at 390.
+  - Momentum is one thin bar per closed 5-minute bucket (18 slots, 3px gaps) diverging from a `line` axis: positive values rise in `home`, negative drop in `away`, zero is a 2px tick. Height is the fact's value over the largest absolute value so far, scaled to half the strip. Ticks 0′, 45′, 90′ sit below. Moment pins are 24px-wide buttons across the strip: a 2px vertical tick in `chip` at 50% opacity through the full strip height, with the minute label in a row below the axis ticks. The selected pin's tick is solid `lime` and its label always shows; other labels hide when they would overlap a neighbour (the full text stays in `aria-label`). The strip is 72px tall at 1440 and 56px at 390.
 
 ## Motion
 

@@ -10,15 +10,9 @@ from collections.abc import Mapping, Sequence
 
 from contracts.models import Event, Fact
 
-from .display import render_clock
+from .display import display_value, render_clock
 from .extract_events import ON_TARGET, side_values
-from .football import (
-    SIDES,
-    end_location,
-    in_attacking_third,
-    is_complete_pass,
-    location,
-)
+from .football import SIDES, in_opponent_half, location
 from .registry import FactRegistry, build_fact
 from .windows import WINDOW_S, WINDOWS_PER_PERIOD, window_id
 
@@ -29,7 +23,12 @@ BUCKET_MINUTES = 5
 BUCKETS_PER_PERIOD = 9
 BUCKET_COUNT = 2 * BUCKETS_PER_PERIOD
 RUNNING_METRICS = ("possession_share", "shots", "shots_on_target", "xg")
-FULL_SHARE = 100.0  # momentum runs from -FULL_SHARE to FULL_SHARE percentage points
+FULL_SHARE = 100.0  # momentum runs inside -FULL_SHARE to FULL_SHARE percentage points
+# Added to the denominator so a bucket with a handful of actions cannot read as a landslide:
+# 3 actions to 0 is 33 pp, not 100. Six is about the actions a side makes in a quiet minute; chosen
+# by eye, not fitted.
+MOMENTUM_PRIOR = 6
+ATTACKING_TYPES = frozenset({"pass", "carry", "shot"})
 
 
 def bucket_id(number: int) -> str:
@@ -100,33 +99,24 @@ def covered_windows(
 
 
 def attacking_actions(events: Sequence[Event], side: str) -> int:
-    """Shots, plus passes and carries that take the ball into the side's attacking third from
-    outside it. An incomplete pass is not an entry."""
-    count = 0
-    for e in events:
-        if e.side.value != side:
-            continue
-        kind = e.type.value
-        if kind == "shot":
-            count += 1
-        elif kind == "carry" or (kind == "pass" and is_complete_pass(e)):
-            end = end_location(e)
-            if (
-                end is not None
-                and in_attacking_third(side, end[0])
-                and not in_attacking_third(side, location(e)[0])
-            ):
-                count += 1
-    return count
+    """Every pass, carry and shot that starts in the opposition half."""
+    return sum(
+        1
+        for e in events
+        if e.side.value == side
+        and e.type.value in ATTACKING_TYPES
+        and in_opponent_half(side, location(e)[0])
+    )
 
 
 def momentum_value(events: Sequence[Event]) -> float:
-    """Home share minus away share of attacking actions, in percentage points; 0 with none."""
+    """(home - away) / (home + away + MOMENTUM_PRIOR) * 100, rounded to a whole number of
+    percentage points. Equal counts give 0; no bucket reaches 100 or -100."""
     home = attacking_actions(events, "home")
     away = attacking_actions(events, "away")
-    if home + away == 0:
-        return 0.0
-    return FULL_SHARE * (home - away) / (home + away)
+    return display_value(
+        FULL_SHARE * (home - away) / (home + away + MOMENTUM_PRIOR), "pp"
+    )
 
 
 def running_facts(

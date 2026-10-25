@@ -4,19 +4,22 @@ import pytest
 from contracts.models import Fact
 from intel.desk import (
     BUCKET_COUNT,
+    MOMENTUM_PRIOR,
     attacking_actions,
     bucket_number,
     is_desk_fact,
     minute_mark,
 )
+from intel.display import display_value
 from intel.engine import FactEngine
-from intel.labels import LabelContext, label_for
+from intel.labels import LabelContext, desk_label_for, label_for
 from intel.since import last_minutes, since
 from matches import lean, match
 
 STORIES = [("red_card_flip", 3), ("late_comeback", 1)]
 TEAMS = {"home": "Rivermouth", "away": "Ashford Vale"}
 RAW_TIME = re.compile(r"t\d+\.\d+|match time")
+CLOCK = re.compile(r"\d+:\d\d")
 
 
 def named(facts: list[Fact], prefix: str) -> dict[str, Fact]:
@@ -81,12 +84,14 @@ def test_momentum_is_in_range_for_18_buckets_and_its_sign_matches_the_shares(
         assert -100.0 <= value <= 100.0
         home = attacking_actions(buckets[n], "home")
         away = attacking_actions(buckets[n], "away")
-        if home + away == 0:
+        if home == away:
             assert value == 0.0
         else:
-            assert value == pytest.approx(
-                100.0 * (home - away) / (home + away), abs=1e-3
+            assert value == display_value(
+                100.0 * (home - away) / (home + away + MOMENTUM_PRIOR), "pp"
             )
+            assert abs(value) < 100.0
+            assert value != 0.0
             assert (value > 0) - (value < 0) == (home > away) - (home < away)
 
 
@@ -130,7 +135,11 @@ def test_no_label_or_aggregate_description_shows_raw_time(
     since(anchor.id.root, reg, m.events, [])
     last_minutes(11, reg, m.events)
     ctx = LabelContext(TEAMS, {e.id.root: e for e in m.events}, reg)
-    labels = [label_for(f, ctx) for f in reg.all()]
+    labels = [desk_label_for(f, ctx) for f in reg.all()]
     assert not [x for x in labels if RAW_TIME.search(x)]
+    # The Narrator's labels stay free of clocks and minutes.
+    assert not [f.name for f in reg.all() if CLOCK.search(label_for(f, ctx))]
     assert not [d for d in reg.aggregates.values() if RAW_TIME.search(d)]
-    assert any("(to " in label_for(f, ctx) for f in reg.all() if ", last " in f.name)
+    assert any(
+        "(to " in desk_label_for(f, ctx) for f in reg.all() if ", last " in f.name
+    )

@@ -52,7 +52,7 @@ from contracts.models import (
 from intel.beats import BeatDetector
 from intel.desk import is_desk_fact
 from intel.engine import FactEngine
-from intel.labels import LabelContext, label_for
+from intel.labels import LabelContext, desk_label_for
 from mcp_match.store import MatchStore
 from sim import iter_events
 from sim.positions import run
@@ -189,7 +189,7 @@ def pipeline(
         return Entry(clock, kind, data, anchor_id)
 
     def labelled(fact: Fact) -> Fact:
-        return fact.model_copy(update={"label": label_for(fact, ctx)})
+        return fact.model_copy(update={"label": desk_label_for(fact, ctx)})
 
     def beat_entries(beat: Beat) -> list[Entry]:
         out: list[Entry] = []

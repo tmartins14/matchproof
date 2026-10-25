@@ -126,21 +126,29 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 .mp-stat-head b { font-family: var(--mp-display); font-size: 24px; font-weight: 700; }
 .mp-bar { display: flex; gap: 3px; height: 4px; }
 .mp-ticker li { display: grid; grid-template-columns: 50px minmax(0, 1fr) 72px; gap: 8px; font-size: 14px; color: var(--mp-text2); }
-.mp-moment { position: relative; height: 72px; }
+.mp-moment-wrap { position: relative; display: flex; flex-direction: column; gap: 4px; }
+.mp-moment { position: relative; height: var(--mp-strip-h, 72px); }
 .mp-moment::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--mp-line); }
 .mp-moment-bars { position: absolute; inset: 0; display: grid; gap: 3px; }
 .mp-moment-col { position: relative; }
 .mp-moment-bar { position: absolute; left: 0; right: 0; }
 .mp-moment-zero { position: absolute; left: 0; right: 0; top: calc(50% - 1px); height: 2px; background: var(--mp-muted); }
 .mp-moment-ticks { display: flex; justify-content: space-between; font-size: 12px; }
-/* Pins sit on the axis. The 44px-high button is the target; the chip inside is what is drawn. */
-.mp-pin { position: absolute; top: 50%; z-index: 1; display: flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; padding: 0; background: transparent; border: 0; transform: translate(-50%, -50%); }
-.mp-pin[data-edge="end"] { transform: translate(-100%, -50%); }
-.mp-pin-chip { display: flex; align-items: center; min-width: 10px; height: 18px; padding: 0 6px; background: var(--mp-chip); color: var(--mp-ink); clip-path: var(--mp-cut); font-family: var(--mp-display); font-weight: 600; font-size: 14px; white-space: nowrap; }
-.mp-pin-text { display: none; padding: 0 4px; }
-.mp-pin[aria-pressed="true"] .mp-pin-text, .mp-pin:hover .mp-pin-text, .mp-pin:focus-visible .mp-pin-text { display: inline; }
-.mp-pin[aria-pressed="true"], .mp-pin:hover, .mp-pin:focus-visible { z-index: 2; }
-.mp-pin:not([aria-pressed="true"]) .mp-pin-chip { opacity: 0.85; }
+.mp-pin-row { height: 22px; }
+/* A pin is a button across the strip and the label row. The tick is drawn through the strip; its label sits under the axis ticks. */
+.mp-pin { position: absolute; top: 0; bottom: 0; width: 24px; padding: 0; background: transparent; border: 0; transform: translateX(-50%); }
+.mp-pin[data-edge="start"] { transform: translateX(-12px); }
+.mp-pin[data-edge="end"] { transform: translateX(calc(-100% + 12px)); }
+.mp-pin-tick { position: absolute; top: 0; left: calc(50% - 1px); width: 2px; height: var(--mp-strip-h, 72px); background: var(--mp-chip); opacity: 0.5; }
+.mp-pin[data-edge="start"] .mp-pin-tick { left: 11px; }
+.mp-pin[data-edge="end"] .mp-pin-tick { left: auto; right: 11px; }
+.mp-pin[aria-pressed="true"] .mp-pin-tick { background: var(--mp-lime); opacity: 1; }
+.mp-pin-label { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-family: var(--mp-display); font-weight: 600; font-size: 14px; line-height: 18px; white-space: nowrap; color: var(--mp-text2); }
+.mp-pin[data-edge="start"] .mp-pin-label { left: 0; transform: none; }
+.mp-pin[data-edge="end"] .mp-pin-label { left: auto; right: 0; transform: none; }
+.mp-pin[aria-pressed="true"] .mp-pin-label { color: var(--mp-lime); }
+.mp-pin-label[data-hidden="true"] { visibility: hidden; }
+.mp-pin:hover .mp-pin-tick, .mp-pin:focus-visible .mp-pin-tick { opacity: 1; }
 
 /* Key moments */
 .mp-moment-row { display: flex; flex-direction: column; }
@@ -187,7 +195,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
   .mp-setup-row { flex-direction: column; }
   .mp-setup-summary { flex: none; width: 100%; }
   .mp-setup-row > .mp-btns { margin-left: 0; }
-  .mp-moment { height: 56px; }
+  .mp-moment-wrap { --mp-strip-h: 56px; }
   .mp-header, .mp-setup, .mp-pipeline, .mp-main { padding-left: 16px; padding-right: 16px; }
   .mp-chevron { right: -260px; }
   .mp-sweep { display: none; } /* the sweep would sit behind text at this width */

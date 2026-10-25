@@ -24,7 +24,7 @@ def test_known_labels(red_card: tuple[LabelContext, dict[str, str]]) -> None:
         "Ashford Vale back line, before the red card (63′)"
     )
     assert labels["back_line_height(away, since ev-001484 to t4671.00)"] == (
-        "Ashford Vale back line, since the red card (63′) (to 77:51)"
+        "Ashford Vale back line, since the red card (63′)"
     )
     assert labels["shot(ev-000222).xg"] == "chance quality (xG)"
     assert labels["card(ev-001484).kind"].endswith(", second yellow, sent off")
@@ -61,7 +61,7 @@ def test_change_label_reads_the_direction_from_the_before_and_since_facts(
     change = labels["back_line_change(away, ev-001484, to t4671.00)"]
     assert (
         change
-        == "Ashford Vale back line dropped deeper since the red card (63′), to 77:51 (size of the change)"
+        == "Ashford Vale back line dropped deeper since the red card (63′) (size of the change)"
     )
 
 

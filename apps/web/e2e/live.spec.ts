@@ -55,3 +55,28 @@ test("fixture mode still renders the static desk", async ({ page }) => {
   await page.goto("/?source=fixture&beat=bt-000993-territorial_spell");
   await expect(page.locator('aside .mp-stamp[data-verdict="blocked"]').first()).toHaveText("OVERTURNED");
 });
+
+const LABELS = ["9′", "63′", "42–52′", "90+4′", "45+3–52′"];
+
+for (const size of [{ name: "1440", width: 1440, height: 900 }, { name: "390", width: 390, height: 844 }]) {
+  test(`headlines line up whatever the minute label, at ${size.name}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto(`/?source=fixture&labels=${encodeURIComponent(LABELS.join("|"))}`);
+    await page.evaluate(() => document.fonts.ready);
+    const rows = page.locator(".mp-bar-head");
+    expect(await rows.count()).toBeGreaterThanOrEqual(LABELS.length);
+    const found = await page.locator(".mp-minute").allTextContents();
+    for (const label of LABELS) expect(found).toContain(label);
+    const lefts = new Set<number>();
+    for (const label of LABELS) {
+      const row = page.locator(".mp-bar-head", { has: page.locator(".mp-minute", { hasText: new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`) }) });
+      const minute = row.locator(".mp-minute");
+      const headline = await row.locator(".mp-headline").boundingBox();
+      if (!headline) throw new Error(`no headline for ${label}`);
+      lefts.add(Math.round(headline.x * 10) / 10);
+      const fits = await minute.evaluate((el) => el.scrollWidth <= el.clientWidth);
+      expect(fits, `${label} fits its block`).toBe(true);
+    }
+    expect([...lefts]).toHaveLength(1);
+  });
+}

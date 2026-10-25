@@ -5,6 +5,9 @@ import type { Mode } from "@/desk/reviewParams";
 import { ClaimItem } from "./ClaimItem";
 import { VerdictStamp } from "./VerdictStamp";
 
+/** A label longer than this many characters takes the smaller type so the minute block never grows. */
+export const LONG_LABEL = 6;
+
 interface KeyMomentRowProps {
   copy: Copy;
   mode: Mode;
@@ -29,7 +32,7 @@ export function KeyMomentRow({ copy, mode, row, headline, onBeat, onClaim }: Key
     <li className="mp-moment-row">
       <div className={checking ? undefined : "mp-lift"}>
         <button type="button" className="mp-bar-head" data-checking={checking} aria-expanded={row.selected} onClick={() => onBeat(row.beat.id)}>
-          <span className="mp-minute num">{row.beat.label}</span>
+          <span className={row.beat.label.length > LONG_LABEL ? "mp-minute mp-minute--long num" : "mp-minute num"}>{row.beat.label}</span>
           <span className="mp-headline">{headline}</span>
           <span className="mp-bar-stamp">
             <VerdictStamp verdict={row.verdict} copy={copy} />

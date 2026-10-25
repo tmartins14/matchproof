@@ -33,6 +33,11 @@ test("full-page desk shots", async ({ page }) => {
   await page.screenshot({ path: `${OUT}/desk-390.png`, fullPage: true });
 });
 
+test("key-moments column crop", async ({ page }) => {
+  await open(page, `?labels=${encodeURIComponent("9′|63′|42–52′|90+4′|45+3–52′")}`);
+  await page.locator("section.mp-col-feed").screenshot({ path: `${OUT}/feed-1440.png` });
+});
+
 async function controlsShot(page: Page, size: { width: number; height: number }, name: string): Promise<void> {
   await open(page, "", size);
   const header = await page.locator("header.mp-header").boundingBox();

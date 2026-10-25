@@ -11,6 +11,8 @@ export interface ReviewState {
   claim?: string;
   setupOpen: boolean;
   stamp?: StampState;
+  /** replaces the labels of the first beats, in order, separated by | (fixture review only) */
+  labels?: string[];
 }
 
 type RawParams = Record<string, string | string[] | undefined>;
@@ -32,5 +34,6 @@ export function parseReviewParams(params: RawParams): ReviewState {
     claim: one(params.claim),
     setupOpen: one(params.setup) === "open",
     stamp: stamps.find((s) => s === stampParam),
+    labels: one(params.labels)?.split("|"),
   };
 }

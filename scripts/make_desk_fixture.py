@@ -32,6 +32,7 @@ from intel.engine import extract_all
 from intel.labels import LabelContext, desk_label_for
 from intel.registry import FactRegistry
 from intel.score import is_goal, match_score
+from intel.sources import aggregate_label, freeze_frame_label, window_label
 from intel.windows import windows as window_table
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -261,17 +262,22 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
             other_sources[source] = {
                 "kind": "aggregate",
                 "description": aggregates[source],
+                "label": aggregate_label(source, ctx),
             }
         elif source in windows_by_id:
             other_sources[source] = {
                 "kind": "window",
                 "t_from": windows_by_id[source].t_from,
                 "t_to": windows_by_id[source].t_to,
+                "label": window_label(
+                    windows_by_id[source].t_from, windows_by_id[source].t_to
+                ),
             }
         elif source.startswith("ff-"):
             other_sources[source] = {
                 "kind": "freeze_frame",
                 "event_id": f"ev-{source[3:]}",
+                "label": freeze_frame_label(f"ev-{source[3:]}", ctx),
             }
         else:
             print(

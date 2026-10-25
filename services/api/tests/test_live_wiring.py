@@ -111,17 +111,18 @@ def test_sources_route_answers_each_kind_and_404s_an_unknown_id() -> None:
     ).json()["match_id"]
     aggregate_id = next(iter(main.match_registry(match_id).aggregates))
     got = client.get(f"/matches/{match_id}/sources/{aggregate_id}").json()
-    assert got == {
-        "kind": "aggregate",
-        "description": main.match_registry(match_id).aggregates[aggregate_id],
-    }
+    assert got["kind"] == "aggregate"
+    assert got["description"] == main.match_registry(match_id).aggregates[aggregate_id]
+    assert got["label"] and "1 Hz" not in got["label"] and "ev-" not in got["label"]
 
     window = client.get(f"/matches/{match_id}/sources/win-01").json()
     assert window["kind"] == "window" and window["t_from"] == 0.0
     assert window["t_to"] == 900.0
+    assert window["label"] == "Play from 0:00 to 15:00"
 
     freeze = client.get(f"/matches/{match_id}/sources/ff-000123").json()
-    assert freeze == {"kind": "freeze_frame", "event_id": "ev-000123"}
+    assert freeze["kind"] == "freeze_frame" and freeze["event_id"] == "ev-000123"
+    assert freeze["label"].startswith("Where everyone stood at ")
 
     assert client.get(f"/matches/{match_id}/sources/nope-1").status_code == 404
     assert client.get("/matches/unknown/sources/win-01").status_code == 404

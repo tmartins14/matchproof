@@ -62,11 +62,17 @@ describe("evidence rail", () => {
         const text = textOf(renderToStaticMarkup(createElement(EvidenceRail, { copy: copy[lang], claim: view, rail })));
         // The machine name stays under each label (it is the proof); only the aggregates' descriptions are checked here.
         const rows = rail.events.filter((e) => !e.isEvent).map((e) => e.who);
-        for (const who of rows) expect(who, claim.id).not.toMatch(/t\d+\.\d+|match time/);
+        for (const who of rows) expect(who, claim.id).not.toMatch(/t\d+\.\d+|match time|1 Hz|samples|seconds before|\bev-\d|\bagg-/);
         expect(text, claim.id).not.toContain("agg-");
         expect(text, claim.id).not.toMatch(/match time/);
       }
     }
+  });
+
+  it("describes every aggregate source in the viewer's words, from the server's label", () => {
+    const rows = fixture.claims.flatMap((claim) => buildRail(fixture, claim.fact_ids, claim.numbers.map((n) => n.fact_id), "en", copy.en).events.filter((e) => e.label === copy.en.rail.aggregate));
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) expect(row.who).toMatch(/^(Play |Where )/);
   });
 
   it("puts the label first and the machine name beneath", () => {

@@ -1,9 +1,10 @@
 import type { Beat, Claim, Event, Fact, MatchBrief, PositionFrame } from "@/contracts/types";
 
+/** A source that is not an event. `label` is the viewer's wording; an aggregate's `description` is for the API. */
 export type SourceRef =
-  | { kind: "aggregate"; description: string }
-  | { kind: "window"; t_from: number; t_to: number }
-  | { kind: "freeze_frame"; event_id: string };
+  | { kind: "aggregate"; description: string; label: string }
+  | { kind: "window"; t_from: number; t_to: number; label: string }
+  | { kind: "freeze_frame"; event_id: string; label: string };
 
 export interface Highlight {
   player_ids?: string[];

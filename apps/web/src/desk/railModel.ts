@@ -110,8 +110,8 @@ export function buildRail(fx: DeskData, claimFactIds: string[], numberFactIds: s
     if (source?.kind === "window") {
       return { id, label: c.rail.window, who: `${formatClock(source.t_from)}–${formatClock(source.t_to)}`, time: "", isEvent: false };
     }
-    if (source?.kind === "freeze_frame") return { id, label: c.rail.freezeFrame, who: source.event_id, time: "", isEvent: false };
-    return { id, label: c.rail.aggregate, who: source?.kind === "aggregate" ? source.description : "", time: "", isEvent: false };
+    if (source?.kind === "freeze_frame") return { id, label: c.rail.freezeFrame, who: source.label, time: "", isEvent: false };
+    return { id, label: c.rail.aggregate, who: source?.kind === "aggregate" ? source.label : "", time: "", isEvent: false };
   });
 
   const lead = pickLead(numberFactIds.flatMap((id) => factById.get(id) ?? []));

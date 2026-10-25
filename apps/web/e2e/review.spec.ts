@@ -28,3 +28,31 @@ for (const size of SIZES) {
     });
   }
 }
+
+for (const size of SIZES) {
+  for (const lang of ["en", "es"]) {
+    test(`every headline beside every stamp stays inside its bar, at ${size.name} in ${lang}`, async ({ page }) => {
+      await page.setViewportSize(size);
+      await page.goto(`/review/key-moments?lang=${lang}`);
+      await page.evaluate(() => document.fonts.ready);
+      const rows = page.locator(".mp-moment-row");
+      expect(await rows.count()).toBeGreaterThanOrEqual(50);
+      const failures: string[] = [];
+      for (let i = 0; i < (await rows.count()); i++) {
+        const row = rows.nth(i);
+        const bar = await row.locator(".mp-bar-head").boundingBox();
+        const stamp = await row.locator(".mp-stamp").boundingBox();
+        const headline = row.locator(".mp-headline");
+        const text = (await headline.innerText()).replace(/\s+/g, " ");
+        const stampText = await row.locator(".mp-stamp").innerText();
+        if (!bar || !stamp) throw new Error(`no box for row ${i}`);
+        const inside = stamp.x >= bar.x - 0.5 && stamp.x + stamp.width <= bar.x + bar.width + 0.5 && stamp.y >= bar.y - 0.5 && stamp.y + stamp.height <= bar.y + bar.height + 0.5;
+        const wordsFit = await headline.evaluate((el) => el.scrollWidth <= el.clientWidth + 1);
+        // The stamp keeps the right edge of the bar, less the 12 px padding.
+        const atRightEdge = Math.abs(bar.x + bar.width - 12 - (stamp.x + stamp.width)) <= 1;
+        if (!inside || !wordsFit || !atRightEdge) failures.push(`${text} / ${stampText}: inside ${inside}, words fit ${wordsFit}, right edge ${atRightEdge}`);
+      }
+      expect(failures).toEqual([]);
+    });
+  }
+}

@@ -8,6 +8,14 @@ import { VerdictStamp } from "./VerdictStamp";
 /** A label longer than this many characters takes the smaller type so the minute block never grows. */
 export const LONG_LABEL = 6;
 
+/** A headline whose longest unbreakable word has at least this many characters takes the smaller type. */
+export const TIGHT_WORD = 9;
+
+/** From the characters alone, never from a measurement: words break at spaces and after hyphens. */
+export function needsTightHeadline(headline: string): boolean {
+  return headline.split(/\s+|(?<=-)/).some((word) => word.length >= TIGHT_WORD);
+}
+
 interface KeyMomentRowProps {
   copy: Copy;
   mode: Mode;
@@ -33,7 +41,7 @@ export function KeyMomentRow({ copy, mode, row, headline, onBeat, onClaim }: Key
       <div className={checking ? undefined : "mp-lift"}>
         <button type="button" className="mp-bar-head" data-checking={checking} aria-expanded={row.selected} onClick={() => onBeat(row.beat.id)}>
           <span className={row.beat.label.length > LONG_LABEL ? "mp-minute mp-minute--long num" : "mp-minute num"}>{row.beat.label}</span>
-          <span className="mp-headline">{headline}</span>
+          <span className={needsTightHeadline(headline) ? "mp-headline mp-headline--tight" : "mp-headline"}>{headline}</span>
           <span className="mp-bar-stamp">
             <VerdictStamp verdict={row.verdict} copy={copy} />
           </span>

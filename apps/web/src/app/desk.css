@@ -153,12 +153,13 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 
 /* Key moments */
 .mp-moment-row { display: flex; flex-direction: column; }
-.mp-bar-head { display: flex; align-items: stretch; width: 100%; min-height: 56px; padding: 0 12px 0 0; border: 0; background: var(--mp-chip); color: var(--mp-ink); text-align: left; gap: 12px; }
+.mp-bar-head { display: flex; align-items: stretch; width: 100%; min-height: 56px; padding: 0 12px 0 0; border: 0; background: var(--mp-chip); color: var(--mp-ink); text-align: left; gap: 6px 12px; flex-wrap: wrap; }
 .mp-bar-head[data-checking="true"] { background: var(--mp-surface); color: var(--mp-text); outline: 2px dashed var(--mp-checkingBorder); outline-offset: -2px; }
 .mp-minute { display: flex; flex: none; align-items: center; box-sizing: border-box; width: 96px; white-space: nowrap; padding: 0 22px 0 12px; background: var(--mp-surface); color: var(--mp-text); clip-path: var(--mp-cutTab); font-family: var(--mp-display); font-weight: 600; font-size: 17px; }
 .mp-minute--long { font-size: 15px; }
-.mp-headline { flex: 1 1 120px; display: flex; align-items: center; padding: 6px 0; font-family: var(--mp-display); font-weight: 700; font-size: 21px; line-height: 1.15; text-transform: uppercase; }
-.mp-bar-stamp { display: flex; align-items: center; margin-left: auto; }
+.mp-headline { flex: 1 1 0; min-width: min-content; display: flex; align-items: center; padding: 6px 0; font-family: var(--mp-display); font-weight: 700; font-size: 21px; line-height: 1.15; text-transform: uppercase; hyphens: none; overflow-wrap: normal; word-break: normal; }
+.mp-headline--tight { font-size: 17px; }
+.mp-bar-stamp { display: flex; flex: none; align-items: center; margin-left: auto; padding: 6px 0; }
 .mp-claims { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 14px; background: var(--mp-surface); border: 1px solid var(--mp-line2); }
 .mp-claim { display: flex; flex-direction: column; gap: 6px; width: 100%; min-height: 44px; padding: 10px 12px; text-align: left; background: var(--mp-code); border: 1px solid var(--mp-line2); }
 .mp-claim[aria-pressed="true"] { background: var(--mp-raised); border-color: var(--mp-lime); }

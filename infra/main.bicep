@@ -28,6 +28,14 @@ param budgetAmount int = 50
 @description('Email that receives budget alerts.')
 param budgetEmail string
 
+// --- Web and API scale ------------------------------------------------------
+@description('Extra browser origin for the API, e.g. https://matchproof.tylermartins.com. Empty for none.')
+param customWebOrigin string = ''
+
+@description('API replicas kept warm. 1 for judging; 0 afterwards to scale to zero.')
+@minValue(0)
+param apiMinReplicas int = 1
+
 var tags = { 'azd-env-name': environmentName }
 var token = take(uniqueString(subscription().id, environmentName), 8)
 
@@ -94,6 +102,16 @@ module foundry 'modules/foundry.bicep' = {
   }
 }
 
+module web 'modules/staticwebapp.bicep' = {
+  name: 'staticwebapp'
+  scope: rg
+  params: {
+    location: location
+    tags: tags
+    token: token
+  }
+}
+
 module app 'modules/containerapp.bicep' = {
   name: 'containerapp'
   scope: rg
@@ -109,6 +127,22 @@ module app 'modules/containerapp.bicep' = {
     storageAccountName: storage.outputs.accountName
     modelBaseUrl: foundry.outputs.modelBaseUrl
     modelDeploymentName: foundry.outputs.deploymentName
+    webOrigins: join(filter(['https://${web.outputs.hostname}', customWebOrigin], origin => !empty(origin)), ',')
+    minReplicas: apiMinReplicas
+  }
+}
+
+module availability 'modules/availability.bicep' = {
+  name: 'availability'
+  scope: rg
+  params: {
+    location: location
+    tags: tags
+    token: token
+    appInsightsName: monitoring.outputs.appInsightsName
+    webUrl: 'https://${web.outputs.hostname}'
+    apiHealthUrl: '${app.outputs.url}/health'
+    alertEmail: budgetEmail
   }
 }
 
@@ -127,6 +161,7 @@ output AZURE_LOCATION string = location
 output AZURE_RESOURCE_GROUP string = rg.name
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = registry.outputs.loginServer
 output API_URL string = app.outputs.url
+output WEB_URL string = 'https://${web.outputs.hostname}'
 output MODEL_BASE_URL string = foundry.outputs.modelBaseUrl
 output MODEL_DEPLOYMENT_NAME string = foundry.outputs.deploymentName
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.appInsightsName

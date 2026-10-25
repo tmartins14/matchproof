@@ -48,10 +48,10 @@ Stage One is pass/fail on theme fit and on reasonably applying the required tech
 | 4.4 Pitch | Short description: what, which Microsoft tech, what it does, problem solved | docs/PITCH.md, reused on the form | Copy pasted into form |
 | 4.4 Video | Under 2 minutes, shows it running, public on YouTube or Vimeo | 1:50 cut, unlisted-public YouTube link | Duration checked before upload |
 | 4.4 Repo | Public GitHub repo URL | github.com/tmartins14/matchproof, MIT licence | Opened in a logged-out browser |
-| 4.8 Testing | Working demo link, free, no restriction, live until Nov 10 | Static Web App on Azure at matchproof.tylermartins.com, no login; live runs with the cached replay as the zero-model-call fallback | Uptime check scheduled through Nov 10 |
+| 4.8 Testing | Working demo link, free, no restriction, live until Nov 10 | Static Web App on Azure at matchproof.tylermartins.com, no login; live runs with the cached replay as the zero-model-call fallback | Uptime check scheduled through Nov 10 Partly met (Oct 25): the deployed desk at https://gray-sand-08c45ef0f.2.azurestaticapps.net answers with no login, `scripts/smoke_prod.sh` passes all 5 checks, and two availability tests (web root, API `/health`) from 3 regions every 5 minutes passed 72 of 72 runs in their first 2 hours. Not yet met: no live match has reached full time on the deployed pair, because the API container restarted twice mid-match (docs/DEPLOY.md, Known issue). Custom domain not set up. |
 | 4.9 Language | All materials in English | English README, video, pitch; Spanish output is a feature, not a material | Review |
 | 4.3 Functionality | Must run as shown in the video | Video recorded from the deployed URL, not localhost | Video source = prod URL |
-| 6.1 Required tech | Reasonably applies the featured technologies | Foundry, Agent Framework, MCP, Azure AI Translator, Container Apps, Static Web Apps, App Insights | ARCHITECTURE.md service table |
+| 6.1 Required tech | Reasonably applies the featured technologies | Foundry, Agent Framework, MCP, Azure AI Translator, Container Apps, Static Web Apps, App Insights | ARCHITECTURE.md service table Static Web Apps met (Oct 25): `infra/modules/staticwebapp.bicep` and `azd deploy web` serve the exported desk, and a live match streamed to it from the Container App (docs/screenshots/13/). |
 | 1 Registration | Registered by Oct 20, 12 PM PT; Innovation Studio access | Registered; chase invite Monday if not received | Login confirmed |
 
 ## Scoring strategy

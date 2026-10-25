@@ -74,6 +74,9 @@ async def sample(
     interval_s: float = INTERVAL_S,
 ) -> None:
     """Log one line per interval until cancelled: memory, CPU %, event-loop lag, load."""
+    emit(
+        "startup", startup_limits()
+    )  # once, from the sampler: a line logged from install() never reached the console log
     last_cpu = time.process_time()
     last_wall = time.monotonic()
     while True:
@@ -95,9 +98,8 @@ async def sample(
 
 
 def install(streams: Callable[[], int], pending: Callable[[], int]) -> None:
-    """faulthandler for hard crashes, a SIGTERM record, and the startup limits."""
+    """faulthandler for hard crashes and a SIGTERM record."""
     faulthandler.enable()
-    emit("startup", startup_limits())
     if threading.current_thread() is not threading.main_thread():
         return  # signal handlers are main-thread only (test clients run the lifespan elsewhere)
     previous = signal.getsignal(signal.SIGTERM)

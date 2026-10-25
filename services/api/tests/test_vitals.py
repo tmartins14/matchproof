@@ -21,8 +21,10 @@ def test_sample_logs_one_line_per_interval(caplog: pytest.LogCaptureFixture) -> 
 
     with caplog.at_level(logging.WARNING, logger="matchproof.vitals"):
         asyncio.run(run())
-    lines = [json.loads(r.getMessage()) for r in caplog.records]
-    assert lines and all(line["event"] == "vitals" for line in lines)
+    records = [json.loads(r.getMessage()) for r in caplog.records]
+    assert records[0]["event"] == "startup"
+    lines = [r for r in records if r["event"] == "vitals"]
+    assert lines
     assert lines[0]["streams"] == 2 and lines[0]["ledger_pending"] == 3
     assert lines[0]["loop_lag_ms"] >= 0 and lines[0]["threads"] >= 1
 

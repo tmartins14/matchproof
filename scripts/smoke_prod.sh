@@ -45,7 +45,7 @@ pass "3 CORS allows $WEB_URL and refuses https://example.com"
 # 4. a match streams: status and an event within 30 s, then the stream closes
 match_id="$(curl -fsS --max-time 30 -X POST "$API_URL/matches/random" -H 'Content-Type: application/json' -d '{}' \
   | python3 -I -c 'import json,sys; print(json.load(sys.stdin)["match_id"])')" || fail "4 POST /matches/random failed"
-seen="$(curl -sS -N --max-time 30 "$API_URL/matches/$match_id/stream?speed=6" \
+seen="$(curl -sS -N --max-time 30 "$API_URL/matches/$match_id/stream?speed=6" 2>/dev/null \
   | awk '/^event: status/ {s=1} /^event: event/ {e=1} s && e {print "both"; exit}')"
 [ "$seen" = "both" ] || fail "4 stream of $match_id gave no status and event within 30 s"
 pass "4 /matches/$match_id/stream delivers status and event"

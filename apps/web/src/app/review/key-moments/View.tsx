@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { KeyMomentRow } from "@/components/desk/KeyMomentRow";
 import { copy, type Lang } from "@/desk/copy";
 import type { Beat } from "@/contracts/types";
@@ -8,7 +9,8 @@ import type { BeatView, Verdict } from "@/desk/model";
 const VERDICTS: Verdict[] = ["checking", "verified", "rephrased", "blocked", "delayed"];
 
 /** Every headline in the copy file beside every stamp, in the desk's own three-column layout. */
-export function KeyMomentsView({ lang }: { lang: Lang }) {
+export function KeyMomentsView() {
+  const lang: Lang = useSearchParams().get("lang") === "es" ? "es" : "en";
   const c = copy[lang];
   const rows = Object.entries(c.beatKind).flatMap(([kind, headline]) =>
     VERDICTS.map((verdict): { key: string; headline: string; row: BeatView } => ({

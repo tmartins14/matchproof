@@ -14,3 +14,14 @@ services:
       path: ./Dockerfile
       context: ../..
       remoteBuild: true
+  web:
+    project: ./apps/web
+    language: js
+    host: staticwebapp
+    dist: out
+    hooks:
+      # The export bakes the API URL in at build time; azd has it once the API is provisioned.
+      prepackage:
+        shell: sh
+        run: |
+          url="$(azd env get-value API_URL)" && printf 'NEXT_PUBLIC_API_URL=%s\n' "$url" > .env.production.local

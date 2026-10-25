@@ -41,6 +41,8 @@ jobs:
       - name: Build web
         run: npm run build
         working-directory: apps/web
+        env:
+          NEXT_PUBLIC_API_URL: https://api.invalid
 
   container-smoke:
     runs-on: ubuntu-latest

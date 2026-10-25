@@ -1,7 +1,7 @@
 import type { MatchBrief } from "@/contracts/types";
 import type { SourceRef } from "@/desk/deskData";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? (process.env.NODE_ENV === "production" ? "" : "http://localhost:8000");
 
 /** Why a call failed, in terms the desk has copy for. */
 export type Failure = "rate_limit" | "busy" | "rejected" | "finished" | "unreachable";

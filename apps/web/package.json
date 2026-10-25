@@ -5,12 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "serve out -l 3100",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "gen:types": "node ../../scripts/gen_types.mjs",
     "test": "vitest run",
-    "shots": "next build && playwright test e2e/shots.spec.ts --config playwright.config.ts",
+    "shots": "NEXT_PUBLIC_API_URL=http://localhost:8000 next build && playwright test e2e/shots.spec.ts --config playwright.config.ts",
     "axe": "playwright test e2e/a11y.spec.ts --config playwright.config.ts"
   },
   "dependencies": {
@@ -27,6 +27,7 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.2",
     "json-schema-to-typescript": "^16.0.0",
+    "serve": "^14.2.4",
     "typescript": "^6.0.3",
     "vitest": "^5.0.5"
   }

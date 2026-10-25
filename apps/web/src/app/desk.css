@@ -97,6 +97,7 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 
 /* Main */
 .mp-main { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; align-items: flex-start; }
+.mp-pitch-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
 .mp-col-match { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .mp-col-feed { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
 .mp-col-rail { flex: 1 1 320px; min-width: 0; }

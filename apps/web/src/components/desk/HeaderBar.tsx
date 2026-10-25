@@ -10,7 +10,7 @@ interface HeaderBarProps {
   awayShort: string;
   score: { home: number; away: number };
   clock: string;
-  status: "live" | "fullTime";
+  status: "off" | "pre" | "live" | "halfTime" | "fullTime";
   mode: Mode;
   lang: Lang;
   onMode: (mode: Mode) => void;
@@ -30,7 +30,7 @@ export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mo
         away={score.away}
         clock={clock}
         status={status}
-        statusText={status === "live" ? h.live : h.fullTime}
+        statusText={{ off: "", pre: h.pre, live: h.live, halfTime: h.halfTime, fullTime: h.fullTime }[status]}
       />
       <div className="mp-controls">
         <SegmentedControl

@@ -1,7 +1,7 @@
 import type { Fact } from "@/contracts/types";
 import type { Copy, Lang } from "./copy";
 import { fill } from "./copy";
-import type { DeskFixture } from "./fixture";
+import type { DeskData } from "./deskData";
 import { formatClock, formatMinute } from "./format";
 
 export interface RailEvent {
@@ -71,7 +71,7 @@ export function pickLead(facts: Fact[]): Fact | undefined {
   return facts.find(isHeadline) ?? facts.find((f) => f.unit !== "s") ?? facts[0];
 }
 
-export function buildRail(fx: DeskFixture, claimFactIds: string[], numberFactIds: string[], lang: Lang, c: Copy, side?: "home" | "away"): RailView {
+export function buildRail(fx: DeskData, claimFactIds: string[], numberFactIds: string[], lang: Lang, c: Copy, side?: "home" | "away"): RailView {
   const factById = new Map(fx.facts.map((f) => [f.id, f]));
   const facts = [...new Set([...claimFactIds, ...numberFactIds])].flatMap((id) => factById.get(id) ?? []);
   const factLines = facts.map((f) => ({ factId: f.id, label: f.label ?? f.name, value: displayOf(f, lang), name: f.name }));
@@ -97,4 +97,12 @@ export function buildRail(fx: DeskFixture, claimFactIds: string[], numberFactIds
     ? { value: shortDisplayOf(lead, lang), metric: metricLabel(lead, c, side), factId: lead.id, window: windowLabel(lead, c) }
     : undefined;
   return { factLines, events, statCard };
+}
+
+/** Source ids behind these facts that are neither a received event nor a known source: the rail fetches them. */
+export function missingSources(fx: DeskData, factIds: string[]): string[] {
+  const events = new Set(fx.events.map((e) => e.id));
+  const ids = new Set(factIds);
+  const wanted = fx.facts.filter((f) => ids.has(f.id)).flatMap((f) => f.source_ids);
+  return [...new Set(wanted)].filter((id) => !events.has(id) && !(id in fx.sources));
 }

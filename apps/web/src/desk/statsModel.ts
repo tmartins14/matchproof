@@ -1,6 +1,6 @@
 import type { Copy, Lang } from "./copy";
 import { fill } from "./copy";
-import type { DeskFixture, RunningMark } from "./fixture";
+import type { DeskData, RunningMark } from "./deskData";
 import { displayOf } from "./railModel";
 import type { DeskModel } from "./model";
 
@@ -42,11 +42,11 @@ export interface PipelineView {
 }
 
 /** The latest 5-minute mark that has closed by the clock. */
-function lastMark(fx: DeskFixture, clock: number): RunningMark | undefined {
+function lastMark(fx: DeskData, clock: number): RunningMark | undefined {
   return fx.running.filter((m) => m.t_to <= clock).at(-1);
 }
 
-export function buildStats(fx: DeskFixture, clock: number, lang: Lang, c: Copy): StatsView | undefined {
+export function buildStats(fx: DeskData, clock: number, lang: Lang, c: Copy): StatsView | undefined {
   const mark = lastMark(fx, clock);
   if (!mark) return undefined;
   const byId = new Map(fx.facts.map((f) => [f.id, f]));
@@ -70,29 +70,23 @@ export function buildStats(fx: DeskFixture, clock: number, lang: Lang, c: Copy):
 }
 
 /** One bar per momentum fact whose bucket has closed by the clock. */
-export function buildMomentum(fx: DeskFixture, clock: number): MomentumBar[] {
+export function buildMomentum(fx: DeskData, clock: number): MomentumBar[] {
   const byId = new Map(fx.facts.map((f) => [f.id, f]));
   const closed = fx.momentum.flatMap((id, slot) => {
-    const fact = byId.get(id);
-    return fact && (fact.scope?.t_to ?? Infinity) <= clock ? [{ slot, factId: id, value: Number(fact.value) }] : [];
+    const fact = id ? byId.get(id) : undefined;
+    return id && fact && (fact.scope?.t_to ?? Infinity) <= clock ? [{ slot, factId: id, value: Number(fact.value) }] : [];
   });
   const peak = Math.max(...closed.map((b) => Math.abs(b.value)), 0);
   return closed.map((b) => ({ ...b, scale: peak === 0 ? 0 : b.value / peak }));
 }
 
-export function scoreAt(fx: DeskFixture, clock: number): { home: number; away: number } {
-  const row = fx.score_timeline.filter((s) => s.t <= clock).at(-1);
-  return row ? { home: row.home, away: row.away } : { home: 0, away: 0 };
-}
-
-export function buildPipeline(fx: DeskFixture, model: DeskModel): PipelineView {
-  const counts = fx.count_timeline[model.minute] ?? { events: 0, facts: 0 };
+export function buildPipeline(fx: DeskData, model: DeskModel): PipelineView {
   const verdicts = model.feed.flatMap((row) => row.verdicts);
   const tally = (v: string): number => verdicts.filter((x) => x === v).length;
   return {
-    events: counts.events,
-    facts: counts.facts,
-    beats: model.revealed.length,
+    events: fx.counts.events,
+    facts: fx.counts.facts,
+    beats: fx.beats.filter((b) => b.t_detect <= fx.clock).length,
     claims: verdicts.length,
     stand: tally("verified"),
     amended: tally("rephrased"),

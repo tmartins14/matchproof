@@ -11,6 +11,21 @@ interface PitchProps {
   checking: boolean;
 }
 
+function captionText(copy: Copy, caption: PitchView["caption"]): string | undefined {
+  switch (caption?.kind) {
+    case "freeze":
+      return fill(copy.pitch.freeze, { clock: formatClock(caption.t) });
+    case "focus":
+      return copy.pitch.focus;
+    case "live":
+      return copy.pitch.livePlay;
+    case "start":
+      return copy.pitch.startingShape;
+    default:
+      return undefined;
+  }
+}
+
 const pct = (value: number, of: number): string => `${((value / of) * 100).toFixed(2)}%`;
 const side = (s: "home" | "away"): string => (s === "home" ? "var(--mp-home)" : "var(--mp-away)");
 
@@ -58,6 +73,7 @@ function MarkDot({ mark }: { mark: PitchMark }) {
 
 export function Pitch({ copy, view, headline, checking }: PitchProps) {
   const { frame, marks, highlight } = view;
+  const caption = captionText(copy, view.caption);
   const lit = checking ? new Set(highlight?.player_ids ?? []) : new Set<string>();
   return (
     <div className="mp-pitch" role="img" aria-label={fill(copy.pitch.aria, { headline, n: frame?.players.length ?? 0 })}>
@@ -77,11 +93,13 @@ export function Pitch({ copy, view, headline, checking }: PitchProps) {
         <MarkDot key={m.id} mark={m} />
       ))}
       {frame ? <div className="mp-ball" style={{ left: pct(frame.ball[0], 120), top: pct(frame.ball[1], 80) }} /> : null}
-      <div className="mp-lift" style={{ position: "absolute", left: "50%", bottom: 18, transform: "translateX(-50%)" }}>
-        <span className="mp-caption mp-cut" style={{ position: "static", transform: "none", display: "block" }}>
-          {fill(copy.pitch.freeze, { clock: formatClock(frame?.t ?? 0) })}
-        </span>
-      </div>
+      {caption ? (
+        <div className="mp-lift" style={{ position: "absolute", left: "50%", bottom: 18, transform: "translateX(-50%)" }}>
+          <span className="mp-caption mp-cut" style={{ position: "static", transform: "none", display: "block" }}>
+            {caption}
+          </span>
+        </div>
+      ) : null}
       <span className="mp-attack">{copy.pitch.attack}</span>
     </div>
   );

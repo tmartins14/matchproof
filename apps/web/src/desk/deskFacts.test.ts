@@ -10,13 +10,13 @@ import { buildModel } from "./model";
 import { buildRail } from "./railModel";
 import { buildMomentum, buildStats } from "./statsModel";
 
-const SNAPSHOT_T = fixture.snapshot.t;
+const SNAPSHOT_T = fixture.clock;
 const factName = new Map(fixture.facts.map((f) => [f.id, f.name]));
 const textOf = (html: string): string => html.replace(/<[^>]*>/g, " ");
 
 describe("stats panel", () => {
   it("uses the to-date facts of the latest 5-minute mark at 71′", () => {
-    expect(fixture.snapshot.minute).toBe(71);
+    expect(Math.floor(fixture.clock / 60)).toBe(71);
     const view = buildStats(fixture, SNAPSHOT_T, "en", copy.en)!;
     expect(view.window).toBe("Match · to 70′");
     expect(view.rows.map((r) => r.label)).toEqual(["Possession", "Shots", "Shots on target", "xG"]);

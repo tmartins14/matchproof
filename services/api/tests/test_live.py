@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 import threading
 from collections import Counter
 from functools import lru_cache
@@ -142,7 +143,7 @@ def test_ordering_and_facts_before_beats() -> None:
     ]
 
 
-def test_window_and_beat_facts_only() -> None:
+def test_window_desk_and_beat_facts_only() -> None:
     messages = [m for _, m in stream("red_card_flip", SPEED_FASTEST)]
     cited = {
         f
@@ -156,8 +157,26 @@ def test_window_and_beat_facts_only() -> None:
         for f in facts
         if len(f["source_ids"]) == 1 and f["source_ids"][0].startswith("win-")
     ]
-    assert len(facts) < 1000  # the registry holds about 10,800
-    assert {f["id"] for f in facts} == cited | {f["id"] for f in windows}
+    desk = [
+        f
+        for f in facts
+        if f["extractor"]["name"] in ("extract_running", "extract_momentum")
+    ]
+    assert len(facts) < 1200  # the registry holds about 10,800
+    assert {f["id"] for f in facts} == cited | {f["id"] for f in windows} | {
+        f["id"] for f in desk
+    }
+    assert sum(f["name"].startswith("momentum(") for f in desk) == 18
+
+
+def test_every_fact_on_the_stream_has_a_label() -> None:
+    messages = [m for _, m in stream("red_card_flip", SPEED_FASTEST)]
+    facts = [dump(m)["data"] for m in messages if m.type.value == "fact"]
+    assert facts
+    assert [f["name"] for f in facts if not f.get("label")] == []
+    assert not [
+        f["label"] for f in facts if re.search(r"t\d+\.\d+|match time", f["label"])
+    ]
 
 
 @pytest.mark.slow

@@ -6,6 +6,8 @@ import { TacticsFields } from "./TacticsFields";
 interface MatchSetupBarProps {
   copy: Copy;
   summary: string;
+  /** the summary is the first sentence of a brief the user wrote, not the tactics shorthand */
+  custom: boolean;
   brief: string;
   note: string | undefined;
   tactics: Tactics;
@@ -18,8 +20,23 @@ interface MatchSetupBarProps {
   onTactics: (next: Tactics) => void;
 }
 
+interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "className"> {
+  primary?: boolean;
+}
+
+/** Cut buttons take their offset shadow from the wrapper: box-shadow would be clipped with the button. */
+function Button({ primary, children, ...rest }: ButtonProps) {
+  return (
+    <span className="mp-lift">
+      <button type="button" className={primary ? "mp-btn mp-btn--primary" : "mp-btn"} {...rest}>
+        {children}
+      </button>
+    </span>
+  );
+}
+
 export function MatchSetupBar(props: MatchSetupBarProps) {
-  const { copy, summary, brief, note, tactics, open } = props;
+  const { copy, summary, custom, brief, note, tactics, open } = props;
   const s = copy.setup;
   const storylineText = s.storylines[props.storylineId as keyof typeof s.storylines] ?? s.storylines.custom;
   return (
@@ -28,19 +45,23 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
         <SectionTab as="span" size="sm">
           {s.label}
         </SectionTab>
-        <p className="mp-setup-summary" title={summary}>
+        <p className="mp-setup-summary">
+          {custom ? <span className="mp-muted">{s.customBrief} </span> : null}
           {summary}
         </p>
         <div className="mp-btns">
-          <button type="button" className="mp-btn" aria-expanded={open} aria-controls="mp-setup-body" onClick={props.onToggle}>
+          <Button onClick={props.onToggle} aria-expanded={open} aria-controls="mp-setup-body">
             {open ? s.hide : s.edit}
             <svg className="mp-chevron-icon" data-open={open} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M6 9l6 6 6-6" />
             </svg>
-          </button>
-          <button type="button" className="mp-btn">{s.randomize}</button>
-          <button type="button" className="mp-btn mp-btn--primary">{s.kickoff}</button>
-          <button type="button" className="mp-btn">{s.cached}</button>
+          </Button>
+          <Button>{s.randomize}</Button>
+          <Button primary>
+            <i className="mp-btn-dot" aria-hidden="true" />
+            {s.kickoff}
+          </Button>
+          <Button>{s.cached}</Button>
         </div>
       </div>
       {note ? (
@@ -56,7 +77,7 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
             </label>
             <textarea id="mp-brief" className="mp-input" rows={3} value={brief} onChange={(e) => props.onBrief(e.target.value)} />
             <div className="mp-btns">
-              <button type="button" className="mp-btn">{s.readBrief}</button>
+              <Button>{s.readBrief}</Button>
             </div>
           </div>
           <fieldset style={{ flex: "1 1 380px", minWidth: 0, margin: 0, padding: 0, border: 0, display: "flex", flexDirection: "column", gap: 12 }}>

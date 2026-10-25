@@ -33,6 +33,20 @@ test("full-page desk shots", async ({ page }) => {
   await page.screenshot({ path: `${OUT}/desk-390.png`, fullPage: true });
 });
 
+async function controlsShot(page: Page, size: { width: number; height: number }, name: string): Promise<void> {
+  await open(page, "", size);
+  const header = await page.locator("header.mp-header").boundingBox();
+  const setup = await page.locator("section.mp-setup").boundingBox();
+  if (!header || !setup) throw new Error("no header or setup bar");
+  const bottom = setup.y + setup.height;
+  await page.screenshot({ path: `${OUT}/${name}`, clip: { x: 0, y: header.y, width: size.width, height: bottom - header.y + 14 } });
+}
+
+test("controls crops", async ({ page }) => {
+  await controlsShot(page, DESK, "controls-1440.png");
+  await controlsShot(page, PHONE, "controls-390.png");
+});
+
 const STAMPS: [string, string, string][] = [
   ["checking", "", "CHECKING"],
   ["verified", "?beat=bt-001484-card", "STANDS"],

@@ -235,8 +235,12 @@ id: string
  * Machine name in the form metric(args), e.g. field_tilt(home, 55-70) or freeze_frame(ev-000597).home_ahead_of_ball.
  */
 name: string
+/**
+ * Plain-English label from intel.labels; for display only.
+ */
+label?: string
 value: (number | string | boolean)
-unit?: ("" | "m" | "m2" | "s" | "pct" | "xg" | "count" | "m_s")
+unit?: ("" | "m" | "m2" | "s" | "pct" | "xg" | "count" | "m_s" | "pp")
 /**
  * How the number may be written in prose, e.g. 1.18 shown as 1.2. The reconciler accepts only these renderings.
  */

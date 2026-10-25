@@ -17,8 +17,9 @@ While it runs, the worker also writes what it has computed into a MatchStore (wh
 agents can query a match mid-stream. It writes a batch only once the batch is within LOOKAHEAD_S of
 playback, so the store never holds more than the lookahead.
 
-Sent: every event, frames as above, window facts when their window closes, and each beat with the
-facts it cites just before it. The rest of the registry stays server-side, looked up by id.
+Sent: every event, frames as above, window facts and the desk's running totals and momentum when
+their span closes, and each beat with the facts it cites just before it. Every fact carries its
+plain-English `label`, written by intel.labels. The rest of the registry stays server-side, looked up by id.
 
 With a MatchRun (the agent workflow), each beat is also handed to it as the worker finds it, in the
 lookahead. When playback reaches the beat, its claims follow it: a claim whose check has finished is
@@ -49,7 +50,9 @@ from contracts.models import (
     StreamMessage,
 )
 from intel.beats import BeatDetector
+from intel.desk import is_desk_fact
 from intel.engine import FactEngine
+from intel.labels import LabelContext, desk_label_for
 from mcp_match.store import MatchStore
 from sim import iter_events
 from sim.positions import run
@@ -150,6 +153,11 @@ def is_window_fact(f: Fact) -> bool:
     return len(f.source_ids) == 1 and f.source_ids[0].root.startswith("win-")
 
 
+def is_sent_on_close(f: Fact) -> bool:
+    """Facts sent when their span closes, without a beat citing them."""
+    return is_window_fact(f) or is_desk_fact(f)
+
+
 @dataclass(frozen=True)
 class Entry:
     """One thing the pipeline produced, before the player decides whether and when to send it."""
@@ -171,6 +179,8 @@ def pipeline(
     engine = engine or FactEngine(roster_of(brief), teams_of(brief))
     detector = BeatDetector()
     sent: set[str] = set()
+    seen: dict[str, Event] = {}
+    ctx = LabelContext(teams_of(brief), seen, engine.registry)
     clock = 0.0
 
     def entry(t: float, kind: str, data: Any, anchor_id: str | None = None) -> Entry:
@@ -178,22 +188,25 @@ def pipeline(
         clock = max(clock, t)
         return Entry(clock, kind, data, anchor_id)
 
+    def labelled(fact: Fact) -> Fact:
+        return fact.model_copy(update={"label": desk_label_for(fact, ctx)})
+
     def beat_entries(beat: Beat) -> list[Entry]:
         out: list[Entry] = []
         for fid in beat.fact_ids:
             fact = engine.registry.get(fid.root)
             if fact.id.root not in sent:
                 sent.add(fact.id.root)
-                out.append(entry(beat.t_detect.root, "fact", fact))
+                out.append(entry(beat.t_detect.root, "fact", labelled(fact)))
         out.append(entry(beat.t_detect.root, "beat", beat))
         return out
 
     def window_entries(facts: list[Fact], t: float) -> list[Entry]:
         out: list[Entry] = []
         for f in facts:
-            if is_window_fact(f) and f.id.root not in sent:
+            if is_sent_on_close(f) and f.id.root not in sent:
                 sent.add(f.id.root)
-                out.append(entry(t, "fact", f))
+                out.append(entry(t, "fact", labelled(f)))
         return out
 
     yield [
@@ -212,6 +225,8 @@ def pipeline(
                 )
             ]
             break
+        if isinstance(item, Event):
+            seen[item.id.root] = item
         facts = engine.push(item)
         beats = detector.push(item, engine.registry)
         out = window_entries(facts, t)

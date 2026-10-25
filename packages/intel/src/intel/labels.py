@@ -13,7 +13,7 @@ from dataclasses import dataclass
 
 from contracts.models import Event, Fact
 
-from .display import minute_text
+from .display import minute_text, render_clock
 from .registry import FactRegistry
 
 TEAM_FACT = re.compile(r"^(?P<metric>[a-z_]+)\((?P<side>home|away), (?P<rest>.*)\)$")
@@ -23,6 +23,7 @@ EVENT_ID = re.compile(r"ev-\d{6}")
 SINCE = re.compile(r"^since (?P<ev>ev-\d{6}) to t[\d.]+$")
 BEFORE = re.compile(r"^before (?P<ev>ev-\d{6})$")
 CHANGE = re.compile(r"^(?P<ev>ev-\d{6}), to t[\d.]+$")
+MOMENTUM_FACT = re.compile(r"^momentum\(min-(?P<number>\d{2})\)$")
 PLAYER_ID = re.compile(r"^(?P<side>home|away)-(?P<number>\d{2})$")
 
 # What each team measure is called. {team} is the club name.
@@ -224,3 +225,48 @@ def spoken_values(fact: Fact, ctx: LabelContext) -> list[str]:
 
 def labels_for(facts: Mapping[str, Fact], ctx: LabelContext) -> dict[str, str]:
     return {fid: label_for(f, ctx) for fid, f in facts.items()}
+
+
+# The desk's labels. label_for is what the Narrator and the judges read and stays free of clocks and
+# minutes; the desk adds to it where a viewer needs to know when.
+DESK_SINCE = re.compile(r"^since ev-\d{6} to t(?P<t>[\d.]+)$")
+DESK_LAST = re.compile(r"^last [\d.]+m to t(?P<t>[\d.]+)$")
+DESK_CHANGE = re.compile(r"^ev-\d{6}, to t(?P<t>[\d.]+)$")
+DESK_RUNNING = re.compile(r"^to (?P<minute>\d+)′$")
+RUNNING_SPAN = "match so far (to {minute}′)"
+MOMENTUM_LABEL = (
+    "Momentum, {start}–{end}′ ({home} minus {away} share of attacking actions)"
+)
+MOMENTUM_BUCKET_MINUTES = 5
+CLOCK_SUFFIX = " (to {clock})"
+
+
+def _broadcast_clock(seconds: str) -> str:
+    """A t-suffix from a machine name (3103.99) as the broadcast clock (51:43)."""
+    return render_clock(float(seconds), "en")[0]
+
+
+def desk_label_for(fact: Fact, ctx: LabelContext) -> str:
+    """label_for plus what the desk shows: the clock a since or latest-spell fact runs to, the
+    minute a running total runs to, and the momentum span. Fills Fact.label for the desk only."""
+    if m := MOMENTUM_FACT.match(fact.name):
+        end = int(m["number"]) * MOMENTUM_BUCKET_MINUTES
+        return MOMENTUM_LABEL.format(
+            start=end - MOMENTUM_BUCKET_MINUTES,
+            end=end,
+            home=ctx.teams["home"],
+            away=ctx.teams["away"],
+        )
+    if (m := TEAM_FACT.match(fact.name)) and (r := DESK_RUNNING.match(m["rest"])):
+        template = TEAM_METRICS.get(
+            m["metric"], "{team} " + m["metric"].replace("_", " ")
+        )
+        name = template.format(team=ctx.teams[m["side"]])
+        return f"{name}, {RUNNING_SPAN.format(minute=r['minute'])}"
+    base = label_for(fact, ctx)
+    if m := TEAM_FACT.match(fact.name):
+        rest = m["rest"]
+        t = DESK_CHANGE.match(rest) or DESK_SINCE.match(rest) or DESK_LAST.match(rest)
+        if t:
+            return base + CLOCK_SUFFIX.format(clock=_broadcast_clock(t["t"]))
+    return base

@@ -10,7 +10,7 @@ from collections.abc import Iterable, Sequence
 
 from contracts.models import Event, Fact, PositionFrame
 
-from .display import display_value
+from .display import display_value, render_clock
 from .extract_events import side_values
 from .extract_positions import (
     Sample,
@@ -160,7 +160,7 @@ def since(
         t0,
         now,
         [anchor_event_id],
-        f"Events and 1 Hz samples from {anchor_event_id} to match time {now:.2f}",
+        f"Events and 1 Hz samples from {anchor_event_id} up to {render_clock(now, 'en')[0]}",
     )
     made = list(before.values()) + list(after.values())
     for side in SIDES:
@@ -209,6 +209,6 @@ def last_minutes(
         t_from,
         now,
         [events[-1].id.root],
-        f"Events in the {minutes:g} minutes up to match time {now:.2f}",
+        f"Events in the {minutes:g} minutes up to {render_clock(now, 'en')[0]}",
     )
     return [f for (_, metric), f in found.items() if metric in LAST_N_METRICS]

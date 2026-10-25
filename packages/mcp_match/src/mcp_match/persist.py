@@ -36,6 +36,7 @@ from contracts.models import (
     MatchBrief,
     PositionFrame,
 )
+from intel.labels import LabelContext, desk_label_for
 from intel.registry import FactRegistry
 
 if TYPE_CHECKING:
@@ -186,7 +187,13 @@ def final_score(events: Iterable[Event]) -> dict[str, int]:
 
 
 def build_claim_graph(record: "MatchRecord", created_at: datetime) -> ClaimGraph:
-    """The record as a ClaimGraph. Raises pydantic.ValidationError if it breaks the contract."""
+    """The record as a ClaimGraph, its facts carrying their plain-English labels. Raises
+    pydantic.ValidationError if it breaks the contract."""
+    ctx = LabelContext(
+        {"home": record.brief.home.name, "away": record.brief.away.name},
+        {e.id.root: e for e in record.events},
+        record.registry,
+    )
     return ClaimGraph.model_validate(
         {
             "schema_version": CLAIM_GRAPH_VERSION,
@@ -197,7 +204,10 @@ def build_claim_graph(record: "MatchRecord", created_at: datetime) -> ClaimGraph
             "generated_at": created_at,
             "final_score": final_score(record.events),
             "facts": [
-                f.model_dump(mode="json", by_alias=True, exclude_none=True)
+                {
+                    **f.model_dump(mode="json", by_alias=True, exclude_none=True),
+                    "label": desk_label_for(f, ctx),
+                }
                 for f in record.registry.all()
             ],
             "beats": [

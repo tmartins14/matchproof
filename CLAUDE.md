@@ -39,7 +39,7 @@ voice/              voice rules and Narrator examples
 - Python 3.12, `uv` for environments, `ruff` + `mypy --strict`, `pytest`. snake_case module and function names.
 - TypeScript strict. JavaScript and TypeScript method names in camelCase (e.g. `setPieceCornerKick`), never snake_case.
 - Pitch coordinates: 120 × 80, absolute. The home team attacks toward x = 120 in both halves. See ADR 0007.
-- IDs: events `ev-000123`, windows `win-NN`, aggregates `agg-<name>`, facts `fx-…`, beats `bt-…`, claims `cl-…`.
+- IDs: events `ev-000123`, windows `win-NN`, aggregates `agg-<name>`, facts `fx-…`, beats `bt-…`, claims `cl-…`, momentum buckets `min-NN`.
 - Product text (narration and UI copy) follows `docs/VOICE.md`; `voice/banned.yaml` is enforced in CI.
 - Fictional clubs and players only. No real Premier League names, crests, marks or data in code, fixtures or UI.
 - No secrets in code or config. Azure access uses managed identity; local development uses `az login`.

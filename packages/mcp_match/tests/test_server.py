@@ -1,7 +1,9 @@
 import asyncio
+import re
 from typing import Any
 
 from helpers import call, client_for, fill, finished, validator
+from intel.labels import LabelContext, label_for
 from intel.registry import FactRegistry
 from mcp_match import MAX_MATCHES, InMemoryMatchStore
 from mcp_match.server import MAX_EVENTS, MAX_FACTS
@@ -137,6 +139,33 @@ def test_red_card_follow_up_bundle_has_every_cited_fact() -> None:
                 and f["scope"]["side"] == ten_men
                 for f in bundle["facts"]
             )
+
+    run(scenario())
+
+
+def test_bundle_labels_are_the_narrators_labels_with_no_clock() -> None:
+    store, match_id = finished()
+    registry = store.registry(match_id)
+    brief = store.brief(match_id)
+    ctx = LabelContext(
+        {"home": brief.home.name, "away": brief.away.name},
+        {e.id.root: e for e in store.events(match_id)},
+        registry,
+    )
+
+    async def scenario() -> None:
+        async with client_for(store, False) as s:
+            beats = (await call(s, "list_beats", match_id=match_id))["beats"]
+            checked = 0
+            for beat in beats:
+                bundle = await call(
+                    s, "get_beat_bundle", match_id=match_id, beat_id=beat["id"]
+                )
+                for f in bundle["facts"]:
+                    assert f["label"] == label_for(registry.get(f["id"]), ctx)
+                    assert not re.search(r"\d+:\d\d", f["label"]), f["label"]
+                    checked += 1
+            assert checked
 
     run(scenario())
 

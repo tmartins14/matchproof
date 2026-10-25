@@ -40,18 +40,27 @@ export function EvidenceRail({ copy, claim, rail }: EvidenceRailProps) {
             </div>
             <div className="mp-step">
               <span>{r.fact}</span>
-              <code className="mp-code">{rail.factLines.join("\n")}</code>
+              <ul className="mp-code mp-facts">
+                {rail.factLines.map((line) => (
+                  <li key={line.factId} data-fact={line.factId}>
+                    <span className="mp-fact-label">
+                      {line.label} = <b className="num">{line.value}</b>
+                    </span>
+                    <span className="mono mp-fact-name">{line.name}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="mp-step">
               <span>{r.events}</span>
               {rail.events.length === 0 ? <span style={{ color: "var(--mp-overturned)", fontSize: 14 }}>{r.noEvents}</span> : null}
               <div className="mp-events">
                 {rail.events.map((e) => (
-                  <div key={e.id}>
-                    <span className="mono">{e.id}</span>
+                  <div key={e.id} title={e.isEvent ? undefined : e.id}>
+                    {e.isEvent ? <span className="mono">{e.id}</span> : <span className="mp-muted">{e.label}</span>}
                     <span>
-                      {e.label}
-                      {e.who ? `, ${e.who}` : ""}
+                      {e.isEvent ? e.label : null}
+                      {e.isEvent && e.who ? `, ${e.who}` : e.who}
                     </span>
                     <span className="num mp-muted" style={{ textAlign: "right" }}>{e.time}</span>
                   </div>

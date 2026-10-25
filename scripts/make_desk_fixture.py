@@ -3,7 +3,10 @@
 Reads an archived match (brief, facts, beats, events, freeze frames, score). The archive of
 m-red-card-flip-3 was saved with no claims, so the claims come from a captured SSE run of the same
 match: the final text and verdict of each claim id are the last claim or verdict message for it.
-Every claim's beat and every fact it cites must resolve in the archive, or the script exits 1.
+The fact registry is rebuilt from the archived brief, events and frames with the current intel
+(extract_all, then the beat detector for the on-demand facts), so running totals, momentum and
+labels are the ones the engine makes now. Every claim's beat and every fact it cites must resolve in
+the rebuilt registry, or the script exits 1.
 """
 
 import argparse
@@ -13,6 +16,21 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
+
+from contracts.models import Event, Fact, PositionFrame
+from intel.beats import detect_all
+from intel.desk import (
+    BUCKET_COUNT,
+    RUNNING_METRICS,
+    attacking_actions,
+    bucket_id,
+    bucket_number,
+    minute_mark,
+)
+from intel.engine import extract_all
+from intel.labels import LabelContext, desk_label_for
+from intel.registry import FactRegistry
+from intel.windows import windows as window_table
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = ROOT / "apps" / "web" / "fixtures" / "desk.json"
@@ -33,7 +51,6 @@ CLAIM_KEYS = (
     "reason",
     "correction",
 )
-STAT_METRICS = ("possession_share", "shots", "xg", "field_tilt")
 SSE_BLOCK = re.compile(r"event: (claim|verdict)\ndata: (.*)")
 
 Json = dict[str, Any]
@@ -72,7 +89,7 @@ def check_resolves(
     )
     missing_facts = sorted({(cid, fid) for cid, fid in refs if fid not in fact_ids})
     print(
-        f"claims {len(claims)}, fact refs {len(refs)}, archive beats {len(beat_ids)}, archive facts {len(fact_ids)}"
+        f"claims {len(claims)}, fact refs {len(refs)}, archive beats {len(beat_ids)}, rebuilt facts {len(fact_ids)}"
     )
     print(f"unresolved beats {missing_beats}, unresolved facts {missing_facts}")
     return len(missing_beats) + len(missing_facts)
@@ -114,22 +131,67 @@ def count_timeline(
     return rows
 
 
-def stat_windows(facts_by_name: dict[str, Json]) -> list[Json]:
-    """The six fixed windows, each with the fact id of every stat for both sides."""
+def running_totals(by_name: dict[str, Fact]) -> list[Json]:
+    """One entry per 5-minute mark: the match-to-date fact id of every metric for both sides."""
     rows: list[Json] = []
-    for number in range(1, 7):
-        win = f"win-{number:02d}"
-        entry: Json = {"id": win, "facts": {}}
-        for metric in STAT_METRICS:
+    for number in range(1, BUCKET_COUNT + 1):
+        entry: Json = {"minute": minute_mark(number), "facts": {}}
+        for metric in RUNNING_METRICS:
             for side in ("home", "away"):
-                fact = facts_by_name.get(f"{metric}({side}, {win})")
+                fact = by_name.get(f"{metric}({side}, to {minute_mark(number)}′)")
                 if fact is None:
                     continue
-                entry["facts"].setdefault(metric, {})[side] = fact["id"]
-                entry["t_from"] = fact["scope"]["t_from"]
-                entry["t_to"] = fact["scope"]["t_to"]
+                entry["facts"].setdefault(metric, {})[side] = fact.id.root
+                if fact.scope is not None and fact.scope.t_to is not None:
+                    entry["t_to"] = fact.scope.t_to.root
         rows.append(entry)
     return rows
+
+
+def momentum_ids(by_name: dict[str, Fact]) -> list[str]:
+    """The momentum(min-NN) fact ids in bucket order."""
+    return [
+        by_name[f"momentum({bucket_id(n)})"].id.root for n in range(1, BUCKET_COUNT + 1)
+    ]
+
+
+def rebuild_registry(
+    archive: Path, brief: Json, events: list[Event]
+) -> tuple[FactRegistry, LabelContext]:
+    """The match's registry with the current intel, and the context its labels are written from."""
+    frames = [
+        PositionFrame.model_validate(r) for r in read_jsonl(archive / "frames.jsonl.gz")
+    ]
+    freeze = [
+        PositionFrame.model_validate(r["frame"])
+        for r in read_jsonl(archive / "freeze.jsonl.gz")
+    ]
+    teams = {"home": brief["home"]["name"], "away": brief["away"]["name"]}
+    roster = {
+        p["id"]: p["name"] for side in ("home", "away") for p in brief[side]["players"]
+    }
+    registry = extract_all(events, frames, freeze, roster, teams)
+    detect_all(events, frames, freeze, registry)
+    return registry, LabelContext(teams, {e.id.root: e for e in events}, registry)
+
+
+def print_momentum(events: list[Event], by_name: dict[str, Fact]) -> None:
+    """Every bucket's home and away attacking actions beside the momentum fact made from them."""
+    buckets: dict[int, list[Event]] = {n: [] for n in range(1, BUCKET_COUNT + 1)}
+    for e in events:
+        buckets[bucket_number(e.period.value, e.t.root)].append(e)
+    print("bucket  home  away  momentum (pp)")
+    for number in range(1, BUCKET_COUNT + 1):
+        fact = by_name[f"momentum({bucket_id(number)})"]
+        home = attacking_actions(buckets[number], "home")
+        away = attacking_actions(buckets[number], "away")
+        print(f"{bucket_id(number)}  {home:4d}  {away:4d}  {float(fact.value):+.0f}")
+
+
+def fact_row(fact: Fact, ctx: LabelContext) -> Json:
+    row: Json = json.loads(fact.model_dump_json(by_alias=True, exclude_none=True))
+    row["label"] = desk_label_for(fact, ctx)
+    return row
 
 
 def highlight_for(beat: Json, event: Json | None) -> Json | None:
@@ -151,10 +213,19 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
     brief = json.loads((archive / "brief.json").read_text())
     graph = json.loads((archive / "claim_graph.json").read_text())
     beats = read_jsonl(archive / "beats.jsonl")
-    events = {e["id"]: e for e in read_jsonl(archive / "events.jsonl.gz")}
-    fact_rows = read_jsonl(archive / "facts.jsonl.gz")
-    aggregates: dict[str, str] = fact_rows[0]["aggregates"]
-    facts = {f["id"]: f for f in fact_rows[1:]}
+    event_rows = read_jsonl(archive / "events.jsonl.gz")
+    events = {e["id"]: e for e in event_rows}
+    registry, ctx = rebuild_registry(
+        archive, brief, [Event.model_validate(e) for e in event_rows]
+    )
+    aggregates = registry.aggregates
+    fact_models = {f.id.root: f for f in registry.all()}
+    facts = {fid: fact_row(f, ctx) for fid, f in fact_models.items()}
+    archived = {f["id"] for f in read_jsonl(archive / "facts.jsonl.gz")[1:]}
+    print(
+        f"rebuilt facts {len(facts)}, archived {len(archived)}, "
+        f"in the archive but not rebuilt {len(archived - set(facts))}"
+    )
     frames = {
         row["event_id"]: row["frame"] for row in read_jsonl(archive / "freeze.jsonl.gz")
     }
@@ -171,15 +242,17 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
         (b for b in beats if any(c["beat_id"] == b["id"] for c in claim_rows)),
         key=lambda b: b["t_detect"],
     )
-    facts_by_name = {f["name"]: f for f in facts.values()}
-    windows = stat_windows(facts_by_name)
-    stat_ids = {
-        fid for w in windows for sides in w["facts"].values() for fid in sides.values()
-    }
+    by_name = {f.name: f for f in fact_models.values()}
+    print_momentum([Event.model_validate(e) for e in event_rows], by_name)
+    running = running_totals(by_name)
+    momentum = momentum_ids(by_name)
+    desk_ids = {
+        fid for r in running for sides in r["facts"].values() for fid in sides.values()
+    } | set(momentum)
     score_rows = score_timeline(list(facts.values()))
     keep_facts = (
         {fid for c in claim_rows for fid in cited_fact_ids(c)}
-        | stat_ids
+        | desk_ids
         | {r["fact_id"] for r in score_rows}
     )
 
@@ -195,7 +268,9 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
         | set(ticker)
         | {b["anchor_event_id"] for b in feed_beats}
     )
-    windows_by_id = {w["id"]: w for w in windows}
+    windows_by_id = {
+        w.id: w for w in window_table(Event.model_validate(e) for e in event_rows)
+    }
     other_sources: Json = {}
     for source in sorted(source_ids - set(events)):
         if source in aggregates:
@@ -206,8 +281,8 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
         elif source in windows_by_id:
             other_sources[source] = {
                 "kind": "window",
-                "t_from": windows_by_id[source]["t_from"],
-                "t_to": windows_by_id[source]["t_to"],
+                "t_from": windows_by_id[source].t_from,
+                "t_to": windows_by_id[source].t_to,
             }
         elif source.startswith("ff-"):
             other_sources[source] = {
@@ -254,7 +329,8 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
         "count_timeline": count_timeline(
             list(events.values()), list(facts.values()), 96
         ),
-        "stat_windows": windows,
+        "running": running,
+        "momentum": momentum,
     }
 
 

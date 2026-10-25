@@ -322,6 +322,7 @@ class Unit(StrEnum):
     xg = 'xg'
     count = 'count'
     m_s = 'm_s'
+    pp = 'pp'
 
 
 class Display(BaseModel):
@@ -362,6 +363,10 @@ class Fact(BaseModel):
             description='Machine name in the form metric(args), e.g. field_tilt(home, 55-70) or freeze_frame(ev-000597).home_ahead_of_ball.'
         ),
     ]
+    label: Annotated[
+        str | None,
+        Field(description='Plain-English label from intel.labels; for display only.'),
+    ] = None
     value: float | int | str | bool
     unit: Unit | None = None
     display: Annotated[

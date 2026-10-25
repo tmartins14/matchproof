@@ -97,13 +97,22 @@ The minimum is 12px, and only for mono.
 | Token | Value | Used by |
 | --- | --- | --- |
 | `radius` | `0` | Everything. No rounded corners except the player dots and the LIVE dot |
-| `cut` | `polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)` | Segmented controls, Kick off, stamps, pipeline stages, lower-third caption |
+| `cut` | `polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)` | Middle segmented chips, setup-bar buttons, stamps, pipeline stages, lower-third caption, moment pins |
+| `cutStart` | `polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%)` | First chip of a group: straight left side, slanted right |
+| `cutEnd` | `polygon(8px 0, 100% 0, 100% 100%, 0 100%)` | Last chip of a group: slanted left side, straight right |
 | `cutTab` | `polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%)` | Section tabs, minute blocks, wordmark |
 | `shadowPanel` | `8px 8px 0` + `shadow` | Panels, pitch |
 | `shadowChip` | `5px 5px 0` + `shadow` | Scorebug, wordmark, key-moment bars, caption |
 | `pitchFrameWidth` | `4px` | Pitch frame |
 
 Shadows never have blur. The cut always slants the same way (top-left to bottom-right), so the screen reads as moving right, toward the attacking end.
+
+**Rules for any element with a cut.**
+
+- Its shadow comes from `filter: drop-shadow(...)` on an unclipped wrapper (`.mp-lift`), never `box-shadow` on the element, which `clip-path` clips.
+- It has no border. A square container with a border is fine.
+- At the edge of a square container it uses `cutStart` or `cutEnd`, so its outer side is straight and meets the border without a wedge-shaped gap.
+- The backdrop's lime sweep may pass between controls, but never behind text or a control's own surface.
 
 **Focus on cut elements.** `clip-path` clips an outside outline. Every element with a cut uses an inset focus ring: `outline: 2px solid lime; outline-offset: -3px`.
 
@@ -117,13 +126,14 @@ Shadows never have blur. The cut always slants the same way (top-left to bottom-
   - Clock in mono.
   - LIVE chip on lime with a pulsing dot.
   - `shadowChip`.
-- **Segmented control** (mode, language, speed). Active: `chip` / `ink`. Inactive: transparent with `muted` text. `cut`. Minimum height 40px, or 44px for primary actions.
+- **Segmented control** (mode, language, speed). Active: `chip` / `ink`. Inactive: transparent with `muted` text. The group keeps a square box and border with 3px padding. Each chip's cut comes from its position: the first is `cutStart`, the last `cutEnd`, the rest `cut` (a group of two is `cutStart` then `cutEnd`), so the selected chip sits 3px from the border on every side. Minimum height 40px, or 44px for primary actions.
 - **Match setup bar.**
   - One row, always visible:
     - a `cutTab` label;
-    - a one-line summary of both teams' shape and the storyline (ellipsis, full text in `title`);
-    - Edit tactics and brief (`aria-expanded`; the chevron rotates);
-    - Randomize, Kick off, Watch cached replay.
+    - a `cutTab` label;
+    - the summary: 15px `text2`, line-height 1.45, max width 760px. It shows all of it and wraps in its own column, never under the tab or the buttons. The two teams' shape sit on the first line and the storyline on the second. It updates live while the editor is open. A brief the user wrote shows "Custom brief" in `muted`, then the brief's first sentence in full;
+    - Edit tactics and brief (`aria-expanded`; the chevron rotates), Randomize, Kick off, Watch cached replay, top-aligned and level with the tab. At 390px the tab, summary and buttons stack.
+  - Buttons: every one is `cut`, with its depth from a `.mp-lift` wrapper. Secondary buttons are `raised` blocks with `text` (6.8:1) and no border; hover keeps the fill and adds a 2px inset `text` outline (`outline-offset: -4px`); disabled is 45% opacity. Kick off live is `lime` with `limeInk` and an 8px dot before its label. Never put white text on `strong`: it measures 2.9:1.
   - While live, the row holds speed and New match instead, and Edit is disabled.
   - Expanding reveals the brief textarea, Read brief and the tactics fieldset, under a `line` rule. Kick off collapses it.
 - **Pipeline strip.** Five stages (name / value / detail) as slanted `surface` blocks with a 4px gap. The active stage has a 3px lime top rule.
@@ -151,10 +161,11 @@ Shadows never have blur. The cut always slants the same way (top-left to bottom-
 - **Evidence rail.**
   - `surface` panel with `shadowPanel` and a section tab.
   - At the top, the **stat card**: the fact's number large in a lime `cutTab` block, joined to a white label chip (metric · team, fact ID · window). This is the first frame of the video.
-  - Then four steps: Claim, Computed fact (a mono `code` block), Source events (rows of ID / event, player / time), Verdict.
+  - Then four steps: Claim, Computed fact (the fact's plain-English `label` = rendered value, with the machine name beneath in 12px mono `muted`), Source events (event rows show ID / event, player / time; window and aggregate rows show what they cover with the clock, and their id in `title`), Verdict.
 - **Stats and momentum.**
   - `surface` panels. Home bar in `home`, away bar in `away`, with a 3px gap.
-  - Momentum is diverging bars around a `line` axis, with moment pins as buttons.
+  - The stats panel is headed "Match · to 70′" and shows the latest match-to-date facts at the clock: possession, shots, shots on target, xG.
+  - Momentum is one thin bar per closed 5-minute bucket (18 slots, 3px gaps) diverging from a `line` axis: positive values rise in `home`, negative drop in `away`, zero is a 2px tick. Height is the fact's value over the largest absolute value so far, scaled to half the strip. Ticks 0′, 45′, 90′ sit below. Moment pins are 24px-wide buttons across the strip: a 2px vertical tick in `chip` at 50% opacity through the full strip height, with the minute label in a row below the axis ticks. The selected pin's tick is solid `lime` and its label always shows; other labels hide when they would overlap a neighbour (the full text stays in `aria-label`). The strip is 72px tall at 1440 and 56px at 390.
 
 ## Motion
 

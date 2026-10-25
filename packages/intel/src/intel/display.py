@@ -14,6 +14,7 @@ SECOND_DECIMALS = 0  # seconds are shown as whole numbers
 XG_DECIMALS = 2  # the primary xG rendering
 XG_SHORT_DECIMALS = 1  # the shorter xG rendering also accepted
 SPEED_DECIMALS = 1  # metres per second
+PP_DECIMALS = 0  # percentage points are shown as whole numbers
 SECONDS_PER_MINUTE = 60
 
 UNIT_DECIMALS = {
@@ -23,6 +24,7 @@ UNIT_DECIMALS = {
     "s": SECOND_DECIMALS,
     "xg": XG_DECIMALS,
     "m_s": SPEED_DECIMALS,
+    "pp": PP_DECIMALS,
 }
 
 
@@ -78,6 +80,9 @@ def render(value: Value, unit: str, lang: str) -> list[str]:
         )
     if unit == "m_s":
         return [f"{_number(value, SPEED_DECIMALS, lang)} m/s"]
+    if unit == "pp":
+        n = _number(value, PP_DECIMALS, lang)
+        return [f"{n} pp"] if es else [f"{n} pp", f"{n} percentage points"]
     if isinstance(value, int):
         return [str(value)]
     return [_number(value, XG_DECIMALS, lang).rstrip("0").rstrip(",.")]

@@ -55,5 +55,12 @@ function shortLine(c: Copy, code: string, side: SideTactics, lang: "en" | "es"):
 }
 
 export function setupSummary(c: Copy, tactics: Tactics, brief: MatchBrief, storyline: string, lang: "en" | "es"): string {
-  return `${shortLine(c, brief.home.short, tactics.home, lang)} ${c.setup.versus} ${shortLine(c, brief.away.short, tactics.away, lang)} · ${storyline}`;
+  return `${shortLine(c, brief.home.short, tactics.home, lang)} ${c.setup.versus} ${shortLine(c, brief.away.short, tactics.away, lang)}\n${storyline}`;
+}
+
+/** The first sentence of a brief, in full. */
+export function firstSentence(text: string): string {
+  const trimmed = text.trim();
+  const end = trimmed.search(/[.!?](\s|$)/);
+  return end === -1 ? trimmed : trimmed.slice(0, end + 1);
 }

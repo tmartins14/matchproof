@@ -254,6 +254,14 @@
   "feedExtra": {
     "producerRemoved": "Eliminadas por el verificador: {n}"
   },
+  "reasonLine": {
+    "noFacts": "No cita ningún dato",
+    "outsideMoment": "Cita datos de fuera de este momento",
+    "numberNotInFacts": "Cifra que no está en los datos: {n}",
+    "comparison": "Compara con algo que no está antes: {word}",
+    "player": "Nombre que no está en los datos: {name}",
+    "unanswered": "La comprobación no pudo terminar"
+  },
   "reasonCategory": {
     "overclaim": "Afirmación excesiva",
     "evaluative-adjective": "Adjetivo sin respaldo",

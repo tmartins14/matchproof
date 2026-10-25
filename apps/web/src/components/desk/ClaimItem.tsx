@@ -1,6 +1,6 @@
 import type { Copy } from "@/desk/copy";
 import type { ClaimView } from "@/desk/model";
-import { displayReason } from "@/desk/reason";
+import { displayReason, reasonLines } from "@/desk/reason";
 import { OverturnedLines } from "./OverturnedLines";
 import { VerdictStamp } from "./VerdictStamp";
 
@@ -23,7 +23,15 @@ export function ClaimItem({ copy, view, onPick }: ClaimItemProps) {
         ) : (
           <span style={{ fontWeight: 500, lineHeight: 1.35 }}>{claim.text}</span>
         )}
-        {overturned && claim.reason ? <span className="mp-note">{displayReason(claim.reason, copy)}</span> : null}
+        {overturned && claim.reason ? (
+          <span className="mp-note">
+            {reasonLines(claim.reason, copy).map((line) => (
+              <span key={line} style={{ display: "block" }}>
+                {line}
+              </span>
+            ))}
+          </span>
+        ) : null}
         <span style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "6px 10px" }}>
           <span className="mono mp-muted" style={{ fontSize: 12 }}>
             {claim.fact_ids[0]}

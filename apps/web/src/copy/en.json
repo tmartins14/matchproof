@@ -254,6 +254,14 @@
   "feedExtra": {
     "producerRemoved": "Removed by the checker: {n}"
   },
+  "reasonLine": {
+    "noFacts": "Cites no facts",
+    "outsideMoment": "Cites evidence from outside this moment",
+    "numberNotInFacts": "Number not in the facts: {n}",
+    "comparison": "Compares with nothing before it: {word}",
+    "player": "Name not in the facts: {name}",
+    "unanswered": "The check could not finish"
+  },
   "reasonCategory": {
     "overclaim": "Overclaim",
     "evaluative-adjective": "Unsupported adjective",

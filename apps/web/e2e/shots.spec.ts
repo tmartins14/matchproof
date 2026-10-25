@@ -2,7 +2,7 @@ import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
-const OUT = resolve(__dirname, "../../../docs/screenshots/11");
+const OUT = resolve(__dirname, "../../../docs/screenshots/12");
 const DESK = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
 
@@ -10,7 +10,7 @@ test.beforeAll(() => mkdirSync(OUT, { recursive: true }));
 
 async function open(page: Page, query: string, size = DESK): Promise<void> {
   await page.setViewportSize(size);
-  await page.goto(`/${query}`);
+  await page.goto(`/${query}${query ? "&" : "?"}source=fixture`);
   await page.evaluate(() => document.fonts.ready);
 }
 

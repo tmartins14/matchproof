@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from contracts.models import Event, Fact, PositionFrame
+from contracts.models import Beat, Event, Fact, PositionFrame
 from intel.beats import detect_all
 from intel.desk import (
     BUCKET_COUNT,
@@ -25,19 +25,19 @@ from intel.desk import (
     attacking_actions,
     bucket_id,
     bucket_number,
+    highlight_for,
     minute_mark,
 )
 from intel.engine import extract_all
 from intel.labels import LabelContext, desk_label_for
 from intel.registry import FactRegistry
+from intel.score import is_goal, match_score
 from intel.windows import windows as window_table
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = ROOT / "apps" / "web" / "fixtures" / "desk.json"
 MAX_BYTES = 400 * 1024
 TICKER_LEN = 5
-HALF_X = 60.0
-PITCH_LENGTH = 120.0
 # Claim fields the desk shows; the checker, audit and span bookkeeping stay in the archive.
 CLAIM_KEYS = (
     "id",
@@ -95,21 +95,18 @@ def check_resolves(
     return len(missing_beats) + len(missing_facts)
 
 
-def score_timeline(facts: list[Json]) -> list[Json]:
-    """One entry per score_after fact, parsed here so the browser never reads a score out of prose."""
+def score_timeline(events: list[Event], by_name: dict[str, Fact]) -> list[Json]:
+    """One entry per goal: the score after it (intel.score.match_score) and its score_after fact."""
     rows: list[Json] = []
-    for fact in facts:
-        if fact["name"].startswith("score_after("):
-            home, away = re.findall(r"(\d+)–(\d+)", fact["display"]["en"][-1])[0]
-            rows.append(
-                {
-                    "t": fact["scope"]["t_from"],
-                    "home": int(home),
-                    "away": int(away),
-                    "fact_id": fact["id"],
-                }
-            )
-    return sorted(rows, key=lambda row: row["t"])
+    for event in sorted(events, key=lambda e: e.t.root):
+        if not is_goal(event):
+            continue
+        home, away = match_score(events, event.t.root)
+        fact = by_name[f"score_after({event.id.root})"]
+        rows.append(
+            {"t": event.t.root, "home": home, "away": away, "fact_id": fact.id.root}
+        )
+    return rows
 
 
 def count_timeline(
@@ -194,20 +191,6 @@ def fact_row(fact: Fact, ctx: LabelContext) -> Json:
     return row
 
 
-def highlight_for(beat: Json, event: Json | None) -> Json | None:
-    """Evidence the pitch shows while a beat's claims are checking: the anchor player, or a half."""
-    out: Json = {}
-    if event and event.get("player_id"):
-        out["player_ids"] = [event["player_id"]]
-    if beat["kind"] == "territorial_spell" and beat.get("side"):
-        out["zone"] = (
-            {"x_from": HALF_X, "x_to": PITCH_LENGTH}
-            if beat["side"] == "home"
-            else {"x_from": 0.0, "x_to": HALF_X}
-        )
-    return out or None
-
-
 def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
     manifest = json.loads((archive / "manifest.json").read_text())
     brief = json.loads((archive / "brief.json").read_text())
@@ -249,7 +232,8 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
     desk_ids = {
         fid for r in running for sides in r["facts"].values() for fid in sides.values()
     } | set(momentum)
-    score_rows = score_timeline(list(facts.values()))
+    event_models = [Event.model_validate(e) for e in event_rows]
+    score_rows = score_timeline(event_models, by_name)
     keep_facts = (
         {fid for c in claim_rows for fid in cited_fact_ids(c)}
         | desk_ids
@@ -320,9 +304,17 @@ def build(archive: Path, sse: Path, snapshot_minute: int) -> Json:
             b["anchor_event_id"]: frames[b["anchor_event_id"]] for b in feed_beats
         },
         "highlights": {
-            b["id"]: h
+            b["id"]: json.loads(h.model_dump_json(exclude_none=True))
             for b in feed_beats
-            if (h := highlight_for(b, events.get(b["anchor_event_id"])))
+            if (
+                h := highlight_for(
+                    Beat.model_validate(b),
+                    next(
+                        (e for e in event_models if e.id.root == b["anchor_event_id"]),
+                        None,
+                    ),
+                )
+            )
         },
         "ticker_event_ids": ticker,
         "score_timeline": score_rows,

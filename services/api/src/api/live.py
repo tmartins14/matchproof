@@ -50,9 +50,10 @@ from contracts.models import (
     StreamMessage,
 )
 from intel.beats import BeatDetector
-from intel.desk import is_desk_fact
+from intel.desk import highlight_for, is_desk_fact
 from intel.engine import FactEngine
 from intel.labels import LabelContext, desk_label_for
+from intel.score import is_goal, match_score
 from mcp_match.store import MatchStore
 from sim import iter_events
 from sim.positions import run
@@ -183,6 +184,10 @@ def pipeline(
     ctx = LabelContext(teams_of(brief), seen, engine.registry)
     clock = 0.0
 
+    def score_now() -> dict[str, int]:
+        home, away = match_score(seen.values())
+        return {"home": home, "away": away}
+
     def entry(t: float, kind: str, data: Any, anchor_id: str | None = None) -> Entry:
         nonlocal clock
         clock = max(clock, t)
@@ -198,7 +203,12 @@ def pipeline(
             if fact.id.root not in sent:
                 sent.add(fact.id.root)
                 out.append(entry(beat.t_detect.root, "fact", labelled(fact)))
-        out.append(entry(beat.t_detect.root, "beat", beat))
+        marked = beat.model_copy(
+            update={
+                "highlight": highlight_for(beat, seen.get(beat.anchor_event_id.root))
+            }
+        )
+        out.append(entry(beat.t_detect.root, "beat", marked))
         return out
 
     def window_entries(facts: list[Fact], t: float) -> list[Entry]:
@@ -221,7 +231,13 @@ def pipeline(
         if until_s is not None and t > until_s:
             yield [
                 entry(
-                    until_s, "status", {"state": "full_time", "message": FULL_TIME_TEXT}
+                    until_s,
+                    "status",
+                    {
+                        "state": "full_time",
+                        "message": FULL_TIME_TEXT,
+                        "score": score_now(),
+                    },
                 )
             ]
             break
@@ -232,6 +248,8 @@ def pipeline(
         out = window_entries(facts, t)
         if kind == "event" and event is not None:
             out.append(entry(t, "event", event))
+            if is_goal(event):
+                out.append(entry(t, "status", {"state": "score", "score": score_now()}))
         elif kind == "frame":
             out.append(entry(t, "frame", item))
         elif frame is not None and event is not None:
@@ -242,7 +260,10 @@ def pipeline(
             if event.type.value == "period_end":
                 state = "half_time" if event.period.value == 1 else "full_time"
                 text = HALF_TIME_TEXT if event.period.value == 1 else FULL_TIME_TEXT
-                out.append(entry(t, "status", {"state": state, "message": text}))
+                status: dict[str, Any] = {"state": state, "message": text}
+                if state == "full_time":
+                    status["score"] = score_now()
+                out.append(entry(t, "status", status))
             elif event.type.value == "period_start" and event.period.value == 2:
                 out.append(entry(t, "status", {"state": "live"}))
         yield out
@@ -397,6 +418,7 @@ class _Builder:
         *,
         text: str | None = None,
         event_id: str | None = None,
+        score: dict[str, int] | None = None,
     ) -> StreamMessage:
         data: dict[str, object] = {"state": state}
         if state not in ("focus", "freeze"):
@@ -405,6 +427,8 @@ class _Builder:
             data["event_id"] = event_id
         if text is not None:
             data["message"] = text
+        if score is not None:
+            data["score"] = score
         return self.message("status", t, data)
 
 
@@ -482,7 +506,12 @@ async def schedule(
         if e.kind == "status":
             yield (
                 due_s,
-                builder.status(e.data["state"], e.t, text=e.data.get("message")),
+                builder.status(
+                    e.data["state"],
+                    e.t,
+                    text=e.data.get("message"),
+                    score=e.data.get("score"),
+                ),
             )
         elif e.kind == "frame":
             if timeline.focus or e.t >= next_frame_t:

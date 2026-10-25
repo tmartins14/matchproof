@@ -38,12 +38,22 @@
       "properties": {
         "state": {
           "type": "string",
-          "enum": ["pre_match", "live", "half_time", "full_time", "error", "focus", "freeze", "notice"],
-          "description": "focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it. notice: a message for the viewer (narration paused, verification unavailable) that changes nothing about playback."
+          "enum": ["pre_match", "live", "half_time", "full_time", "error", "focus", "freeze", "notice", "score"],
+          "description": "score: sent after every goal with the new score. focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it. notice: a message for the viewer (narration paused, verification unavailable) that changes nothing about playback."
         },
         "speed": { "type": "integer", "enum": [1, 3, 6], "description": "Match minutes per real second while cruising. Absent in focus and freeze." },
         "event_id": { "$ref": "common.schema.json#/$defs/eventId", "description": "The anchor event, on a freeze status only." },
-        "message": { "type": "string", "description": "Viewer-facing text; follows docs/VOICE.md." }
+        "message": { "type": "string", "description": "Viewer-facing text; follows docs/VOICE.md." },
+        "score": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["home", "away"],
+          "description": "Goals so far, from intel.score.match_score. On every score status and on full_time.",
+          "properties": {
+            "home": { "type": "integer", "minimum": 0 },
+            "away": { "type": "integer", "minimum": 0 }
+          }
+        }
       }
     }
   }

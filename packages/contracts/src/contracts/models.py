@@ -30,6 +30,14 @@ class Origin(StrEnum):
     detected = 'detected'
 
 
+class Zone(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    x_from: float
+    x_to: float
+
+
 class Verdict(StrEnum):
     checking = 'checking'
     verified = 'verified'
@@ -566,12 +574,21 @@ class State(StrEnum):
     focus = 'focus'
     freeze = 'freeze'
     notice = 'notice'
+    score = 'score'
 
 
 class Speed(IntEnum):
     integer_1 = 1
     integer_3 = 3
     integer_6 = 6
+
+
+class Score(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    home: Annotated[int, Field(ge=0)]
+    away: Annotated[int, Field(ge=0)]
 
 
 class Status(BaseModel):
@@ -581,7 +598,7 @@ class Status(BaseModel):
     state: Annotated[
         State,
         Field(
-            description='focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it. notice: a message for the viewer (narration paused, verification unavailable) that changes nothing about playback.'
+            description='score: sent after every goal with the new score. focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it. notice: a message for the viewer (narration paused, verification unavailable) that changes nothing about playback.'
         ),
     ]
     speed: Annotated[
@@ -596,6 +613,20 @@ class Status(BaseModel):
     message: Annotated[
         str | None, Field(description='Viewer-facing text; follows docs/VOICE.md.')
     ] = None
+    score: Annotated[
+        Score | None,
+        Field(
+            description='Goals so far, from intel.score.match_score. On every score status and on full_time.'
+        ),
+    ] = None
+
+
+class Highlight(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    player_ids: list[PlayerId] | None = None
+    zone: Zone | None = None
 
 
 class Beat(BaseModel):
@@ -616,6 +647,12 @@ class Beat(BaseModel):
     anchor_event_id: EventId
     fact_ids: Annotated[list[FactId], Field(min_length=1)]
     salience: Annotated[float, Field(ge=0.0, le=1.0)]
+    highlight: Annotated[
+        Highlight | None,
+        Field(
+            description="What the pitch marks while the beat's claims are checking: the anchor player, or a half. Set by the pipeline."
+        ),
+    ] = None
     rank: Annotated[
         int | None,
         Field(

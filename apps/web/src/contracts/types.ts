@@ -60,6 +60,16 @@ anchor_event_id: string
 fact_ids: string[]
 salience: number
 /**
+ * What the pitch marks while the beat's claims are checking: the anchor player, or a half. Set by the pipeline.
+ */
+highlight?: {
+player_ids?: string[]
+zone?: {
+x_from: number
+x_to: number
+}
+}
+/**
  * Set by the Producer. Absent means not selected for the feed.
  */
 rank?: number
@@ -408,9 +418,9 @@ data: (Status | Event | PositionFrame | Fact | Beat | Claim)
 }
 export interface Status {
 /**
- * focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it. notice: a message for the viewer (narration paused, verification unavailable) that changes nothing about playback.
+ * score: sent after every goal with the new score. focus: slow playback into a moment, and it says nothing about what is coming. freeze: the freeze frame of event_id follows and playback holds on it. notice: a message for the viewer (narration paused, verification unavailable) that changes nothing about playback.
  */
-state: ("pre_match" | "live" | "half_time" | "full_time" | "error" | "focus" | "freeze" | "notice")
+state: ("pre_match" | "live" | "half_time" | "full_time" | "error" | "focus" | "freeze" | "notice" | "score")
 /**
  * Match minutes per real second while cruising. Absent in focus and freeze.
  */
@@ -423,4 +433,11 @@ event_id?: string
  * Viewer-facing text; follows docs/VOICE.md.
  */
 message?: string
+/**
+ * Goals so far, from intel.score.match_score. On every score status and on full_time.
+ */
+score?: {
+home: number
+away: number
+}
 }

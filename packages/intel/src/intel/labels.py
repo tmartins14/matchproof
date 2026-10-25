@@ -239,6 +239,7 @@ MOMENTUM_LABEL = (
 )
 MOMENTUM_BUCKET_MINUTES = 5
 CLOCK_SUFFIX = " (to {clock})"
+CHANGE_SUFFIX = " (size of the change)"
 
 
 def _broadcast_clock(seconds: str) -> str:
@@ -268,5 +269,9 @@ def desk_label_for(fact: Fact, ctx: LabelContext) -> str:
         rest = m["rest"]
         t = DESK_CHANGE.match(rest) or DESK_SINCE.match(rest) or DESK_LAST.match(rest)
         if t:
-            return base + CLOCK_SUFFIX.format(clock=_broadcast_clock(t["t"]))
+            clock = _broadcast_clock(t["t"])
+            if base.endswith(CHANGE_SUFFIX):
+                # One parenthetical, the clock first: "since the red card (63′), to 77:51 (size of the change)".
+                return f"{base.removesuffix(CHANGE_SUFFIX)}, to {clock}{CHANGE_SUFFIX}"
+            return base + CLOCK_SUFFIX.format(clock=clock)
     return base

@@ -1,4 +1,5 @@
 import asyncio
+import re
 from functools import lru_cache
 
 import pytest
@@ -128,7 +129,7 @@ def test_sources_route_answers_each_kind_and_404s_an_unknown_id() -> None:
     assert client.get("/matches/unknown/sources/win-01").status_code == 404
 
 
-def test_a_different_brief_under_an_archived_id_gets_a_new_id(
+def test_any_brief_under_an_archived_id_gets_a_fresh_id(
     archive_in_tmp: FileArchive,
 ) -> None:
     from test_archive import seed_archive
@@ -137,8 +138,11 @@ def test_a_different_brief_under_an_archived_id_gets_a_new_id(
     main._briefs.clear()
     store._records.clear()  # a fresh process: the id is only in the archive
     archived = store.brief(match_id)
-    assert main.store_brief(archived) == match_id  # the same brief keeps its id
+    same_id = main.store_brief(
+        archived
+    )  # even an identical brief does not rejoin a finished match
+    assert same_id != match_id and re.fullmatch(rf"{match_id}-r[0-9a-f]{{6}}", same_id)
     edited = archived.model_copy(update={"seed": archived.seed + 1})
     new_id = main.store_brief(edited)
-    assert new_id != match_id and new_id.startswith(f"{match_id}-")
+    assert new_id != match_id and re.fullmatch(rf"{match_id}-r[0-9a-f]{{6}}", new_id)
     assert main.brief_of(match_id) == archived

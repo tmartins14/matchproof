@@ -21,6 +21,7 @@ describe("reading the stream", () => {
   it("tells a refused request from a dropped one", () => {
     expect(failureOf(429)).toBe("rate_limit");
     expect(failureOf(503)).toBe("busy");
+    expect(failureOf(409)).toBe("finished");
     expect(failureOf(500)).toBe("unreachable");
   });
 });

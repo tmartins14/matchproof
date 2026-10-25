@@ -201,16 +201,19 @@ _streams: Counter[str] = Counter()
 make_pacer: Callable[[], Pacer] = RealPacer  # tests swap this for a no-op clock
 
 
+def is_archived(match_id: str) -> bool:
+    return store.archive is not None and match_id in store.archive.matches()
+
+
 def store_brief(brief: MatchBrief) -> str:
-    """Keep a brief and return its match id. A different brief under a taken id gets a hash suffix."""
+    """Keep a brief and return its match id. An archived id always gets a fresh `-r` suffix, so a
+    new run never inherits a finished match's claims; a different brief under another taken id gets
+    a hash suffix."""
     match_id = brief.match_id
+    if is_archived(match_id):
+        match_id = f"{match_id}-r{secrets.token_hex(3)}"
+        brief = brief.model_copy(update={"match_id": match_id})
     held = _briefs.get(match_id)
-    if (
-        held is None
-        and store.archive is not None
-        and match_id in store.archive.matches()
-    ):
-        held = store.brief(match_id)
     if held is not None and held != brief:
         digest = hashlib.sha256(brief.model_dump_json().encode()).hexdigest()[:8]
         match_id = f"{match_id}-{digest}"
@@ -500,6 +503,10 @@ async def stream_match(
     last_event_id: Annotated[str | None, Header()] = None,
 ) -> Response:
     brief = brief_of(match_id)
+    if is_archived(match_id):
+        return JSONResponse(
+            status_code=409, content={"replay": f"/matches/{match_id}/replay"}
+        )
     if speed not in SPEEDS:
         raise HTTPException(
             status_code=422, detail=f"speed must be one of {list(SPEEDS)}"

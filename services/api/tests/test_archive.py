@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -125,3 +126,28 @@ def test_archived_matches_are_listed_and_served_after_a_restart(
     ]
     assert client.get(f"/matches/{match_id}/facts/fx-nothing").status_code == 404
     assert client.get("/matches/m-unknown-1/audit").status_code == 404
+
+
+def archive_short_match(seed: int = 5) -> str:
+    match_id = play_short(seed)
+    assert save_now(store, store.brief(match_id), {}, [], {"usage": {}}) is True
+    return match_id
+
+
+def test_an_identical_brief_to_an_archived_match_gets_a_fresh_id() -> None:
+    archived = archive_short_match()
+    client = TestClient(main.app)
+    first = client.post("/matches", json={"story": "late_comeback", "seed": 5})
+    second = client.post("/matches", json={"story": "late_comeback", "seed": 5})
+    ids = {first.json()["match_id"], second.json()["match_id"]}
+    assert len(ids) == 2
+    for new_id in ids:
+        assert re.fullmatch(rf"{archived}-r[0-9a-f]{{6}}", new_id)
+    assert main.brief_of(first.json()["match_id"]).match_id == first.json()["match_id"]
+
+
+def test_a_stream_of_an_archived_id_answers_409_with_the_replay_path() -> None:
+    archived = archive_short_match()
+    reply = TestClient(main.app).get(f"/matches/{archived}/stream?speed=6")
+    assert reply.status_code == 409
+    assert reply.json() == {"replay": f"/matches/{archived}/replay"}

@@ -4,11 +4,12 @@ import type { SourceRef } from "@/desk/deskData";
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 /** Why a call failed, in terms the desk has copy for. */
-export type Failure = "rate_limit" | "busy" | "rejected" | "unreachable";
+export type Failure = "rate_limit" | "busy" | "rejected" | "finished" | "unreachable";
 
 export type Result<T> = { ok: true; value: T } | { ok: false; reason: Failure };
 
 export function failureOf(status: number): Failure {
+  if (status === 409) return "finished";
   if (status === 429) return "rate_limit";
   if (status === 503) return "busy";
   if (status === 400 || status === 422) return "rejected";

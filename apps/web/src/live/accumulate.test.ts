@@ -5,7 +5,7 @@ import { emptyDesk, type DeskData } from "@/desk/deskData";
 import { fixture } from "@/desk/fixture";
 import { buildModel } from "@/desk/model";
 import type { ReviewState } from "@/desk/reviewParams";
-import { buildMomentum, buildStats } from "@/desk/statsModel";
+import { buildMomentum, buildPipeline, buildStats } from "@/desk/statsModel";
 import { accumulate } from "./accumulate";
 import { recordedStream } from "./recorded";
 
@@ -109,6 +109,26 @@ describe("claims: the last message per claim wins", () => {
     expect(d.claims[0]?.text).toBe("A softer wording.");
     expect(d.claims[0]?.draft_text).toBe("The Narrator's first wording.");
     expect(d.claims[0]?.correction?.previous_text).toBe(other.text);
+  });
+});
+
+describe("verdicts after full time", () => {
+  it("keep arriving, and the Checker tally follows them", () => {
+    const claim = fixture.claims.find((c) => c.verdict === "verified")!;
+    const beat = { ...(stream.find((m) => m.type === "beat")!.data as Beat), id: claim.beat_id, rank: 1 };
+    const fullTime = stream.find((m) => m.type === "status" && (m.data as Status).state === "full_time")!;
+    const onAir: StreamMessage[] = [{ seq: 1, type: "beat", t: beat.t_detect, data: beat }, fullTime];
+    const tally = (d: DeskData) => {
+      const p = buildPipeline(d, buildModel(d, state));
+      return { stand: p.stand, amended: p.amended };
+    };
+    const atFullTime = [...onAir, claimMessage(9000, "claim", claim)].reduce(accumulate, fresh());
+    expect(atFullTime.phase).toBe("full_time");
+    expect(tally(atFullTime)).toEqual({ stand: 1, amended: 0 });
+    const corrected: Claim = { ...claim, verdict: "rephrased", text: "A softer wording.", reason: "overclaim", correction: { at_t: 6000, previous_text: claim.text, reason: "overclaim", by: ["auditor", "judge"] } };
+    const afterCorrection = accumulate(atFullTime, { ...claimMessage(9001, "verdict", corrected), t: 6000 });
+    expect(afterCorrection.phase).toBe("full_time");
+    expect(tally(afterCorrection)).toEqual({ stand: 0, amended: 1 });
   });
 });
 

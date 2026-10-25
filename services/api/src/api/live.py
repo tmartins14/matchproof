@@ -45,8 +45,6 @@ from contracts.models import (
     Fact,
     MatchBrief,
     PositionFrame,
-    State,
-    Status,
     StreamMessage,
 )
 from intel.beats import BeatDetector
@@ -95,13 +93,10 @@ PRE_MATCH_TEXT = "Teams are out."
 HALF_TIME_TEXT = "Half-time."
 FULL_TIME_TEXT = "Full-time."
 PRODUCER_WAIT_S = 15.0  # real seconds a beat waits at air for the Producer's decision
-DRAIN_TIMEOUT_S = (
-    60.0  # real seconds after full time the stream waits for checks still running
+POST_FULL_TIME_S = 60.0  # real seconds after full time the stream stays open for late verdicts; the archive save waits as long
+HOLD_POLL_S = (
+    0.05  # how often the wait after full time looks at the ledger when nothing lands
 )
-FULL_TIME_HOLD_S = (
-    30.0  # real seconds full time waits for audits and corrections still running
-)
-HOLD_POLL_S = 0.05  # how often the hold looks at the ledger when nothing lands
 PAUSED_TEXT = "Narration is paused for today."
 UNAVAILABLE_TEXT = "Verification is unavailable right now."
 
@@ -634,21 +629,28 @@ async def _air_beat(msg: StreamMessage, track: _AgentTrack) -> list[StreamMessag
     return out
 
 
-async def _hold_for_checks(track: _AgentTrack) -> AsyncGenerator[StreamMessage, None]:
-    """Before full time, wait for the audits and corrections still running (up to FULL_TIME_HOLD_S),
-    sending what lands. The SSE layer sends a heartbeat for every HEARTBEAT_S of silence."""
+async def _late_verdicts(track: _AgentTrack) -> AsyncGenerator[StreamMessage, None]:
+    """After full time: send each claim, audit and correction as it lands, until the checks have
+    settled (no beat still being followed, no audit or correction in flight) or POST_FULL_TIME_S has
+    passed. The SSE layer sends a heartbeat for every HEARTBEAT_S of silence."""
     run = track.run
-    if not isinstance(run, MatchRun):
-        return
     loop = asyncio.get_running_loop()
-    deadline = loop.time() + FULL_TIME_HOLD_S
-    while run.ledger.pending > 0 and loop.time() < deadline:
+    deadline = loop.time() + POST_FULL_TIME_S
+    while True:
+        for late_msg in track.drain():
+            yield late_msg
+        pending = isinstance(run, MatchRun) and run.ledger.pending > 0
+        if not (track.followers or pending) or loop.time() >= deadline:
+            return
         getter = asyncio.ensure_future(track.late.get())
-        await asyncio.wait({getter}, timeout=min(HOLD_POLL_S, deadline - loop.time()))
+        waiting: set[asyncio.Future[Any]] = {getter, *track.followers}
+        await asyncio.wait(
+            waiting,
+            timeout=min(HOLD_POLL_S, max(deadline - loop.time(), 0.0)),
+            return_when=asyncio.FIRST_COMPLETED,
+        )
         if not getter.cancel():  # it finished first: the message is ours to send
             yield track.from_late(getter.result())
-    for late_msg in track.drain():
-        yield late_msg
 
 
 async def run_live(
@@ -729,20 +731,11 @@ async def run_live(
                 for sent in await _air_beat(msg, track):
                     yield sent
             else:
-                if isinstance(msg.data, Status) and msg.data.state == State.full_time:
-                    async for held in _hold_for_checks(track):
-                        yield held
                 yield track.number(msg)
         if track is not None:
-            # Full time: let the checks still running finish and be sent. Audits are not waited for.
-            while track.followers or not track.late.empty():
-                for late_msg in track.drain():
-                    yield late_msg
-                if track.followers:
-                    await asyncio.wait(set(track.followers), timeout=DRAIN_TIMEOUT_S)
-                    if track.followers:
-                        break
-            for late_msg in track.drain():
+            # Full time has gone out at once. Stay open for the claims, audits and corrections still
+            # landing: what the archive saves is what the desk was shown.
+            async for late_msg in _late_verdicts(track):
                 yield late_msg
     finally:
         control.cancel()

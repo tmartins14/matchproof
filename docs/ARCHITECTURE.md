@@ -144,7 +144,7 @@ Unknown match, fact, beat and event ids return a tool error. A running match is 
 
 ## Match storage
 
-A match is archived at full time, in a background task, so the stream is not delayed. The save waits up to 60 s for audits still running, then writes `<match_id>/` through a `MatchArchive` (`mcp_match/persist.py`): `FileArchive` under `data/archive/` locally (the default; `MATCH_ARCHIVE_DIR` moves it), or `BlobArchive` on the `matches` container (`MATCH_ARCHIVE=blob`, account from `AZURE_STORAGE_ACCOUNT`, `DefaultAzureCredential`; the API's managed identity holds Storage Blob Data Contributor on that container). An archived match is not saved again.
+A match is archived at full time, in a background task, so the stream is not delayed. The stream sends `full_time` at once and stays open up to `POST_FULL_TIME_S` (60 s) for the claims, audits and corrections still landing, so the desk sees what is saved; the save then waits up to as long again for audits still running, then writes `<match_id>/` through a `MatchArchive` (`mcp_match/persist.py`): `FileArchive` under `data/archive/` locally (the default; `MATCH_ARCHIVE_DIR` moves it), or `BlobArchive` on the `matches` container (`MATCH_ARCHIVE=blob`, account from `AZURE_STORAGE_ACCOUNT`, `DefaultAzureCredential`; the API's managed identity holds Storage Blob Data Contributor on that container). An archived match is not saved again.
 
 | File | Holds |
 | --- | --- |

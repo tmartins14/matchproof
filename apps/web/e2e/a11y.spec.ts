@@ -7,6 +7,7 @@ test.use({ reducedMotion: "reduce" });
 const SIZES = [
   { name: "1440", width: 1440, height: 900 },
   { name: "390", width: 390, height: 844 },
+  { name: "1920", width: 1920, height: 1080 },
 ];
 const QUERIES = ["", "?setup=open", "?mode=fan"];
 

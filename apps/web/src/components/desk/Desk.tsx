@@ -206,6 +206,7 @@ export function Desk({ data, initial, live }: DeskProps) {
   return (
     <div className="mp-root">
       <Backdrop />
+      <div className="mp-shell mp-above">
       <HeaderBar copy={c} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
       <MatchSetupBar
         copy={c}
@@ -247,6 +248,7 @@ export function Desk({ data, initial, live }: DeskProps) {
         <KeyMomentFeed copy={c} mode={mode} model={model} headlineOf={headlineOf} onBeat={(id) => { setBeatId(id); setClaimId(undefined); }} onClaim={(b, id) => { setBeatId(b); setClaimId(id); }} />
         {mode === "fan" ? null : <EvidenceRail copy={c} claim={claim} rail={rail} />}
       </main>
+      </div>
     </div>
   );
 }

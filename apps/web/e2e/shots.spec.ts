@@ -2,7 +2,7 @@ import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
-const OUT = resolve(__dirname, "../../../docs/screenshots/12");
+const OUT = resolve(__dirname, "../../../docs/screenshots/14");
 const DESK = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
 
@@ -17,6 +17,15 @@ async function open(page: Page, query: string, size = DESK): Promise<void> {
 test("full-page desk shots", async ({ page }) => {
   await open(page, "");
   await page.screenshot({ path: `${OUT}/desk-1440.png`, fullPage: true });
+  for (const [name, size] of [["mbp14", { width: 1512, height: 982 }], ["mbp16", { width: 1728, height: 1117 }]] as const) {
+    await open(page, "", size);
+    await page.screenshot({ path: `${OUT}/desk-${name}.png`, fullPage: true });
+    await page.screenshot({ path: `${OUT}/desk-${name}-fold.png` });
+  }
+  for (const width of [1920, 2560]) {
+    await open(page, "", { width, height: 1080 });
+    await page.screenshot({ path: `${OUT}/desk-${width}.png`, fullPage: true });
+  }
   await open(page, "?setup=open");
   await page.screenshot({ path: `${OUT}/setup-open-1440.png`, fullPage: true });
   await open(page, "?mode=fan");
@@ -76,5 +85,13 @@ for (const [verdict, query, label] of STAMPS) {
       path: `${OUT}/stamp-${verdict}.png`,
       clip: { x: Math.max(0, box.x - pad), y: Math.max(0, box.y - pad), width: box.width + 2 * pad, height: box.height + 2 * pad },
     });
+  });
+}
+
+for (const width of [360, 390, 1280, 1440, 1512, 1728, 1920, 2560]) {
+  test(`no horizontal scroll at ${width}`, async ({ page }) => {
+    await open(page, "", { width, height: width >= 1920 ? 1080 : 900 });
+    const [scrollWidth, innerWidth] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+    expect(scrollWidth).toBeLessThanOrEqual(innerWidth);
   });
 }

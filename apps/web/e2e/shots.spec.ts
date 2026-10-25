@@ -17,6 +17,11 @@ async function open(page: Page, query: string, size = DESK): Promise<void> {
 test("full-page desk shots", async ({ page }) => {
   await open(page, "");
   await page.screenshot({ path: `${OUT}/desk-1440.png`, fullPage: true });
+  for (const [name, size] of [["mbp14", { width: 1512, height: 982 }], ["mbp16", { width: 1728, height: 1117 }]] as const) {
+    await open(page, "", size);
+    await page.screenshot({ path: `${OUT}/desk-${name}.png`, fullPage: true });
+    await page.screenshot({ path: `${OUT}/desk-${name}-fold.png` });
+  }
   for (const width of [1920, 2560]) {
     await open(page, "", { width, height: 1080 });
     await page.screenshot({ path: `${OUT}/desk-${width}.png`, fullPage: true });
@@ -83,7 +88,7 @@ for (const [verdict, query, label] of STAMPS) {
   });
 }
 
-for (const width of [360, 390, 1280, 1440, 1920, 2560]) {
+for (const width of [360, 390, 1280, 1440, 1512, 1728, 1920, 2560]) {
   test(`no horizontal scroll at ${width}`, async ({ page }) => {
     await open(page, "", { width, height: width >= 1920 ? 1080 : 900 });
     const [scrollWidth, innerWidth] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);

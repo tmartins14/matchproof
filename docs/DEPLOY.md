@@ -175,3 +175,7 @@ azd down --purge                                  # or remove everything
 ```
 
 Disable the availability alert rules first if you keep the app, or the 5-minute tests keep waking the API.
+
+## Known issue: the API container restarts during a live match
+
+Twice on Oct 25 (19:34:05 and 20:19:44 UTC) the API container restarted in place about two minutes into a live match, and the desk showed "Connection lost." There is no exit code, no OOM event and no Python traceback in `ContainerAppSystemLogs_CL` or `ContainerAppConsoleLogs_CL`: the last console line is a normal model-call response, and the next is the new `uvicorn` start. Memory was about 460 to 510 MiB of 2 GiB and CPU about 25% at the last sample. The match store is in memory, so a restart loses the match; the desk does not reconnect. The cause is not found. A full match did reach full time on the same app earlier (2 to 0, 98:04). The next steps are an RSS and SIGTERM log line, `faulthandler`, and the container's real memory limit (`/sys/fs/cgroup/memory.max`); the cached replay (prompt 14) is the fallback for judging.

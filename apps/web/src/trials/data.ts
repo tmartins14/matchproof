@@ -47,9 +47,8 @@ export const cachedRowsOf = (candidate: string, fixture: string): CachedRow[] =>
 export const deskCandidates: string[] = tableOrder.filter((id) => isMeasured(id) && summaryOf(id)?.cleared === true);
 export const liveNarrator: string | null = web.live_narrator;
 export const fixtureIds: string[] = web.fixtures.map((f) => f.id);
-/** The `TRAP <clock>` chips of a fixture, in trap order. */
-export const trapClocks = (fixture: string): string[] =>
-  (fixtureById(fixture)?.trap_beats ?? []).map((t) => momentOf(fixture, t.beat)?.clock ?? "");
+/** The trap chips of a fixture, in trap order: what the trap is and its clock, such as `RED CARD 61′`. */
+export const trapLabels = (fixture: string): string[] => (fixtureById(fixture)?.traps ?? []).map((t) => t.label);
 /** The Compare page for a beat of a pack fixture, or undefined when the export has no such moment. */
 export const compareHref = (fixture: string, beat: string, focus: string): string | undefined =>
   momentOf(fixture, beat) ? `/compare/${fixture}/${beat}?focus=${focus}` : undefined;

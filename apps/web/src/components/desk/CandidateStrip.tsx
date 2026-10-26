@@ -1,6 +1,6 @@
 import type { Copy } from "@/desk/copy";
 import { fill } from "@/desk/copy";
-import { deskCandidates, liveNarrator, rankOf, trapClocks, web } from "@/trials/data";
+import { deskCandidates, liveNarrator, rankOf, trapLabels, web } from "@/trials/data";
 import { fixtureNumber } from "@/trials/format";
 
 /** What the Desk needs to know about the Trials choice; the strip and the desk both read it. */
@@ -67,9 +67,9 @@ export function CandidateStrip(props: StripProps) {
           ))}
         </select>
         <span className="tr-cand-traps">
-          {trapClocks(props.fixture).map((clock, i) => (
+          {trapLabels(props.fixture).map((label, i) => (
             <span key={i} className="tr-chip">
-              {fill(t.trap, { clock })}
+              {label}
             </span>
           ))}
         </span>

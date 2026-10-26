@@ -812,6 +812,12 @@ class Trap1(BaseModel):
     kind: str
     note: str
     event_id: EventId
+    label: Annotated[
+        str,
+        Field(
+            description='The chip text: what the trap is and its broadcast clock, such as RED CARD 61′.'
+        ),
+    ]
 
 
 class TrapBeat(BaseModel):

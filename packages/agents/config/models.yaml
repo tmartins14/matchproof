@@ -90,7 +90,7 @@ trial_candidates:
     model: grok-4.7 1
     deployment: judge-grok
     max_output_tokens: 700
-    timeout_s: 30
+    timeout_s: 60
     response_format: json_schema
     temperature: 0
   - id: gpt-5-nano

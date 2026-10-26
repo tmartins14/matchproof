@@ -14,6 +14,7 @@ from intel.voice_lint import lint
 
 from evals.trials import (
     POINTS,
+    CauseRecorder,
     check_pack,
     claim_row,
     differing_span,
@@ -325,6 +326,54 @@ def test_unreadable_costs_points_and_a_failed_call_does_not() -> None:
         "fx-01", "m", "bt-000100-card", 60, [], exc=LlmError("APITimeoutError")
     )
     assert (raised["lost"], raised["verdict"]) == ("no_answer", "HELD")
+
+
+def test_a_no_answer_row_names_the_cause() -> None:
+    from_exc = lost_beat(
+        "fx-01", "m", "bt-000100-card", 60, [], exc=LlmError("RateLimitError")
+    )
+    assert from_exc["reasons"] == ["LlmError", "RateLimitError"]
+    from_run = lost_beat(
+        "fx-01",
+        "m",
+        "bt-000100-card",
+        60,
+        [],
+        run=BeatRun([], [], 5, error="Narrator: LlmError"),
+        cause="APITimeoutError",
+    )
+    assert from_run["reasons"] == ["LlmError", "APITimeoutError"]
+    unknown = lost_beat(
+        "fx-01",
+        "m",
+        "bt-000100-card",
+        60,
+        [],
+        run=BeatRun([], [], 5, error="Narrator: LlmError"),
+    )
+    assert unknown["reasons"] == ["LlmError"]
+
+
+def test_the_cause_recorder_keeps_the_last_failure_and_passes_replies_through() -> None:
+    class Inner:
+        deployment = "d"
+        response_format = "none"
+
+        def __init__(self) -> None:
+            self.fail: str | None = "APITimeoutError"
+
+        def complete(self, prompt: str, **kwargs: Any) -> str:
+            if self.fail:
+                raise LlmError(self.fail)
+            return "ok"
+
+    inner = Inner()
+    rec = CauseRecorder(inner)  # type: ignore[arg-type]
+    with pytest.raises(LlmError):
+        rec.complete("p")
+    assert rec.last_cause == "APITimeoutError"
+    inner.fail = None
+    assert rec.complete("p") == "ok" and rec.last_cause == "APITimeoutError"
 
 
 def test_equal_denominators_with_a_lost_beat() -> None:

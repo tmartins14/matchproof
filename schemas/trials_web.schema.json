@@ -175,7 +175,7 @@
     "claim_clock": { "type": "object", "description": "Broadcast clock of each claim row, keyed by its index in results.claims.", "additionalProperties": { "type": "string" } },
     "claim_numbers": {
       "type": "object",
-      "description": "Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Empty for a lost row. Fills claim.numbers on a cached replay.",
+      "description": "Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Fills claim.numbers on a cached replay.",
       "additionalProperties": {
         "type": "array",
         "items": {

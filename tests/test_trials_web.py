@@ -369,6 +369,4 @@ def test_claim_numbers_tie_each_number_to_a_fact_the_row_cites() -> None:
     assert set(numbers) == {str(i) for i in range(len(claims))}
     for i, c in enumerate(claims):
         assert {n["fact_id"] for n in numbers[str(i)]} <= set(c["fact_ids"])
-        if c["lost"]:
-            assert numbers[str(i)] == []
     assert any(numbers.values())

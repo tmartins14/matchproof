@@ -1357,7 +1357,7 @@ class TrialsWeb(BaseModel):
     claim_numbers: Annotated[
         dict[str, list[ClaimNumber]],
         Field(
-            description="Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Empty for a lost row. Fills claim.numbers on a cached replay."
+            description="Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Fills claim.numbers on a cached replay."
         ),
     ]
     next_up: list[NextUpItem]

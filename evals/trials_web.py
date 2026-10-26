@@ -230,12 +230,14 @@ async def bundles_of(
 def aired_text(claim: Json) -> str:
     """The wording the Desk's claim carries: a blocked claim keeps the Narrator's draft for audit."""
     blocked = claim["verdict"] in ("OVERTURNED", "HELD")
-    return claim["draft_text"] if blocked and claim["draft_text"] else claim["text"]
+    return str(
+        claim["draft_text"] if blocked and claim["draft_text"] else claim["text"]
+    )
 
 
 def numbers_of(claim: Json, bundle: Json) -> list[Json]:
     """Each number in the claim's wording tied to the cited fact it matches: the deterministic
-    reconciler run on the row, no model. A lost row cites nothing and has none."""
+    reconciler run on the row, no model. Facts it cites that are not in the bundle match nothing."""
     facts = {f["id"]: Fact.model_validate(f) for f in bundle["facts"]}
     found = reconcile(aired_text(claim), claim["fact_ids"], facts)
     return [{"as_written": n.as_written, "fact_id": n.fact_id} for n in found.numbers]

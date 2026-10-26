@@ -1,7 +1,7 @@
 {
   "pack": "pack-v1",
-  "run_at": "2026-10-26T02:34:51Z",
-  "git_sha": "c3e2a3a",
+  "run_at": "2026-10-26T12:18:08Z",
+  "git_sha": "23c7f64",
   "referee": {
     "checker": "code",
     "judge": "gpt-5-mini",
@@ -10,10 +10,10 @@
     "audited": true,
     "cost": {
       "currency": "USD",
-      "total": 0.083203,
+      "total": 0.109466,
       "by_role": {
-        "judge": 0.025403,
-        "auditor": 0.0578
+        "judge": 0.027114,
+        "auditor": 0.082352
       }
     }
   },
@@ -75,8 +75,9 @@
       "minute": 24,
       "candidate": "gpt-5-mini",
       "scored": true,
-      "text": "Rivermouth win it 29 metres out and Pryce fires an 8-second move into a blocked effort, a 0.09 xG chance.",
-      "draft_text": "Rivermouth win it 29 metres out and Pryce fires an 8-second move into a blocked effort, a 0.09 xG chance.",
+      "lost": null,
+      "text": "Rivermouth win it 29 metres out and Pryce fires a blocked shot from 8 s into the move, a 0.09 xG chance.",
+      "draft_text": "Rivermouth win it 29 metres out and Pryce fires a blocked shot from 8 s into the move, a 0.09 xG chance.",
       "verdict": "STANDS",
       "reason_bucket": null,
       "reasons": [],
@@ -91,8 +92,10 @@
       ],
       "checker": "3/3 numbers matched",
       "auditor": "agree",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 11171,
+      "latency_ms": 7282,
+      "narrator_ms": 3973,
       "tokens_in": 1872,
       "tokens_out": 111
     },
@@ -103,25 +106,59 @@
       "minute": 33,
       "candidate": "gpt-5-mini",
       "scored": true,
-      "text": "Ashford Vale have had 66 per cent of the ball and 57 touches in Rivermouth's half in the latest spell.",
-      "draft_text": "Ashford Vale are pinning Rivermouth back, with 66 per cent possession and 57 touches in the Rivermouth half in the latest spell.",
+      "lost": null,
+      "text": "Ashford Vale have had 66% of the ball in the latest spell and registered 57 touches in Rivermouth's half.",
+      "draft_text": "Ashford Vale have dominated the ball in the latest spell, with 66% possession and 57 touches in Rivermouth's half.",
       "verdict": "AMENDED",
       "reason_bucket": "overclaim",
       "reasons": [
-        "Judge (overclaim): 'are pinning Rivermouth back' claims territorial control not stated by possession and touches facts."
+        "Judge (overclaim): 'dominated the ball' is an evaluative claim not supported by the possession percentage and touches alone."
       ],
-      "failed_span": "are pinning Rivermouth back, with 66 per cent possession and 57 touches in the Rivermouth",
-      "corrected_span": "have had 66 per cent of the ball and 57 touches in Rivermouth's",
+      "failed_span": "dominated the ball in the latest spell, with 66% possession and",
+      "corrected_span": "had 66% of the ball in the latest spell and registered",
       "fact_ids": [
         "fx-possession_share-away-last-7m-to-t1922-38",
         "fx-touches_in_opponent_half-away-last-7m-to-t1922-38"
       ],
       "checker": "2/2 numbers matched",
       "auditor": "agree",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 7118,
-      "tokens_in": 3939,
-      "tokens_out": 175
+      "latency_ms": 7914,
+      "narrator_ms": 2257,
+      "tokens_in": 4034,
+      "tokens_out": 324
+    },
+    {
+      "id": "cl-000588-territorial_spell-02",
+      "fixture": "fx-01",
+      "beat": "bt-000588-territorial_spell",
+      "minute": 33,
+      "candidate": "gpt-5-mini",
+      "scored": false,
+      "lost": null,
+      "text": "Rivermouth have 34% possession and 34 touches in the opponent half in that same spell, but have failed to test the goalkeeper.",
+      "draft_text": "Rivermouth are working hard without reward: 34% possession and 34 touches in the opponent half but no shots.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (motive): 'are working hard' attributes intent/effort not stated in the facts; the facts only give possession and touches."
+      ],
+      "failed_span": "are working hard without reward: 34% possession and 34 touches in the opponent half but no shots.",
+      "corrected_span": "have 34% possession and 34 touches in the opponent half in that same spell, but have failed to test the goalkeeper.",
+      "fact_ids": [
+        "fx-possession_share-home-last-7m-to-t1922-38",
+        "fx-touches_in_opponent_half-home-last-7m-to-t1922-38",
+        "fx-shots-home-last-7m-to-t1922-38"
+      ],
+      "checker": "2/2 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 7914,
+      "narrator_ms": 2257,
+      "tokens_in": 4034,
+      "tokens_out": 324
     },
     {
       "id": "cl-000970-big_chance-01",
@@ -130,24 +167,31 @@
       "minute": 42,
       "candidate": "gpt-5-mini",
       "scored": true,
-      "text": "Ashford Vale's chance is saved, Kowal's 0.30 xG effort beaten away.",
-      "draft_text": "Ashford Vale's chance is saved, Kowal's 0.30 xG effort beaten away.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-shot-ev-000970-xg",
-        "fx-shot-ev-000970-outcome",
-        "fx-shot-ev-000970-shooter"
+      "lost": null,
+      "text": "Ashford Vale's Kowal fires on target and is saved, a 0.30 xG chance in the 42′ move.",
+      "draft_text": "Ashford Vale's Kowal forces a smart save from close range, a 0.30 xG shot on target in the 42′ move.",
+      "verdict": "AMENDED",
+      "reason_bucket": "wording",
+      "reasons": [
+        "Voice rule evaluative-adjective broken by \"smart\": A judgement the data cannot support; say what happened."
       ],
-      "checker": "1/1 numbers matched",
+      "failed_span": "forces a smart save from close range, a 0.30 xG shot on target",
+      "corrected_span": "fires on target and is saved, a 0.30 xG chance",
+      "fact_ids": [
+        "fx-shot-ev-000970-outcome",
+        "fx-shot-ev-000970-shooter",
+        "fx-shot-ev-000970-xg",
+        "fx-shot-ev-000970-minute",
+        "fx-shot-ev-000970-on_target"
+      ],
+      "checker": "2/2 numbers matched",
       "auditor": "agree",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 4244,
-      "tokens_in": 1838,
-      "tokens_out": 75
+      "latency_ms": 5668,
+      "narrator_ms": 1879,
+      "tokens_in": 3829,
+      "tokens_out": 203
     },
     {
       "id": "cl-000996-high_turnover_chance-01",
@@ -156,26 +200,30 @@
       "minute": 43,
       "candidate": "gpt-5-mini",
       "scored": true,
-      "text": "Ashford Vale win it 6 metres from goal and Throgmorton shoots 3 seconds later; the effort flies wide but was a 0.30 xG chance.",
-      "draft_text": "Ashford Vale win it 6 metres from goal and Throgmorton shoots 3 seconds later; the effort flies wide but was a 0.30 xG chance.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-sequence-ev-000996-ball_won_distance",
-        "fx-sequence-ev-000996-seconds",
-        "fx-shot-ev-000996-shooter",
-        "fx-shot-ev-000996-outcome",
-        "fx-shot-ev-000996-xg"
+      "lost": null,
+      "text": "Ashford's Throgmorton shoots three seconds after winning the ball, a 0.30 xG chance from 6 metres out.",
+      "draft_text": "Ashford's Throgmorton fires wide from 6 metres after winning the ball, a 0.30 xG chance three seconds into the move.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Second reviewer (overclaim): No fact says the shot went wide, and 6 metres is where the ball was won, not the shot distance.; Judge, asked again (overclaim): No fact states the shot was fired wide or that the shot was taken from 6 metres; facts only give where the ball was won and the shot xG/time/shooter."
       ],
-      "checker": "3/3 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 3300,
+      "failed_span": "fires wide from 6 metres after winning the ball, a 0.30 xG chance three seconds into the move.",
+      "corrected_span": "shoots three seconds after winning the ball, a 0.30 xG chance from 6 metres out.",
+      "fact_ids": [
+        "fx-sequence-ev-000996-seconds",
+        "fx-shot-ev-000996-xg",
+        "fx-sequence-ev-000996-ball_won_distance",
+        "fx-shot-ev-000996-shooter"
+      ],
+      "checker": "2/2 numbers matched",
+      "auditor": "disagree (overclaim)",
+      "referee_split": null,
+      "corrected_by_consensus": true,
+      "latency_ms": 4118,
+      "narrator_ms": 2237,
       "tokens_in": 1874,
-      "tokens_out": 113
+      "tokens_out": 99
     },
     {
       "id": "cl-001053-high_turnover_chance-01",
@@ -184,26 +232,29 @@
       "minute": 46,
       "candidate": "gpt-5-mini",
       "scored": true,
-      "text": "Rivermouth win the ball 6 metres out and Pryce fires on target, a 0.30 xG chance saved.",
-      "draft_text": "Rivermouth win the ball 6 metres out and Pryce fires on target, a 0.30 xG chance saved.",
+      "lost": null,
+      "text": "Rivermouth's Pryce fires a saved shot from close after winning the ball 6 m from goal, a 0.30 xG chance two seconds into the move.",
+      "draft_text": "Rivermouth's Pryce fires a saved shot from close after winning the ball 6 m from goal, a 0.30 xG chance two seconds into the move.",
       "verdict": "STANDS",
       "reason_bucket": null,
       "reasons": [],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
-        "fx-sequence-ev-001053-ball_won_distance",
         "fx-shot-ev-001053-shooter",
-        "fx-shot-ev-001053-on_target",
+        "fx-sequence-ev-001053-ball_won_distance",
         "fx-shot-ev-001053-xg",
+        "fx-sequence-ev-001053-seconds",
         "fx-shot-ev-001053-outcome"
       ],
       "checker": "2/2 numbers matched",
       "auditor": "agree",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 3704,
+      "latency_ms": 3759,
+      "narrator_ms": 2089,
       "tokens_in": 1880,
-      "tokens_out": 104
+      "tokens_out": 114
     },
     {
       "id": "cl-000996-territorial_spell-01",
@@ -212,25 +263,58 @@
       "minute": 48,
       "candidate": "gpt-5-mini",
       "scored": true,
-      "text": "Rivermouth have 57 per cent of the ball and 30 touches in the Ashford half in this spell.",
-      "draft_text": "Rivermouth are on top in this spell, with 57% of the ball and 30 touches in the Ashford half.",
+      "lost": null,
+      "text": "Rivermouth have had 57% of the ball and 30 touches in the Ashford half in this spell.",
+      "draft_text": "Rivermouth are on top in this spell, with 57% possession and 30 touches in the Ashford half.",
       "verdict": "AMENDED",
       "reason_bucket": "overclaim",
       "reasons": [
-        "Judge (overclaim): 'Are on top' claims control/dominance not stated by possession or touches facts."
+        "Judge (overclaim): Saying 'are on top' is a state of control not supported by possession and touches facts."
       ],
-      "failed_span": "are on top in this spell, with 57% of the ball and 30 touches in the Ashford half.",
-      "corrected_span": "have 57 per cent of the ball and 30 touches in the Ashford half in this spell.",
+      "failed_span": "are on top in this spell, with 57% possession and 30 touches in the Ashford half.",
+      "corrected_span": "have had 57% of the ball and 30 touches in the Ashford half in this spell.",
       "fact_ids": [
         "fx-possession_share-home-last-5m-to-t2837-35",
         "fx-touches_in_opponent_half-home-last-5m-to-t2837-35"
       ],
       "checker": "2/2 numbers matched",
       "auditor": "agree",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 7326,
-      "tokens_in": 3932,
-      "tokens_out": 169
+      "latency_ms": 7901,
+      "narrator_ms": 2096,
+      "tokens_in": 4029,
+      "tokens_out": 279
+    },
+    {
+      "id": "cl-000996-territorial_spell-02",
+      "fixture": "fx-01",
+      "beat": "bt-000996-territorial_spell",
+      "minute": 48,
+      "candidate": "gpt-5-mini",
+      "scored": false,
+      "lost": null,
+      "text": "They have also managed 2 shots and won the ball high twice in that period.",
+      "draft_text": "They've turned that pressure into chances too, mustering 2 shots and winning the ball high twice.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (unsupported_cause): Claiming they 'turned that pressure into chances' asserts a causal link not stated by the facts (they simply show 2 shots and 2 high turnovers)."
+      ],
+      "failed_span": "They've turned that pressure into chances too, mustering 2 shots and winning the ball high twice.",
+      "corrected_span": "They have also managed 2 shots and won the ball high twice in that period.",
+      "fact_ids": [
+        "fx-shots-home-last-5m-to-t2837-35",
+        "fx-high_turnovers-home-last-5m-to-t2837-35"
+      ],
+      "checker": "1/1 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 7901,
+      "narrator_ms": 2096,
+      "tokens_in": 4029,
+      "tokens_out": 279
     },
     {
       "id": "cl-001100-high_turnover_chance-01",
@@ -239,8 +323,9 @@
       "minute": 48,
       "candidate": "gpt-5-mini",
       "scored": true,
-      "text": "Rivermouth win it 39 metres out and Whitcombe fires wide after an 11 s move, a 0.10 xG chance.",
-      "draft_text": "Rivermouth win it 39 metres out and Whitcombe fires wide after an 11 s move, a 0.10 xG chance.",
+      "lost": null,
+      "text": "Rivermouth win it 39 metres from goal and Whitcombe fires wide from 11 s into the move, a 0.10 xG chance.",
+      "draft_text": "Rivermouth win it 39 metres from goal and Whitcombe fires wide from 11 s into the move, a 0.10 xG chance.",
       "verdict": "STANDS",
       "reason_bucket": null,
       "reasons": [],
@@ -248,17 +333,19 @@
       "corrected_span": null,
       "fact_ids": [
         "fx-sequence-ev-001100-ball_won_distance",
-        "fx-shot-ev-001100-shooter",
         "fx-sequence-ev-001100-seconds",
         "fx-shot-ev-001100-xg",
-        "fx-shot-ev-001100-outcome"
+        "fx-shot-ev-001100-outcome",
+        "fx-shot-ev-001100-shooter"
       ],
       "checker": "3/3 numbers matched",
       "auditor": "agree",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 4703,
+      "latency_ms": 3727,
+      "narrator_ms": 1848,
       "tokens_in": 1872,
-      "tokens_out": 108
+      "tokens_out": 110
     },
     {
       "id": "cl-001374-card-01",
@@ -267,563 +354,9 @@
       "minute": 61,
       "candidate": "gpt-5-mini",
       "scored": true,
-      "text": "Abernathy is sent off with a straight red. Ashford Vale are down to 10.",
-      "draft_text": "Abernathy is sent off with a straight red. Ashford Vale are down to 10.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-card-ev-001374-kind",
-        "fx-card-ev-001374-players_after",
-        "fx-card-ev-001374-player"
-      ],
-      "checker": "1/1 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 4162,
-      "tokens_in": 1454,
-      "tokens_out": 72
-    },
-    {
-      "id": "cl-001489-territorial_spell-01",
-      "fixture": "fx-01",
-      "beat": "bt-001489-territorial_spell",
-      "minute": 71,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Rivermouth have had 72% of the ball in this spell and 64% of the play in Ashford's half.",
-      "draft_text": "Rivermouth are pressing hard and pinning play in the Ashford half, with 72% possession and 64% of play in the opposition half in this spell.",
-      "verdict": "AMENDED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Judge (overclaim): 'pressing hard and pinning play' describes a state/control not stated by the possession/territory figures alone."
-      ],
-      "failed_span": "are pressing hard and pinning play in the Ashford half, with 72% possession and 64% of play in the opposition half in this spell.",
-      "corrected_span": "have had 72% of the ball in this spell and 64% of the play in Ashford's half.",
-      "fact_ids": [
-        "fx-possession_share-home-last-5m-to-t4225-76",
-        "fx-territory-home-last-5m-to-t4225-76"
-      ],
-      "checker": "2/2 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 8453,
-      "tokens_in": 4056,
-      "tokens_out": 299
-    },
-    {
-      "id": "cl-001489-territorial_spell-02",
-      "fixture": "fx-01",
-      "beat": "bt-001489-territorial_spell",
-      "minute": 71,
-      "candidate": "gpt-5-mini",
-      "scored": false,
-      "text": "Ashford have managed 9 touches in the Rivermouth half and no shots in the same period.",
-      "draft_text": "Ashford have barely touched the Rivermouth half, managing just 9 touches and no shots in the same period.",
-      "verdict": "AMENDED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Judge (overclaim): 'Have barely touched the Rivermouth half' is an evaluative claim beyond the raw counts; facts give counts (9 touches, 0 shots) but not that this qualifies as 'barely'."
-      ],
-      "failed_span": "barely touched the Rivermouth half, managing just 9 touches",
-      "corrected_span": "managed 9 touches in the Rivermouth half",
-      "fact_ids": [
-        "fx-touches_in_opponent_half-away-last-5m-to-t4225-76",
-        "fx-shots-away-last-5m-to-t4225-76"
-      ],
-      "checker": "1/1 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 8453,
-      "tokens_in": 4056,
-      "tokens_out": 299
-    },
-    {
-      "id": "cl-001664-counter_goal-01",
-      "fixture": "fx-01",
-      "beat": "bt-001664-counter_goal",
-      "minute": 74,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Rivermouth take the lead as Whitcombe finishes the counter after a 12 s move, a 0.17 xG strike to make it 1–0.",
-      "draft_text": "Rivermouth take the lead as Whitcombe finishes the counter after a 12 s break, a tidy 0.17 xG strike to make it 1–0.",
-      "verdict": "AMENDED",
-      "reason_bucket": "wording",
-      "reasons": [
-        "Voice rule evaluative-adjective broken by \"tidy\": A judgement the data cannot support; say what happened."
-      ],
-      "failed_span": "break, a tidy",
-      "corrected_span": "move, a",
-      "fact_ids": [
-        "fx-shot-ev-001664-shooter",
-        "fx-sequence-ev-001664-seconds",
-        "fx-shot-ev-001664-xg",
-        "fx-score_after-ev-001664"
-      ],
-      "checker": "4/4 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 6137,
-      "tokens_in": 4018,
-      "tokens_out": 199
-    },
-    {
-      "id": "cl-001374-momentum_swing-01",
-      "fixture": "fx-01",
-      "beat": "bt-001374-momentum_swing",
-      "minute": 76,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Rivermouth have had 60% of the ball since the red card, turning possession the way of the home side.",
-      "draft_text": "Rivermouth have taken control since the red card, winning 60% of the ball and pinning Ashford back.",
-      "verdict": "OVERTURNED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Judge (overclaim): 'taken control' and 'pinning Ashford back' describe dominance and being pinned which the possession stat alone does not prove."
-      ],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-possession_share-home-since-ev-001374-to-t4519-00"
-      ],
-      "checker": "1/1 numbers matched",
-      "auditor": "not audited",
-      "corrected_by_consensus": false,
-      "latency_ms": 9189,
-      "tokens_in": 3874,
-      "tokens_out": 202
-    },
-    {
-      "id": "cl-001374-momentum_swing-02",
-      "fixture": "fx-01",
-      "beat": "bt-001374-momentum_swing",
-      "minute": 76,
-      "candidate": "gpt-5-mini",
-      "scored": false,
-      "text": "Ashford's back line has dropped 9 m and their shape has tightened by 224 square metres since the red card.",
-      "draft_text": "Ashford's back line has dropped 9 m and their shape has tightened by 224 square metres since the red card.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-back_line_change-away-ev-001374-to-t4519-00",
-        "fx-compactness_change-away-ev-001374-to-t4519-00"
-      ],
-      "checker": "2/2 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 9189,
-      "tokens_in": 3874,
-      "tokens_out": 202
-    },
-    {
-      "id": "cl-001767-high_turnover_chance-01",
-      "fixture": "fx-01",
-      "beat": "bt-001767-high_turnover_chance",
-      "minute": 78,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Rivermouth win it 26 metres out and Fenwick-Ode fires a saved, on-target 0.19 xG attempt after an 8 s move.",
-      "draft_text": "Rivermouth win it 26 metres out and Fenwick-Ode fires a saved, on-target 0.19 xG attempt after an 8 s move.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-sequence-ev-001767-ball_won_distance",
-        "fx-shot-ev-001767-shooter",
-        "fx-shot-ev-001767-outcome",
-        "fx-shot-ev-001767-on_target",
-        "fx-shot-ev-001767-xg",
-        "fx-sequence-ev-001767-seconds"
-      ],
-      "checker": "3/3 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 8590,
-      "tokens_in": 1874,
-      "tokens_out": 122
-    },
-    {
-      "id": "cl-001962-open_play_goal-01",
-      "fixture": "fx-01",
-      "beat": "bt-001962-open_play_goal",
-      "minute": 87,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Quain scores for Rivermouth, the finish coming after a 13-pass move that began in the 86′ and ends 77 seconds later with a 0.14 xG strike.",
-      "draft_text": "Quain scores for Rivermouth, the finish coming after a 13-pass move that began in the 86′ and ends 77 seconds later with a 0.14 xG strike.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-shot-ev-001962-shooter",
-        "fx-shot-ev-001962-outcome",
-        "fx-sequence-ev-001962-passes",
-        "fx-sequence-ev-001962-start_clock",
-        "fx-sequence-ev-001962-seconds",
-        "fx-shot-ev-001962-xg"
-      ],
-      "checker": "4/4 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 4389,
-      "tokens_in": 1926,
-      "tokens_out": 126
-    },
-    {
-      "id": "cl-001981-high_turnover_chance-01",
-      "fixture": "fx-01",
-      "beat": "bt-001981-high_turnover_chance",
-      "minute": 89,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Ashford Vale win the ball 30 metres out and Throgmorton fires a wide 0.08 xG attempt after 5 seconds.",
-      "draft_text": "Ashford Vale win the ball 30 metres out and Throgmorton fires a wide 0.08 xG attempt after 5 seconds.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-sequence-ev-001981-ball_won_distance",
-        "fx-shot-ev-001981-shooter",
-        "fx-shot-ev-001981-xg",
-        "fx-sequence-ev-001981-seconds",
-        "fx-shot-ev-001981-outcome"
-      ],
-      "checker": "3/3 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 3880,
-      "tokens_in": 1874,
-      "tokens_out": 107
-    },
-    {
-      "id": "cl-001664-momentum_swing-01",
-      "fixture": "fx-01",
-      "beat": "bt-001664-momentum_swing",
-      "minute": 89,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Rivermouth lead 1–0 and have dominated possession since the goal, holding 74% of the ball.",
-      "draft_text": "Rivermouth lead 1–0 and then take control, owning 74% of the ball since the goal.",
-      "verdict": "AMENDED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Second reviewer (overclaim): \"take control\" states a team state of control that 74% possession does not establish.; Judge, asked again (overclaim): 'take control' asserts a state of control not supported by the possession fact; 74% possession is a measured share, not proof they 'take control'."
-      ],
-      "failed_span": "then take control, owning 74% of the ball since the goal.",
-      "corrected_span": "have dominated possession since the goal, holding 74% of the ball.",
-      "fact_ids": [
-        "fx-score_after-ev-001664",
-        "fx-possession_share-home-since-ev-001664-to-t5300-00"
-      ],
-      "checker": "3/3 numbers matched",
-      "auditor": "disagree (overclaim)",
-      "corrected_by_consensus": true,
-      "latency_ms": 4137,
-      "tokens_in": 1762,
-      "tokens_out": 138
-    },
-    {
-      "id": "cl-001664-momentum_swing-02",
-      "fixture": "fx-01",
-      "beat": "bt-001664-momentum_swing",
-      "minute": 89,
-      "candidate": "gpt-5-mini",
-      "scored": false,
-      "text": "Rivermouth lead 1–0 and have upped possession to 74%, their back line sitting 30 metres since the goal.",
-      "draft_text": "Their back line has dropped 6 metres, sitting 30 metres high as they protect the lead.",
-      "verdict": "AMENDED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Second reviewer (motive): \"as they protect the lead\" assigns intent that no fact states.; Judge, asked again (motive): Saying they sit 30m high and dropped 6m matches the facts, but \"as they protect the lead\" gives intent not stated in the facts."
-      ],
-      "failed_span": "Their back line has dropped 6 metres, sitting 30 metres high as they protect the lead.",
-      "corrected_span": "Rivermouth lead 1–0 and have upped possession to 74%, their back line sitting 30 metres since the goal.",
-      "fact_ids": [
-        "fx-score_after-ev-001664",
-        "fx-possession_share-home-since-ev-001664-to-t5300-00",
-        "fx-back_line_height-home-since-ev-001664-to-t5300-00"
-      ],
-      "checker": "4/4 numbers matched",
-      "auditor": "disagree (motive)",
-      "corrected_by_consensus": true,
-      "latency_ms": 4137,
-      "tokens_in": 1762,
-      "tokens_out": 138
-    },
-    {
-      "id": "cl-002101-high_turnover_chance-01",
-      "fixture": "fx-01",
-      "beat": "bt-002101-high_turnover_chance",
-      "minute": 94,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Rivermouth win it 25 metres out and Pryce forces a blocked 0.10 xG effort in 90+4′.",
-      "draft_text": "Rivermouth win it 25 metres out and Pryce fires a blocked 0.10 xG effort in the 90+4′, the last throw of the game.",
-      "verdict": "AMENDED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Second reviewer (overclaim): Calling it the last throw of the game asserts a final action the facts do not state.; Judge, asked again (overclaim): Calling it 'the last throw of the game' asserts it was the final action of the match, which the facts do not state."
-      ],
-      "failed_span": "fires a blocked 0.10 xG effort in the 90+4′, the last throw of the game.",
-      "corrected_span": "forces a blocked 0.10 xG effort in 90+4′.",
-      "fact_ids": [
-        "fx-sequence-ev-002101-ball_won_distance",
-        "fx-shot-ev-002101-shooter",
-        "fx-shot-ev-002101-outcome",
-        "fx-shot-ev-002101-xg",
-        "fx-shot-ev-002101-minute"
-      ],
-      "checker": "4/4 numbers matched",
-      "auditor": "disagree (overclaim)",
-      "corrected_by_consensus": true,
-      "latency_ms": 4423,
-      "tokens_in": 1880,
-      "tokens_out": 113
-    },
-    {
-      "id": "cl-002178-high_turnover_chance-01",
-      "fixture": "fx-01",
-      "beat": "bt-002178-high_turnover_chance",
-      "minute": 98,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Ashford's late break ends with Dunmore firing a saved effort, a 0.23 xG chance in the 90+8′ surge from 10 metres out.",
-      "draft_text": "Ashford's late break ends with Dunmore firing a saved effort, a 0.23 xG chance in the 90+8′ surge from 10 metres out.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-shot-ev-002178-xg",
-        "fx-shot-ev-002178-outcome",
-        "fx-shot-ev-002178-minute",
-        "fx-sequence-ev-002178-ball_won_distance",
-        "fx-shot-ev-002178-shooter"
-      ],
-      "checker": "4/4 numbers matched",
-      "auditor": "unavailable",
-      "corrected_by_consensus": false,
-      "latency_ms": 3980,
-      "tokens_in": 1880,
-      "tokens_out": 111
-    },
-    {
-      "id": "cl-001962-momentum_swing-01",
-      "fixture": "fx-01",
-      "beat": "bt-001962-momentum_swing",
-      "minute": 99,
-      "candidate": "gpt-5-mini",
-      "scored": true,
-      "text": "Rivermouth lead 2–0 and have had 56 per cent of the ball since the goal.",
-      "draft_text": "Rivermouth lead 2–0 and have eased into control of the ball, holding 56 per cent possession since the goal.",
-      "verdict": "AMENDED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Judge (overclaim): 'eased into control of the ball' claims a state of control/dominance beyond the possession percentage; facts only give 56% possession since the goal."
-      ],
-      "failed_span": "eased into control of the ball, holding 56 per cent possession",
-      "corrected_span": "had 56 per cent of the ball",
-      "fact_ids": [
-        "fx-score_after-ev-001962",
-        "fx-possession_share-home-since-ev-001962-to-t5881-42"
-      ],
-      "checker": "3/3 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 8019,
-      "tokens_in": 3364,
-      "tokens_out": 153
-    },
-    {
-      "id": "cl-000588-territorial_spell-01",
-      "fixture": "fx-01",
-      "beat": "bt-000588-territorial_spell",
-      "minute": 33,
-      "candidate": "gpt-5-nano",
-      "scored": true,
-      "text": "Ashford Vale push high up the pitch, Rivermouth press with 100% in the latest spell.",
-      "draft_text": "Ashford Vale hold the ball high up the pitch, Rivermouth press with 100% in the latest spell.",
-      "verdict": "OVERTURNED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Judge (overclaim): Saying Ashford Vale 'hold the ball high up the pitch' states where they are in control (territorial position) but no fact about location or possession in the latest spell is provided."
-      ],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-press_rate-away-last-7m-to-t1922-38",
-        "fx-press_rate-home-last-7m-to-t1922-38"
-      ],
-      "checker": "1/1 numbers matched",
-      "auditor": "not audited",
-      "corrected_by_consensus": false,
-      "latency_ms": 7640,
-      "tokens_in": 4038,
-      "tokens_out": 272
-    },
-    {
-      "id": "cl-000588-territorial_spell-02",
-      "fixture": "fx-01",
-      "beat": "bt-000588-territorial_spell",
-      "minute": 33,
-      "candidate": "gpt-5-nano",
-      "scored": false,
-      "text": "Ashford Vale have 66% of possession in the spell while Rivermouth stay aggressive.",
-      "draft_text": "Ashford Vale have 66% of possession in the spell, Rivermouth keep the pressure up.",
-      "verdict": "OVERTURNED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Judge (overclaim): 'Rivermouth keep the pressure up' is a claim about Rivermouth's pressure not supported by possession facts."
-      ],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-possession_share-away-last-7m-to-t1922-38",
-        "fx-press_rate-home-last-7m-to-t1922-38"
-      ],
-      "checker": "1/1 numbers matched",
-      "auditor": "not audited",
-      "corrected_by_consensus": false,
-      "latency_ms": 7640,
-      "tokens_in": 4038,
-      "tokens_out": 272
-    },
-    {
-      "id": "cl-000996-high_turnover_chance-01",
-      "fixture": "fx-01",
-      "beat": "bt-000996-high_turnover_chance",
-      "minute": 43,
-      "candidate": "gpt-5-nano",
-      "scored": true,
-      "text": "Ashford Vale launch a shot in the 43rd minute, a 0.30 xG chance that just misses.",
-      "draft_text": "Ashford Vale have a shooting chance from 43′, Throgmorton fires early for a 0.30 xG miss.",
-      "verdict": "AMENDED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Second reviewer (overclaim): “fires early” adds that the shot was taken prematurely, which no fact states.; Judge, asked again (overclaim): “fires early” implies the timing/pace of the shot beyond the facts; the facts only state minute, shooter, outcome and xG."
-      ],
-      "failed_span": "have a shooting chance from 43′, Throgmorton fires early for a 0.30 xG miss.",
-      "corrected_span": "launch a shot in the 43rd minute, a 0.30 xG chance that just misses.",
-      "fact_ids": [
-        "fx-shot-ev-000996-minute",
-        "fx-shot-ev-000996-shooter",
-        "fx-shot-ev-000996-outcome",
-        "fx-shot-ev-000996-xg"
-      ],
-      "checker": "2/2 numbers matched",
-      "auditor": "disagree (overclaim)",
-      "corrected_by_consensus": true,
-      "latency_ms": 8167,
-      "tokens_in": 3931,
-      "tokens_out": 251
-    },
-    {
-      "id": "cl-000996-high_turnover_chance-02",
-      "fixture": "fx-01",
-      "beat": "bt-000996-high_turnover_chance",
-      "minute": 43,
-      "candidate": "gpt-5-nano",
-      "scored": false,
-      "text": "Ashford Vale win it and Throgmorton shoots from 43′, a 0.30 xG chance.",
-      "draft_text": "The move has 0 passes and ends with a shot wide from 43′, a quick break in Ashford Vale's play.",
-      "verdict": "OVERTURNED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "Judge (overclaim): Calling it 'a quick break' asserts the move was quick, which the facts do not state."
-      ],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-shot-ev-000996-minute",
-        "fx-shot-ev-000996-shooter",
-        "fx-shot-ev-000996-outcome",
-        "fx-shot-ev-000996-xg"
-      ],
-      "checker": "2/2 numbers matched",
-      "auditor": "not audited",
-      "corrected_by_consensus": false,
-      "latency_ms": 8167,
-      "tokens_in": 3931,
-      "tokens_out": 251
-    },
-    {
-      "id": "cl-001053-high_turnover_chance-01",
-      "fixture": "fx-01",
-      "beat": "bt-001053-high_turnover_chance",
-      "minute": 46,
-      "candidate": "gpt-5-nano",
-      "scored": true,
-      "text": "Rivermouth win it at 45+1 and Pryce tests the keeper, a 0.3 xG effort.",
-      "draft_text": "Rivermouth win it at 6 metres and Pryce tests the keeper from 45+1′, a 0.3 xG effort.",
-      "verdict": "OVERTURNED",
-      "reason_bucket": "numbers",
-      "reasons": [
-        "The number \"6\" matches no display rendering of the cited facts."
-      ],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-shot-ev-001053-minute",
-        "fx-shot-ev-001053-on_target",
-        "fx-shot-ev-001053-shooter",
-        "fx-shot-ev-001053-xg",
-        "fx-sequence-ev-001053-start_clock"
-      ],
-      "checker": "2/3 numbers matched",
-      "auditor": "not audited",
-      "corrected_by_consensus": false,
-      "latency_ms": 4468,
-      "tokens_in": 3906,
-      "tokens_out": 205
-    },
-    {
-      "id": "cl-000996-territorial_spell-01",
-      "fixture": "fx-01",
-      "beat": "bt-000996-territorial_spell",
-      "minute": 48,
-      "candidate": "gpt-5-nano",
-      "scored": true,
-      "text": "Rivermouth pressure pays off as they win the ball high, then keep Ashford pegged in their own half.",
-      "draft_text": "Rivermouth push in the Ashford half, and their 57% of the spell shows they are on top as Ashford sit deeper.",
-      "verdict": "OVERTURNED",
-      "reason_bucket": "overclaim",
-      "reasons": [
-        "'deeper' compares, but no before or change fact is cited."
-      ],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-high_turnovers-home-last-5m-to-t2837-35",
-        "fx-touches_in_opponent_half-home-last-5m-to-t2837-35"
-      ],
-      "checker": "no numbers",
-      "auditor": "not audited",
-      "corrected_by_consensus": false,
-      "latency_ms": 5325,
-      "tokens_in": 3954,
-      "tokens_out": 199
-    },
-    {
-      "id": "cl-001374-card-01",
-      "fixture": "fx-01",
-      "beat": "bt-001374-card",
-      "minute": 61,
-      "candidate": "gpt-5-nano",
-      "scored": true,
-      "text": "Ashford Vale go down to 10 after Abernathy is shown a red card at 61′.",
-      "draft_text": "Ashford Vale go down to 10 after Abernathy is shown a red card at 61′.",
+      "lost": null,
+      "text": "Ashford Vale's Abernathy is sent off with a straight red, leaving Ashford down to 10.",
+      "draft_text": "Ashford Vale's Abernathy is sent off with a straight red, leaving Ashford down to 10.",
       "verdict": "STANDS",
       "reason_bucket": null,
       "reasons": [],
@@ -832,15 +365,719 @@
       "fact_ids": [
         "fx-card-ev-001374-kind",
         "fx-card-ev-001374-player",
-        "fx-card-ev-001374-minute",
         "fx-card-ev-001374-players_after"
+      ],
+      "checker": "1/1 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 3530,
+      "narrator_ms": 1905,
+      "tokens_in": 1454,
+      "tokens_out": 75
+    },
+    {
+      "id": "cl-001489-territorial_spell-01",
+      "fixture": "fx-01",
+      "beat": "bt-001489-territorial_spell",
+      "minute": 71,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth are camped in the Ashford half, enjoying 72% of the ball and 64% territory in this spell.",
+      "draft_text": "Rivermouth are camped in the Ashford half, enjoying 72% of the ball and 64% territory in this spell.",
+      "verdict": "STANDS",
+      "reason_bucket": null,
+      "reasons": [],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-possession_share-home-last-5m-to-t4225-76",
+        "fx-territory-home-last-5m-to-t4225-76"
       ],
       "checker": "2/2 numbers matched",
       "auditor": "agree",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 3956,
-      "tokens_in": 1454,
-      "tokens_out": 83
+      "latency_ms": 7467,
+      "narrator_ms": 2320,
+      "tokens_in": 3973,
+      "tokens_out": 227
+    },
+    {
+      "id": "cl-001489-territorial_spell-02",
+      "fixture": "fx-01",
+      "beat": "bt-001489-territorial_spell",
+      "minute": 71,
+      "candidate": "gpt-5-mini",
+      "scored": false,
+      "lost": null,
+      "text": "Rivermouth have 45 touches in the Ashford half and have won three high turnovers in that spell.",
+      "draft_text": "They have 45 touches in the opposition half and have forced three high turnovers, piling on the pressure.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (motive): 'piling on the pressure' states intent/effect (pressure) not supported by the facts which only give touches and turnovers."
+      ],
+      "failed_span": "They have 45 touches in the opposition half and have forced three high turnovers, piling on the pressure.",
+      "corrected_span": "Rivermouth have 45 touches in the Ashford half and have won three high turnovers in that spell.",
+      "fact_ids": [
+        "fx-touches_in_opponent_half-home-last-5m-to-t4225-76",
+        "fx-high_turnovers-home-last-5m-to-t4225-76"
+      ],
+      "checker": "1/1 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 7467,
+      "narrator_ms": 2320,
+      "tokens_in": 3973,
+      "tokens_out": 227
+    },
+    {
+      "id": "cl-001664-counter_goal-01",
+      "fixture": "fx-01",
+      "beat": "bt-001664-counter_goal",
+      "minute": 74,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth take the lead as Whitcombe finishes the counter, a 12 s move that ends with a 0.17 xG strike.",
+      "draft_text": "Rivermouth take the lead as Whitcombe finishes the counter, a 12 s move that ends with a 0.17 xG strike.",
+      "verdict": "STANDS",
+      "reason_bucket": null,
+      "reasons": [],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-shot-ev-001664-shooter",
+        "fx-sequence-ev-001664-seconds",
+        "fx-shot-ev-001664-xg",
+        "fx-shot-ev-001664-outcome",
+        "fx-lead-ev-001664"
+      ],
+      "checker": "2/2 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 3615,
+      "narrator_ms": 1900,
+      "tokens_in": 1934,
+      "tokens_out": 105
+    },
+    {
+      "id": "cl-001374-momentum_swing-01",
+      "fixture": "fx-01",
+      "beat": "bt-001374-momentum_swing",
+      "minute": 76,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth have taken over since the red card, owning 60% of the ball while Ashford Vale are defending 27 metres deeper than before.",
+      "draft_text": "Rivermouth have taken over since the red card, owning 60% of the ball and forcing Ashford Vale to defend 27 metres deeper.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "'deeper' compares, but no before or change fact is cited."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-possession_share-home-since-ev-001374-to-t4519-00",
+        "fx-back_line_change-away-ev-001374-to-t4519-00"
+      ],
+      "checker": "1/2 numbers matched",
+      "auditor": "not audited",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 3732,
+      "narrator_ms": 1889,
+      "tokens_in": 3846,
+      "tokens_out": 184
+    },
+    {
+      "id": "cl-001767-high_turnover_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-001767-high_turnover_chance",
+      "minute": 78,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth win the ball 26 metres out and Fenwick-Ode rifles a saved effort after an 8 s move, a 0.19 xG chance.",
+      "draft_text": "Rivermouth win the ball 26 metres out and Fenwick-Ode fires a saved shot after an 8 s break in play, a 0.19 xG chance.",
+      "verdict": "AMENDED",
+      "reason_bucket": "timing",
+      "reasons": [
+        "Second reviewer (wrong_time): The 8 s fact is time from the start of the move to the shot, not a break in play.; Judge, asked again (wrong_time): The fact gives 8 s as time from the start of the move to the shot, not a break in play, so describing it as a break in play is unsupported."
+      ],
+      "failed_span": "fires a saved shot after an 8 s break in play,",
+      "corrected_span": "rifles a saved effort after an 8 s move,",
+      "fact_ids": [
+        "fx-sequence-ev-001767-ball_won_distance",
+        "fx-sequence-ev-001767-seconds",
+        "fx-shot-ev-001767-xg",
+        "fx-shot-ev-001767-outcome",
+        "fx-shot-ev-001767-shooter"
+      ],
+      "checker": "3/3 numbers matched",
+      "auditor": "disagree (wrong_time)",
+      "referee_split": null,
+      "corrected_by_consensus": true,
+      "latency_ms": 3612,
+      "narrator_ms": 2103,
+      "tokens_in": 1874,
+      "tokens_out": 115
+    },
+    {
+      "id": "cl-001962-open_play_goal-01",
+      "fixture": "fx-01",
+      "beat": "bt-001962-open_play_goal",
+      "minute": 87,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Quain scores for Rivermouth with the shot on target to make it 2–0.",
+      "draft_text": "Quain scores for Rivermouth, a composed finish after a 77 s, 13-pass move to make it 2–0.",
+      "verdict": "AMENDED",
+      "reason_bucket": "numbers",
+      "reasons": [
+        "Cited fact fx-shot-ev-001962-seconds is not in the beat's fact bundle.",
+        "The number \"77\" matches no display rendering of the cited facts.",
+        "Voice rule evaluative-adjective broken by \"composed\": A judgement the data cannot support; say what happened."
+      ],
+      "failed_span": "Rivermouth, a composed finish after a 77 s, 13-pass move",
+      "corrected_span": "Rivermouth with the shot on target",
+      "fact_ids": [
+        "fx-shot-ev-001962-shooter",
+        "fx-shot-ev-001962-on_target",
+        "fx-score_after-ev-001962"
+      ],
+      "checker": "2/2 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 7578,
+      "narrator_ms": 1980,
+      "tokens_in": 4112,
+      "tokens_out": 266
+    },
+    {
+      "id": "cl-001962-open_play_goal-02",
+      "fixture": "fx-01",
+      "beat": "bt-001962-open_play_goal",
+      "minute": 87,
+      "candidate": "gpt-5-mini",
+      "scored": false,
+      "lost": null,
+      "text": "The finish arrives after a 13-pass move that began in the 86′ and ended in the 87′.",
+      "draft_text": "The goal came from 93 metres out, underlining how patient that build-up was.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (overclaim): Saying it 'underlines how patient that build-up was' asserts a characteristic (patient build-up) not supported by the distance fact."
+      ],
+      "failed_span": "goal came from 93 metres out, underlining how patient that build-up was.",
+      "corrected_span": "finish arrives after a 13-pass move that began in the 86′ and ended in the 87′.",
+      "fact_ids": [
+        "fx-sequence-ev-001962-passes",
+        "fx-sequence-ev-001962-start_clock",
+        "fx-sequence-ev-001962-shot_clock"
+      ],
+      "checker": "3/3 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 7578,
+      "narrator_ms": 1980,
+      "tokens_in": 4112,
+      "tokens_out": 266
+    },
+    {
+      "id": "cl-001981-high_turnover_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-001981-high_turnover_chance",
+      "minute": 89,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Ashford Vale win the ball 30 metres out and Throgmorton lets fly after 5 seconds, but it's wide, a 0.08 xG chance.",
+      "draft_text": "Ashford Vale win the ball 30 metres out and Throgmorton lets fly after 5 seconds, but it's wide, a 0.08 xG chance.",
+      "verdict": "STANDS",
+      "reason_bucket": null,
+      "reasons": [],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-sequence-ev-001981-ball_won_distance",
+        "fx-sequence-ev-001981-seconds",
+        "fx-shot-ev-001981-xg",
+        "fx-shot-ev-001981-outcome",
+        "fx-shot-ev-001981-shooter"
+      ],
+      "checker": "3/3 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 3977,
+      "narrator_ms": 2290,
+      "tokens_in": 1874,
+      "tokens_out": 112
+    },
+    {
+      "id": "cl-001664-momentum_swing-01",
+      "fixture": "fx-01",
+      "beat": "bt-001664-momentum_swing",
+      "minute": 89,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth lead 1–0 and have kept 74% of the ball since the goal, starving Ashford of possession.",
+      "draft_text": "Rivermouth lead 1–0 and have taken control, with 74% of the ball since the goal.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (overclaim): 'have taken control' asserts dominance not supported by possession percentage alone."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-score_after-ev-001664",
+        "fx-possession_share-home-since-ev-001664-to-t5300-00"
+      ],
+      "checker": "3/3 numbers matched",
+      "auditor": "confirms (overclaim)",
+      "referee_split": false,
+      "corrected_by_consensus": false,
+      "latency_ms": 8063,
+      "narrator_ms": 2255,
+      "tokens_in": 3679,
+      "tokens_out": 219
+    },
+    {
+      "id": "cl-001664-momentum_swing-02",
+      "fixture": "fx-01",
+      "beat": "bt-001664-momentum_swing",
+      "minute": 89,
+      "candidate": "gpt-5-mini",
+      "scored": false,
+      "lost": null,
+      "text": "Rivermouth's back line has dropped 6 metres and now sits 30 metres from goal.",
+      "draft_text": "Their back line has dropped 6 metres, sitting 30 metres from goal as they hold onto the advantage.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Second reviewer (overclaim): Facts only show Rivermouth's back line dropped 6m to 30m since their goal; they do not state any advantage or that the side is holding one.; Judge, asked again (overclaim): The facts support the 6m drop to 30m but do not state that Rivermouth are 'holding onto the advantage'."
+      ],
+      "failed_span": "Their back line has dropped 6 metres, sitting 30 metres from goal as they hold onto the advantage.",
+      "corrected_span": "Rivermouth's back line has dropped 6 metres and now sits 30 metres from goal.",
+      "fact_ids": [
+        "fx-back_line_change-home-ev-001664-to-t5300-00",
+        "fx-back_line_height-home-since-ev-001664-to-t5300-00"
+      ],
+      "checker": "2/2 numbers matched",
+      "auditor": "disagree (overclaim)",
+      "referee_split": null,
+      "corrected_by_consensus": true,
+      "latency_ms": 8063,
+      "narrator_ms": 2255,
+      "tokens_in": 3679,
+      "tokens_out": 219
+    },
+    {
+      "id": "cl-002101-high_turnover_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-002101-high_turnover_chance",
+      "minute": 94,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth win it 25 metres out and Pryce shoots 5 seconds later, the effort blocked, a 0.10 xG chance in stoppage time.",
+      "draft_text": "Rivermouth win it 25 metres out and Pryce shoots 5 seconds later, the effort blocked, a 0.10 xG chance in stoppage time.",
+      "verdict": "STANDS",
+      "reason_bucket": null,
+      "reasons": [],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-sequence-ev-002101-ball_won_distance",
+        "fx-sequence-ev-002101-seconds",
+        "fx-shot-ev-002101-shooter",
+        "fx-shot-ev-002101-outcome",
+        "fx-shot-ev-002101-xg",
+        "fx-sequence-ev-002101-start_clock"
+      ],
+      "checker": "3/3 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 3541,
+      "narrator_ms": 1872,
+      "tokens_in": 1880,
+      "tokens_out": 124
+    },
+    {
+      "id": "cl-002178-high_turnover_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-002178-high_turnover_chance",
+      "minute": 98,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Ashford's late chance: Dunmore shoots from close after they win it 10 metres out and it's saved, a 0.23 xG look in the 90+8′.",
+      "draft_text": "Ashford's late chance: Dunmore shoots from close after they win it 10 metres out and it's saved, a 0.23 xG look in the 90+8′.",
+      "verdict": "STANDS",
+      "reason_bucket": null,
+      "reasons": [],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-shot-ev-002178-shooter",
+        "fx-sequence-ev-002178-ball_won_distance",
+        "fx-shot-ev-002178-outcome",
+        "fx-shot-ev-002178-xg",
+        "fx-shot-ev-002178-minute"
+      ],
+      "checker": "4/4 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 3827,
+      "narrator_ms": 1977,
+      "tokens_in": 1880,
+      "tokens_out": 114
+    },
+    {
+      "id": "cl-001962-momentum_swing-01",
+      "fixture": "fx-01",
+      "beat": "bt-001962-momentum_swing",
+      "minute": 99,
+      "candidate": "gpt-5-mini",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth lead 2–0 and have 56 per cent of the possession since the goal.",
+      "draft_text": "Rivermouth lead 2–0 and have the upper hand after that goal, their share of possession easing to 56 per cent since it went in.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (overclaim): 'have the upper hand' is a state of control not supported by score or possession facts."
+      ],
+      "failed_span": "the upper hand after that goal, their share of possession easing to 56 per cent since it went in.",
+      "corrected_span": "56 per cent of the possession since the goal.",
+      "fact_ids": [
+        "fx-score_after-ev-001962",
+        "fx-possession_share-home-since-ev-001962-to-t5881-42"
+      ],
+      "checker": "3/3 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 7318,
+      "narrator_ms": 1883,
+      "tokens_in": 3355,
+      "tokens_out": 157
+    },
+    {
+      "id": "cl-000544-high_turnover_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-000544-high_turnover_chance",
+      "minute": 24,
+      "candidate": "gpt-5-nano",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth win it in 24′ and Pryce shoots, blocked on the line, the move still alive.",
+      "draft_text": "Rivermouth win it 8 seconds into a quick move and Pryce unleashes a strike that's blocked on the line, chance still alive.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "names",
+      "reasons": [
+        "The player \"Pryce\" is not named by any cited fact."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-shot-ev-000544-minute",
+        "fx-shot-ev-000544-on_target",
+        "fx-shot-ev-000544-outcome",
+        "fx-sequence-ev-000544-seconds"
+      ],
+      "checker": "1/1 numbers matched",
+      "auditor": "not audited",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 5784,
+      "narrator_ms": 3384,
+      "tokens_in": 3906,
+      "tokens_out": 209
+    },
+    {
+      "id": "cl-000588-territorial_spell-01",
+      "fixture": "fx-01",
+      "beat": "bt-000588-territorial_spell",
+      "minute": 33,
+      "candidate": "gpt-5-nano",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth press Ashford Vale high and win it back in the Ashford half, and Rivermouth stay on top of the move.",
+      "draft_text": "Rivermouth presses Ashford Vale high, and Rivermouth win it back in the Ashford half.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (overclaim): Facts show Rivermouth had 0 high turnovers (no high presses won) and only 42% share in opposition half, so claiming they 'press Ashford Vale high' and 'win it back in the Ashford half' overstates their control and an event not supported by the turnover fact."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-territory-home-last-7m-to-t1922-38",
+        "fx-high_turnovers-home-last-7m-to-t1922-38",
+        "fx-possession_share-away-last-7m-to-t1922-38"
+      ],
+      "checker": "no numbers",
+      "auditor": "confirms (overclaim)",
+      "referee_split": false,
+      "corrected_by_consensus": false,
+      "latency_ms": 7535,
+      "narrator_ms": 2001,
+      "tokens_in": 3983,
+      "tokens_out": 196
+    },
+    {
+      "id": "cl-000970-big_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-000970-big_chance",
+      "minute": 42,
+      "candidate": "gpt-5-nano",
+      "scored": true,
+      "lost": "rejected",
+      "text": "Ashford Vale have a big chance as Kowal shoots at 42′, a 0.3 xG moment that nearly changes the game.",
+      "draft_text": "Ashford Vale have a big chance as Kowal shoots at 42′, a 0.3 xG moment that nearly changes the game.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "citation",
+      "reasons": [
+        "Unknown fact id fx-shot-ev-000970-seconds."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-shot-ev-000970-minute",
+        "fx-shot-ev-000970-on_target",
+        "fx-shot-ev-000970-shooter",
+        "fx-shot-ev-000970-xg",
+        "fx-shot-ev-000970-outcome",
+        "fx-shot-ev-000970-seconds",
+        "fx-sequence-ev-000970-start_clock",
+        "fx-freeze_frame-ev-000970-attackers_v_defenders",
+        "fx-freeze_frame-ev-000970-defenders_between_ball_and_goal"
+      ],
+      "checker": "not checked",
+      "auditor": "not audited",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": null,
+      "narrator_ms": null,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "id": "cl-000996-high_turnover_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-000996-high_turnover_chance",
+      "minute": 43,
+      "candidate": "gpt-5-nano",
+      "scored": true,
+      "lost": null,
+      "text": "Ashford Vale push at 43′ as Throgmorton drives a 0.3 xG chance wide from the move.",
+      "draft_text": "Ashford Vale push at 43′, Throgmorton drives a 0.3 xG chance wide after 3 seconds from the move.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "names",
+      "reasons": [
+        "Cited fact fx-sequence-ev-000996-shooter is not in the beat's fact bundle.",
+        "The player \"Throgmorton\" is not named by any cited fact."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-shot-ev-000996-minute",
+        "fx-shot-ev-000996-shooter",
+        "fx-shot-ev-000996-xg",
+        "fx-shot-ev-000996-outcome",
+        "fx-sequence-ev-000996-seconds",
+        "fx-sequence-ev-000996-start_clock",
+        "fx-freeze_frame-ev-000996-attackers_v_defenders",
+        "fx-freeze_frame-ev-000996-defenders_between_ball_and_goal"
+      ],
+      "checker": "2/2 numbers matched",
+      "auditor": "supports",
+      "referee_split": true,
+      "corrected_by_consensus": false,
+      "latency_ms": 8340,
+      "narrator_ms": 2082,
+      "tokens_in": 3967,
+      "tokens_out": 291
+    },
+    {
+      "id": "cl-001053-high_turnover_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-001053-high_turnover_chance",
+      "minute": 46,
+      "candidate": "gpt-5-nano",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth attack ends with Pryce shooting true at 45+1′, saved on the line.",
+      "draft_text": "Rivermouth win it 6 metres from goal and Pryce fires a 0.3 xG shot at 45+1′, saved on the line.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "numbers",
+      "reasons": [
+        "The number \"6\" matches no display rendering of the cited facts.",
+        "The number \"0.3\" matches no display rendering of the cited facts.",
+        "The player \"Pryce\" is not named by any cited fact."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-shot-ev-001053-minute",
+        "fx-shot-ev-001053-on_target",
+        "fx-shot-ev-001053-outcome",
+        "fx-sequence-ev-001053-start_clock",
+        "fx-sequence-ev-001053-shot_clock"
+      ],
+      "checker": "2/2 numbers matched",
+      "auditor": "not audited",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 4100,
+      "narrator_ms": 1921,
+      "tokens_in": 3962,
+      "tokens_out": 217
+    },
+    {
+      "id": "cl-000996-territorial_spell-01",
+      "fixture": "fx-01",
+      "beat": "bt-000996-territorial_spell",
+      "minute": 48,
+      "candidate": "gpt-5-nano",
+      "scored": true,
+      "lost": null,
+      "text": "Rivermouth press and win it back high up, then drive 2 shots in the latest spell of play.",
+      "draft_text": "Rivermouth press and win it back high up, then drive 2 shots in the latest spell of play.",
+      "verdict": "STANDS",
+      "reason_bucket": null,
+      "reasons": [],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-high_turnovers-home-last-5m-to-t2837-35",
+        "fx-shots-home-last-5m-to-t2837-35"
+      ],
+      "checker": "1/1 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 5096,
+      "narrator_ms": 2086,
+      "tokens_in": 3977,
+      "tokens_out": 232
+    },
+    {
+      "id": "cl-000996-territorial_spell-02",
+      "fixture": "fx-01",
+      "beat": "bt-000996-territorial_spell",
+      "minute": 48,
+      "candidate": "gpt-5-nano",
+      "scored": false,
+      "lost": null,
+      "text": "Rivermouth have 57% possession in the last spell as Ashford Vale defend in their half.",
+      "draft_text": "Rivermouth have 57% possession in the last spell as Ashford Vale defend in their half.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (overclaim): Fact gives Ashford Vale share of play in the opposition half (45%), not that they are defending in their half, so 'defend in their half' overclaims area/role."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-possession_share-home-last-5m-to-t2837-35",
+        "fx-territory-away-last-5m-to-t2837-35"
+      ],
+      "checker": "1/1 numbers matched",
+      "auditor": "confirms (overclaim)",
+      "referee_split": false,
+      "corrected_by_consensus": false,
+      "latency_ms": 5096,
+      "narrator_ms": 2086,
+      "tokens_in": 3977,
+      "tokens_out": 232
+    },
+    {
+      "id": "cl-001100-high_turnover_chance-01",
+      "fixture": "fx-01",
+      "beat": "bt-001100-high_turnover_chance",
+      "minute": 48,
+      "candidate": "gpt-5-nano",
+      "scored": true,
+      "lost": "rejected",
+      "text": "Rivermouth win the ball in the 39-m zone and Whitcombe fires a 11-second move, low xG 0.10, but the shot misses wide.",
+      "draft_text": "Rivermouth win the ball in the 39-m zone and Whitcombe fires a 11-second move, low xG 0.10, but the shot misses wide.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "citation",
+      "reasons": [
+        "Unknown fact id fx-shot-ev-001100-min."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-shot-ev-001100-xg",
+        "fx-shot-ev-001100-outcome",
+        "fx-shot-ev-001100-minute",
+        "fx-sequence-ev-001100-seconds",
+        "fx-sequence-ev-001100-passes",
+        "fx-sequence-ev-001100-ball_won_distance",
+        "fx-freeze_frame-ev-001100-attackers_v_defenders",
+        "fx-freeze_frame-ev-001100-attackers_ahead_of_ball",
+        "fx-freeze_frame-ev-001100-zone_attackers",
+        "fx-freeze_frame-ev-001100-zone_defenders",
+        "fx-freeze_frame-ev-001100-defenders_between_ball_and_goal",
+        "fx-freeze_frame-ev-001100-defenders_drawn",
+        "fx-freeze_frame-ev-001100-shooter_nearest_defender"
+      ],
+      "checker": "not checked",
+      "auditor": "not audited",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": null,
+      "narrator_ms": null,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "id": "cl-001374-card-01",
+      "fixture": "fx-01",
+      "beat": "bt-001374-card",
+      "minute": 61,
+      "candidate": "gpt-5-nano",
+      "scored": true,
+      "lost": null,
+      "text": "Ashford Vale go down to 10 after Abernathy's straight red at 61′.",
+      "draft_text": "Ashford Vale go down to 10 after Abernathy's straight red at 61′, and Rivermouth sense the chances to push on.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (motive): 'Rivermouth sense the chances to push on' assigns intent/motive not supported by the facts."
+      ],
+      "failed_span": "61′, and Rivermouth sense the chances to push on.",
+      "corrected_span": "61′.",
+      "fact_ids": [
+        "fx-card-ev-001374-kind",
+        "fx-card-ev-001374-player",
+        "fx-card-ev-001374-players_after",
+        "fx-card-ev-001374-minute"
+      ],
+      "checker": "2/2 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
+      "corrected_by_consensus": false,
+      "latency_ms": 5485,
+      "narrator_ms": 1232,
+      "tokens_in": 3055,
+      "tokens_out": 174
     },
     {
       "id": "cl-001489-territorial_spell-01",
@@ -849,50 +1086,29 @@
       "minute": 71,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Rivermouth press and win it back high, then push into Ashford Vale's half.",
-      "draft_text": "Rivermouth press and win it back high, then push into Ashford Vale's half.",
-      "verdict": "HELD",
-      "reason_bucket": null,
-      "reasons": [],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
-        "fx-high_turnovers-home-last-5m-to-t4225-76",
-        "fx-touches_in_opponent_half-home-last-5m-to-t4225-76"
-      ],
-      "checker": "no numbers",
-      "auditor": "not audited",
-      "corrected_by_consensus": false,
-      "latency_ms": 7306,
-      "tokens_in": 3918,
-      "tokens_out": 199
-    },
-    {
-      "id": "cl-001489-territorial_spell-02",
-      "fixture": "fx-01",
-      "beat": "bt-001489-territorial_spell",
-      "minute": 71,
-      "candidate": "gpt-5-nano",
-      "scored": false,
-      "text": "Rivermouth keep 72% of the ball in the latest spell, and Ashford Vale tightens in their own half.",
-      "draft_text": "Rivermouth dominate the spell with 72% possession in the latest period.",
+      "lost": null,
+      "text": "Rivermouth dominate the spell, 72% of the ball in the latest stretch.",
+      "draft_text": "Rivermouth presses high and grabs 72% of the ball in the latest spell, and Ashford Vale struggle to clear as Rivermouth push for a breakthrough.",
       "verdict": "OVERTURNED",
       "reason_bucket": "overclaim",
       "reasons": [
-        "Judge (overclaim): 'dominate the spell' asserts control beyond the measured possession share; 72% possession is a figure but 'dominate' is an unmeasured qualitative claim."
+        "Judge (motive): 'push for a breakthrough' attributes intent/motive not stated in the facts."
       ],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
+        "fx-shots-home-last-5m-to-t4225-76",
         "fx-possession_share-home-last-5m-to-t4225-76",
-        "fx-territory-away-last-5m-to-t4225-76"
+        "fx-territory-home-last-5m-to-t4225-76"
       ],
       "checker": "1/1 numbers matched",
-      "auditor": "not audited",
+      "auditor": "confirms (overclaim)",
+      "referee_split": false,
       "corrected_by_consensus": false,
-      "latency_ms": 7306,
-      "tokens_in": 3918,
-      "tokens_out": 199
+      "latency_ms": 5700,
+      "narrator_ms": 1997,
+      "tokens_in": 3949,
+      "tokens_out": 195
     },
     {
       "id": "cl-001664-counter_goal-01",
@@ -901,55 +1117,38 @@
       "minute": 74,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Rivermouth break through Whitcombe, a 12-second move ends in a goal that opens the scoring.",
-      "draft_text": "Rivermouth break through Whitcombe, a 12-second move ends in a 0.17 xG shot that opens the scoring.",
+      "lost": null,
+      "text": "Rivermouth take the lead as Whitcombe fires in from 12 seconds, a 0.2 xG chance.",
+      "draft_text": "Rivermouth break as Whitcombe fires in from 12 seconds of passing, 74′ move, to put them 1–0 up.",
       "verdict": "OVERTURNED",
       "reason_bucket": "numbers",
       "reasons": [
+        "Cited fact fx-sh... is not in the beat's fact bundle.",
         "The number \"12\" matches no display rendering of the cited facts.",
+        "The number \"74′\" matches no display rendering of the cited facts.",
+        "The number \"1\" matches no display rendering of the cited facts.",
+        "The number \"0\" matches no display rendering of the cited facts.",
         "The player \"Whitcombe\" is not named by any cited fact."
       ],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
+        "fx-shot-ev-001664-on_target",
         "fx-shot-ev-001664-minute",
-        "fx-shot-ev-001664-outcome",
-        "fx-sequence-ev-001664-seconds"
-      ],
-      "checker": "1/1 numbers matched",
-      "auditor": "not audited",
-      "corrected_by_consensus": false,
-      "latency_ms": 4806,
-      "tokens_in": 4099,
-      "tokens_out": 303
-    },
-    {
-      "id": "cl-001664-counter_goal-02",
-      "fixture": "fx-01",
-      "beat": "bt-001664-counter_goal",
-      "minute": 74,
-      "candidate": "gpt-5-nano",
-      "scored": false,
-      "text": "Rivermouth lead as the move finishes with a Whitcombe strike after a 4-pass move and a 77 m sprint from the ball.",
-      "draft_text": "Rivermouth lead as the move finishes with a Whitcombe goal after 4 passes and a 77 m ball sprint.",
-      "verdict": "OVERTURNED",
-      "reason_bucket": "names",
-      "reasons": [
-        "The player \"Whitcombe\" is not named by any cited fact."
-      ],
-      "failed_span": null,
-      "corrected_span": null,
-      "fact_ids": [
+        "fx-shot-ev-001664-shooter",
+        "fx-sequence-ev-001664-seconds",
         "fx-sequence-ev-001664-passes",
-        "fx-sequence-ev-001664-ball_won_distance",
-        "fx-score_after-ev-001664"
+        "fx-score_after-ev-001664",
+        "fx-lead-ev-001664"
       ],
-      "checker": "2/2 numbers matched",
+      "checker": "1/2 numbers matched",
       "auditor": "not audited",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 4806,
-      "tokens_in": 4099,
-      "tokens_out": 303
+      "latency_ms": 3448,
+      "narrator_ms": 1520,
+      "tokens_in": 4063,
+      "tokens_out": 177
     },
     {
       "id": "cl-001374-momentum_swing-01",
@@ -958,50 +1157,29 @@
       "minute": 76,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Ashford Vale drop 9 m deeper and tighten up after the red card.",
-      "draft_text": "Rivermouth push for a quick switch after the red card, with their possession at 60% since then.",
-      "verdict": "AMENDED",
-      "reason_bucket": "citation",
+      "lost": null,
+      "text": "Rivermouth take 60% of the ball since the red card, Ashford Vale defend deeper, and Rivermouth push to a sharper shape.",
+      "draft_text": "Ashford Vale press and Rivermouth stay compact after the red card, 60% possession for Rivermouth since then.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "overclaim",
       "reasons": [
-        "Cited fact fx-1301 is not in the beat's fact bundle."
+        "Judge (unsupported_cause): Saying Rivermouth 'stay compact after the red card' asserts a defensive shape consequence not supported by possession facts; only possession percentages since the red card are given."
       ],
-      "failed_span": "Rivermouth push for a quick switch after the red card, with their possession at 60% since then.",
-      "corrected_span": "Ashford Vale drop 9 m deeper and tighten up after the red card.",
-      "fact_ids": [
-        "fx-back_line_change-away-ev-001374-to-t4519-00",
-        "fx-compactness_change-away-ev-001374-to-t4519-00"
-      ],
-      "checker": "1/1 numbers matched",
-      "auditor": "agree",
-      "corrected_by_consensus": false,
-      "latency_ms": 8072,
-      "tokens_in": 3858,
-      "tokens_out": 208
-    },
-    {
-      "id": "cl-001374-momentum_swing-02",
-      "fixture": "fx-01",
-      "beat": "bt-001374-momentum_swing",
-      "minute": 76,
-      "candidate": "gpt-5-nano",
-      "scored": false,
-      "text": "Ashford Vale drop 9 m deeper and tighten up after the red card, reshaping the defence.",
-      "draft_text": "Ashford Vale drop 9 m deeper and tighten up after the red card, reshaping the defence.",
-      "verdict": "STANDS",
-      "reason_bucket": null,
-      "reasons": [],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
+        "fx-possession_share-home-since-ev-001374-to-t4519-00",
         "fx-back_line_change-away-ev-001374-to-t4519-00",
-        "fx-compactness_change-away-ev-001374-to-t4519-00"
+        "fx-compactness-away-since-ev-001374-to-t4519-00"
       ],
       "checker": "1/1 numbers matched",
-      "auditor": "agree",
+      "auditor": "confirms (overclaim)",
+      "referee_split": false,
       "corrected_by_consensus": false,
-      "latency_ms": 8072,
-      "tokens_in": 3858,
-      "tokens_out": 208
+      "latency_ms": 6428,
+      "narrator_ms": 1790,
+      "tokens_in": 3866,
+      "tokens_out": 197
     },
     {
       "id": "cl-001767-high_turnover_chance-01",
@@ -1010,8 +1188,9 @@
       "minute": 78,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Rivermouth attack as Fenwick-Ode shoots after an 8-second move, his effort on target but saved.",
-      "draft_text": "Rivermouth win it in the 78th minute and Fenwick-Ode shoots, his effort saved after an 8-second move.",
+      "lost": null,
+      "text": "Rivermouth move at 78′, Fenwick-Ode shoots from 26 metres after 8 seconds, and the shot is on target.",
+      "draft_text": "Rivermouth strike at 78′, Fenwick-Ode shoots from 26 metres after 8 seconds of the move, but it's saved and on target.",
       "verdict": "OVERTURNED",
       "reason_bucket": "names",
       "reasons": [
@@ -1021,16 +1200,19 @@
       "corrected_span": null,
       "fact_ids": [
         "fx-shot-ev-001767-minute",
+        "fx-sequence-ev-001767-seconds",
+        "fx-sequence-ev-001767-ball_won_distance",
         "fx-shot-ev-001767-on_target",
-        "fx-shot-ev-001767-outcome",
-        "fx-sequence-ev-001767-seconds"
+        "fx-shot-ev-001767-outcome"
       ],
-      "checker": "1/1 numbers matched",
+      "checker": "3/3 numbers matched",
       "auditor": "not audited",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 4224,
-      "tokens_in": 3883,
-      "tokens_out": 182
+      "latency_ms": 3367,
+      "narrator_ms": 1681,
+      "tokens_in": 3901,
+      "tokens_out": 219
     },
     {
       "id": "cl-001962-open_play_goal-01",
@@ -1039,27 +1221,29 @@
       "minute": 87,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Rivermouth strike as Quain finishes from 87′, a 0.14 xG moment.",
-      "draft_text": "Rivermouth extends the lead as Quain finishes from 87′, a 0.14 xG moment.",
-      "verdict": "AMENDED",
+      "lost": null,
+      "text": "Rivermouth finish from Quain seals the move at 87′.",
+      "draft_text": "Rivermouth move the ball smartly to Quain who buries it from 87′, sealing the move with a clean finish.",
+      "verdict": "OVERTURNED",
       "reason_bucket": "overclaim",
       "reasons": [
-        "'extends' compares, but no before or change fact is cited."
+        "Judge (overclaim): Calling the build-up \"smartly\" and the finish \"clean\" evaluates how they were done, which the facts do not measure."
       ],
-      "failed_span": "extends the lead",
-      "corrected_span": "strike",
+      "failed_span": null,
+      "corrected_span": null,
       "fact_ids": [
         "fx-shot-ev-001962-minute",
         "fx-shot-ev-001962-shooter",
-        "fx-shot-ev-001962-outcome",
-        "fx-shot-ev-001962-xg"
+        "fx-shot-ev-001962-outcome"
       ],
-      "checker": "2/2 numbers matched",
-      "auditor": "agree",
+      "checker": "1/1 numbers matched",
+      "auditor": "supports",
+      "referee_split": true,
       "corrected_by_consensus": false,
-      "latency_ms": 5292,
-      "tokens_in": 3980,
-      "tokens_out": 172
+      "latency_ms": 6098,
+      "narrator_ms": 1849,
+      "tokens_in": 3992,
+      "tokens_out": 149
     },
     {
       "id": "cl-001981-high_turnover_chance-01",
@@ -1068,28 +1252,65 @@
       "minute": 89,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Ashford Vale win it 89′ and Throgmorton shoots from 30 metres, a 0.08 xG chance.",
-      "draft_text": "Ashford win it at 89′ and Throgmorton shoots from 30 metres, a 0.08 xG chance that flies wide.",
+      "lost": null,
+      "text": "Ashford Vale win it high up and Throgmorton shoots wide from 30 metres, 89′ move.",
+      "draft_text": "Ashford Vale win it high up and Throgmorton shoots wide from 30 metres, 5 seconds into the move.",
       "verdict": "OVERTURNED",
-      "reason_bucket": "overclaim",
+      "reason_bucket": "names",
       "reasons": [
-        "Judge (overclaim): 'Ashford win it' claims they won the ball but facts only state where the ball was won (distance) and by whom for the shot sequence; it asserts a team-level turnover ('win it') not supported by the cited facts."
+        "The player \"Throgmorton\" is not named by any cited fact."
       ],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
-        "fx-shot-ev-001981-minute",
-        "fx-shot-ev-001981-shooter",
-        "fx-sequence-ev-001981-ball_won_distance",
         "fx-shot-ev-001981-outcome",
-        "fx-shot-ev-001981-xg"
+        "fx-shot-ev-001981-minute",
+        "fx-sequence-ev-001981-seconds",
+        "fx-sequence-ev-001981-ball_won_distance",
+        "fx-freeze_frame-ev-001981-attackers_v_defenders",
+        "fx-freeze_frame-ev-001981-defenders_between_ball_and_goal",
+        "fx-freeze_frame-ev-001981-zone_attackers",
+        "fx-freeze_frame-ev-001981-zone_defenders",
+        "fx-freeze_frame-ev-001981-shooter_nearest_defender"
       ],
-      "checker": "3/3 numbers matched",
+      "checker": "2/2 numbers matched",
       "auditor": "not audited",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 8859,
-      "tokens_in": 3935,
-      "tokens_out": 209
+      "latency_ms": 6092,
+      "narrator_ms": 2109,
+      "tokens_in": 4041,
+      "tokens_out": 374
+    },
+    {
+      "id": "cl-001981-high_turnover_chance-02",
+      "fixture": "fx-01",
+      "beat": "bt-001981-high_turnover_chance",
+      "minute": 89,
+      "candidate": "gpt-5-nano",
+      "scored": false,
+      "lost": null,
+      "text": "The shot finishes 0.08 xG quality, a late warning for Rivermouth.",
+      "draft_text": "The shot finishes 0.08 xG quality, a late warning for Rivermouth.",
+      "verdict": "OVERTURNED",
+      "reason_bucket": "overclaim",
+      "reasons": [
+        "Judge (overclaim): Calling it \"a late warning for Rivermouth\" attributes an effect/impact on Rivermouth not stated by the shot xG and minute facts."
+      ],
+      "failed_span": null,
+      "corrected_span": null,
+      "fact_ids": [
+        "fx-shot-ev-001981-xg",
+        "fx-shot-ev-001981-minute"
+      ],
+      "checker": "1/1 numbers matched",
+      "auditor": "confirms (overclaim)",
+      "referee_split": false,
+      "corrected_by_consensus": false,
+      "latency_ms": 6092,
+      "narrator_ms": 2109,
+      "tokens_in": 4041,
+      "tokens_out": 374
     },
     {
       "id": "cl-001664-momentum_swing-01",
@@ -1098,23 +1319,27 @@
       "minute": 89,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Rivermouth lead as their back line drops 6 m after the goal.",
-      "draft_text": "Rivermouth lead as their back line drops 6 m after the goal.",
+      "lost": null,
+      "text": "Rivermouth lead after the goal, their back line drops 6 m and their possession climbs to 74% since then.",
+      "draft_text": "Rivermouth lead after the goal, their back line drops 6 m and their possession climbs to 74% since then.",
       "verdict": "STANDS",
       "reason_bucket": null,
       "reasons": [],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
+        "fx-lead-ev-001664",
         "fx-back_line_change-home-ev-001664-to-t5300-00",
-        "fx-score_after-ev-001664"
+        "fx-possession_share-home-since-ev-001664-to-t5300-00"
       ],
-      "checker": "1/1 numbers matched",
-      "auditor": "agree",
+      "checker": "2/2 numbers matched",
+      "auditor": "unavailable",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 3911,
+      "latency_ms": 3469,
+      "narrator_ms": 2211,
       "tokens_in": 1762,
-      "tokens_out": 66
+      "tokens_out": 95
     },
     {
       "id": "cl-002101-high_turnover_chance-01",
@@ -1123,26 +1348,34 @@
       "minute": 94,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Rivermouth win it 90+4′ and Pryce fires a shot from 25 metres that's blocked.",
-      "draft_text": "Rivermouth win it 90+4′ and Pryce fires a 0.10 xG shot that's blocked from 25 metres after 5 seconds of the move.",
+      "lost": null,
+      "text": "Rivermouth win it high up and Pryce shoots at 90+4′, a 0.10 xG chance.",
+      "draft_text": "Rivermouth win it high up and Pryce shoots at 90+4′, a 0.10 xG chance.",
       "verdict": "OVERTURNED",
-      "reason_bucket": "names",
+      "reason_bucket": "overclaim",
       "reasons": [
-        "The player \"Pryce\" is not named by any cited fact."
+        "Judge (motive): Saying 'win it high up' attributes intention/possession action beyond the facts; the facts only show a shot event and its details, not that Rivermouth 'won' the ball high up."
       ],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
-        "fx-shot-ev-002101-minute",
+        "fx-shot-ev-002101-xg",
         "fx-shot-ev-002101-outcome",
-        "fx-sequence-ev-002101-ball_won_distance"
+        "fx-shot-ev-002101-minute",
+        "fx-shot-ev-002101-shooter",
+        "fx-sequence-ev-002101-seconds",
+        "fx-freeze_frame-ev-002101-attackers_v_defenders",
+        "fx-freeze_frame-ev-002101-defenders_between_ball_and_goal",
+        "fx-freeze_frame-ev-002101-shooter_nearest_defender"
       ],
       "checker": "3/3 numbers matched",
-      "auditor": "not audited",
+      "auditor": "confirms (overclaim)",
+      "referee_split": false,
       "corrected_by_consensus": false,
-      "latency_ms": 3438,
-      "tokens_in": 3926,
-      "tokens_out": 207
+      "latency_ms": 7215,
+      "narrator_ms": 1813,
+      "tokens_in": 3982,
+      "tokens_out": 298
     },
     {
       "id": "cl-002178-high_turnover_chance-01",
@@ -1151,29 +1384,39 @@
       "minute": 98,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Ashford Vale push late, Dunmore's 0.23 xG shot from 10 m is saved to keep Rivermouth level.",
-      "draft_text": "Ashford Vale make a late move as Dunmore fires in 0.23 xG from 10 metres, saved to keep Rivermouth level.",
+      "lost": null,
+      "text": "Ashford Vale win it high up and Dunmore shoots at 90+8′, a 0.23 xG chance.",
+      "draft_text": "Ashford Vale win it high up and Dunmore shoots at 90+8′, a 0.23 xG chance.",
       "verdict": "OVERTURNED",
-      "reason_bucket": "names",
+      "reason_bucket": "overclaim",
       "reasons": [
-        "'level' compares, but no before or change fact is cited.",
-        "The player \"Dunmore\" is not named by any cited fact."
+        "Judge (overclaim): 'win it high up' claims location/pressure not supported by the facts (they only show a shot and freeze-frame counts)."
       ],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
         "fx-shot-ev-002178-xg",
         "fx-shot-ev-002178-outcome",
+        "fx-shot-ev-002178-on_target",
         "fx-shot-ev-002178-minute",
-        "fx-sequence-ev-002178-ball_won_distance",
-        "fx-freeze_frame-ev-002178-defenders_between_ball_and_goal"
+        "fx-shot-ev-002178-shooter",
+        "fx-sequence-ev-002178-seconds",
+        "fx-freeze_frame-ev-002178-attackers_v_defenders",
+        "fx-freeze_frame-ev-002178-attackers_ahead_of_ball",
+        "fx-freeze_frame-ev-002178-zone_attackers",
+        "fx-freeze_frame-ev-002178-zone_defenders",
+        "fx-freeze_frame-ev-002178-defenders_between_ball_and_goal",
+        "fx-freeze_frame-ev-002178-defenders_drawn",
+        "fx-freeze_frame-ev-002178-shooter_nearest_defender"
       ],
-      "checker": "2/2 numbers matched",
-      "auditor": "not audited",
+      "checker": "3/3 numbers matched",
+      "auditor": "confirms (overclaim)",
+      "referee_split": false,
       "corrected_by_consensus": false,
-      "latency_ms": 3930,
-      "tokens_in": 3944,
-      "tokens_out": 232
+      "latency_ms": 7904,
+      "narrator_ms": 2297,
+      "tokens_in": 4034,
+      "tokens_out": 430
     },
     {
       "id": "cl-001962-momentum_swing-01",
@@ -1182,25 +1425,28 @@
       "minute": 99,
       "candidate": "gpt-5-nano",
       "scored": true,
-      "text": "Rivermouth lead as the 87th minute passes and the clock drains the last chances.",
-      "draft_text": "Rivermouth lead as the clock ticks after the 87th minute, and they keep 56% of the possession since the goal.",
-      "verdict": "OVERTURNED",
-      "reason_bucket": "numbers",
+      "lost": null,
+      "text": "Rivermouth lead as they keep the ball after the goal, 56% of possession since the strike.",
+      "draft_text": "Rivermouth lead as they press after the goal, with the ball 56% of the time since the strike.",
+      "verdict": "AMENDED",
+      "reason_bucket": "overclaim",
       "reasons": [
-        "The number \"87\" matches no display rendering of the cited facts."
+        "Judge (motive): 'as they press after the goal' assigns intent/behaviour ('press') since the strike that the facts do not state."
       ],
-      "failed_span": null,
-      "corrected_span": null,
+      "failed_span": "press after the goal, with the ball 56% of the time",
+      "corrected_span": "keep the ball after the goal, 56% of possession",
       "fact_ids": [
-        "fx-lead-ev-001962",
+        "fx-possession_share-home-since-ev-001962-to-t5881-42",
         "fx-score_after-ev-001962"
       ],
-      "checker": "0/1 numbers matched",
-      "auditor": "not audited",
+      "checker": "1/1 numbers matched",
+      "auditor": "agree",
+      "referee_split": null,
       "corrected_by_consensus": false,
-      "latency_ms": 6074,
-      "tokens_in": 3434,
-      "tokens_out": 252
+      "latency_ms": 7323,
+      "narrator_ms": 2190,
+      "tokens_in": 3429,
+      "tokens_out": 254
     },
     {
       "id": "cl-001962-momentum_swing-02",
@@ -1209,102 +1455,110 @@
       "minute": 99,
       "candidate": "gpt-5-nano",
       "scored": false,
-      "text": "Rivermouth stay in control with 56% of possession since the goal.",
-      "draft_text": "Ashford Vale chase in the final minutes, but Rivermouth hold firm with 44% of the ball since the goal.",
+      "lost": null,
+      "text": "Ashford Vale push to respond as their share falls to 44% in the chase.",
+      "draft_text": "Ashford Vale push to respond as their possession slips to 44% in the chase.",
       "verdict": "OVERTURNED",
       "reason_bucket": "overclaim",
       "reasons": [
-        "Judge (motive): Saying 'Ashford Vale chase in the final minutes' attributes intent/effort not stated by the possession and score facts."
+        "Judge (motive): 'push to respond' attributes intent/motive not stated in the facts."
       ],
       "failed_span": null,
       "corrected_span": null,
       "fact_ids": [
-        "fx-possession_share-home-since-ev-001962-to-t5881-42",
-        "fx-score_after-ev-001962"
+        "fx-possession_share-away-since-ev-001962-to-t5881-42",
+        "fx-lead-ev-001962"
       ],
       "checker": "1/1 numbers matched",
-      "auditor": "not audited",
+      "auditor": "confirms (motive)",
+      "referee_split": false,
       "corrected_by_consensus": false,
-      "latency_ms": 6074,
-      "tokens_in": 3434,
-      "tokens_out": 252
+      "latency_ms": 7323,
+      "narrator_ms": 2190,
+      "tokens_in": 3429,
+      "tokens_out": 254
     }
   ],
   "errors": [
     {
       "candidate": "gpt-5-nano",
       "fixture": "fx-01",
-      "error": "bt-000544-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000544-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-freeze_frame-ev-000544-ball_won_distance.']}])"
+      "error": "bt-000970-big_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000970-big_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-000970-seconds.']}])"
     },
     {
       "candidate": "gpt-5-nano",
       "fixture": "fx-01",
-      "error": "bt-000970-big_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000970-big_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-000970-shot_clock.']}])"
-    },
-    {
-      "candidate": "gpt-5-nano",
-      "fixture": "fx-01",
-      "error": "bt-001100-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 1, 'claim_id': 'cl-001100-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-freeze_frame-ev-001100-ball_won_distance.']}])"
+      "error": "bt-001100-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001100-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-001100-min.']}])"
     }
   ],
   "summary": [
     {
       "candidate": "gpt-5-mini",
       "claims": 18,
-      "stands": 10,
+      "stands": 9,
       "amended": 7,
-      "overturned": 1,
+      "overturned": 2,
       "held": 0,
-      "pts": 34,
-      "clean_pct": 55.6,
-      "p90_ms": 9189,
-      "usd_per_match": 0.0183,
-      "tokens_per_match": 53875,
+      "pts": 28,
+      "clean_pct": 50.0,
+      "lost": 0,
+      "p90_ms": 2320,
+      "on_air_p90_ms": 7914,
+      "double_checked": 1,
+      "referee_splits": 0,
+      "usd_per_match": 0.0203,
+      "tokens_per_match": 58580,
       "cleared": true,
       "fail_profile": {
-        "overclaim": 0.875,
-        "wording": 0.125
+        "overclaim": 0.667,
+        "wording": 0.111,
+        "timing": 0.111,
+        "numbers": 0.111
       },
       "form": [
         "A"
       ],
       "by_fixture": {
         "fx-01": {
-          "pts": 34,
-          "clean_pct": 55.6
+          "pts": 28,
+          "clean_pct": 50.0
         }
       },
-      "audit_agreement": 0.842
+      "audit_agreement": 0.857
     },
     {
       "candidate": "gpt-5-nano",
-      "claims": 15,
+      "claims": 18,
       "stands": 2,
-      "amended": 3,
-      "overturned": 9,
-      "held": 1,
-      "pts": -18,
-      "clean_pct": 14.3,
-      "p90_ms": 8167,
+      "amended": 2,
+      "overturned": 14,
+      "held": 0,
+      "pts": -34,
+      "clean_pct": 11.1,
+      "lost": 2,
+      "p90_ms": 2297,
+      "on_air_p90_ms": 7904,
+      "double_checked": 7,
+      "referee_splits": 2,
       "usd_per_match": "prices not set",
-      "tokens_per_match": 72109,
+      "tokens_per_match": 72112,
       "cleared": false,
       "fail_profile": {
-        "overclaim": 0.417,
-        "numbers": 0.25,
-        "citation": 0.083,
-        "names": 0.25
+        "names": 0.25,
+        "overclaim": 0.5,
+        "citation": 0.125,
+        "numbers": 0.125
       },
       "form": [
-        "O"
+        "A"
       ],
       "by_fixture": {
         "fx-01": {
-          "pts": -18,
-          "clean_pct": 14.3
+          "pts": -34,
+          "clean_pct": 11.1
         }
       },
-      "audit_agreement": 0.833
+      "audit_agreement": 1.0
     }
   ]
 }

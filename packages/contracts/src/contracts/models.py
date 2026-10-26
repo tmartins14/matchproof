@@ -794,6 +794,16 @@ class Picks(BaseModel):
     ]
 
 
+class Points(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    STANDS: int
+    AMENDED: int
+    OVERTURNED: int
+    HELD: int
+
+
 class Trap1(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -853,6 +863,14 @@ class Moments(BaseModel):
             description="The anchor event's freeze frame; null where it was dropped to keep the file small."
         ),
     ]
+
+
+class ClaimNumber(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    as_written: str
+    fact_id: FactId
 
 
 class NextUpItem(BaseModel):
@@ -1327,6 +1345,12 @@ class TrialsWeb(BaseModel):
             description='Over measured candidates only; each is null when nothing qualifies.'
         ),
     ]
+    points: Annotated[
+        Points,
+        Field(
+            description="The Table's scale: points per scored verdict. The Desk's RECORD tile adds landed claims with it."
+        ),
+    ]
     live_narrator: Annotated[
         str | None,
         Field(
@@ -1344,6 +1368,12 @@ class TrialsWeb(BaseModel):
         dict[str, str],
         Field(
             description='Broadcast clock of each claim row, keyed by its index in results.claims.'
+        ),
+    ]
+    claim_numbers: Annotated[
+        dict[str, list[ClaimNumber]],
+        Field(
+            description="Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Fills claim.numbers on a cached replay."
         ),
     ]
     next_up: list[NextUpItem]

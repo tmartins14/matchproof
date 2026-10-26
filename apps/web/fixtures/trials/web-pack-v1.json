@@ -13511,14 +13511,14 @@
    "fixture": "fx-04",
    "beat": "bt-001725-counter_goal",
    "verdict": "AMENDED",
-   "note": "numbers: Cited fact fx-shot-ev-001725-seconds is not in the beat's fact bundle."
+   "note": "numbers: The number \"12\" matches no display rendering of the cited facts."
   },
   "grok-4.7": null,
   "gpt-5-nano": {
    "fixture": "fx-06",
    "beat": "bt-002191-open_play_goal",
    "verdict": "OVERTURNED",
-   "note": "citation: Unknown fact id fx-shot-ev-002191-seconds."
+   "note": "citation: cited a fact that doesn't exist"
   },
   "phi-4-mini": null
  },
@@ -13580,6 +13580,12 @@
    "p90_ms": 2749,
    "usd_per_match": 0.0171
   }
+ },
+ "points": {
+  "STANDS": 3,
+  "AMENDED": 1,
+  "OVERTURNED": -3,
+  "HELD": 0
  },
  "live_narrator": "gpt-5-mini",
  "fixtures": [
@@ -42308,320 +42314,6 @@
      ]
     }
    },
-   "bt-002174-territorial_spell": {
-    "kind": "territorial_spell",
-    "label": "90+6–90+8′",
-    "clock": "90+8′",
-    "t": 5826.5,
-    "facts": [
-     {
-      "id": "fx-shots-home-last-2m-to-t5826-50",
-      "label": "Rivermouth shots, in the latest spell of play",
-      "text": "1"
-     },
-     {
-      "id": "fx-possession_share-home-last-2m-to-t5826-50",
-      "label": "Rivermouth share of possession, in the latest spell of play",
-      "text": "73%"
-     },
-     {
-      "id": "fx-territory-home-last-2m-to-t5826-50",
-      "label": "Rivermouth share of play in the opposition half, in the latest spell of play",
-      "text": "33%"
-     },
-     {
-      "id": "fx-high_turnovers-home-last-2m-to-t5826-50",
-      "label": "Rivermouth high turnovers (ball won high up the pitch), in the latest spell of play",
-      "text": "0"
-     },
-     {
-      "id": "fx-touches_in_opponent_half-home-last-2m-to-t5826-50",
-      "label": "Rivermouth touches in the opposition half, in the latest spell of play",
-      "text": "8"
-     },
-     {
-      "id": "fx-press_rate-home-last-2m-to-t5826-50",
-      "label": "Rivermouth pressing rate, in the latest spell of play",
-      "text": "0%"
-     },
-     {
-      "id": "fx-shots-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale shots, in the latest spell of play",
-      "text": "0"
-     },
-     {
-      "id": "fx-possession_share-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale share of possession, in the latest spell of play",
-      "text": "27%"
-     },
-     {
-      "id": "fx-territory-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale share of play in the opposition half, in the latest spell of play",
-      "text": "63%"
-     },
-     {
-      "id": "fx-high_turnovers-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale high turnovers (ball won high up the pitch), in the latest spell of play",
-      "text": "0"
-     },
-     {
-      "id": "fx-touches_in_opponent_half-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale touches in the opposition half, in the latest spell of play",
-      "text": "9"
-     },
-     {
-      "id": "fx-press_rate-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale pressing rate, in the latest spell of play",
-      "text": "50%"
-     }
-    ],
-    "sources": [
-     {
-      "id": "ev-002174",
-      "type": "pass",
-      "player": "Tolliver",
-      "clock": "90+6′"
-     },
-     {
-      "id": "ev-002193",
-      "type": "period_end",
-      "player": null,
-      "clock": "90+8′"
-     }
-    ],
-    "freeze": {
-     "match_id": "m-custom-106-94d2c7",
-     "t": 5731.51,
-     "freeze_frame_of": "ev-002174",
-     "ball": [
-      40.1,
-      62.7
-     ],
-     "possession": "away",
-     "players": [
-      {
-       "id": "home-01",
-       "side": "home",
-       "at": [
-        4.4,
-        42.8
-       ],
-       "speed_ms": 0.1,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-02",
-       "side": "home",
-       "at": [
-        29.0,
-        26.3
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-03",
-       "side": "home",
-       "at": [
-        28.1,
-        38.4
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-04",
-       "side": "home",
-       "at": [
-        28.1,
-        51.9
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-05",
-       "side": "home",
-       "at": [
-        29.0,
-        64.1
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-06",
-       "side": "home",
-       "at": [
-        38.1,
-        45.2
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-07",
-       "side": "home",
-       "at": [
-        41.5,
-        34.4
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-08",
-       "side": "home",
-       "at": [
-        41.5,
-        56.0
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-09",
-       "side": "home",
-       "at": [
-        54.7,
-        27.5
-       ],
-       "speed_ms": 4.7,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-10",
-       "side": "home",
-       "at": [
-        58.3,
-        45.3
-       ],
-       "speed_ms": 7.3,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-11",
-       "side": "home",
-       "at": [
-        54.9,
-        63.0
-       ],
-       "speed_ms": 5.3,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-01",
-       "side": "away",
-       "at": [
-        112.4,
-        42.8
-       ],
-       "speed_ms": 0.1,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-02",
-       "side": "away",
-       "at": [
-        70.2,
-        22.9
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-03",
-       "side": "away",
-       "at": [
-        72.2,
-        38.0
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-04",
-       "side": "away",
-       "at": [
-        71.6,
-        55.1
-       ],
-       "speed_ms": 1.3,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-05",
-       "side": "away",
-       "at": [
-        70.2,
-        69.9
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-06",
-       "side": "away",
-       "at": [
-        51.2,
-        46.4
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-07",
-       "side": "away",
-       "at": [
-        44.2,
-        33.0
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-08",
-       "side": "away",
-       "at": [
-        44.2,
-        59.9
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-09",
-       "side": "away",
-       "at": [
-        21.8,
-        24.8
-       ],
-       "speed_ms": 4.7,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-10",
-       "side": "away",
-       "at": [
-        19.5,
-        46.4
-       ],
-       "speed_ms": 7.3,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-11",
-       "side": "away",
-       "at": [
-        40.1,
-        62.7
-       ],
-       "speed_ms": 7.3,
-       "role": "hold_slot"
-      }
-     ]
-    }
-   },
    "bt-002020-momentum_swing": {
     "kind": "momentum_swing",
     "label": "88–90+8′",
@@ -42963,6 +42655,320 @@
         55.6
        ],
        "speed_ms": 0.0,
+       "role": "hold_slot"
+      }
+     ]
+    }
+   },
+   "bt-002174-territorial_spell": {
+    "kind": "territorial_spell",
+    "label": "90+6–90+8′",
+    "clock": "90+8′",
+    "t": 5826.5,
+    "facts": [
+     {
+      "id": "fx-shots-home-last-2m-to-t5826-50",
+      "label": "Rivermouth shots, in the latest spell of play",
+      "text": "1"
+     },
+     {
+      "id": "fx-possession_share-home-last-2m-to-t5826-50",
+      "label": "Rivermouth share of possession, in the latest spell of play",
+      "text": "73%"
+     },
+     {
+      "id": "fx-territory-home-last-2m-to-t5826-50",
+      "label": "Rivermouth share of play in the opposition half, in the latest spell of play",
+      "text": "33%"
+     },
+     {
+      "id": "fx-high_turnovers-home-last-2m-to-t5826-50",
+      "label": "Rivermouth high turnovers (ball won high up the pitch), in the latest spell of play",
+      "text": "0"
+     },
+     {
+      "id": "fx-touches_in_opponent_half-home-last-2m-to-t5826-50",
+      "label": "Rivermouth touches in the opposition half, in the latest spell of play",
+      "text": "8"
+     },
+     {
+      "id": "fx-press_rate-home-last-2m-to-t5826-50",
+      "label": "Rivermouth pressing rate, in the latest spell of play",
+      "text": "0%"
+     },
+     {
+      "id": "fx-shots-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale shots, in the latest spell of play",
+      "text": "0"
+     },
+     {
+      "id": "fx-possession_share-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale share of possession, in the latest spell of play",
+      "text": "27%"
+     },
+     {
+      "id": "fx-territory-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale share of play in the opposition half, in the latest spell of play",
+      "text": "63%"
+     },
+     {
+      "id": "fx-high_turnovers-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale high turnovers (ball won high up the pitch), in the latest spell of play",
+      "text": "0"
+     },
+     {
+      "id": "fx-touches_in_opponent_half-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale touches in the opposition half, in the latest spell of play",
+      "text": "9"
+     },
+     {
+      "id": "fx-press_rate-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale pressing rate, in the latest spell of play",
+      "text": "50%"
+     }
+    ],
+    "sources": [
+     {
+      "id": "ev-002174",
+      "type": "pass",
+      "player": "Tolliver",
+      "clock": "90+6′"
+     },
+     {
+      "id": "ev-002193",
+      "type": "period_end",
+      "player": null,
+      "clock": "90+8′"
+     }
+    ],
+    "freeze": {
+     "match_id": "m-custom-106-94d2c7",
+     "t": 5731.51,
+     "freeze_frame_of": "ev-002174",
+     "ball": [
+      40.1,
+      62.7
+     ],
+     "possession": "away",
+     "players": [
+      {
+       "id": "home-01",
+       "side": "home",
+       "at": [
+        4.4,
+        42.8
+       ],
+       "speed_ms": 0.1,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-02",
+       "side": "home",
+       "at": [
+        29.0,
+        26.3
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-03",
+       "side": "home",
+       "at": [
+        28.1,
+        38.4
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-04",
+       "side": "home",
+       "at": [
+        28.1,
+        51.9
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-05",
+       "side": "home",
+       "at": [
+        29.0,
+        64.1
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-06",
+       "side": "home",
+       "at": [
+        38.1,
+        45.2
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-07",
+       "side": "home",
+       "at": [
+        41.5,
+        34.4
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-08",
+       "side": "home",
+       "at": [
+        41.5,
+        56.0
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-09",
+       "side": "home",
+       "at": [
+        54.7,
+        27.5
+       ],
+       "speed_ms": 4.7,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-10",
+       "side": "home",
+       "at": [
+        58.3,
+        45.3
+       ],
+       "speed_ms": 7.3,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-11",
+       "side": "home",
+       "at": [
+        54.9,
+        63.0
+       ],
+       "speed_ms": 5.3,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-01",
+       "side": "away",
+       "at": [
+        112.4,
+        42.8
+       ],
+       "speed_ms": 0.1,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-02",
+       "side": "away",
+       "at": [
+        70.2,
+        22.9
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-03",
+       "side": "away",
+       "at": [
+        72.2,
+        38.0
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-04",
+       "side": "away",
+       "at": [
+        71.6,
+        55.1
+       ],
+       "speed_ms": 1.3,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-05",
+       "side": "away",
+       "at": [
+        70.2,
+        69.9
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-06",
+       "side": "away",
+       "at": [
+        51.2,
+        46.4
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-07",
+       "side": "away",
+       "at": [
+        44.2,
+        33.0
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-08",
+       "side": "away",
+       "at": [
+        44.2,
+        59.9
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-09",
+       "side": "away",
+       "at": [
+        21.8,
+        24.8
+       ],
+       "speed_ms": 4.7,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-10",
+       "side": "away",
+       "at": [
+        19.5,
+        46.4
+       ],
+       "speed_ms": 7.3,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-11",
+       "side": "away",
+       "at": [
+        40.1,
+        62.7
+       ],
+       "speed_ms": 7.3,
        "role": "hold_slot"
       }
      ]
@@ -43379,6 +43385,2547 @@
   "405": "90+7′",
   "406": "90+8′",
   "407": "90+8′"
+ },
+ "claim_numbers": {
+  "0": [
+   {
+    "as_written": "29",
+    "fact_id": "fx-sequence-ev-000544-ball_won_distance"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-000544-seconds"
+   }
+  ],
+  "1": [
+   {
+    "as_written": "66",
+    "fact_id": "fx-possession_share-away-last-7m-to-t1922-38"
+   },
+   {
+    "as_written": "57",
+    "fact_id": "fx-touches_in_opponent_half-away-last-7m-to-t1922-38"
+   }
+  ],
+  "2": [
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-000970-xg"
+   },
+   {
+    "as_written": "42′",
+    "fact_id": "fx-shot-ev-000970-minute"
+   }
+  ],
+  "3": [
+   {
+    "as_written": "6",
+    "fact_id": "fx-sequence-ev-000996-ball_won_distance"
+   },
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-000996-xg"
+   }
+  ],
+  "4": [
+   {
+    "as_written": "6",
+    "fact_id": "fx-sequence-ev-001053-ball_won_distance"
+   },
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-001053-xg"
+   }
+  ],
+  "5": [
+   {
+    "as_written": "57",
+    "fact_id": "fx-possession_share-home-last-5m-to-t2837-35"
+   },
+   {
+    "as_written": "30",
+    "fact_id": "fx-touches_in_opponent_half-home-last-5m-to-t2837-35"
+   }
+  ],
+  "6": [
+   {
+    "as_written": "39",
+    "fact_id": "fx-sequence-ev-001100-ball_won_distance"
+   },
+   {
+    "as_written": "11",
+    "fact_id": "fx-sequence-ev-001100-seconds"
+   },
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-001100-xg"
+   }
+  ],
+  "7": [],
+  "8": [
+   {
+    "as_written": "10",
+    "fact_id": "fx-card-ev-001374-players_after"
+   },
+   {
+    "as_written": "61′",
+    "fact_id": "fx-card-ev-001374-minute"
+   }
+  ],
+  "9": [
+   {
+    "as_written": "72",
+    "fact_id": "fx-possession_share-home-last-5m-to-t4225-76"
+   },
+   {
+    "as_written": "45",
+    "fact_id": "fx-touches_in_opponent_half-home-last-5m-to-t4225-76"
+   }
+  ],
+  "10": [
+   {
+    "as_written": "0.17",
+    "fact_id": "fx-shot-ev-001664-xg"
+   },
+   {
+    "as_written": "12",
+    "fact_id": "fx-sequence-ev-001664-seconds"
+   }
+  ],
+  "11": [
+   {
+    "as_written": "60",
+    "fact_id": "fx-possession_share-home-since-ev-001374-to-t4519-00"
+   }
+  ],
+  "12": [
+   {
+    "as_written": "26",
+    "fact_id": "fx-sequence-ev-001767-ball_won_distance"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-001767-seconds"
+   },
+   {
+    "as_written": "0.19",
+    "fact_id": "fx-shot-ev-001767-xg"
+   }
+  ],
+  "13": [
+   {
+    "as_written": "87′",
+    "fact_id": "fx-shot-ev-001962-minute"
+   },
+   {
+    "as_written": "77",
+    "fact_id": "fx-sequence-ev-001962-seconds"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001962"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-001962"
+   }
+  ],
+  "14": [
+   {
+    "as_written": "30",
+    "fact_id": "fx-sequence-ev-001981-ball_won_distance"
+   },
+   {
+    "as_written": "0.08",
+    "fact_id": "fx-shot-ev-001981-xg"
+   },
+   {
+    "as_written": "5",
+    "fact_id": "fx-sequence-ev-001981-seconds"
+   }
+  ],
+  "15": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001664"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-001664"
+   },
+   {
+    "as_written": "74%",
+    "fact_id": "fx-possession_share-home-since-ev-001664-to-t5300-00"
+   }
+  ],
+  "16": [
+   {
+    "as_written": "6",
+    "fact_id": "fx-back_line_change-home-ev-001664-to-t5300-00"
+   },
+   {
+    "as_written": "30",
+    "fact_id": "fx-back_line_height-home-since-ev-001664-to-t5300-00"
+   }
+  ],
+  "17": [
+   {
+    "as_written": "90",
+    "fact_id": "fx-sequence-ev-002101-start_clock"
+   },
+   {
+    "as_written": "4′",
+    "fact_id": "fx-sequence-ev-002101-start_clock"
+   },
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-002101-xg"
+   },
+   {
+    "as_written": "25",
+    "fact_id": "fx-sequence-ev-002101-ball_won_distance"
+   }
+  ],
+  "18": [
+   {
+    "as_written": "10",
+    "fact_id": "fx-sequence-ev-002178-ball_won_distance"
+   },
+   {
+    "as_written": "0.23",
+    "fact_id": "fx-shot-ev-002178-xg"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002178-minute"
+   },
+   {
+    "as_written": "8′",
+    "fact_id": "fx-shot-ev-002178-minute"
+   }
+  ],
+  "19": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001962"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-001962"
+   },
+   {
+    "as_written": "56%",
+    "fact_id": "fx-possession_share-home-since-ev-001962-to-t5881-42"
+   }
+  ],
+  "20": [
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-000481-ball_won_distance"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-sequence-ev-000481-seconds"
+   },
+   {
+    "as_written": "0.27",
+    "fact_id": "fx-shot-ev-000481-xg"
+   }
+  ],
+  "21": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-sequence-ev-000831-ball_won_distance"
+   },
+   {
+    "as_written": "3",
+    "fact_id": "fx-sequence-ev-000831-seconds"
+   },
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-000831-xg"
+   }
+  ],
+  "22": [
+   {
+    "as_written": "25",
+    "fact_id": "fx-sequence-ev-000894-seconds"
+   }
+  ],
+  "23": [
+   {
+    "as_written": "69%",
+    "fact_id": "fx-territory-away-last-16m-to-t2428-72"
+   },
+   {
+    "as_written": "86",
+    "fact_id": "fx-touches_in_opponent_half-away-last-16m-to-t2428-72"
+   }
+  ],
+  "24": [
+   {
+    "as_written": "64%",
+    "fact_id": "fx-possession_share-home-last-16m-to-t2428-72"
+   }
+  ],
+  "25": [
+   {
+    "as_written": "69",
+    "fact_id": "fx-possession_share-home-last-8m-to-t3152-50"
+   },
+   {
+    "as_written": "39",
+    "fact_id": "fx-touches_in_opponent_half-home-last-8m-to-t3152-50"
+   }
+  ],
+  "26": [
+   {
+    "as_written": "25",
+    "fact_id": "fx-touches_in_opponent_half-away-last-8m-to-t3152-50"
+   }
+  ],
+  "27": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000894"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000894"
+   }
+  ],
+  "28": [
+   {
+    "as_written": "5",
+    "fact_id": "fx-back_line_change-home-ev-000894-to-t3208-00"
+   }
+  ],
+  "29": [
+   {
+    "as_written": "75",
+    "fact_id": "fx-press_rate-home-last-4m-to-t4304-66"
+   },
+   {
+    "as_written": "22",
+    "fact_id": "fx-touches_in_opponent_half-home-last-4m-to-t4304-66"
+   }
+  ],
+  "30": [
+   {
+    "as_written": "13",
+    "fact_id": "fx-sequence-ev-001715-ball_won_distance"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-001715-seconds"
+   },
+   {
+    "as_written": "0.17",
+    "fact_id": "fx-shot-ev-001715-xg"
+   }
+  ],
+  "31": [
+   {
+    "as_written": "0.12",
+    "fact_id": "fx-shot-ev-001815-xg"
+   }
+  ],
+  "32": [
+   {
+    "as_written": "60",
+    "fact_id": "fx-territory-away-since-ev-001815-to-t5622-20"
+   }
+  ],
+  "33": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-home-ev-001815-to-t5622-20"
+   },
+   {
+    "as_written": "34",
+    "fact_id": "fx-back_line_height-home-since-ev-001815-to-t5622-20"
+   }
+  ],
+  "34": [
+   {
+    "as_written": "38",
+    "fact_id": "fx-sequence-ev-002184-ball_won_distance"
+   },
+   {
+    "as_written": "0.06",
+    "fact_id": "fx-shot-ev-002184-xg"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-002184-seconds"
+   }
+  ],
+  "35": [
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-002202-xg"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002202"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-002202"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002202-minute"
+   },
+   {
+    "as_written": "6′",
+    "fact_id": "fx-shot-ev-002202-minute"
+   }
+  ],
+  "36": [
+   {
+    "as_written": "34",
+    "fact_id": "fx-sequence-ev-002202-ball_won_distance"
+   },
+   {
+    "as_written": "5",
+    "fact_id": "fx-sequence-ev-002202-seconds"
+   }
+  ],
+  "37": [
+   {
+    "as_written": "18",
+    "fact_id": "fx-sequence-ev-002235-ball_won_distance"
+   },
+   {
+    "as_written": "0.05",
+    "fact_id": "fx-shot-ev-002235-xg"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002235-minute"
+   },
+   {
+    "as_written": "8′",
+    "fact_id": "fx-shot-ev-002235-minute"
+   }
+  ],
+  "38": [
+   {
+    "as_written": "13",
+    "fact_id": "fx-sequence-ev-000199-ball_won_distance"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-000199-seconds"
+   },
+   {
+    "as_written": "0.16",
+    "fact_id": "fx-shot-ev-000199-xg"
+   }
+  ],
+  "39": [
+   {
+    "as_written": "70",
+    "fact_id": "fx-possession_share-away-last-5m-to-t869-52"
+   },
+   {
+    "as_written": "45",
+    "fact_id": "fx-touches_in_opponent_half-away-last-5m-to-t869-52"
+   }
+  ],
+  "40": [
+   {
+    "as_written": "100",
+    "fact_id": "fx-press_rate-home-last-5m-to-t869-52"
+   },
+   {
+    "as_written": "30",
+    "fact_id": "fx-possession_share-home-last-5m-to-t869-52"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-touches_in_opponent_half-home-last-5m-to-t869-52"
+   }
+  ],
+  "41": [
+   {
+    "as_written": "22",
+    "fact_id": "fx-sequence-ev-000390-seconds"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000390"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000390"
+   }
+  ],
+  "42": [
+   {
+    "as_written": "19",
+    "fact_id": "fx-sequence-ev-000449-ball_won_distance"
+   },
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-000449-xg"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-000449-seconds"
+   }
+  ],
+  "43": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000390"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000390"
+   },
+   {
+    "as_written": "62%",
+    "fact_id": "fx-possession_share-home-since-ev-000390-to-t1878-00"
+   }
+  ],
+  "44": [
+   {
+    "as_written": "14",
+    "fact_id": "fx-sequence-ev-000776-seconds"
+   },
+   {
+    "as_written": "0.18",
+    "fact_id": "fx-shot-ev-000776-xg"
+   }
+  ],
+  "45": [
+   {
+    "as_written": "31",
+    "fact_id": "fx-touches_in_opponent_half-home-last-7m-to-t2273-10"
+   },
+   {
+    "as_written": "65%",
+    "fact_id": "fx-possession_share-home-last-7m-to-t2273-10"
+   }
+  ],
+  "46": [
+   {
+    "as_written": "53%",
+    "fact_id": "fx-territory-away-last-7m-to-t2273-10"
+   }
+  ],
+  "47": [
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-000977-xg"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-000977"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000977"
+   }
+  ],
+  "48": [
+   {
+    "as_written": "61",
+    "fact_id": "fx-territory-away-since-ev-000776-to-t2914-22"
+   }
+  ],
+  "49": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-000977"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000977"
+   },
+   {
+    "as_written": "62%",
+    "fact_id": "fx-territory-home-since-ev-000977-to-t3506-00"
+   }
+  ],
+  "50": [
+   {
+    "as_written": "24",
+    "fact_id": "fx-sequence-ev-001444-ball_won_distance"
+   },
+   {
+    "as_written": "5",
+    "fact_id": "fx-sequence-ev-001444-seconds"
+   },
+   {
+    "as_written": "0.08",
+    "fact_id": "fx-shot-ev-001444-xg"
+   }
+  ],
+  "51": [
+   {
+    "as_written": "69%",
+    "fact_id": "fx-possession_share-home-last-9m-to-t3892-44"
+   }
+  ],
+  "52": [],
+  "53": [],
+  "54": [
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-001800-seconds"
+   },
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-001800-xg"
+   },
+   {
+    "as_written": "3",
+    "fact_id": "fx-score_after-ev-001800"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001800"
+   }
+  ],
+  "55": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001531"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001531"
+   },
+   {
+    "as_written": "59",
+    "fact_id": "fx-possession_share-away-since-ev-001531-to-t4960-00"
+   }
+  ],
+  "56": [
+   {
+    "as_written": "3",
+    "fact_id": "fx-score_after-ev-001800"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001800"
+   },
+   {
+    "as_written": "6",
+    "fact_id": "fx-back_line_change-home-ev-001800-to-t5641-19"
+   },
+   {
+    "as_written": "9",
+    "fact_id": "fx-back_line_change-away-ev-001800-to-t5641-19"
+   }
+  ],
+  "57": [
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002199-minute"
+   },
+   {
+    "as_written": "8′",
+    "fact_id": "fx-shot-ev-002199-minute"
+   },
+   {
+    "as_written": "0.8",
+    "fact_id": "fx-shot-ev-002199-xg"
+   },
+   {
+    "as_written": "45",
+    "fact_id": "fx-sequence-ev-002199-seconds"
+   }
+  ],
+  "58": [
+   {
+    "as_written": "65",
+    "fact_id": "fx-territory-away-last-10m-to-t5866-44"
+   },
+   {
+    "as_written": "61",
+    "fact_id": "fx-touches_in_opponent_half-away-last-10m-to-t5866-44"
+   }
+  ],
+  "59": [
+   {
+    "as_written": "100",
+    "fact_id": "fx-press_rate-home-last-10m-to-t5866-44"
+   },
+   {
+    "as_written": "12",
+    "fact_id": "fx-touches_in_opponent_half-home-last-10m-to-t5866-44"
+   },
+   {
+    "as_written": "35",
+    "fact_id": "fx-possession_share-home-last-10m-to-t5866-44"
+   }
+  ],
+  "60": [
+   {
+    "as_written": "75",
+    "fact_id": "fx-territory-home-last-3m-to-t727-40"
+   }
+  ],
+  "61": [
+   {
+    "as_written": "9",
+    "fact_id": "fx-sequence-ev-000440-ball_won_distance"
+   },
+   {
+    "as_written": "0.26",
+    "fact_id": "fx-shot-ev-000440-xg"
+   },
+   {
+    "as_written": "7",
+    "fact_id": "fx-sequence-ev-000440-seconds"
+   }
+  ],
+  "62": [
+   {
+    "as_written": "54%",
+    "fact_id": "fx-territory-home-last-8m-to-t1525-06"
+   },
+   {
+    "as_written": "41",
+    "fact_id": "fx-touches_in_opponent_half-home-last-8m-to-t1525-06"
+   }
+  ],
+  "63": [
+   {
+    "as_written": "53",
+    "fact_id": "fx-possession_share-home-last-12m-to-t4007-48"
+   },
+   {
+    "as_written": "47",
+    "fact_id": "fx-touches_in_opponent_half-home-last-12m-to-t4007-48"
+   }
+  ],
+  "64": [
+   {
+    "as_written": "57",
+    "fact_id": "fx-territory-away-last-12m-to-t4007-48"
+   },
+   {
+    "as_written": "64",
+    "fact_id": "fx-touches_in_opponent_half-away-last-12m-to-t4007-48"
+   }
+  ],
+  "65": [
+   {
+    "as_written": "12",
+    "fact_id": "fx-sequence-ev-001725-seconds"
+   },
+   {
+    "as_written": "0.16",
+    "fact_id": "fx-shot-ev-001725-xg"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-001725"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001725"
+   }
+  ],
+  "66": [
+   {
+    "as_written": "55",
+    "fact_id": "fx-possession_share-home-last-9m-to-t5222-50"
+   },
+   {
+    "as_written": "44",
+    "fact_id": "fx-touches_in_opponent_half-home-last-9m-to-t5222-50"
+   }
+  ],
+  "67": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-shots-away-last-9m-to-t5222-50"
+   },
+   {
+    "as_written": "47",
+    "fact_id": "fx-touches_in_opponent_half-away-last-9m-to-t5222-50"
+   }
+  ],
+  "68": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-away-ev-001725-to-t5302-00"
+   }
+  ],
+  "69": [
+   {
+    "as_written": "6",
+    "fact_id": "fx-back_line_change-away-ev-001725-to-t5302-00"
+   },
+   {
+    "as_written": "37",
+    "fact_id": "fx-back_line_height-away-before-ev-001725"
+   },
+   {
+    "as_written": "31",
+    "fact_id": "fx-back_line_height-away-since-ev-001725-to-t5302-00"
+   }
+  ],
+  "70": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000250"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000250"
+   }
+  ],
+  "71": [
+   {
+    "as_written": "0.06",
+    "fact_id": "fx-shot-ev-000516-xg"
+   },
+   {
+    "as_written": "37",
+    "fact_id": "fx-sequence-ev-000516-ball_won_distance"
+   }
+  ],
+  "72": [
+   {
+    "as_written": "10",
+    "fact_id": "fx-card-ev-000536-players_after"
+   }
+  ],
+  "73": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000250"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000250"
+   },
+   {
+    "as_written": "63",
+    "fact_id": "fx-possession_share-home-since-ev-000250-to-t1534-54"
+   }
+  ],
+  "74": [
+   {
+    "as_written": "23",
+    "fact_id": "fx-sequence-ev-000754-ball_won_distance"
+   },
+   {
+    "as_written": "6",
+    "fact_id": "fx-sequence-ev-000754-seconds"
+   },
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-000754-xg"
+   }
+  ],
+  "75": [
+   {
+    "as_written": "97",
+    "fact_id": "fx-touches_in_opponent_half-home-last-16m-to-t2335-04"
+   }
+  ],
+  "76": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-home-ev-000536-to-t2343-27"
+   }
+  ],
+  "77": [
+   {
+    "as_written": "694",
+    "fact_id": "fx-compactness-away-since-ev-000536-to-t2343-27"
+   }
+  ],
+  "78": [
+   {
+    "as_written": "27",
+    "fact_id": "fx-sequence-ev-000937-ball_won_distance"
+   },
+   {
+    "as_written": "4",
+    "fact_id": "fx-sequence-ev-000937-seconds"
+   },
+   {
+    "as_written": "0.06",
+    "fact_id": "fx-shot-ev-000937-xg"
+   }
+  ],
+  "79": [
+   {
+    "as_written": "5 m",
+    "fact_id": "fx-sequence-ev-001159-ball_won_distance"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-001159-seconds"
+   },
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-001159-xg"
+   }
+  ],
+  "80": [
+   {
+    "as_written": "13",
+    "fact_id": "fx-sequence-ev-001246-seconds"
+   },
+   {
+    "as_written": "0.17",
+    "fact_id": "fx-shot-ev-001246-xg"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001246"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001246"
+   }
+  ],
+  "81": [
+   {
+    "as_written": "69%",
+    "fact_id": "fx-possession_share-home-since-ev-001246-to-t4200-00"
+   }
+  ],
+  "82": [
+   {
+    "as_written": "4 m",
+    "fact_id": "fx-back_line_change-away-ev-001246-to-t4200-00"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001246"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001246"
+   }
+  ],
+  "83": [
+   {
+    "as_written": "17",
+    "fact_id": "fx-touches_in_opponent_half-home-last-3m-to-t4279-45"
+   }
+  ],
+  "84": [
+   {
+    "as_written": "7 m",
+    "fact_id": "fx-sequence-ev-001737-ball_won_distance"
+   },
+   {
+    "as_written": "0.17",
+    "fact_id": "fx-shot-ev-001737-xg"
+   }
+  ],
+  "85": [
+   {
+    "as_written": "71%",
+    "fact_id": "fx-possession_share-home-last-8m-to-t5290-39"
+   },
+   {
+    "as_written": "43",
+    "fact_id": "fx-touches_in_opponent_half-home-last-8m-to-t5290-39"
+   }
+  ],
+  "86": [
+   {
+    "as_written": "57%",
+    "fact_id": "fx-territory-away-last-8m-to-t5290-39"
+   }
+  ],
+  "87": [
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-002083-xg"
+   },
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-sequence-ev-002083-ball_won_distance"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-sequence-ev-002083-start_clock"
+   },
+   {
+    "as_written": "1′",
+    "fact_id": "fx-sequence-ev-002083-start_clock"
+   }
+  ],
+  "88": [
+   {
+    "as_written": "4",
+    "fact_id": "fx-shots-home-last-7m-to-t5827-97"
+   },
+   {
+    "as_written": "62",
+    "fact_id": "fx-territory-home-last-7m-to-t5827-97"
+   }
+  ],
+  "89": [
+   {
+    "as_written": "9",
+    "fact_id": "fx-sequence-ev-000426-seconds"
+   },
+   {
+    "as_written": "0.1",
+    "fact_id": "fx-shot-ev-000426-xg"
+   }
+  ],
+  "90": [
+   {
+    "as_written": "66%",
+    "fact_id": "fx-territory-away-last-16m-to-t1604-92"
+   },
+   {
+    "as_written": "79",
+    "fact_id": "fx-touches_in_opponent_half-away-last-16m-to-t1604-92"
+   }
+  ],
+  "91": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000426"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000426"
+   },
+   {
+    "as_written": "57%",
+    "fact_id": "fx-possession_share-away-since-ev-000426-to-t2007-00"
+   }
+  ],
+  "92": [
+   {
+    "as_written": "43%",
+    "fact_id": "fx-possession_share-home-since-ev-000426-to-t2007-00"
+   },
+   {
+    "as_written": "37",
+    "fact_id": "fx-back_line_height-home-since-ev-000426-to-t2007-00"
+   }
+  ],
+  "93": [
+   {
+    "as_written": "44",
+    "fact_id": "fx-sequence-ev-000836-seconds"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000836"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-000836"
+   }
+  ],
+  "94": [
+   {
+    "as_written": "80%",
+    "fact_id": "fx-possession_share-home-since-ev-000836-to-t3085-37"
+   }
+  ],
+  "95": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-000836"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000836"
+   }
+  ],
+  "96": [
+   {
+    "as_written": "24",
+    "fact_id": "fx-touches_in_opponent_half-home-last-6m-to-t3719-43"
+   },
+   {
+    "as_written": "100",
+    "fact_id": "fx-press_rate-home-last-6m-to-t3719-43"
+   }
+  ],
+  "97": [
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-001730-xg"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001730"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001730"
+   }
+  ],
+  "98": [
+   {
+    "as_written": "76′",
+    "fact_id": "fx-shot-ev-001730-minute"
+   },
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-001730-xg"
+   },
+   {
+    "as_written": "4",
+    "fact_id": "fx-sequence-ev-001730-seconds"
+   }
+  ],
+  "99": [
+   {
+    "as_written": "33",
+    "fact_id": "fx-sequence-ev-001926-ball_won_distance"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-001926-seconds"
+   },
+   {
+    "as_written": "0.14",
+    "fact_id": "fx-shot-ev-001926-xg"
+   }
+  ],
+  "100": [
+   {
+    "as_written": "6",
+    "fact_id": "fx-sequence-ev-002020-seconds"
+   },
+   {
+    "as_written": "19",
+    "fact_id": "fx-sequence-ev-002020-ball_won_distance"
+   },
+   {
+    "as_written": "0.13",
+    "fact_id": "fx-shot-ev-002020-xg"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002020"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002020"
+   }
+  ],
+  "101": [
+   {
+    "as_written": "4",
+    "fact_id": "fx-back_line_change-away-ev-001730-to-t5409-00"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001730"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001730"
+   }
+  ],
+  "102": [
+   {
+    "as_written": "18",
+    "fact_id": "fx-sequence-ev-002191-seconds"
+   },
+   {
+    "as_written": "3",
+    "fact_id": "fx-score_after-ev-002191"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002191"
+   }
+  ],
+  "103": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002020"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002020"
+   },
+   {
+    "as_written": "6",
+    "fact_id": "fx-back_line_change-home-ev-002020-to-t5826-50"
+   },
+   {
+    "as_written": "6",
+    "fact_id": "fx-back_line_change-home-ev-002020-to-t5826-50"
+   }
+  ],
+  "104": [
+   {
+    "as_written": "73%",
+    "fact_id": "fx-possession_share-home-last-2m-to-t5826-50"
+   }
+  ],
+  "105": [],
+  "106": [
+   {
+    "as_written": "66%",
+    "fact_id": "fx-possession_share-away-last-7m-to-t1922-38"
+   },
+   {
+    "as_written": "58%",
+    "fact_id": "fx-territory-away-last-7m-to-t1922-38"
+   }
+  ],
+  "107": [
+   {
+    "as_written": "57",
+    "fact_id": "fx-touches_in_opponent_half-away-last-7m-to-t1922-38"
+   },
+   {
+    "as_written": "34",
+    "fact_id": "fx-touches_in_opponent_half-home-last-7m-to-t1922-38"
+   }
+  ],
+  "108": [],
+  "109": [],
+  "110": [],
+  "111": [],
+  "112": [],
+  "113": [
+   {
+    "as_written": "61′",
+    "fact_id": "fx-card-ev-001374-minute"
+   }
+  ],
+  "114": [
+   {
+    "as_written": "10",
+    "fact_id": "fx-card-ev-001374-players_after"
+   }
+  ],
+  "115": [
+   {
+    "as_written": "72%",
+    "fact_id": "fx-possession_share-home-last-5m-to-t4225-76"
+   },
+   {
+    "as_written": "64%",
+    "fact_id": "fx-territory-home-last-5m-to-t4225-76"
+   }
+  ],
+  "116": [
+   {
+    "as_written": "45",
+    "fact_id": "fx-touches_in_opponent_half-home-last-5m-to-t4225-76"
+   },
+   {
+    "as_written": "9",
+    "fact_id": "fx-touches_in_opponent_half-away-last-5m-to-t4225-76"
+   }
+  ],
+  "117": [],
+  "118": [],
+  "119": [
+   {
+    "as_written": "26 m",
+    "fact_id": "fx-sequence-ev-001767-ball_won_distance"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-001767-seconds"
+   }
+  ],
+  "120": [
+   {
+    "as_written": "0.19",
+    "fact_id": "fx-shot-ev-001767-xg"
+   }
+  ],
+  "121": [],
+  "122": [],
+  "123": [],
+  "124": [
+   {
+    "as_written": "25 m",
+    "fact_id": "fx-sequence-ev-002101-ball_won_distance"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002101-minute"
+   },
+   {
+    "as_written": "4′",
+    "fact_id": "fx-shot-ev-002101-minute"
+   }
+  ],
+  "125": [
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-002101-xg"
+   },
+   {
+    "as_written": "5",
+    "fact_id": "fx-sequence-ev-002101-seconds"
+   }
+  ],
+  "126": [
+   {
+    "as_written": "10 m",
+    "fact_id": "fx-sequence-ev-002178-ball_won_distance"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-002178-seconds"
+   }
+  ],
+  "127": [
+   {
+    "as_written": "0.23",
+    "fact_id": "fx-shot-ev-002178-xg"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002178-minute"
+   },
+   {
+    "as_written": "8'",
+    "fact_id": "fx-shot-ev-002178-minute"
+   }
+  ],
+  "128": [],
+  "129": [],
+  "130": [],
+  "131": [],
+  "132": [],
+  "133": [],
+  "134": [],
+  "135": [],
+  "136": [],
+  "137": [],
+  "138": [],
+  "139": [],
+  "140": [],
+  "141": [],
+  "142": [],
+  "143": [],
+  "144": [],
+  "145": [
+   {
+    "as_written": "19 m",
+    "fact_id": "fx-sequence-ev-000449-ball_won_distance"
+   },
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-000449-xg"
+   }
+  ],
+  "146": [],
+  "147": [],
+  "148": [],
+  "149": [],
+  "150": [],
+  "151": [],
+  "152": [
+   {
+    "as_written": "24 m",
+    "fact_id": "fx-sequence-ev-001444-ball_won_distance"
+   },
+   {
+    "as_written": "5",
+    "fact_id": "fx-sequence-ev-001444-seconds"
+   }
+  ],
+  "153": [
+   {
+    "as_written": "0.08",
+    "fact_id": "fx-shot-ev-001444-xg"
+   }
+  ],
+  "154": [],
+  "155": [],
+  "156": [],
+  "157": [
+   {
+    "as_written": "59%",
+    "fact_id": "fx-possession_share-away-since-ev-001531-to-t4960-00"
+   },
+   {
+    "as_written": "36%",
+    "fact_id": "fx-possession_share-away-before-ev-001531"
+   }
+  ],
+  "158": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001531"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-001531"
+   }
+  ],
+  "159": [],
+  "160": [],
+  "161": [],
+  "162": [],
+  "163": [
+   {
+    "as_written": "9 m",
+    "fact_id": "fx-sequence-ev-000440-ball_won_distance"
+   },
+   {
+    "as_written": "7",
+    "fact_id": "fx-sequence-ev-000440-seconds"
+   }
+  ],
+  "164": [
+   {
+    "as_written": "0.26",
+    "fact_id": "fx-shot-ev-000440-xg"
+   }
+  ],
+  "165": [],
+  "166": [],
+  "167": [],
+  "168": [],
+  "169": [],
+  "170": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-away-ev-001725-to-t5302-00"
+   }
+  ],
+  "171": [],
+  "172": [],
+  "173": [
+   {
+    "as_written": "25′",
+    "fact_id": "fx-card-ev-000536-minute"
+   }
+  ],
+  "174": [
+   {
+    "as_written": "10",
+    "fact_id": "fx-card-ev-000536-players_after"
+   }
+  ],
+  "175": [],
+  "176": [],
+  "177": [
+   {
+    "as_written": "63%",
+    "fact_id": "fx-territory-home-last-16m-to-t2335-04"
+   },
+   {
+    "as_written": "3",
+    "fact_id": "fx-shots-home-last-16m-to-t2335-04"
+   }
+  ],
+  "178": [
+   {
+    "as_written": "6",
+    "fact_id": "fx-high_turnovers-home-last-16m-to-t2335-04"
+   },
+   {
+    "as_written": "100%",
+    "fact_id": "fx-press_rate-away-last-16m-to-t2335-04"
+   }
+  ],
+  "179": [],
+  "180": [
+   {
+    "as_written": "27 m",
+    "fact_id": "fx-sequence-ev-000937-ball_won_distance"
+   }
+  ],
+  "181": [
+   {
+    "as_written": "4",
+    "fact_id": "fx-sequence-ev-000937-seconds"
+   }
+  ],
+  "182": [
+   {
+    "as_written": "5 m",
+    "fact_id": "fx-sequence-ev-001159-ball_won_distance"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-001159-seconds"
+   }
+  ],
+  "183": [
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-001159-xg"
+   }
+  ],
+  "184": [],
+  "185": [],
+  "186": [],
+  "187": [],
+  "188": [],
+  "189": [],
+  "190": [],
+  "191": [],
+  "192": [],
+  "193": [],
+  "194": [],
+  "195": [],
+  "196": [],
+  "197": [],
+  "198": [
+   {
+    "as_written": "33 m",
+    "fact_id": "fx-sequence-ev-001926-ball_won_distance"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-001926-seconds"
+   }
+  ],
+  "199": [
+   {
+    "as_written": "0.14",
+    "fact_id": "fx-shot-ev-001926-xg"
+   }
+  ],
+  "200": [],
+  "201": [],
+  "202": [
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002191-minute"
+   },
+   {
+    "as_written": "7′",
+    "fact_id": "fx-shot-ev-002191-minute"
+   }
+  ],
+  "203": [
+   {
+    "as_written": "3",
+    "fact_id": "fx-score_after-ev-002191"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002191"
+   }
+  ],
+  "204": [],
+  "205": [],
+  "206": [
+   {
+    "as_written": "24",
+    "fact_id": "fx-shot-ev-000544-minute"
+   },
+   {
+    "as_written": "29",
+    "fact_id": "fx-sequence-ev-000544-ball_won_distance"
+   }
+  ],
+  "207": [
+   {
+    "as_written": "57%",
+    "fact_id": "fx-touches_in_opponent_half-away-last-7m-to-t1922-38"
+   }
+  ],
+  "208": [],
+  "209": [
+   {
+    "as_written": "42′",
+    "fact_id": "fx-shot-ev-000970-minute"
+   },
+   {
+    "as_written": "22",
+    "fact_id": "fx-freeze_frame-ev-000970-shooter_nearest_defender"
+   }
+  ],
+  "210": [
+   {
+    "as_written": "43′",
+    "fact_id": "fx-shot-ev-000996-minute"
+   },
+   {
+    "as_written": "0.3",
+    "fact_id": "fx-shot-ev-000996-xg"
+   }
+  ],
+  "211": [
+   {
+    "as_written": "0.3",
+    "fact_id": "fx-shot-ev-001053-xg"
+   },
+   {
+    "as_written": "45",
+    "fact_id": "fx-shot-ev-001053-minute"
+   },
+   {
+    "as_written": "1′",
+    "fact_id": "fx-shot-ev-001053-minute"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-001053-seconds"
+   }
+  ],
+  "212": [
+   {
+    "as_written": "57%",
+    "fact_id": "fx-possession_share-home-last-5m-to-t2837-35"
+   }
+  ],
+  "213": [
+   {
+    "as_written": "53%",
+    "fact_id": "fx-territory-home-last-5m-to-t2837-35"
+   }
+  ],
+  "214": [
+   {
+    "as_written": "0.1",
+    "fact_id": "fx-shot-ev-001100-xg"
+   },
+   {
+    "as_written": "48′",
+    "fact_id": "fx-shot-ev-001100-minute"
+   }
+  ],
+  "215": [
+   {
+    "as_written": "10",
+    "fact_id": "fx-card-ev-001374-players_after"
+   },
+   {
+    "as_written": "61′",
+    "fact_id": "fx-card-ev-001374-minute"
+   }
+  ],
+  "216": [
+   {
+    "as_written": "72%",
+    "fact_id": "fx-possession_share-home-last-5m-to-t4225-76"
+   },
+   {
+    "as_written": "45",
+    "fact_id": "fx-touches_in_opponent_half-home-last-5m-to-t4225-76"
+   }
+  ],
+  "217": [],
+  "218": [
+   {
+    "as_written": "0.17",
+    "fact_id": "fx-shot-ev-001664-xg"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001664"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-001664"
+   }
+  ],
+  "219": [
+   {
+    "as_written": "60%",
+    "fact_id": "fx-possession_share-home-since-ev-001374-to-t4519-00"
+   }
+  ],
+  "220": [
+   {
+    "as_written": "26",
+    "fact_id": "fx-sequence-ev-001767-ball_won_distance"
+   },
+   {
+    "as_written": "0.2",
+    "fact_id": "fx-shot-ev-001767-xg"
+   }
+  ],
+  "221": [
+   {
+    "as_written": "87′",
+    "fact_id": "fx-shot-ev-001962-minute"
+   }
+  ],
+  "222": [
+   {
+    "as_written": "77",
+    "fact_id": "fx-sequence-ev-001962-seconds"
+   }
+  ],
+  "223": [
+   {
+    "as_written": "5",
+    "fact_id": "fx-sequence-ev-001981-seconds"
+   },
+   {
+    "as_written": "89′",
+    "fact_id": "fx-shot-ev-001981-minute"
+   }
+  ],
+  "224": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-home-ev-001664-to-t5300-00"
+   }
+  ],
+  "225": [
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-freeze_frame-ev-002101-defenders_between_ball_and_goal"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-sequence-ev-002101-start_clock"
+   },
+   {
+    "as_written": "4′",
+    "fact_id": "fx-sequence-ev-002101-start_clock"
+   }
+  ],
+  "226": [
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002178-minute"
+   },
+   {
+    "as_written": "8′",
+    "fact_id": "fx-shot-ev-002178-minute"
+   },
+   {
+    "as_written": "0.23",
+    "fact_id": "fx-shot-ev-002178-xg"
+   }
+  ],
+  "227": [],
+  "228": [
+   {
+    "as_written": "21′",
+    "fact_id": "fx-shot-ev-000481-minute"
+   }
+  ],
+  "229": [
+   {
+    "as_written": "37′",
+    "fact_id": "fx-shot-ev-000831-minute"
+   },
+   {
+    "as_written": "0.3",
+    "fact_id": "fx-shot-ev-000831-xg"
+   }
+  ],
+  "230": [
+   {
+    "as_written": "3",
+    "fact_id": "fx-sequence-ev-000831-seconds"
+   },
+   {
+    "as_written": "6",
+    "fact_id": "fx-sequence-ev-000831-ball_won_distance"
+   }
+  ],
+  "231": [
+   {
+    "as_written": "25",
+    "fact_id": "fx-sequence-ev-000894-seconds"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000894"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000894"
+   },
+   {
+    "as_written": "39′",
+    "fact_id": "fx-shot-ev-000894-minute"
+   }
+  ],
+  "232": [],
+  "233": [
+   {
+    "as_written": "60%",
+    "fact_id": "fx-press_rate-home-last-16m-to-t2428-72"
+   }
+  ],
+  "234": [
+   {
+    "as_written": "60%",
+    "fact_id": "fx-press_rate-home-last-8m-to-t3152-50"
+   },
+   {
+    "as_written": "31%",
+    "fact_id": "fx-possession_share-away-last-8m-to-t3152-50"
+   }
+  ],
+  "235": [
+   {
+    "as_written": "39",
+    "fact_id": "fx-touches_in_opponent_half-home-last-8m-to-t3152-50"
+   }
+  ],
+  "236": [],
+  "237": [
+   {
+    "as_written": "5",
+    "fact_id": "fx-back_line_change-home-ev-000894-to-t3208-00"
+   }
+  ],
+  "238": [
+   {
+    "as_written": "54%",
+    "fact_id": "fx-territory-home-last-4m-to-t4304-66"
+   }
+  ],
+  "239": [
+   {
+    "as_written": "75%",
+    "fact_id": "fx-press_rate-home-last-4m-to-t4304-66"
+   }
+  ],
+  "240": [
+   {
+    "as_written": "0.17",
+    "fact_id": "fx-shot-ev-001715-xg"
+   }
+  ],
+  "241": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001815"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001815"
+   },
+   {
+    "as_written": "79′",
+    "fact_id": "fx-shot-ev-001815-minute"
+   }
+  ],
+  "242": [
+   {
+    "as_written": "60%",
+    "fact_id": "fx-territory-away-since-ev-001815-to-t5622-20"
+   }
+  ],
+  "243": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-home-ev-001815-to-t5622-20"
+   }
+  ],
+  "244": [
+   {
+    "as_written": "38",
+    "fact_id": "fx-freeze_frame-ev-002184-zone_defenders"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002184-minute"
+   },
+   {
+    "as_written": "5′",
+    "fact_id": "fx-shot-ev-002184-minute"
+   }
+  ],
+  "245": [
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002202-minute"
+   },
+   {
+    "as_written": "6′",
+    "fact_id": "fx-shot-ev-002202-minute"
+   },
+   {
+    "as_written": "0.10",
+    "fact_id": "fx-shot-ev-002202-xg"
+   },
+   {
+    "as_written": "34",
+    "fact_id": "fx-sequence-ev-002202-ball_won_distance"
+   }
+  ],
+  "246": [
+   {
+    "as_written": "18",
+    "fact_id": "fx-sequence-ev-002235-ball_won_distance"
+   }
+  ],
+  "247": [
+   {
+    "as_written": "9′",
+    "fact_id": "fx-shot-ev-000199-minute"
+   }
+  ],
+  "248": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-000199-seconds"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-sequence-ev-000199-passes"
+   }
+  ],
+  "249": [],
+  "250": [
+   {
+    "as_written": "17′",
+    "fact_id": "fx-shot-ev-000390-minute"
+   }
+  ],
+  "251": [
+   {
+    "as_written": "16′",
+    "fact_id": "fx-sequence-ev-000390-start_clock"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000390"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000390"
+   }
+  ],
+  "252": [
+   {
+    "as_written": "0.3",
+    "fact_id": "fx-shot-ev-000449-xg"
+   },
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-000449-seconds"
+   }
+  ],
+  "253": [],
+  "254": [
+   {
+    "as_written": "62%",
+    "fact_id": "fx-possession_share-home-since-ev-000390-to-t1878-00"
+   }
+  ],
+  "255": [
+   {
+    "as_written": "34′",
+    "fact_id": "fx-shot-ev-000776-minute"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000776"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000776"
+   }
+  ],
+  "256": [
+   {
+    "as_written": "65%",
+    "fact_id": "fx-possession_share-home-last-7m-to-t2273-10"
+   }
+  ],
+  "257": [
+   {
+    "as_written": "53%",
+    "fact_id": "fx-territory-away-last-7m-to-t2273-10"
+   }
+  ],
+  "258": [],
+  "259": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-away-ev-000776-to-t2914-22"
+   }
+  ],
+  "260": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000776"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000776"
+   },
+   {
+    "as_written": "37%",
+    "fact_id": "fx-territory-home-since-ev-000776-to-t2914-22"
+   }
+  ],
+  "261": [],
+  "262": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-000977"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000977"
+   }
+  ],
+  "263": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-freeze_frame-ev-001444-attackers_v_defenders"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-freeze_frame-ev-001444-attackers_v_defenders"
+   },
+   {
+    "as_written": "24",
+    "fact_id": "fx-sequence-ev-001444-ball_won_distance"
+   }
+  ],
+  "264": [],
+  "265": [
+   {
+    "as_written": "69%",
+    "fact_id": "fx-possession_share-home-last-9m-to-t3892-44"
+   },
+   {
+    "as_written": "54%",
+    "fact_id": "fx-territory-home-last-9m-to-t3892-44"
+   }
+  ],
+  "266": [
+   {
+    "as_written": "68′",
+    "fact_id": "fx-shot-ev-001531-minute"
+   },
+   {
+    "as_written": "0.12",
+    "fact_id": "fx-shot-ev-001531-xg"
+   }
+  ],
+  "267": [
+   {
+    "as_written": "8",
+    "fact_id": "fx-sequence-ev-001800-seconds"
+   },
+   {
+    "as_written": "80′",
+    "fact_id": "fx-shot-ev-001800-minute"
+   }
+  ],
+  "268": [],
+  "269": [],
+  "270": [
+   {
+    "as_written": "0.8",
+    "fact_id": "fx-shot-ev-002199-xg"
+   },
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002199-minute"
+   },
+   {
+    "as_written": "8′",
+    "fact_id": "fx-shot-ev-002199-minute"
+   }
+  ],
+  "271": [
+   {
+    "as_written": "61%",
+    "fact_id": "fx-touches_in_opponent_half-away-last-10m-to-t5866-44"
+   }
+  ],
+  "272": [
+   {
+    "as_written": "75",
+    "fact_id": "fx-territory-home-last-3m-to-t727-40"
+   }
+  ],
+  "273": [
+   {
+    "as_written": "7",
+    "fact_id": "fx-sequence-ev-000440-seconds"
+   },
+   {
+    "as_written": "0.3",
+    "fact_id": "fx-shot-ev-000440-xg"
+   }
+  ],
+  "274": [
+   {
+    "as_written": "42%",
+    "fact_id": "fx-possession_share-home-last-8m-to-t1525-06"
+   },
+   {
+    "as_written": "54%",
+    "fact_id": "fx-territory-home-last-8m-to-t1525-06"
+   }
+  ],
+  "275": [],
+  "276": [],
+  "277": [
+   {
+    "as_written": "53%",
+    "fact_id": "fx-possession_share-home-last-12m-to-t4007-48"
+   }
+  ],
+  "278": [
+   {
+    "as_written": "12",
+    "fact_id": "fx-sequence-ev-001725-seconds"
+   },
+   {
+    "as_written": "74′",
+    "fact_id": "fx-shot-ev-001725-minute"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-001725-passes"
+   },
+   {
+    "as_written": "87 m",
+    "fact_id": "fx-sequence-ev-001725-ball_won_distance"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-001725"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001725"
+   }
+  ],
+  "279": [
+   {
+    "as_written": "55%",
+    "fact_id": "fx-possession_share-home-last-9m-to-t5222-50"
+   }
+  ],
+  "280": [
+   {
+    "as_written": "44",
+    "fact_id": "fx-touches_in_opponent_half-home-last-9m-to-t5222-50"
+   }
+  ],
+  "281": [
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-away-ev-001725-to-t5302-00"
+   }
+  ],
+  "282": [
+   {
+    "as_written": "11′",
+    "fact_id": "fx-shot-ev-000250-minute"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000250"
+   },
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000250"
+   }
+  ],
+  "283": [
+   {
+    "as_written": "23′",
+    "fact_id": "fx-shot-ev-000516-minute"
+   },
+   {
+    "as_written": "0.06",
+    "fact_id": "fx-shot-ev-000516-xg"
+   }
+  ],
+  "284": [],
+  "285": [
+   {
+    "as_written": "63%",
+    "fact_id": "fx-possession_share-home-since-ev-000250-to-t1534-54"
+   }
+  ],
+  "286": [
+   {
+    "as_written": "23",
+    "fact_id": "fx-sequence-ev-000754-ball_won_distance"
+   },
+   {
+    "as_written": "0.1",
+    "fact_id": "fx-shot-ev-000754-xg"
+   }
+  ],
+  "287": [],
+  "288": [],
+  "289": [
+   {
+    "as_written": "53%",
+    "fact_id": "fx-possession_share-home-since-ev-000536-to-t2343-27"
+   }
+  ],
+  "290": [
+   {
+    "as_written": "9 m",
+    "fact_id": "fx-back_line_change-away-ev-000536-to-t2343-27"
+   }
+  ],
+  "291": [
+   {
+    "as_written": "4",
+    "fact_id": "fx-sequence-ev-000937-seconds"
+   }
+  ],
+  "292": [
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-001159-xg"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-sequence-ev-001159-seconds"
+   }
+  ],
+  "293": [
+   {
+    "as_written": "56′",
+    "fact_id": "fx-shot-ev-001246-minute"
+   }
+  ],
+  "294": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001246"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001246"
+   },
+   {
+    "as_written": "8 m",
+    "fact_id": "fx-back_line_change-home-ev-001246-to-t4200-00"
+   }
+  ],
+  "295": [],
+  "296": [
+   {
+    "as_written": "60%",
+    "fact_id": "fx-territory-home-last-3m-to-t4279-45"
+   }
+  ],
+  "297": [
+   {
+    "as_written": "7 m",
+    "fact_id": "fx-sequence-ev-001737-ball_won_distance"
+   },
+   {
+    "as_written": "77′",
+    "fact_id": "fx-shot-ev-001737-minute"
+   }
+  ],
+  "298": [
+   {
+    "as_written": "71%",
+    "fact_id": "fx-possession_share-home-last-8m-to-t5290-39"
+   },
+   {
+    "as_written": "43%",
+    "fact_id": "fx-territory-home-last-8m-to-t5290-39"
+   }
+  ],
+  "299": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-high_turnovers-home-last-8m-to-t5290-39"
+   }
+  ],
+  "300": [
+   {
+    "as_written": "0.3",
+    "fact_id": "fx-freeze_frame-ev-002083-defenders_between_ball_and_goal"
+   }
+  ],
+  "301": [
+   {
+    "as_written": "60%",
+    "fact_id": "fx-press_rate-home-last-7m-to-t5827-97"
+   }
+  ],
+  "302": [
+   {
+    "as_written": "39",
+    "fact_id": "fx-touches_in_opponent_half-home-last-7m-to-t5827-97"
+   }
+  ],
+  "303": [
+   {
+    "as_written": "19′",
+    "fact_id": "fx-shot-ev-000426-minute"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-freeze_frame-ev-000426-attackers_v_defenders"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-freeze_frame-ev-000426-attackers_v_defenders"
+   }
+  ],
+  "304": [
+   {
+    "as_written": "79%",
+    "fact_id": "fx-touches_in_opponent_half-away-last-16m-to-t1604-92"
+   }
+  ],
+  "305": [
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000426"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000426"
+   }
+  ],
+  "306": [
+   {
+    "as_written": "0",
+    "fact_id": "fx-score_after-ev-000426"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-000426"
+   }
+  ],
+  "307": [
+   {
+    "as_written": "37′",
+    "fact_id": "fx-shot-ev-000836-minute"
+   }
+  ],
+  "308": [],
+  "309": [],
+  "310": [
+   {
+    "as_written": "51%",
+    "fact_id": "fx-possession_share-home-last-6m-to-t3719-43"
+   }
+  ],
+  "311": [
+   {
+    "as_written": "24",
+    "fact_id": "fx-touches_in_opponent_half-home-last-6m-to-t3719-43"
+   }
+  ],
+  "312": [
+   {
+    "as_written": "0.1",
+    "fact_id": "fx-shot-ev-001730-xg"
+   }
+  ],
+  "313": [
+   {
+    "as_written": "33 m",
+    "fact_id": "fx-sequence-ev-001926-ball_won_distance"
+   }
+  ],
+  "314": [
+   {
+    "as_written": "88′",
+    "fact_id": "fx-shot-ev-002020-minute"
+   },
+   {
+    "as_written": "6",
+    "fact_id": "fx-sequence-ev-002020-seconds"
+   }
+  ],
+  "315": [
+   {
+    "as_written": "4 m",
+    "fact_id": "fx-back_line_change-away-ev-001730-to-t5409-00"
+   }
+  ],
+  "316": [
+   {
+    "as_written": "90",
+    "fact_id": "fx-shot-ev-002191-minute"
+   },
+   {
+    "as_written": "7′",
+    "fact_id": "fx-shot-ev-002191-minute"
+   },
+   {
+    "as_written": "0.2",
+    "fact_id": "fx-shot-ev-002191-xg"
+   }
+  ],
+  "317": [],
+  "318": [
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002020"
+   },
+   {
+    "as_written": "2",
+    "fact_id": "fx-score_after-ev-002020"
+   },
+   {
+    "as_written": "6 m",
+    "fact_id": "fx-back_line_change-home-ev-002020-to-t5826-50"
+   }
+  ],
+  "319": [
+   {
+    "as_written": "73",
+    "fact_id": "fx-possession_share-home-last-2m-to-t5826-50"
+   }
+  ],
+  "320": [],
+  "321": [],
+  "322": [
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-000970-xg"
+   }
+  ],
+  "323": [],
+  "324": [],
+  "325": [],
+  "326": [],
+  "327": [],
+  "328": [],
+  "329": [],
+  "330": [],
+  "331": [],
+  "332": [],
+  "333": [],
+  "334": [],
+  "335": [],
+  "336": [
+   {
+    "as_written": "7m",
+    "fact_id": "fx-freeze_frame-ev-002178-shooter_nearest_defender"
+   },
+   {
+    "as_written": "0.23",
+    "fact_id": "fx-shot-ev-002178-xg"
+   },
+   {
+    "as_written": "1",
+    "fact_id": "fx-freeze_frame-ev-002178-attackers_v_defenders"
+   }
+  ],
+  "337": [],
+  "338": [],
+  "339": [],
+  "340": [],
+  "341": [],
+  "342": [],
+  "343": [],
+  "344": [],
+  "345": [],
+  "346": [],
+  "347": [],
+  "348": [],
+  "349": [],
+  "350": [],
+  "351": [],
+  "352": [],
+  "353": [],
+  "354": [
+   {
+    "as_written": "15′",
+    "fact_id": "fx-shots-away-last-5m-to-t869-52"
+   }
+  ],
+  "355": [],
+  "356": [],
+  "357": [],
+  "358": [],
+  "359": [],
+  "360": [],
+  "361": [],
+  "362": [],
+  "363": [
+   {
+    "as_written": "3",
+    "fact_id": "fx-freeze_frame-ev-001444-shooter_nearest_defender"
+   },
+   {
+    "as_written": "0.13",
+    "fact_id": "fx-freeze_frame-ev-001444-defenders_between_ball_and_goal"
+   }
+  ],
+  "364": [],
+  "365": [
+   {
+    "as_written": "68",
+    "fact_id": "fx-shot-ev-001531-minute"
+   }
+  ],
+  "366": [],
+  "367": [],
+  "368": [],
+  "369": [],
+  "370": [],
+  "371": [],
+  "372": [],
+  "373": [],
+  "374": [],
+  "375": [],
+  "376": [],
+  "377": [],
+  "378": [],
+  "379": [],
+  "380": [],
+  "381": [],
+  "382": [
+   {
+    "as_written": "37%",
+    "fact_id": "fx-possession_share-away-since-ev-000250-to-t1534-54"
+   }
+  ],
+  "383": [],
+  "384": [],
+  "385": [],
+  "386": [],
+  "387": [],
+  "388": [],
+  "389": [
+   {
+    "as_written": "1",
+    "fact_id": "fx-score_after-ev-001246"
+   }
+  ],
+  "390": [],
+  "391": [],
+  "392": [],
+  "393": [
+   {
+    "as_written": "6m",
+    "fact_id": "fx-sequence-ev-002083-ball_won_distance"
+   },
+   {
+    "as_written": "0.30",
+    "fact_id": "fx-shot-ev-002083-xg"
+   }
+  ],
+  "394": [],
+  "395": [],
+  "396": [],
+  "397": [],
+  "398": [],
+  "399": [],
+  "400": [],
+  "401": [],
+  "402": [],
+  "403": [],
+  "404": [],
+  "405": [],
+  "406": [],
+  "407": []
  },
  "next_up": [
   {

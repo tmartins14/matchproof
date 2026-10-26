@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MatchBrief } from "@/contracts/types";
-import { copy as copies, type Lang } from "@/desk/copy";
+import { copy as copies, fill, type Lang } from "@/desk/copy";
 import type { DeskData, Phase } from "@/desk/deskData";
 import { formatClock } from "@/desk/format";
 import { buildModel } from "@/desk/model";
@@ -10,15 +10,19 @@ import { buildPitch } from "@/desk/pitchModel";
 import { buildRail, missingSources } from "@/desk/railModel";
 import type { Mode, ReviewState } from "@/desk/reviewParams";
 import { startingFrame, setupData } from "@/desk/startingShape";
+import { rankOf } from "@/trials/data";
 import { buildMomentum, buildPipeline, buildStats } from "@/desk/statsModel";
 import { composeBrief, firstSentence, setupSummary, tacticsOf, type Tactics } from "@/desk/tactics";
 import { getSource } from "@/live/api";
 import type { Failure } from "@/live/api";
 import type { LiveMatch, Speed } from "@/live/useLiveMatch";
 import type { SourceRef } from "@/desk/deskData";
+import { compareHref, scoredVerdicts, web } from "@/trials/data";
+import { landedOf, recordOf } from "@/trials/record";
 import { Pitch } from "@/viz/Pitch";
 import { PitchLegend } from "@/viz/PitchLegend";
 import { Backdrop } from "./Backdrop";
+import { CandidateStrip, ordinal, type TrialsDeskProps } from "./CandidateStrip";
 import { EvidenceRail } from "./EvidenceRail";
 import { HeaderBar } from "./HeaderBar";
 import { KeyMomentFeed } from "./KeyMomentFeed";
@@ -38,6 +42,8 @@ interface DeskProps {
   initial: ReviewState;
   /** The live controls; absent when the desk shows the static fixture. */
   live?: Omit<LiveMatch, "data">;
+  /** Set on the Trials desk: the narrator and fixture strip, cached replay and the RECORD tile. */
+  trials?: TrialsDeskProps;
 }
 
 const STREAMING: Phase[] = ["connecting", "live", "focus", "freeze", "half_time"];
@@ -47,7 +53,7 @@ function withTactics(brief: MatchBrief, t: Tactics): MatchBrief {
   return { ...brief, home: side(brief.home, t.home), away: side(brief.away, t.away) };
 }
 
-export function Desk({ data, initial, live }: DeskProps) {
+export function Desk({ data, initial, live, trials }: DeskProps) {
   const [mode, setMode] = useState<Mode>(initial.mode);
   const [lang, setLang] = useState<Lang>(initial.lang);
   const [beatId, setBeatId] = useState(initial.beat);
@@ -62,6 +68,8 @@ export function Desk({ data, initial, live }: DeskProps) {
   const [fetchedFor, setFetchedFor] = useState(data.match_id);
   const requested = useRef(new Set<string>());
   const [custom, setCustom] = useState(false);
+  // A random or composed match, or edited tactics, is not a pack fixture: there is nothing to compare it with.
+  const [packMatch, setPackMatch] = useState(true);
   const [shown, setShown] = useState<{ text: string; ms: number } | undefined>(undefined);
   const notify = (text: string, ms: number): void => setShown({ text, ms });
   const note = shown?.text;
@@ -90,6 +98,11 @@ export function Desk({ data, initial, live }: DeskProps) {
   const stats = buildStats(view, model.clock, lang, c);
   const bars = buildMomentum(view, model.clock);
   const pipeline = buildPipeline(view, model);
+  const packFixture = trials !== undefined && packMatch;
+  const tableVerdicts = trials?.playingCached ? scoredVerdicts(trials.narrator, trials.fixture) : undefined;
+  const record = packFixture ? recordOf(landedOf(view.claims, tableVerdicts), web.points) : undefined;
+  const narratorUpper = trials?.narrator.toUpperCase() ?? "";
+  const compareFor = (beatId: string): string | undefined => (packFixture && trials ? compareHref(trials.fixture, beatId, trials.narrator) : undefined);
   const score = view.score;
   const eventById = new Map(view.events.map((e) => [e.id, e]));
   const ticker = view.ticker_event_ids.flatMap((id) => {
@@ -101,11 +114,13 @@ export function Desk({ data, initial, live }: DeskProps) {
     setBrief((b) => withTactics(b, next));
     setBriefText(composeBrief(c, next, storyline));
     setCustom(false);
+    setPackMatch(false);
     notify(c.setup.rewritten, STATUS_MS);
   };
   const typed = (text: string): void => {
     setBriefText(text);
     setCustom(true);
+    setPackMatch(false);
     setShown(undefined);
   };
   const title = beat ? headlineOf(beat.kind) : c.pitch.waiting;
@@ -154,6 +169,8 @@ export function Desk({ data, initial, live }: DeskProps) {
   const actions: SetupActions | undefined = live
     ? {
         locked: streaming,
+        inStrip: trials !== undefined,
+        cachedOnly: trials?.cachedMode === true,
         finished: phase === "full_time" || phase === "error",
         reading,
         warnings,
@@ -166,6 +183,7 @@ export function Desk({ data, initial, live }: DeskProps) {
           setBrief((b) => ({ ...b, storyline: { id: id as MatchBrief["storyline"]["id"], text: story.text }, planted_beats: story.planted_beats }));
           setBriefText(composeBrief(c, tactics, c.setup.storylines[id as keyof typeof c.setup.storylines] ?? story.text));
           setCustom(false);
+          setPackMatch(false);
         },
         onRandomize: () => {
           void live.randomize().then((r) => {
@@ -173,6 +191,7 @@ export function Desk({ data, initial, live }: DeskProps) {
             setBrief(r.value.brief);
             setBriefText(r.value.brief.brief_text);
             setCustom(false);
+            setPackMatch(false);
             setWarnings([]);
           });
         },
@@ -185,6 +204,7 @@ export function Desk({ data, initial, live }: DeskProps) {
             setBriefText(r.value.brief_text);
             setWarnings(r.value.warnings);
             setCustom(false);
+            setPackMatch(false);
           });
         },
         onKickoff: () => {
@@ -207,7 +227,10 @@ export function Desk({ data, initial, live }: DeskProps) {
     <div className="mp-root">
       <Backdrop />
       <div className="mp-shell mp-above">
-      <HeaderBar copy={c} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
+      <HeaderBar copy={c} topBar={trials !== undefined} deskLabel={trials ? fill(c.trials.desk.label, { model: trials.narrator, rank: ordinal(rankOf(trials.narrator)) }) : undefined} replayText={trials?.playingCached ? fill(c.trials.desk.replay, { pack: web.pack }) : undefined} cachedChip={trials?.playingCached ? fill(c.trials.desk.cachedChip, { pack: web.pack }) : undefined} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
+      {trials ? (
+        <CandidateStrip {...trials} copy={c} locked={streaming} finished={phase === "full_time" || phase === "error"} onKickoff={actions?.onKickoff ?? (() => undefined)} onNewMatch={actions?.onNewMatch ?? (() => undefined)} />
+      ) : null}
       <MatchSetupBar
         copy={c}
         summary={custom && briefText ? firstSentence(briefText) : setupSummary(c, tactics, brief, storyline, lang)}
@@ -224,7 +247,7 @@ export function Desk({ data, initial, live }: DeskProps) {
         onTactics={edited}
         actions={actions}
       />
-      <PipelineStrip copy={c} view={pipeline} running={!live || streaming} />
+      <PipelineStrip copy={c} view={pipeline} running={!live || streaming} record={record ? { view: record, title: fill(c.trials.desk.recordTitle, { model: narratorUpper }) } : undefined} />
       <main className="mp-main mp-above">
         <section className="mp-col-match" aria-label={c.pitch.label}>
           <div className="mp-pitch-head">
@@ -245,7 +268,7 @@ export function Desk({ data, initial, live }: DeskProps) {
           </div>
           <MomentumStrip copy={c} bars={bars} model={model} gridSeconds={GRID_SECONDS} headlineOf={headlineOf} onPick={(id) => { setBeatId(id); setClaimId(undefined); }} />
         </section>
-        <KeyMomentFeed copy={c} mode={mode} model={model} headlineOf={headlineOf} onBeat={(id) => { setBeatId(id); setClaimId(undefined); }} onClaim={(b, id) => { setBeatId(b); setClaimId(id); }} />
+        <KeyMomentFeed copy={c} mode={mode} model={model} badge={trials ? fill(c.trials.desk.badge, { model: narratorUpper }) : undefined} compareHref={compareFor} headlineOf={headlineOf} onBeat={(id) => { setBeatId(id); setClaimId(undefined); }} onClaim={(b, id) => { setBeatId(b); setClaimId(id); }} />
         {mode === "fan" ? null : <EvidenceRail copy={c} claim={claim} rail={rail} />}
       </main>
       </div>

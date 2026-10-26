@@ -59,7 +59,7 @@ function Row({ row, leader }: { row: SummaryRow; leader: boolean }) {
         {row.pts}
       </div>
       <div role="cell" className="tr-num" data-label={t.table.cols.clean}>
-        {row.clean_pct === null ? "n/a" : `${row.clean_pct}%`}
+        {row.clean_pct === null || rank === undefined ? "n/a" : `${row.clean_pct}%`}
       </div>
       <div role="cell" className={`tr-trap${record && record.OVERTURNED > 0 ? " tr-overturned" : ""}`} data-label={t.table.cols.traps}>
         {record ? fill(t.table.trapsLine, { overturned: record.OVERTURNED, total: trapTotal }) : ""}

@@ -1,4 +1,6 @@
 import type { TrialsWeb } from "@/contracts/types";
+import { copy } from "@/desk/copy";
+import type { CachedRow } from "@/live/cached";
 import raw from "../../fixtures/trials/web-pack-v1.json";
 
 /**
@@ -37,3 +39,36 @@ export const clockOfWorst = (w: Worst): string => momentOf(w.fixture, w.beat)?.c
 /** Table order: measured rows by rank, then the unmeasured rows below the divider. */
 export const tableOrder: string[] = web.order;
 export const firstTrapBeat = (fixture: string): string | undefined => fixtureById(fixture)?.trap_beats[0]?.beat;
+/** The candidate's claim rows on a fixture, scored or not, in index order, each with the numbers the export tied to facts. */
+export const cachedRowsOf = (candidate: string, fixture: string): CachedRow[] =>
+  web.results.claims.flatMap((row, i) => (row.candidate === candidate && row.fixture === fixture ? [{ row, numbers: web.claim_numbers[String(i)] ?? [] }] : []));
+
+/** The narrators the Desk offers: measured and cleared for air, in Table order. Nobody else is listed. */
+export const deskCandidates: string[] = tableOrder.filter((id) => isMeasured(id) && summaryOf(id)?.cleared === true);
+export const liveNarrator: string | null = web.live_narrator;
+export const fixtureIds: string[] = web.fixtures.map((f) => f.id);
+/** The `TRAP <clock>` chips of a fixture, in trap order. */
+export const trapClocks = (fixture: string): string[] =>
+  (fixtureById(fixture)?.trap_beats ?? []).map((t) => momentOf(fixture, t.beat)?.clock ?? "");
+/** The Compare page for a beat of a pack fixture, or undefined when the export has no such moment. */
+export const compareHref = (fixture: string, beat: string, focus: string): string | undefined =>
+  momentOf(fixture, beat) ? `/compare/${fixture}/${beat}?focus=${focus}` : undefined;
+/** Claim id to Table verdict, for the candidate's scored rows on a fixture. */
+export const scoredVerdicts = (candidate: string, fixture: string): Map<string, ClaimRow["verdict"]> =>
+  new Map(web.results.claims.filter((c) => c.candidate === candidate && c.fixture === fixture && c.scored).map((c) => [c.id, c.verdict]));
+
+/** One Fixtures cell: the Table's verdict for the row, and why a lost row got it. */
+export interface Cell {
+  verdict: ClaimRow["verdict"];
+  /** HELD because the model call failed: the stamp reads NO ANSWER */
+  noAnswer: boolean;
+  /** plain English for a lost row that was overturned (tooltip and subtext) */
+  why?: string;
+}
+
+/** The cell for a candidate on a beat, from its scored row; undefined when there is none. */
+export function cellOf(candidate: string, fixture: string, beat: string): Cell | undefined {
+  const row = scoredClaim(candidate, fixture, beat);
+  if (!row) return undefined;
+  return { verdict: row.verdict, noAnswer: row.lost === "no_answer", why: row.lost && row.lost !== "no_answer" ? copy.en.trials.lostReason[row.lost] : undefined };
+}

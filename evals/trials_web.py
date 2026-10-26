@@ -18,13 +18,20 @@ from typing import Any
 import yaml
 from agents.llm_client import load_models
 from agents.pipeline import tool_result
-from contracts.models import Beat, Event, TrialsWeb
+from agents.reconcile import (
+    NO_FACTS_REASON,
+    NOT_IN_BUNDLE_REASON,
+    NUMBER_REASON_PREFIX,
+    PLAYER_REASON_PREFIX,
+    reconcile,
+)
+from contracts.models import Beat, Event, Fact, TrialsWeb
 from intel.display import render_minute
 from mcp_match import InMemoryMatchStore, build_server
 
 from .golden import build_store_from_brief
 from .run import ROOT
-from .trials import PACK_PATH, Fixture, load_pack
+from .trials import PACK_PATH, POINTS, UNKNOWN_FACT_PREFIX, Fixture, load_pack
 
 NEXT_UP_PATH = Path(__file__).parent / "trials" / "next_up.yaml"
 WEB_FIXTURES_DIR = ROOT / "apps" / "web" / "fixtures" / "trials"
@@ -66,13 +73,39 @@ def trim(text: str, limit: int = NOTE_CHARS) -> str:
     return cut.rstrip(" ,;:.-") + "…"
 
 
+def citation_words(reason: str) -> str | None:
+    """A citation reason in plain English, with no fact id in it; None for any other reason."""
+    if reason.startswith(UNKNOWN_FACT_PREFIX):
+        return "cited a fact that doesn't exist"
+    if reason.endswith(NOT_IN_BUNDLE_REASON):
+        return "cited a fact it wasn't given"
+    if reason == NO_FACTS_REASON:
+        return "cited no facts"
+    return None
+
+
+def reason_for(bucket: str | None, reasons: list[str]) -> str:
+    """The first reason that belongs to the bucket, else the first reason."""
+    if bucket == "numbers":
+        match = next((r for r in reasons if r.startswith(NUMBER_REASON_PREFIX)), None)
+    elif bucket == "names":
+        match = next((r for r in reasons if r.startswith(PLAYER_REASON_PREFIX)), None)
+    elif bucket == "citation":
+        match = next((r for r in reasons if citation_words(r)), None)
+    else:
+        match = None
+    return match or reasons[0]
+
+
 def note_of(claim: Json) -> str:
-    """`<bucket>: <reason>` with the reviewer's prefix ("Judge (overclaim): ") stripped."""
+    """`<bucket>: <reason>` with the reviewer's prefix ("Judge (overclaim): ") stripped. The reason
+    is the one that matches the bucket; citation reasons are plain English, never a fact id."""
     reasons = claim["reasons"]
     if not reasons:
         return trim(claim["text"])
-    reason = REVIEWER_PREFIX.sub("", reasons[0])
     bucket = claim["reason_bucket"]
+    reason = reason_for(bucket, reasons)
+    reason = citation_words(reason) or REVIEWER_PREFIX.sub("", reason)
     return trim(f"{bucket}: {reason}" if bucket else reason)
 
 
@@ -194,6 +227,22 @@ async def bundles_of(
     }
 
 
+def aired_text(claim: Json) -> str:
+    """The wording the Desk's claim carries: a blocked claim keeps the Narrator's draft for audit."""
+    blocked = claim["verdict"] in ("OVERTURNED", "HELD")
+    return str(
+        claim["draft_text"] if blocked and claim["draft_text"] else claim["text"]
+    )
+
+
+def numbers_of(claim: Json, bundle: Json) -> list[Json]:
+    """Each number in the claim's wording tied to the cited fact it matches: the deterministic
+    reconciler run on the row, no model. Facts it cites that are not in the bundle match nothing."""
+    facts = {f["id"]: Fact.model_validate(f) for f in bundle["facts"]}
+    found = reconcile(aired_text(claim), claim["fact_ids"], facts)
+    return [{"as_written": n.as_written, "fact_id": n.fact_id} for n in found.numbers]
+
+
 def moment_of(
     store: InMemoryMatchStore,
     match_id: str,
@@ -258,6 +307,7 @@ def build_web(
     meta = {f["id"]: f for f in results["fixtures"]}
     fixture_rows: list[Json] = []
     moments: Json = {}
+    all_bundles: dict[str, Json] = {}
     clocks: dict[tuple[str, str], str] = {}
     for fixture in fixtures:
         if fixture.id not in meta:
@@ -285,6 +335,7 @@ def build_web(
             wanted.get(fixture.id, ()), key=lambda b: beats[b].t_detect.root
         )
         bundles = asyncio.run(bundles_of(store, match_id, beat_ids))
+        all_bundles[fixture.id] = bundles
         for beat_id in beat_ids:
             m = moment_of(store, match_id, beats[beat_id], bundles[beat_id], events)
             moments[fixture.id][beat_id] = m
@@ -312,11 +363,16 @@ def build_web(
         },
         "fail_top": {r["candidate"]: fail_top_of(r["fail_profile"]) for r in summary},
         "picks": picks_of(summary),
+        "points": dict(POINTS),
         "live_narrator": live_narrator_of(results["candidates"], narrator_deployment),
         "fixtures": fixture_rows,
         "moments": moments,
         "claim_clock": {
             str(i): clocks[(c["fixture"], c["beat"])]
+            for i, c in enumerate(results["claims"])
+        },
+        "claim_numbers": {
+            str(i): numbers_of(c, all_bundles[c["fixture"]][c["beat"]])
             for i, c in enumerate(results["claims"])
         },
         "next_up": next_up,

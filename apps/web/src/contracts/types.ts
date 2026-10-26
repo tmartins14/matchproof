@@ -737,6 +737,15 @@ usd_per_match: (number | null)
 })
 }
 /**
+ * The Table's scale: points per scored verdict. The Desk's RECORD tile adds landed claims with it.
+ */
+points: {
+STANDS: number
+AMENDED: number
+OVERTURNED: number
+HELD: number
+}
+/**
  * The candidate whose deployment is the one config/models.yaml narrator uses live; null if none.
  */
 live_narrator: (string | null)
@@ -815,6 +824,15 @@ freeze: (null | PositionFrame)
  */
 claim_clock: {
 [k: string]: string
+}
+/**
+ * Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Fills claim.numbers on a cached replay.
+ */
+claim_numbers: {
+[k: string]: {
+as_written: string
+fact_id: string
+}[]
 }
 next_up: {
 model: string

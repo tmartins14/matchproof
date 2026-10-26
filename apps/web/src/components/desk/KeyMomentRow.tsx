@@ -23,9 +23,11 @@ interface KeyMomentRowProps {
   headline: string;
   onBeat: (beatId: string) => void;
   onClaim: (beatId: string, claimId: string) => void;
+  badge?: string;
+  compareHref?: string;
 }
 
-export function KeyMomentRow({ copy, mode, row, headline, onBeat, onClaim }: KeyMomentRowProps) {
+export function KeyMomentRow({ copy, mode, row, headline, onBeat, onClaim, badge, compareHref }: KeyMomentRowProps) {
   const checking = row.verdict === "checking";
   const fan = mode === "fan";
   const removedText =
@@ -56,7 +58,7 @@ export function KeyMomentRow({ copy, mode, row, headline, onBeat, onClaim }: Key
           ) : (
             <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {row.claims.map((view) => (
-                <ClaimItem key={view.claim.id} copy={copy} view={view} onPick={(id) => onClaim(row.beat.id, id)} />
+                <ClaimItem key={view.claim.id} copy={copy} view={view} onPick={(id) => onClaim(row.beat.id, id)} badge={badge} compareHref={compareHref} />
               ))}
             </ul>
           )}

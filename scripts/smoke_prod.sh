@@ -21,8 +21,10 @@ pass() { echo "ok   $1"; }
 
 # 1. web root
 body="$(curl -fsS --max-time 20 "$WEB_URL/")" || fail "1 web root did not return 200 ($WEB_URL/)"
-printf '%s' "$body" | grep -q "<title>Matchproof live desk</title>" || fail "1 web root is 200 but is not the desk's HTML"
-pass "1 web root returns the desk"
+printf '%s' "$body" | grep -q "<title>Matchproof Narrator Trials</title>" || fail "1 web root is 200 but is not the Table's HTML"
+desk="$(curl -fsS --max-time 20 "$WEB_URL/desk")" || fail "1 $WEB_URL/desk did not return 200"
+printf '%s' "$desk" | grep -q "<title>Matchproof live desk</title>" || fail "1 /desk is 200 but is not the desk's HTML"
+pass "1 web root returns the Table and /desk the desk"
 
 # 2. API health
 health="$(curl -fsS --max-time 60 "$API_URL/health")" || fail "2 $API_URL/health did not return 200"

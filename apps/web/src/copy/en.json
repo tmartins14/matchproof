@@ -449,6 +449,11 @@
     },
     "compare": {
       "crumb": "Fixture {fixture} · {home} v {away} · moment",
+      "fixtureSelect": "Fixture",
+      "momentSelect": "Moment",
+      "fixtureOption": "{n} · {home} v {away} · {brief}",
+      "momentOption": "{clock} {label}",
+      "trapOption": "{clock} TRAP · {label}",
       "chip": "{clock} {label}",
       "freeze": "Freeze frame · {clock}",
       "sameFrame": "Same frame for every narrator.",

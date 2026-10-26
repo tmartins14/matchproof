@@ -31,7 +31,7 @@ export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mo
   return (
     <>
       {topBar ? <TopBar /> : null}
-    <header className="mp-header mp-above">
+    <header className={`mp-header mp-above${topBar ? " mp-header--strip" : ""}`}>
       {topBar ? deskLabel ? <span className="tr-hd tr-desk-label">{deskLabel}</span> : null : <Wordmark first={copy.wordmark.first} second={copy.wordmark.second} />}
       <Scorebug
         label={h.score}

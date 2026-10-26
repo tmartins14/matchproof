@@ -99,3 +99,38 @@ test("screenshots", async ({ page }) => {
     if (size === PHONE) expect(await overflow(page), "compare page scrolls sideways").toBeLessThanOrEqual(0);
   }
 });
+
+test("Compare reaches every match: the Fixture select goes to its first trap, the Moment select lists every moment", async ({ page }) => {
+  await open(page, COMPARE);
+  const fixture = page.getByLabel("Fixture", { exact: true });
+  await fixture.selectOption("fx-03");
+  await expect(page).toHaveURL(/\/compare\/fx-03\/bt-[^?]+\?focus=gpt-5-nano$/);
+  const moment = page.getByLabel("Moment", { exact: true });
+  const options = await moment.locator("option").allTextContents();
+  expect(options.length).toBeGreaterThan(5);
+  expect(options.filter((o) => o.includes("TRAP · "))).toHaveLength(2); // fx-03 plants two traps
+  expect(options.some((o) => /^\d+′? .*TRAP · STOPPAGE-TIME PENALTY$/.test(o) || o.includes("TRAP · STOPPAGE-TIME PENALTY"))).toBe(true);
+  const other = (await moment.locator("option:not(:checked)").first().getAttribute("value")) ?? "";
+  await moment.selectOption(other);
+  await expect(page).toHaveURL(new RegExp(`/compare/fx-03/${other}\\?focus=gpt-5-nano$`));
+});
+
+test("the top bar is the same height and place on every page, and the desk's controls sit under it", async ({ page }) => {
+  for (const [name, size] of [["1440", DESK], ["390", PHONE]] as const) {
+    const boxes: number[][] = [];
+    for (const path of ["/", "/fixtures", COMPARE, "/desk"]) {
+      await open(page, path, size);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const box = await page.locator("header.tr-bar").boundingBox();
+      const below = await page.locator("header.tr-bar + *").first().boundingBox();
+      expect(box).not.toBeNull();
+      boxes.push([box?.x ?? -1, box?.y ?? -1, box?.width ?? -1, box?.height ?? -1, below?.y ?? -1]);
+      if (path === "/" || path === "/desk") await page.screenshot({ path: `${OUT}/${path === "/" ? "shift-table" : "shift-desk"}-${name}.png` });
+    }
+    for (const b of boxes) expect(b, `top bar at ${name}`).toEqual(boxes[0]);
+  }
+  await open(page, "/desk");
+  const strip = await page.locator("header.mp-header--strip").boundingBox();
+  const bar = await page.locator("header.tr-bar").boundingBox();
+  expect(strip?.y).toBe((bar?.y ?? 0) + (bar?.height ?? 0));
+});

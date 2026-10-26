@@ -18,13 +18,19 @@ from typing import Any
 import yaml
 from agents.llm_client import load_models
 from agents.pipeline import tool_result
+from agents.reconcile import (
+    NO_FACTS_REASON,
+    NOT_IN_BUNDLE_REASON,
+    NUMBER_REASON_PREFIX,
+    PLAYER_REASON_PREFIX,
+)
 from contracts.models import Beat, Event, TrialsWeb
 from intel.display import render_minute
 from mcp_match import InMemoryMatchStore, build_server
 
 from .golden import build_store_from_brief
 from .run import ROOT
-from .trials import PACK_PATH, Fixture, load_pack
+from .trials import PACK_PATH, UNKNOWN_FACT_PREFIX, Fixture, load_pack
 
 NEXT_UP_PATH = Path(__file__).parent / "trials" / "next_up.yaml"
 WEB_FIXTURES_DIR = ROOT / "apps" / "web" / "fixtures" / "trials"
@@ -66,13 +72,39 @@ def trim(text: str, limit: int = NOTE_CHARS) -> str:
     return cut.rstrip(" ,;:.-") + "…"
 
 
+def citation_words(reason: str) -> str | None:
+    """A citation reason in plain English, with no fact id in it; None for any other reason."""
+    if reason.startswith(UNKNOWN_FACT_PREFIX):
+        return "cited a fact that doesn't exist"
+    if reason.endswith(NOT_IN_BUNDLE_REASON):
+        return "cited a fact it wasn't given"
+    if reason == NO_FACTS_REASON:
+        return "cited no facts"
+    return None
+
+
+def reason_for(bucket: str | None, reasons: list[str]) -> str:
+    """The first reason that belongs to the bucket, else the first reason."""
+    if bucket == "numbers":
+        match = next((r for r in reasons if r.startswith(NUMBER_REASON_PREFIX)), None)
+    elif bucket == "names":
+        match = next((r for r in reasons if r.startswith(PLAYER_REASON_PREFIX)), None)
+    elif bucket == "citation":
+        match = next((r for r in reasons if citation_words(r)), None)
+    else:
+        match = None
+    return match or reasons[0]
+
+
 def note_of(claim: Json) -> str:
-    """`<bucket>: <reason>` with the reviewer's prefix ("Judge (overclaim): ") stripped."""
+    """`<bucket>: <reason>` with the reviewer's prefix ("Judge (overclaim): ") stripped. The reason
+    is the one that matches the bucket; citation reasons are plain English, never a fact id."""
     reasons = claim["reasons"]
     if not reasons:
         return trim(claim["text"])
-    reason = REVIEWER_PREFIX.sub("", reasons[0])
     bucket = claim["reason_bucket"]
+    reason = reason_for(bucket, reasons)
+    reason = citation_words(reason) or REVIEWER_PREFIX.sub("", reason)
     return trim(f"{bucket}: {reason}" if bucket else reason)
 
 

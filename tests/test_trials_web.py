@@ -154,6 +154,41 @@ def test_note_is_bucket_and_reason_with_the_reviewer_prefix_stripped() -> None:
     assert note_of(claim("STANDS", 1, "bt-1", reasons=[])) == "Text."
 
 
+def test_note_says_citation_reasons_in_plain_english_with_no_fact_id() -> None:
+    not_given = claim(
+        "OVERTURNED",
+        1,
+        "bt-1",
+        reasons=["Cited fact fx-000123 is not in the beat's fact bundle."],
+        reason_bucket="citation",
+    )
+    assert note_of(not_given) == "citation: cited a fact it wasn't given"
+    unknown = claim(
+        "OVERTURNED",
+        1,
+        "bt-1",
+        reasons=["Unknown fact id fx-nope."],
+        reason_bucket="citation",
+    )
+    assert note_of(unknown) == "citation: cited a fact that doesn't exist"
+    for row in (not_given, unknown):
+        assert "fx-" not in note_of(row)
+
+
+def test_note_uses_the_reason_that_matches_the_bucket() -> None:
+    both = claim(
+        "OVERTURNED",
+        1,
+        "bt-1",
+        reasons=[
+            "Cited fact fx-9 is not in the beat's fact bundle.",
+            'The number "6" matches no display rendering of the cited facts.',
+        ],
+        reason_bucket="numbers",
+    )
+    assert note_of(both).startswith("numbers: The number")
+
+
 def test_note_is_cut_at_a_word_boundary_near_90_characters() -> None:
     text = "word " * 60
     got = trim(text)

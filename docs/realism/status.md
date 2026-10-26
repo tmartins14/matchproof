@@ -12,6 +12,12 @@ Part C is out of scope for this run: no `feat/realistic-play`, no `engine.py` / 
 | B3.4 calibration | 16:00 | pass: `pytest -m slow -k calibration` and `sim calibrate --seeds 1-8` (every row, shape rows included) |
 | B3.5 fixtures | 16:04 | regenerated: `stream-short`, `metric-families`, six `public/trials/streams`; `desk.json` and `setup.json` unchanged; adv-42's quoted compactness 730 -> 755 |
 | B3.6 checks | 16:17 | pass: lint, typecheck, check-contracts, `pytest -n 2 -m "not slow"` (646 passed, 1 xfailed), `npm test` (80 passed) |
+| B merged | 16:32 | PR 39 merged by me after CI green (13 min) |
+| B4.1 grok fixes, B4.2 trap labels | 16:48 | PR 40 merged: cause names on `no_answer` rows, grok-4.7 `timeout_s: 60`, trap `label`. `narrator-grok` not created: `InsufficientQuota` at capacity 50 (30 units free) and the retry at 30 was refused by the permission classifier; grok keeps `judge-grok` |
+| B4.3 full pack run | 16:33 to 18:17 | done (6253 s, referee cost 0.94 USD). `--upload` failed with 403 `AuthorizationPermissionMismatch` (not a blocker); `--publish` wrote the web copy |
+| B4.4 regenerate | 18:19 | `trials_web`, `record_fixtures`, `npm run build` ok |
+| B4.5 deploy | 18:21 | all four conditions held (85 scored rows each; gpt-5-mini measured and cleared; build passes; recorded beat ids match the export). `azd deploy web` done, `scripts/smoke_prod.sh` 5 of 5 ok |
+| B4.6 README | 18:30 | README headline, limits, Status and PROGRESS updated; PR open |
 
 ## Realism, before and after (6 pack fixtures + calibration seeds 1-8 x 4 storylines)
 

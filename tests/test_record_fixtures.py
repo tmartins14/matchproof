@@ -32,12 +32,14 @@ def test_virtual_pacer_jumps_forward_and_never_back() -> None:
     assert asyncio.run(run()) == 2.5
 
 
-def test_recording_twice_gives_the_same_bytes_as_the_committed_file() -> None:
+def test_recording_twice_gives_the_same_bytes_and_the_committed_content() -> None:
     fixture = next(f for f in load_pack(PACK_PATH)[1] if f.id == "fx-04")
     first, _, _ = record(fixture)
     second, _, _ = record(fixture)
     assert first == second
-    assert first == (DEFAULT_DIR / "fx-04.ndjson.gz").read_bytes()
+    # The compressed bytes can differ by platform (zlib build); what the file says must not.
+    committed = gzip.decompress((DEFAULT_DIR / "fx-04.ndjson.gz").read_bytes())
+    assert gzip.decompress(first) == committed
 
 
 @pytest.mark.parametrize("fixture", FIXTURE_IDS)

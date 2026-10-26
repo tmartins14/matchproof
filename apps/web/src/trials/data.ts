@@ -1,4 +1,5 @@
 import type { TrialsWeb } from "@/contracts/types";
+import { copy } from "@/desk/copy";
 import type { CachedRow } from "@/live/cached";
 import raw from "../../fixtures/trials/web-pack-v1.json";
 
@@ -55,3 +56,19 @@ export const compareHref = (fixture: string, beat: string, focus: string): strin
 /** Claim id to Table verdict, for the candidate's scored rows on a fixture. */
 export const scoredVerdicts = (candidate: string, fixture: string): Map<string, ClaimRow["verdict"]> =>
   new Map(web.results.claims.filter((c) => c.candidate === candidate && c.fixture === fixture && c.scored).map((c) => [c.id, c.verdict]));
+
+/** One Fixtures cell: the Table's verdict for the row, and why a lost row got it. */
+export interface Cell {
+  verdict: ClaimRow["verdict"];
+  /** HELD because the model call failed: the stamp reads NO ANSWER */
+  noAnswer: boolean;
+  /** plain English for a lost row that was overturned (tooltip and subtext) */
+  why?: string;
+}
+
+/** The cell for a candidate on a beat, from its scored row; undefined when there is none. */
+export function cellOf(candidate: string, fixture: string, beat: string): Cell | undefined {
+  const row = scoredClaim(candidate, fixture, beat);
+  if (!row) return undefined;
+  return { verdict: row.verdict, noAnswer: row.lost === "no_answer", why: row.lost && row.lost !== "no_answer" ? copy.en.trials.lostReason[row.lost] : undefined };
+}

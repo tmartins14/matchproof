@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { copy, fill } from "@/desk/copy";
-import { scoredClaim, tableOrder, trapClocks, web } from "@/trials/data";
+import { cellOf, tableOrder, trapClocks, web } from "@/trials/data";
 import { fixtureNumber, runDate, verdictKey } from "@/trials/format";
 import { VerdictStamp } from "../desk/VerdictStamp";
 import { Shell } from "./Shell";
@@ -78,12 +78,19 @@ export function FixturesPage() {
                   </div>
                 </div>
                 {tableOrder.map((id) => {
-                  const claim = trap ? scoredClaim(id, f.id, trap) : undefined;
+                  const cell = trap ? cellOf(id, f.id, trap) : undefined;
                   return (
                     <div key={id} role="cell" className={`tr-fx-cell${focus === id ? " tr-fx-focus" : ""}`}>
                       {trap ? (
                         <Link href={`/compare/${f.id}/${trap}?focus=${id}`} className="tr-fx-link" aria-label={fill(t.open, { id, fixture: fixtureNumber(f.id) })}>
-                          {claim && !claim.lost ? <VerdictStamp verdict={verdictKey(claim.verdict)} copy={c} /> : <span className="tr-chip">{t.noClaim}</span>}
+                          {cell ? (
+                            <span className="tr-fx-stamp">
+                              <VerdictStamp verdict={verdictKey(cell.verdict)} copy={c} reason={cell.why} label={cell.noAnswer ? t.noAnswer : undefined} />
+                              {cell.why ? <span className="tr-sub">{cell.why}</span> : null}
+                            </span>
+                          ) : (
+                            <span className="tr-sub">—</span>
+                          )}
                         </Link>
                       ) : null}
                     </div>

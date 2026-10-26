@@ -1,4 +1,5 @@
 import type { Beat, Claim, StreamMessage } from "@/contracts/types";
+import { copy } from "@/desk/copy";
 import type { ClaimRow } from "@/trials/data";
 
 /** One line of a recorded fixture stream (scripts/record_fixtures.py). */
@@ -21,6 +22,7 @@ export interface Timed {
 /** The on-air time to use when a row has none (a lost row). */
 export const DEFAULT_LATENCY_MS = 1500;
 const NO_CLAIM_TEXT = "No claim aired";
+const lostReason = copy.en.trials.lostReason;
 
 const VERDICT = { STANDS: "verified", AMENDED: "rephrased", OVERTURNED: "blocked", HELD: "delayed" } as const;
 
@@ -48,20 +50,21 @@ export async function loadRecording(fixture: string, base = ""): Promise<Recorde
   return parseNdjson(await decodeRecording(new Uint8Array(await reply.arrayBuffer())));
 }
 
-/** The claim as the Desk shows it: still `checking` on the draft, or settled in the row's verdict. A lost row is a blocked claim with its reason. */
+/** The claim as the Desk shows it: still `checking` on the draft, or settled as the Table scored the row. */
 export function claimOf({ row, numbers }: CachedRow, stage: "checking" | "settled"): Claim {
   const lost = row.lost !== null;
-  const draft = row.draft_text || (lost ? NO_CLAIM_TEXT : row.text);
-  const reason = row.reasons[0]?.slice(0, 400) ?? "";
-  const final: Claim["verdict"] = lost ? "blocked" : (VERDICT[row.verdict] ?? "delayed");
+  const draft = row.draft_text || (lost ? (row.lost === "no_answer" ? lostReason.no_answer : NO_CLAIM_TEXT) : row.text);
+  // The Table's verdict is the row's own: a lost row is OVERTURNED, or HELD when the model gave no answer.
+  const final: Claim["verdict"] = VERDICT[row.verdict] ?? "delayed";
   const kind = stage === "checking" ? "checking" : final;
+  const reason = (row.lost ? lostReason[row.lost] : row.reasons[0])?.slice(0, 400) ?? "";
   const changed = kind === "rephrased" || kind === "blocked";
   const claim: Claim = {
     id: row.id,
     beat_id: row.beat,
     lang: "en",
     // A blocked claim keeps the Narrator's draft wording for audit.
-    text: kind === "blocked" || kind === "checking" ? draft : row.text,
+    text: kind === "blocked" || kind === "checking" || kind === "delayed" ? draft : row.text,
     fact_ids: row.fact_ids,
     numbers,
     verdict: kind,

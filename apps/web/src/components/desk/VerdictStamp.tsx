@@ -6,9 +6,11 @@ interface VerdictStampProps {
   copy: Copy;
   /** Why the verdict changed; shown on hover and focus for AMENDED and OVERTURNED. */
   reason?: string;
+  /** replaces the verdict's label (NO ANSWER on a HELD row the model never answered) */
+  label?: string;
 }
 
-export function VerdictStamp({ verdict, copy, reason }: VerdictStampProps) {
+export function VerdictStamp({ verdict, copy, reason, label }: VerdictStampProps) {
   const showReason = reason && (verdict === "rephrased" || verdict === "blocked");
   return (
     <span
@@ -17,7 +19,7 @@ export function VerdictStamp({ verdict, copy, reason }: VerdictStampProps) {
       title={showReason ? reason : undefined}
       tabIndex={showReason ? 0 : undefined}
     >
-      {copy.verdict[verdict]}
+      {label ?? copy.verdict[verdict]}
     </span>
   );
 }

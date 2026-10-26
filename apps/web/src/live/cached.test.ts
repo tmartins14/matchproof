@@ -108,7 +108,7 @@ describe("the cached timeline", () => {
 
 describe("a cached claim", () => {
   it("validates as claim.schema.json in every stage", () => {
-    const lost = row({ lost: "no_claim", verdict: "HELD", draft_text: "", text: "", fact_ids: [], reasons: ["The Narrator wrote no claim for this beat."] });
+    const lost = row({ lost: "no_claim", verdict: "OVERTURNED", draft_text: "", text: "", fact_ids: [], reasons: ["The Narrator wrote no claim for this beat."] });
     const amended = row({ verdict: "AMENDED", text: "New.", draft_text: "Old.", reasons: ["Judge (wording): off."] });
     const held = row({ verdict: "HELD" });
     for (const r of [rows[0]!.row, rows[1]!.row, lost, amended, held]) {
@@ -132,12 +132,25 @@ describe("a cached claim", () => {
     expect([of("STANDS"), of("AMENDED"), of("OVERTURNED"), of("HELD")]).toEqual(["verified", "rephrased", "blocked", "delayed"]);
   });
 
-  it("renders a lost row as blocked with its reason", () => {
-    const lost = row({ lost: "no_claim", verdict: "HELD", draft_text: "", text: "", fact_ids: [], reasons: ["The Narrator wrote no claim for this beat."], latency_ms: null });
-    const t = buildTimeline(lines, [{ row: lost, numbers: [] }]);
-    const d = t.map((x) => x.msg).reduce(accumulate, emptyDesk(fixture.brief, "live"));
-    expect(d.claims).toHaveLength(1);
-    expect(d.claims[0]).toMatchObject({ verdict: "blocked", text: "No claim aired", reason: "The Narrator wrote no claim for this beat." });
+  it("renders a rejected, unreadable or no-claim row as blocked with a plain reason", () => {
+    const cases = [
+      ["rejected", "cited a fact that doesn't exist"],
+      ["unreadable", "output could not be read"],
+      ["no_claim", "wrote no claim"],
+    ] as const;
+    for (const [lost, reason] of cases) {
+      const r = row({ lost, verdict: "OVERTURNED", draft_text: "", text: "", fact_ids: [], reasons: ["raw reason"], latency_ms: null });
+      const d = buildTimeline(lines, [{ row: r, numbers: [] }]).map((x) => x.msg).reduce(accumulate, emptyDesk(fixture.brief, "live"));
+      expect(d.claims).toHaveLength(1);
+      expect(d.claims[0], lost).toMatchObject({ verdict: "blocked", text: "No claim aired", reason });
+    }
+  });
+
+  it("renders a no-answer row as a delayed (HELD) claim", () => {
+    const r = row({ lost: "no_answer", verdict: "HELD", draft_text: "", text: "", fact_ids: [], reasons: ["LlmError"], latency_ms: null });
+    const d = buildTimeline(lines, [{ row: r, numbers: [] }]).map((x) => x.msg).reduce(accumulate, emptyDesk(fixture.brief, "live"));
+    expect(d.claims[0]).toMatchObject({ verdict: "delayed" });
+    expect(d.claims[0]?.reason).toBeUndefined();
   });
 
   it("keeps the draft on a blocked claim and the numbers the export gave", () => {

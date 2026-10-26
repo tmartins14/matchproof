@@ -411,10 +411,10 @@
       "howTitle": "How a fixture is written",
       "how": "A fixture is a seed and a plan: the moments the match must contain, such as a red card on the hour or a stoppage-time penalty. The generator plays it out, so every narrator sees the same events and the same facts.",
       "stampTitle": "What a stamp means",
-      "stamp": "STANDS: the claim matches the facts. AMENDED: the wording was fixed. OVERTURNED: the claim was withdrawn. NO CLAIM: the narrator gave no answer for the moment.",
+      "stamp": "STANDS: the claim matches the facts. AMENDED: the wording was fixed. OVERTURNED: the claim was withdrawn, cited a fact that doesn't exist, could not be read, or was never written. NO ANSWER: the model call failed; it scores 0.",
       "colFixture": "Fixture",
       "trapMoment": "Stamp on the first trap moment",
-      "noClaim": "NO CLAIM",
+      "noAnswer": "NO ANSWER",
       "open": "Compare {id} on fixture {fixture}"
     },
     "compare": {
@@ -467,6 +467,7 @@
       "runLive": "Run narrator",
       "runCached": "Replay cached",
       "cachedChip": "CACHED · {pack}",
+      "replay": "REPLAY · {pack}",
       "cachedSpeed": "Cached replays run at 6×",
       "cachedOnly": "Cached runs play pack fixtures only",
       "fallback": "Live unavailable. Replay this fixture from {pack}?",
@@ -482,6 +483,12 @@
       "AMENDED": "Amended",
       "OVERTURNED": "Overturned",
       "HELD": "Held"
+    },
+    "lostReason": {
+      "rejected": "cited a fact that doesn't exist",
+      "unreadable": "output could not be read",
+      "no_claim": "wrote no claim",
+      "no_answer": "no answer from the narrator"
     },
     "lost": {
       "rejected": "the store refused its claims",

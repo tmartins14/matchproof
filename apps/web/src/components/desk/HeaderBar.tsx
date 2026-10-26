@@ -12,6 +12,8 @@ interface HeaderBarProps {
   score: { home: number; away: number };
   clock: string;
   status: "off" | "pre" | "live" | "halfTime" | "fullTime";
+  /** `REPLAY · pack-v1`: shown in place of LIVE for the whole cached run */
+  replayText?: string;
   mode: Mode;
   lang: Lang;
   onMode: (mode: Mode) => void;
@@ -24,7 +26,7 @@ interface HeaderBarProps {
   cachedChip?: string;
 }
 
-export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mode, lang, onMode, onLang, topBar, deskLabel, cachedChip }: HeaderBarProps) {
+export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mode, lang, onMode, onLang, topBar, deskLabel, cachedChip, replayText }: HeaderBarProps) {
   const h = copy.header;
   return (
     <>
@@ -38,8 +40,8 @@ export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mo
         home={score.home}
         away={score.away}
         clock={clock}
-        status={status}
-        statusText={{ off: "", pre: h.pre, live: h.live, halfTime: h.halfTime, fullTime: h.fullTime }[status]}
+        status={replayText && status === "live" ? "replay" : status}
+        statusText={replayText && status === "live" ? replayText : { off: "", pre: h.pre, live: h.live, halfTime: h.halfTime, fullTime: h.fullTime }[status]}
       />
       {cachedChip ? <span className="tr-chip tr-chip--cached">{cachedChip}</span> : null}
       <div className="mp-controls">

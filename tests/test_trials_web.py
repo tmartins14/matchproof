@@ -12,6 +12,7 @@ from evals.trials import PACK_PATH, load_pack
 from evals.trials_web import (
     build_web,
     fail_top_of,
+    hero_of,
     is_measured,
     live_narrator_of,
     note_of,
@@ -423,3 +424,57 @@ def test_claim_numbers_tie_each_number_to_a_fact_the_row_cites() -> None:
     for i, c in enumerate(claims):
         assert {n["fact_id"] for n in numbers[str(i)]} <= set(c["fact_ids"])
     assert any(numbers.values())
+
+
+def summary_row(
+    candidate: str, *, cleared: bool, pts: int, held: int = 0
+) -> dict[str, Any]:
+    return {
+        "candidate": candidate,
+        "claims": 10,
+        "held": held,
+        "cleared": cleared,
+        "pts": pts,
+        "usd_per_match": 0.01,
+        "p90_ms": 1000,
+    }
+
+
+def test_hero_names_the_sole_cleared_and_the_worst_uncleared() -> None:
+    summary = [
+        summary_row("a", cleared=True, pts=100),
+        summary_row("b", cleared=False, pts=-5),
+        summary_row("c", cleared=False, pts=-50),
+        summary_row("d", cleared=False, pts=-90, held=9),  # unmeasured: never the worst
+    ]
+    record = {
+        k: {"STANDS": 14 - o, "AMENDED": 0, "OVERTURNED": o, "HELD": 0}
+        for k, o in {"a": 3, "b": 8, "c": 8, "d": 14}.items()
+    }
+    picks = {"sole": {"candidate": "a"}}
+    got = hero_of(summary, picks, record)
+    assert got == {
+        "sole": {"candidate": "a", "overturned": 3, "total": 14},
+        "worst": {
+            "candidate": "c",
+            "overturned": 8,
+            "total": 14,
+        },  # ties go to fewer points
+    }
+
+
+def test_hero_is_null_without_a_sole_cleared_narrator() -> None:
+    assert hero_of([], {"sole": None}, {}) is None
+
+
+def test_trap_verdicts_cover_every_trap_of_every_fixture(web: dict[str, Any]) -> None:
+    traps = {f["id"]: f["traps"] for f in web["fixtures"]}
+    for cand, by_fixture in web["trap_verdicts"].items():
+        assert set(by_fixture) == set(traps), cand
+        for fid, rows in by_fixture.items():
+            assert [r["label"] for r in rows] == [t["label"] for t in traps[fid]]
+            assert all(r["beat"] in web["moments"][fid] and r["clock"] for r in rows)
+    record = web["trap_record"]
+    for cand, by_fixture in web["trap_verdicts"].items():
+        n = sum(len(rows) for rows in by_fixture.values())
+        assert n == sum(record[cand].values())

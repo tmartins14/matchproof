@@ -148,6 +148,77 @@ def trap_record_of(
     return record
 
 
+def trap_total(record: Json) -> int:
+    return int(sum(record.values()))
+
+
+def hero_of(summary: list[Json], picks: Json, trap_record: Json) -> Json | None:
+    """The Table's headline parts: the sole narrator cleared for air and the worst measured one that is
+    not, each with its overturned and total trap moments. Null when no one narrator is cleared."""
+    sole = picks["sole"]
+    if sole is None:
+        return None
+
+    def part(candidate: str) -> Json:
+        rec = trap_record[candidate]
+        return {
+            "candidate": candidate,
+            "overturned": rec["OVERTURNED"],
+            "total": trap_total(rec),
+        }
+
+    out = [
+        r
+        for r in summary
+        if is_measured(r) and not r["cleared"] and r["candidate"] in trap_record
+    ]
+    worst = max(
+        out,
+        key=lambda r: (trap_record[r["candidate"]]["OVERTURNED"], -r["pts"]),
+        default=None,
+    )
+    return {
+        "sole": part(sole["candidate"]),
+        "worst": part(worst["candidate"]) if worst else None,
+    }
+
+
+def trap_verdicts_of(
+    claims: list[Json],
+    fixture_rows: list[Json],
+    moments: Json,
+    candidate: str,
+) -> Json:
+    """Per fixture, the candidate's scored claim on each trap beat, in trap order. A lost row keeps the
+    verdict the Table gives it."""
+    out: Json = {}
+    for f in fixture_rows:
+        rows = []
+        for trap, tb in zip(f["traps"], f["trap_beats"], strict=True):
+            claim = next(
+                (
+                    c
+                    for c in claims
+                    if c["candidate"] == candidate
+                    and c["fixture"] == f["id"]
+                    and c["beat"] == tb["beat"]
+                    and c["scored"]
+                ),
+                None,
+            )
+            if claim is not None:
+                rows.append(
+                    {
+                        "label": trap["label"],
+                        "clock": moments[f["id"]][tb["beat"]]["clock"],
+                        "beat": tb["beat"],
+                        "verdict": claim["verdict"],
+                    }
+                )
+        out[f["id"]] = rows
+    return out
+
+
 def fail_top_of(profile: Json) -> Json | None:
     """The biggest bucket of the fail profile, or null when nothing failed."""
     if not profile:
@@ -406,6 +477,20 @@ def build_web(
         },
         "fail_top": {r["candidate"]: fail_top_of(r["fail_profile"]) for r in summary},
         "picks": picks_of(summary),
+        "hero": hero_of(
+            summary,
+            picks_of(summary),
+            {
+                r["candidate"]: trap_record_of(results["claims"], r["candidate"], traps)
+                for r in summary
+            },
+        ),
+        "trap_verdicts": {
+            r["candidate"]: trap_verdicts_of(
+                results["claims"], fixture_rows, moments, r["candidate"]
+            )
+            for r in summary
+        },
         "points": dict(POINTS),
         "live_narrator": live_narrator_of(results["candidates"], narrator_deployment),
         "fixtures": fixture_rows,

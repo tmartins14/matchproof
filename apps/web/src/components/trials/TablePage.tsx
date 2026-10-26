@@ -6,11 +6,31 @@ import { Shell } from "./Shell";
 
 function Hero() {
   const t = copy.en.trials;
+  const h = web.hero;
   return (
     <section className="tr-card tr-hero">
       <div className="tr-hd">{t.hero.kicker}</div>
-      <h1 className="tr-h1">{fill(t.hero.headline, { models: candidateCount(), fixtures: web.fixtures.length })}</h1>
-      <p className="tr-body">{t.hero.how}</p>
+      {h ? (
+        <h1 className="tr-h1">
+          <span className="tr-h1-line">{fill(t.hero.cleared, { id: h.sole.candidate, o: h.sole.overturned, n: h.sole.total })}</span>
+          {h.worst ? <span className="tr-h1-line tr-h1-line--sub">{fill(t.hero.worst, { id: h.worst.candidate, o: h.worst.overturned, n: h.worst.total })}</span> : null}
+        </h1>
+      ) : (
+        <>
+          <h1 className="tr-h1">{fill(t.hero.headline, { models: candidateCount(), fixtures: web.fixtures.length })}</h1>
+          <p className="tr-body">{t.hero.how}</p>
+        </>
+      )}
+      <div className="tr-read" aria-label={t.hero.read.title}>
+        <div className="tr-hd">{t.hero.read.title}</div>
+        <ol className="tr-read-list">
+          {(["rank", "inspect", "deploy"] as const).map((k, i) => (
+            <li key={k}>
+              <span className="tr-step-n">{i + 1}</span> <strong>{t.stepper[k]}</strong> — {t.hero.read[k]}
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }
@@ -128,13 +148,19 @@ function NextUp() {
 export function TablePage() {
   return (
     <Shell>
-      <div className="tr-strip">
-        <Hero />
-        <Referee />
-        <Scoring />
-      </div>
+      <Hero />
       <LeagueTable />
       <Picks />
+      <section className="tr-how" aria-labelledby="how-scored">
+        <h2 id="how-scored" className="tr-hd">
+          {copy.en.trials.howScored.title}
+        </h2>
+        <p className="tr-body">{copy.en.trials.hero.how}</p>
+        <div className="tr-strip">
+          <Referee />
+          <Scoring />
+        </div>
+      </section>
       <Footer />
       <NextUp />
     </Shell>

@@ -737,6 +737,16 @@ class TrapRecord(BaseModel):
     HELD: Annotated[int, Field(ge=0)]
 
 
+class TrapVerdict(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: str
+    clock: str
+    beat: BeatId
+    verdict: Verdict1
+
+
 class FailTop(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1018,6 +1028,15 @@ class TrialVerdict(Enum):
     HELD = 'HELD'
 
 
+class HeroPart(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidate: str
+    overturned: Annotated[int, Field(ge=0)]
+    total: Annotated[int, Field(ge=0)]
+
+
 class Highlight(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1282,6 +1301,19 @@ class TrialsResults(BaseModel):
     ]
 
 
+class Hero(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sole: HeroPart
+    worst: Annotated[
+        HeroPart | None,
+        Field(
+            description='The measured narrator that is not cleared with the most overturned trap moments.'
+        ),
+    ]
+
+
 class Fixture1(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1337,6 +1369,18 @@ class TrialsWeb(BaseModel):
         dict[str, TrapRecord],
         Field(
             description='Per candidate, the verdicts of its scored claims on trap beats (every trap beat of every fixture). Present for unmeasured candidates too.'
+        ),
+    ]
+    hero: Annotated[
+        Hero | None,
+        Field(
+            description="The Table's headline parts. Null when there is no sole cleared narrator."
+        ),
+    ]
+    trap_verdicts: Annotated[
+        dict[str, dict[str, list[TrapVerdict]]],
+        Field(
+            description='Per candidate, per fixture: its scored claim on each trap beat, in trap order.'
         ),
     ]
     fail_top: Annotated[

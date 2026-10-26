@@ -4,9 +4,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { copy, fill } from "@/desk/copy";
-import { cellOf, type Cell, tableOrder, trapLabels, web } from "@/trials/data";
+import { tableOrder, trapLabels, web } from "@/trials/data";
 import { fixtureNumber, runDate, verdictKey } from "@/trials/format";
-import { VerdictStamp } from "../desk/VerdictStamp";
 import { Shell } from "./Shell";
 
 function Header() {
@@ -36,13 +35,6 @@ function Header() {
   );
 }
 
-/** The stamp's words, so the link's accessible name contains them. */
-function cellText(cell: Cell | undefined): string {
-  const t = copy.en.trials.fixtures;
-  if (!cell) return "";
-  return cell.noAnswer ? t.noAnswer : copy.en.verdict[verdictKey(cell.verdict)];
-}
-
 export function FixturesPage() {
   const t = copy.en.trials.fixtures;
   const c = copy.en;
@@ -54,6 +46,7 @@ export function FixturesPage() {
   return (
     <Shell>
       <Header />
+      <p className="tr-body tr-gridnote">{t.gridNote}</p>
       <div className="tr-table-wrap">
         <div role="table" aria-label={t.title} className="tr-fx" style={{ ["--cols" as string]: tableOrder.length }}>
           <div role="row" className="tr-fx-row tr-head">
@@ -67,7 +60,6 @@ export function FixturesPage() {
             ))}
           </div>
           {web.fixtures.map((f) => {
-            const trap = f.trap_beats[0]?.beat;
             const on = fixture === f.id;
             return (
               <div key={f.id} role="row" ref={on ? row : undefined} className={`tr-fx-row${on ? " tr-fx-row--on" : ""}`}>
@@ -84,21 +76,31 @@ export function FixturesPage() {
                     ))}
                   </div>
                 </div>
-                {tableOrder.map((id) => {
-                  const cell = trap ? cellOf(id, f.id, trap) : undefined;
-                  return (
-                    <div key={id} role="cell" className={`tr-fx-cell${focus === id ? " tr-fx-focus" : ""}`}>
-                      {trap ? (
-                        <span className="tr-fx-stamp">
-                          <Link href={`/compare/${f.id}/${trap}?focus=${id}`} className="tr-fx-link" aria-label={`${cellText(cell)}. ${fill(t.open, { id, fixture: fixtureNumber(f.id) })}`}>
-                            {cell ? <VerdictStamp verdict={verdictKey(cell.verdict)} copy={c} reason={cell.why} label={cell.noAnswer ? t.noAnswer : undefined} /> : <span className="tr-sub">—</span>}
+                {tableOrder.map((id) => (
+                  <div key={id} role="cell" className={`tr-fx-cell${focus === id ? " tr-fx-focus" : ""}`}>
+                    <span className="tr-fx-stamps">
+                      {(web.trap_verdicts[id]?.[f.id] ?? []).map((v) => {
+                        const word = v.verdict === "HELD" ? t.noAnswer : c.verdict[verdictKey(v.verdict)];
+                        return (
+                          <Link
+                            key={v.beat}
+                            href={`/compare/${f.id}/${v.beat}?focus=${id}`}
+                            className={`tr-fx-mini tr-fx-mini--${v.verdict}`}
+                            title={fill(t.stampTip, { label: v.label, verdict: word })}
+                            aria-label={fill(t.stampName, { l: v.verdict.charAt(0), clock: v.clock, label: v.label, verdict: word, id, fixture: fixtureNumber(f.id) })}
+                          >
+                            <span className="tr-fx-letter">
+                              {v.verdict[0]}
+                            </span>{" "}
+                            <span className="tr-fx-clock">
+                              {v.clock}
+                            </span>
                           </Link>
-                          {cell?.why ? <span className="tr-sub">{cell.why}</span> : null}
-                        </span>
-                      ) : null}
-                    </div>
-                  );
-                })}
+                        );
+                      })}
+                    </span>
+                  </div>
+                ))}
               </div>
             );
           })}

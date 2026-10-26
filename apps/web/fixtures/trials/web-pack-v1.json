@@ -15317,6 +15317,412 @@
    "usd_per_match": 0.0164
   }
  },
+ "hero": {
+  "sole": {
+   "candidate": "gpt-5-mini",
+   "overturned": 3,
+   "total": 14
+  },
+  "worst": {
+   "candidate": "gpt-5-nano",
+   "overturned": 8,
+   "total": 14
+  }
+ },
+ "trap_verdicts": {
+  "grok-4.7": {
+   "fx-01": [
+    {
+     "label": "RED CARD 61′",
+     "clock": "61′",
+     "beat": "bt-001374-card",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "GOAL 87′",
+     "clock": "87′",
+     "beat": "bt-001962-open_play_goal",
+     "verdict": "STANDS"
+    }
+   ],
+   "fx-02": [
+    {
+     "label": "EQUALISER 79′",
+     "clock": "79′",
+     "beat": "bt-001815-set_piece_goal",
+     "verdict": "HELD"
+    },
+    {
+     "label": "LATE WINNER 90+6′",
+     "clock": "90+6′",
+     "beat": "bt-002202-high_turnover_goal",
+     "verdict": "STANDS"
+    }
+   ],
+   "fx-03": [
+    {
+     "label": "EQUALISER 34′",
+     "clock": "34′",
+     "beat": "bt-000776-counter_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "STOPPAGE-TIME PENALTY 90+8′",
+     "clock": "90+8′",
+     "beat": "bt-002199-open_play_goal",
+     "verdict": "STANDS"
+    }
+   ],
+   "fx-04": [
+    {
+     "label": "COUNTER GOAL 74′",
+     "clock": "74′",
+     "beat": "bt-001725-counter_goal",
+     "verdict": "STANDS"
+    }
+   ],
+   "fx-05": [
+    {
+     "label": "PENALTY 11′",
+     "clock": "11′",
+     "beat": "bt-000250-open_play_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "RED CARD 25′",
+     "clock": "25′",
+     "beat": "bt-000536-card",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "COUNTER GOAL 56′",
+     "clock": "56′",
+     "beat": "bt-001246-counter_goal",
+     "verdict": "STANDS"
+    }
+   ],
+   "fx-06": [
+    {
+     "label": "COUNTER GOAL 37′",
+     "clock": "37′",
+     "beat": "bt-000836-counter_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "SET-PIECE GOAL 76′",
+     "clock": "76′",
+     "beat": "bt-001730-set_piece_goal",
+     "verdict": "HELD"
+    },
+    {
+     "label": "EQUALISER 88′",
+     "clock": "88′",
+     "beat": "bt-002020-high_turnover_goal",
+     "verdict": "AMENDED"
+    },
+    {
+     "label": "LATE WINNER 90+7′",
+     "clock": "90+7′",
+     "beat": "bt-002191-open_play_goal",
+     "verdict": "STANDS"
+    }
+   ]
+  },
+  "gpt-5-mini": {
+   "fx-01": [
+    {
+     "label": "RED CARD 61′",
+     "clock": "61′",
+     "beat": "bt-001374-card",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "GOAL 87′",
+     "clock": "87′",
+     "beat": "bt-001962-open_play_goal",
+     "verdict": "OVERTURNED"
+    }
+   ],
+   "fx-02": [
+    {
+     "label": "EQUALISER 79′",
+     "clock": "79′",
+     "beat": "bt-001815-set_piece_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "LATE WINNER 90+6′",
+     "clock": "90+6′",
+     "beat": "bt-002202-high_turnover_goal",
+     "verdict": "STANDS"
+    }
+   ],
+   "fx-03": [
+    {
+     "label": "EQUALISER 34′",
+     "clock": "34′",
+     "beat": "bt-000776-counter_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "STOPPAGE-TIME PENALTY 90+8′",
+     "clock": "90+8′",
+     "beat": "bt-002199-open_play_goal",
+     "verdict": "AMENDED"
+    }
+   ],
+   "fx-04": [
+    {
+     "label": "COUNTER GOAL 74′",
+     "clock": "74′",
+     "beat": "bt-001725-counter_goal",
+     "verdict": "STANDS"
+    }
+   ],
+   "fx-05": [
+    {
+     "label": "PENALTY 11′",
+     "clock": "11′",
+     "beat": "bt-000250-open_play_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "RED CARD 25′",
+     "clock": "25′",
+     "beat": "bt-000536-card",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "COUNTER GOAL 56′",
+     "clock": "56′",
+     "beat": "bt-001246-counter_goal",
+     "verdict": "OVERTURNED"
+    }
+   ],
+   "fx-06": [
+    {
+     "label": "COUNTER GOAL 37′",
+     "clock": "37′",
+     "beat": "bt-000836-counter_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "SET-PIECE GOAL 76′",
+     "clock": "76′",
+     "beat": "bt-001730-set_piece_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "EQUALISER 88′",
+     "clock": "88′",
+     "beat": "bt-002020-high_turnover_goal",
+     "verdict": "AMENDED"
+    },
+    {
+     "label": "LATE WINNER 90+7′",
+     "clock": "90+7′",
+     "beat": "bt-002191-open_play_goal",
+     "verdict": "STANDS"
+    }
+   ]
+  },
+  "gpt-5-nano": {
+   "fx-01": [
+    {
+     "label": "RED CARD 61′",
+     "clock": "61′",
+     "beat": "bt-001374-card",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "GOAL 87′",
+     "clock": "87′",
+     "beat": "bt-001962-open_play_goal",
+     "verdict": "STANDS"
+    }
+   ],
+   "fx-02": [
+    {
+     "label": "EQUALISER 79′",
+     "clock": "79′",
+     "beat": "bt-001815-set_piece_goal",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "LATE WINNER 90+6′",
+     "clock": "90+6′",
+     "beat": "bt-002202-high_turnover_goal",
+     "verdict": "OVERTURNED"
+    }
+   ],
+   "fx-03": [
+    {
+     "label": "EQUALISER 34′",
+     "clock": "34′",
+     "beat": "bt-000776-counter_goal",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "STOPPAGE-TIME PENALTY 90+8′",
+     "clock": "90+8′",
+     "beat": "bt-002199-open_play_goal",
+     "verdict": "OVERTURNED"
+    }
+   ],
+   "fx-04": [
+    {
+     "label": "COUNTER GOAL 74′",
+     "clock": "74′",
+     "beat": "bt-001725-counter_goal",
+     "verdict": "OVERTURNED"
+    }
+   ],
+   "fx-05": [
+    {
+     "label": "PENALTY 11′",
+     "clock": "11′",
+     "beat": "bt-000250-open_play_goal",
+     "verdict": "AMENDED"
+    },
+    {
+     "label": "RED CARD 25′",
+     "clock": "25′",
+     "beat": "bt-000536-card",
+     "verdict": "AMENDED"
+    },
+    {
+     "label": "COUNTER GOAL 56′",
+     "clock": "56′",
+     "beat": "bt-001246-counter_goal",
+     "verdict": "AMENDED"
+    }
+   ],
+   "fx-06": [
+    {
+     "label": "COUNTER GOAL 37′",
+     "clock": "37′",
+     "beat": "bt-000836-counter_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "SET-PIECE GOAL 76′",
+     "clock": "76′",
+     "beat": "bt-001730-set_piece_goal",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "EQUALISER 88′",
+     "clock": "88′",
+     "beat": "bt-002020-high_turnover_goal",
+     "verdict": "STANDS"
+    },
+    {
+     "label": "LATE WINNER 90+7′",
+     "clock": "90+7′",
+     "beat": "bt-002191-open_play_goal",
+     "verdict": "OVERTURNED"
+    }
+   ]
+  },
+  "phi-4-mini": {
+   "fx-01": [
+    {
+     "label": "RED CARD 61′",
+     "clock": "61′",
+     "beat": "bt-001374-card",
+     "verdict": "HELD"
+    },
+    {
+     "label": "GOAL 87′",
+     "clock": "87′",
+     "beat": "bt-001962-open_play_goal",
+     "verdict": "OVERTURNED"
+    }
+   ],
+   "fx-02": [
+    {
+     "label": "EQUALISER 79′",
+     "clock": "79′",
+     "beat": "bt-001815-set_piece_goal",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "LATE WINNER 90+6′",
+     "clock": "90+6′",
+     "beat": "bt-002202-high_turnover_goal",
+     "verdict": "OVERTURNED"
+    }
+   ],
+   "fx-03": [
+    {
+     "label": "EQUALISER 34′",
+     "clock": "34′",
+     "beat": "bt-000776-counter_goal",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "STOPPAGE-TIME PENALTY 90+8′",
+     "clock": "90+8′",
+     "beat": "bt-002199-open_play_goal",
+     "verdict": "OVERTURNED"
+    }
+   ],
+   "fx-04": [
+    {
+     "label": "COUNTER GOAL 74′",
+     "clock": "74′",
+     "beat": "bt-001725-counter_goal",
+     "verdict": "HELD"
+    }
+   ],
+   "fx-05": [
+    {
+     "label": "PENALTY 11′",
+     "clock": "11′",
+     "beat": "bt-000250-open_play_goal",
+     "verdict": "HELD"
+    },
+    {
+     "label": "RED CARD 25′",
+     "clock": "25′",
+     "beat": "bt-000536-card",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "COUNTER GOAL 56′",
+     "clock": "56′",
+     "beat": "bt-001246-counter_goal",
+     "verdict": "HELD"
+    }
+   ],
+   "fx-06": [
+    {
+     "label": "COUNTER GOAL 37′",
+     "clock": "37′",
+     "beat": "bt-000836-counter_goal",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "SET-PIECE GOAL 76′",
+     "clock": "76′",
+     "beat": "bt-001730-set_piece_goal",
+     "verdict": "OVERTURNED"
+    },
+    {
+     "label": "EQUALISER 88′",
+     "clock": "88′",
+     "beat": "bt-002020-high_turnover_goal",
+     "verdict": "HELD"
+    },
+    {
+     "label": "LATE WINNER 90+7′",
+     "clock": "90+7′",
+     "beat": "bt-002191-open_play_goal",
+     "verdict": "OVERTURNED"
+    }
+   ]
+  }
+ },
  "points": {
   "STANDS": 3,
   "AMENDED": 1,
@@ -44079,6 +44485,320 @@
      ]
     }
    },
+   "bt-002174-territorial_spell": {
+    "kind": "territorial_spell",
+    "label": "90+6–90+8′",
+    "clock": "90+8′",
+    "t": 5826.5,
+    "facts": [
+     {
+      "id": "fx-shots-home-last-2m-to-t5826-50",
+      "label": "Rivermouth shots, in the latest spell of play",
+      "text": "1"
+     },
+     {
+      "id": "fx-possession_share-home-last-2m-to-t5826-50",
+      "label": "Rivermouth share of possession, in the latest spell of play",
+      "text": "73%"
+     },
+     {
+      "id": "fx-territory-home-last-2m-to-t5826-50",
+      "label": "Rivermouth share of play in the opposition half, in the latest spell of play",
+      "text": "33%"
+     },
+     {
+      "id": "fx-high_turnovers-home-last-2m-to-t5826-50",
+      "label": "Rivermouth high turnovers (ball won high up the pitch), in the latest spell of play",
+      "text": "0"
+     },
+     {
+      "id": "fx-touches_in_opponent_half-home-last-2m-to-t5826-50",
+      "label": "Rivermouth touches in the opposition half, in the latest spell of play",
+      "text": "8"
+     },
+     {
+      "id": "fx-press_rate-home-last-2m-to-t5826-50",
+      "label": "Rivermouth pressing rate, in the latest spell of play",
+      "text": "0%"
+     },
+     {
+      "id": "fx-shots-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale shots, in the latest spell of play",
+      "text": "0"
+     },
+     {
+      "id": "fx-possession_share-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale share of possession, in the latest spell of play",
+      "text": "27%"
+     },
+     {
+      "id": "fx-territory-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale share of play in the opposition half, in the latest spell of play",
+      "text": "63%"
+     },
+     {
+      "id": "fx-high_turnovers-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale high turnovers (ball won high up the pitch), in the latest spell of play",
+      "text": "0"
+     },
+     {
+      "id": "fx-touches_in_opponent_half-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale touches in the opposition half, in the latest spell of play",
+      "text": "9"
+     },
+     {
+      "id": "fx-press_rate-away-last-2m-to-t5826-50",
+      "label": "Ashford Vale pressing rate, in the latest spell of play",
+      "text": "50%"
+     }
+    ],
+    "sources": [
+     {
+      "id": "ev-002174",
+      "type": "pass",
+      "player": "Tolliver",
+      "clock": "90+6′"
+     },
+     {
+      "id": "ev-002193",
+      "type": "period_end",
+      "player": null,
+      "clock": "90+8′"
+     }
+    ],
+    "freeze": {
+     "match_id": "m-custom-106-94d2c7",
+     "t": 5731.51,
+     "freeze_frame_of": "ev-002174",
+     "ball": [
+      40.1,
+      62.7
+     ],
+     "possession": "away",
+     "players": [
+      {
+       "id": "home-01",
+       "side": "home",
+       "at": [
+        4.4,
+        42.8
+       ],
+       "speed_ms": 0.1,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-02",
+       "side": "home",
+       "at": [
+        29.0,
+        26.3
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-03",
+       "side": "home",
+       "at": [
+        28.1,
+        38.4
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-04",
+       "side": "home",
+       "at": [
+        28.1,
+        51.9
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-05",
+       "side": "home",
+       "at": [
+        29.0,
+        64.1
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-06",
+       "side": "home",
+       "at": [
+        38.1,
+        45.2
+       ],
+       "speed_ms": 0.3,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-07",
+       "side": "home",
+       "at": [
+        41.4,
+        34.4
+       ],
+       "speed_ms": 0.2,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-08",
+       "side": "home",
+       "at": [
+        41.4,
+        55.9
+       ],
+       "speed_ms": 0.1,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-09",
+       "side": "home",
+       "at": [
+        52.7,
+        27.6
+       ],
+       "speed_ms": 0.2,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-10",
+       "side": "home",
+       "at": [
+        54.8,
+        45.1
+       ],
+       "speed_ms": 0.1,
+       "role": "hold_slot"
+      },
+      {
+       "id": "home-11",
+       "side": "home",
+       "at": [
+        52.7,
+        62.6
+       ],
+       "speed_ms": 1.0,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-01",
+       "side": "away",
+       "at": [
+        112.4,
+        42.8
+       ],
+       "speed_ms": 0.1,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-02",
+       "side": "away",
+       "at": [
+        70.2,
+        22.9
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-03",
+       "side": "away",
+       "at": [
+        72.2,
+        38.0
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-04",
+       "side": "away",
+       "at": [
+        59.0,
+        59.8
+       ],
+       "speed_ms": 3.7,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-05",
+       "side": "away",
+       "at": [
+        70.2,
+        69.9
+       ],
+       "speed_ms": 0.4,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-06",
+       "side": "away",
+       "at": [
+        51.1,
+        46.4
+       ],
+       "speed_ms": 0.3,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-07",
+       "side": "away",
+       "at": [
+        44.1,
+        33.0
+       ],
+       "speed_ms": 0.2,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-08",
+       "side": "away",
+       "at": [
+        44.1,
+        59.9
+       ],
+       "speed_ms": 0.2,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-09",
+       "side": "away",
+       "at": [
+        28.4,
+        24.5
+       ],
+       "speed_ms": 0.5,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-10",
+       "side": "away",
+       "at": [
+        28.4,
+        46.4
+       ],
+       "speed_ms": 1.1,
+       "role": "hold_slot"
+      },
+      {
+       "id": "away-11",
+       "side": "away",
+       "at": [
+        40.1,
+        62.7
+       ],
+       "speed_ms": 1.4,
+       "role": "hold_slot"
+      }
+     ]
+    }
+   },
    "bt-002020-momentum_swing": {
     "kind": "momentum_swing",
     "label": "88–90+8′",
@@ -44420,320 +45140,6 @@
         55.6
        ],
        "speed_ms": 0.0,
-       "role": "hold_slot"
-      }
-     ]
-    }
-   },
-   "bt-002174-territorial_spell": {
-    "kind": "territorial_spell",
-    "label": "90+6–90+8′",
-    "clock": "90+8′",
-    "t": 5826.5,
-    "facts": [
-     {
-      "id": "fx-shots-home-last-2m-to-t5826-50",
-      "label": "Rivermouth shots, in the latest spell of play",
-      "text": "1"
-     },
-     {
-      "id": "fx-possession_share-home-last-2m-to-t5826-50",
-      "label": "Rivermouth share of possession, in the latest spell of play",
-      "text": "73%"
-     },
-     {
-      "id": "fx-territory-home-last-2m-to-t5826-50",
-      "label": "Rivermouth share of play in the opposition half, in the latest spell of play",
-      "text": "33%"
-     },
-     {
-      "id": "fx-high_turnovers-home-last-2m-to-t5826-50",
-      "label": "Rivermouth high turnovers (ball won high up the pitch), in the latest spell of play",
-      "text": "0"
-     },
-     {
-      "id": "fx-touches_in_opponent_half-home-last-2m-to-t5826-50",
-      "label": "Rivermouth touches in the opposition half, in the latest spell of play",
-      "text": "8"
-     },
-     {
-      "id": "fx-press_rate-home-last-2m-to-t5826-50",
-      "label": "Rivermouth pressing rate, in the latest spell of play",
-      "text": "0%"
-     },
-     {
-      "id": "fx-shots-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale shots, in the latest spell of play",
-      "text": "0"
-     },
-     {
-      "id": "fx-possession_share-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale share of possession, in the latest spell of play",
-      "text": "27%"
-     },
-     {
-      "id": "fx-territory-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale share of play in the opposition half, in the latest spell of play",
-      "text": "63%"
-     },
-     {
-      "id": "fx-high_turnovers-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale high turnovers (ball won high up the pitch), in the latest spell of play",
-      "text": "0"
-     },
-     {
-      "id": "fx-touches_in_opponent_half-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale touches in the opposition half, in the latest spell of play",
-      "text": "9"
-     },
-     {
-      "id": "fx-press_rate-away-last-2m-to-t5826-50",
-      "label": "Ashford Vale pressing rate, in the latest spell of play",
-      "text": "50%"
-     }
-    ],
-    "sources": [
-     {
-      "id": "ev-002174",
-      "type": "pass",
-      "player": "Tolliver",
-      "clock": "90+6′"
-     },
-     {
-      "id": "ev-002193",
-      "type": "period_end",
-      "player": null,
-      "clock": "90+8′"
-     }
-    ],
-    "freeze": {
-     "match_id": "m-custom-106-94d2c7",
-     "t": 5731.51,
-     "freeze_frame_of": "ev-002174",
-     "ball": [
-      40.1,
-      62.7
-     ],
-     "possession": "away",
-     "players": [
-      {
-       "id": "home-01",
-       "side": "home",
-       "at": [
-        4.4,
-        42.8
-       ],
-       "speed_ms": 0.1,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-02",
-       "side": "home",
-       "at": [
-        29.0,
-        26.3
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-03",
-       "side": "home",
-       "at": [
-        28.1,
-        38.4
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-04",
-       "side": "home",
-       "at": [
-        28.1,
-        51.9
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-05",
-       "side": "home",
-       "at": [
-        29.0,
-        64.1
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-06",
-       "side": "home",
-       "at": [
-        38.1,
-        45.2
-       ],
-       "speed_ms": 0.3,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-07",
-       "side": "home",
-       "at": [
-        41.4,
-        34.4
-       ],
-       "speed_ms": 0.2,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-08",
-       "side": "home",
-       "at": [
-        41.4,
-        55.9
-       ],
-       "speed_ms": 0.1,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-09",
-       "side": "home",
-       "at": [
-        52.7,
-        27.6
-       ],
-       "speed_ms": 0.2,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-10",
-       "side": "home",
-       "at": [
-        54.8,
-        45.1
-       ],
-       "speed_ms": 0.1,
-       "role": "hold_slot"
-      },
-      {
-       "id": "home-11",
-       "side": "home",
-       "at": [
-        52.7,
-        62.6
-       ],
-       "speed_ms": 1.0,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-01",
-       "side": "away",
-       "at": [
-        112.4,
-        42.8
-       ],
-       "speed_ms": 0.1,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-02",
-       "side": "away",
-       "at": [
-        70.2,
-        22.9
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-03",
-       "side": "away",
-       "at": [
-        72.2,
-        38.0
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-04",
-       "side": "away",
-       "at": [
-        59.0,
-        59.8
-       ],
-       "speed_ms": 3.7,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-05",
-       "side": "away",
-       "at": [
-        70.2,
-        69.9
-       ],
-       "speed_ms": 0.4,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-06",
-       "side": "away",
-       "at": [
-        51.1,
-        46.4
-       ],
-       "speed_ms": 0.3,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-07",
-       "side": "away",
-       "at": [
-        44.1,
-        33.0
-       ],
-       "speed_ms": 0.2,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-08",
-       "side": "away",
-       "at": [
-        44.1,
-        59.9
-       ],
-       "speed_ms": 0.2,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-09",
-       "side": "away",
-       "at": [
-        28.4,
-        24.5
-       ],
-       "speed_ms": 0.5,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-10",
-       "side": "away",
-       "at": [
-        28.4,
-        46.4
-       ],
-       "speed_ms": 1.1,
-       "role": "hold_slot"
-      },
-      {
-       "id": "away-11",
-       "side": "away",
-       "at": [
-        40.1,
-        62.7
-       ],
-       "speed_ms": 1.4,
        "role": "hold_slot"
       }
      ]

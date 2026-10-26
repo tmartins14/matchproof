@@ -5,7 +5,19 @@
   "description": "Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "next_up"],
+  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "hero", "trap_verdicts", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "next_up"],
+  "$defs": {
+    "heroPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate", "overturned", "total"],
+      "properties": {
+        "candidate": { "type": "string" },
+        "overturned": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
   "properties": {
     "pack": { "type": "string" },
     "results": { "$ref": "trials_results.schema.json" },
@@ -48,6 +60,42 @@
           "AMENDED": { "type": "integer", "minimum": 0 },
           "OVERTURNED": { "type": "integer", "minimum": 0 },
           "HELD": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "hero": {
+      "description": "The Table's headline parts. Null when there is no sole cleared narrator.",
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sole", "worst"],
+          "properties": {
+            "sole": { "$ref": "#/$defs/heroPart" },
+            "worst": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/heroPart" }], "description": "The measured narrator that is not cleared with the most overturned trap moments." }
+          }
+        }
+      ]
+    },
+    "trap_verdicts": {
+      "type": "object",
+      "description": "Per candidate, per fixture: its scored claim on each trap beat, in trap order.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "clock", "beat", "verdict"],
+            "properties": {
+              "label": { "type": "string" },
+              "clock": { "type": "string" },
+              "beat": { "$ref": "common.schema.json#/$defs/beatId" },
+              "verdict": { "enum": ["STANDS", "AMENDED", "OVERTURNED", "HELD"] }
+            }
+          }
         }
       }
     },

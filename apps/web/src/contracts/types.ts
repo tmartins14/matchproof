@@ -700,6 +700,32 @@ HELD: number
 }
 }
 /**
+ * The Table's headline parts. Null when there is no sole cleared narrator.
+ */
+hero: (null | {
+sole: HeroPart
+/**
+ * The measured narrator that is not cleared with the most overturned trap moments.
+ */
+worst: (null | HeroPart)
+})
+/**
+ * Per candidate, per fixture: its scored claim on each trap beat, in trap order.
+ */
+trap_verdicts: {
+[k: string]: {
+[k: string]: {
+label: string
+clock: string
+/**
+ * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
+ */
+beat: string
+verdict: ("STANDS" | "AMENDED" | "OVERTURNED" | "HELD")
+}[]
+}
+}
+/**
  * Per candidate, the biggest bucket of its fail profile; null when nothing failed.
  */
 fail_top: {
@@ -842,6 +868,11 @@ next_up: {
 model: string
 reason: string
 }[]
+}
+export interface HeroPart {
+candidate: string
+overturned: number
+total: number
 }
 /**
  * The canonical generator input (ADR 0004). Same tactics and seed produce the same match.

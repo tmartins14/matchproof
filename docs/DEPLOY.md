@@ -190,7 +190,7 @@ The API now logs a JSON `vitals` line every 5 s (`api/vitals.py`), the cgroup li
 - **Production, two streams at once.** Three pairs of matches, then a third pair of which one finished: seven more completed matches, eight on production in all, all reaching full time. The longest stream ran about 360 s, past the 240 s ingress figure, so ingress did not cut it. `/health` p95 0.3 s, max 3.3 s; `/livez` p95 1.1 s, max 3.0 s. Event-loop lag reached 1.0 to 3.7 s at 50 to 100% CPU, mid-match as well as at full time. No restart, no `sigterm` line and no system event in any run.
 - **Memory.** RSS is not released when a match ends: 134 MiB at startup, 360 MiB idle after one match, 809 MiB after two concurrent, 1.14 GiB after four, about 1.4 GiB after seven or eight, which looks like the store (6 matches) and the registry caches filling. That is about 70% of the 2 GiB limit; it flattened but was not driven to the limit.
 
-### Oct 25, 00:3x UTC (Oct 26): capacity change and the first desk run
+### Oct 26, 00:3x UTC: capacity change and the first desk run
 
 The API now has 2 vCPU, 4 GiB and `maxReplicas: 1`; the store keeps 3 matches (`MAX_MATCHES`). One match played from the desk at 6x with agents reached full time (2 to 0 at 98:04, 13 claims; `docs/screenshots/13/m3-full-time-desk.jpg`). Findings from the `vitals` lines:
 

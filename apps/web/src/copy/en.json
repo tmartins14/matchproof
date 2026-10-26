@@ -326,7 +326,18 @@
     "hero": {
       "kicker": "Who do you put on air?",
       "headline": "{models} narrator models. {fixtures} rigged fixtures. One fixed referee.",
-      "how": "Every model commentates the same seeded matches, each with planted traps. Code checks every number and name. A second model checks the wording. Nothing a model says counts until it survives review."
+      "how": "Every model commentates the same seeded matches, each with planted traps. Code checks every number and name. A second model checks the wording. Nothing a model says counts until it survives review.",
+      "cleared": "Cleared for air: {id}, overturned on {o} of {n} traps.",
+      "worst": "{id}: {o} of {n}. Not cleared.",
+      "read": {
+        "title": "How to read this",
+        "rank": "Traps and Pts decide who's cleared.",
+        "inspect": "Click any row to see its worst moment next to the others.",
+        "deploy": "Use on Desk puts a cleared narrator on air."
+      }
+    },
+    "howScored": {
+      "title": "How it's scored"
     },
     "referee": {
       "title": "Referee",
@@ -342,6 +353,22 @@
     },
     "table": {
       "label": "League table",
+      "caption": "{n} scored moments each",
+      "tips": {
+        "rank": "Rank among narrators that answered enough moments to be measured",
+        "narrator": "The model that wrote the commentary",
+        "stands": "Moments whose claim stood as written",
+        "amended": "Moments whose claim stood after the referee fixed the wording",
+        "overturned": "Moments whose claim was withdrawn, unreadable or never written",
+        "pts": "Points: +3 stands, +1 amended, −3 overturned; no answer scores 0",
+        "clean": "Share of moments that stood with no fix",
+        "traps": "Planted moments where a plausible sentence is wrong",
+        "p90": "The narrator's own response time, 9 in 10 calls",
+        "cost": "Cost of narrating one match",
+        "fail": "What the failed claims got wrong",
+        "form": "Verdicts on the last five moments"
+      },
+      "auditorNote": "Most accurate when it answered, but {held} of {claims} moments unanswered (p90 {s} s). Also the auditor.",
       "cols": {
         "rank": "#",
         "narrator": "Narrator",
@@ -415,6 +442,9 @@
       "colFixture": "Fixture",
       "trapMoment": "Stamp on the first trap moment",
       "noAnswer": "NO ANSWER",
+      "gridNote": "Each cell shows how that narrator called this fixture's traps. Click a stamp to see the claim next to the others.",
+      "stampTip": "{label}: {verdict}",
+      "stampName": "{l} {clock}: {label}, {verdict}. Compare {id} on fixture {fixture}",
       "open": "Compare {id} on fixture {fixture}"
     },
     "compare": {

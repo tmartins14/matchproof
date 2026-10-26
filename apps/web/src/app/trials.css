@@ -31,8 +31,9 @@
 
 /* League table */
 .tr-table-wrap { overflow-x: auto; background: var(--mp-surface); border-top: 3px solid var(--mp-text); }
-.tr-table { min-width: 1300px; }
-.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(220px, 1.4fr) 58px 58px 68px 92px 52px 60px 92px 58px 100px minmax(150px, 1fr) 112px 128px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
+.tr-table { min-width: 1260px; }
+.tr-caption { padding: 8px 16px 0; }
+.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(220px, 1.4fr) 112px 60px 64px 64px 100px 56px 70px 96px minmax(130px, 0.9fr) 112px 128px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
 .tr-row:hover { background: var(--mp-raised); }
 .tr-head { min-height: 44px; background: var(--mp-input); }
 .tr-head:hover { background: var(--mp-input); }
@@ -166,3 +167,29 @@
 .tr-fx-link:hover, .tr-fx-link:focus-visible { outline: 2px solid var(--mp-focus); outline-offset: 2px; }
 .tr-fx-focus { outline: 2px solid var(--mp-lime); outline-offset: -2px; }
 .tr-fx-stamp { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+
+/* Table: answer first, then how to read it */
+.tr-h1-line { display: block; }
+.tr-h1-line--sub { margin-top: 6px; font-size: 26px; color: var(--mp-text2); }
+.tr-read { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--mp-line2); }
+.tr-read-list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; font-size: 14px; color: var(--mp-text2); }
+.tr-read-list strong { font-family: var(--mp-display); text-transform: uppercase; letter-spacing: 0.04em; color: var(--mp-text); }
+.tr-how { display: flex; flex-direction: column; gap: 12px; }
+.tr-how h2 { margin: 0; }
+/* Primary columns carry the weight; the breakdown is smaller and muted. */
+.tr-num.tr-minor { font-size: 16px; font-weight: 600; color: var(--mp-muted); }
+.tr-hd--minor { font-size: 11px; }
+
+/* Fixtures cells: one compact stamp per trap */
+.tr-fx-stamps { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.tr-fx-mini { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 0 8px; font-family: var(--mp-display); font-weight: 700; font-size: 14px; text-decoration: none; color: var(--mp-text); border-bottom: 4px solid var(--mp-line); }
+.tr-fx-mini:hover, .tr-fx-mini:focus-visible { outline: 2px solid var(--mp-focus); outline-offset: 2px; }
+.tr-fx-mini--STANDS { border-bottom-color: var(--mp-verified); }
+.tr-fx-mini--AMENDED { border-bottom-color: var(--mp-amended); }
+.tr-fx-mini--OVERTURNED { border-bottom-color: var(--mp-overturned); }
+.tr-fx-mini--HELD { border-bottom-color: var(--mp-checkingBorder); }
+.tr-fx-letter { font-size: 16px; }
+.tr-fx-clock { font-family: var(--mp-mono); font-weight: 400; font-size: 12px; color: var(--mp-text2); }
+.tr-gridnote { margin: 0; }
+.tr-fx-row .tr-who-link::after { content: none; }
+.tr-main > .tr-hero { flex: none; }

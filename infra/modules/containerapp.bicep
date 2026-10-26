@@ -69,8 +69,8 @@ resource api 'Microsoft.App/containerApps@2025-07-01' = {
           name: 'api'
           image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
           resources: {
-            cpu: json('1')
-            memory: '2Gi'
+            cpu: json('2')
+            memory: '4Gi'
           }
           env: [
             { name: 'AZURE_CLIENT_ID', value: identityClientId }
@@ -87,7 +87,7 @@ resource api 'Microsoft.App/containerApps@2025-07-01' = {
       ]
       scale: {
         minReplicas: minReplicas
-        maxReplicas: 2
+        maxReplicas: 1  // the match store is in memory; a second replica would split matches
       }
     }
   }

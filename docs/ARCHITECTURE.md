@@ -140,7 +140,7 @@ The Tactics object inside `MatchBrief` (formation and press, directness and line
 | `put_claims(match_id, beat_id, claims)` | Per-claim `accepted` and `errors`; each claim is checked against `claim.schema.json`, the beat and the fact ids it cites | no | yes |
 | `put_audit(match_id, claim_id, audit)` | Attaches the auditor's result to a stored claim; the verdict is untouched | no | yes |
 
-Unknown match, fact, beat and event ids return a tool error. A running match is registered in the store when its stream starts and filled in as the pipeline advances; the pipeline writes a batch only once it is within the 120 s lookahead of playback, so a query never sees further ahead than that. The store keeps six matches and drops the least recently used.
+Unknown match, fact, beat and event ids return a tool error. A running match is registered in the store when its stream starts and filled in as the pipeline advances; the pipeline writes a batch only once it is within the 120 s lookahead of playback, so a query never sees further ahead than that. The store keeps three matches and drops the least recently used.
 
 ## Match storage
 

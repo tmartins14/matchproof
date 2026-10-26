@@ -190,6 +190,14 @@ The API now logs a JSON `vitals` line every 5 s (`api/vitals.py`), the cgroup li
 - **Production, two streams at once.** Three pairs of matches, then a third pair of which one finished: seven more completed matches, eight on production in all, all reaching full time. The longest stream ran about 360 s, past the 240 s ingress figure, so ingress did not cut it. `/health` p95 0.3 s, max 3.3 s; `/livez` p95 1.1 s, max 3.0 s. Event-loop lag reached 1.0 to 3.7 s at 50 to 100% CPU, mid-match as well as at full time. No restart, no `sigterm` line and no system event in any run.
 - **Memory.** RSS is not released when a match ends: 134 MiB at startup, 360 MiB idle after one match, 809 MiB after two concurrent, 1.14 GiB after four, about 1.4 GiB after seven or eight, which looks like the store (6 matches) and the registry caches filling. That is about 70% of the 2 GiB limit; it flattened but was not driven to the limit.
 
+### Oct 25, 00:3x UTC (Oct 26): capacity change and the first desk run
+
+The API now has 2 vCPU, 4 GiB and `maxReplicas: 1`; the store keeps 3 matches (`MAX_MATCHES`). One match played from the desk at 6x with agents reached full time (2 to 0 at 98:04, 13 claims; `docs/screenshots/13/m3-full-time-desk.jpg`). Findings from the `vitals` lines:
+
+- **Memory spike at full time, seen once.** With one stream open and RSS at 339 MiB, the archive save that starts at full time took RSS to 3,997 MiB in about 40 s (cgroup peak 3,942 MiB of 4,096 MiB), with the loop lag at 2.3 s, then settled at about 1.2 GiB. The save finished (`m-red-card-flip-3-r99de1f`). `iter_frames` runs under `gc.disable()` in `archiving.py`. The same brief (`red_card_flip`, seed 3) and a random match, both streamed with `curl` straight afterwards, did not spike (RSS flat at about 1.19 GiB). At the old 2 GiB limit a spike like this would have been an out-of-memory kill about 2.5 minutes into a match, which is when both restarts happened, but this is not shown: it did not repeat, so the cause is still open. Next step: log RSS around `schedule_save` and reproduce from the desk.
+- **Tally difference, not explained.** The desk's checker panel read 8 stand, 4 amended, 1 overturned; the archive lists 7 verified, 5 rephrased, 1 blocked for the same 13 claims.
+- **Deploy timing.** The old revision's replica was stopped at 00:30:59, after the deploy returned. A stream started before that point ends, and `scripts/smoke_prod.sh` can run against the old replica; wait for the old replica to stop.
+
 ### Ruled out, and what remains
 
 - **A lower real memory limit:** ruled out; `memory.max` is 2 GiB.

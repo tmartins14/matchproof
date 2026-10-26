@@ -19,6 +19,8 @@ export type Fixture = TrialsWeb["fixtures"][number];
 export type Moment = TrialsWeb["moments"][string][string];
 export type Worst = NonNullable<TrialsWeb["worst"][string]>;
 
+export const trapRecordOf = (id: string): TrialsWeb["trap_record"][string] | undefined => web.trap_record[id];
+export const failTopOf = (id: string): TrialsWeb["fail_top"][string] => web.fail_top[id] ?? null;
 export const summaryOf = (id: string): SummaryRow | undefined => web.results.summary.find((r) => r.candidate === id);
 export const candidateById = (id: string): Candidate | undefined => web.results.candidates.find((c) => c.id === id);
 export const rankOf = (id: string): number | undefined => web.ranks[id];

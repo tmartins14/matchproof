@@ -354,7 +354,8 @@
         "p90": "p90",
         "cost": "$ / match",
         "fail": "Fail profile",
-        "form": "Form, last 5"
+        "form": "Form, last 5",
+        "traps": "Traps"
       },
       "provider": "Microsoft Foundry",
       "worst": "worst: {note} (Fixture {fixture}, {clock})",
@@ -368,7 +369,9 @@
       "useOnDesk": "Use on Desk",
       "selfAuditedNote": "Also the auditor; shares capacity with the referee.",
       "failAria": "Fail profile: {parts}",
-      "noFails": "No failures"
+      "noFails": "No failures",
+      "trapsLine": "{overturned} of {total} overturned",
+      "failTop": "{bucket} {pct}%"
     },
     "buckets": {
       "numbers": "numbers",
@@ -385,7 +388,10 @@
       "liveLine": "{id} · p90 {s} s",
       "budget": "Budget pick",
       "budgetLine": "{id} · ${usd} per match",
-      "notCleared": "Not cleared for air"
+      "notCleared": "Not cleared for air",
+      "sole": "Only narrator cleared for air",
+      "soleLine": "{id} · p90 {s} s · ${usd} per match",
+      "soleLineNoPrice": "{id} · p90 {s} s · price not set"
     },
     "footer": {
       "relegation": "Relegation rule",

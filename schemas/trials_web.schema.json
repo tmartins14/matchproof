@@ -5,7 +5,7 @@
   "description": "Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["pack", "results", "ranks", "order", "measured", "worst", "picks", "live_narrator", "fixtures", "moments", "claim_clock", "next_up"],
+  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "live_narrator", "fixtures", "moments", "claim_clock", "next_up"],
   "properties": {
     "pack": { "type": "string" },
     "results": { "$ref": "trials_results.schema.json" },
@@ -30,8 +30,38 @@
               "fixture": { "type": "string", "pattern": "^fx-[0-9]{2}$" },
               "beat": { "$ref": "common.schema.json#/$defs/beatId" },
               "verdict": { "enum": ["STANDS", "AMENDED", "OVERTURNED", "HELD"] },
-              "note": { "type": "string", "maxLength": 110 }
+              "note": { "type": "string", "maxLength": 100, "description": "<bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters." }
             }
+          }
+        ]
+      }
+    },
+    "trap_record": {
+      "type": "object",
+      "description": "Per candidate, the verdicts of its scored claims on trap beats (every trap beat of every fixture). Present for unmeasured candidates too.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["STANDS", "AMENDED", "OVERTURNED", "HELD"],
+        "properties": {
+          "STANDS": { "type": "integer", "minimum": 0 },
+          "AMENDED": { "type": "integer", "minimum": 0 },
+          "OVERTURNED": { "type": "integer", "minimum": 0 },
+          "HELD": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "fail_top": {
+      "type": "object",
+      "description": "Per candidate, the biggest bucket of its fail profile; null when nothing failed.",
+      "additionalProperties": {
+        "anyOf": [
+          { "type": "null" },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["bucket", "share"],
+            "properties": { "bucket": { "type": "string" }, "share": { "type": "number", "minimum": 0, "maximum": 1 } }
           }
         ]
       }
@@ -40,11 +70,12 @@
       "type": "object",
       "description": "Over measured candidates only; each is null when nothing qualifies.",
       "additionalProperties": false,
-      "required": ["live_feed", "budget", "not_cleared"],
+      "required": ["live_feed", "budget", "not_cleared", "sole"],
       "properties": {
         "live_feed": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "p90_ms"], "properties": { "candidate": { "type": "string" }, "p90_ms": { "type": "integer", "minimum": 0 } } }], "description": "Cleared, lowest p90_ms." },
         "budget": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "usd_per_match": { "type": "number", "minimum": 0 } } }], "description": "Cleared, lowest numeric usd_per_match; an unpriced candidate is never the budget pick." },
-        "not_cleared": { "anyOf": [{ "type": "null" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }] }
+        "not_cleared": { "anyOf": [{ "type": "null" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }] },
+        "sole": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "p90_ms", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "p90_ms": { "type": "integer", "minimum": 0 }, "usd_per_match": { "type": ["number", "null"], "minimum": 0 } } }], "description": "Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air." }
       }
     },
     "live_narrator": { "type": ["string", "null"], "description": "The candidate whose deployment is the one config/models.yaml narrator uses live; null if none." },

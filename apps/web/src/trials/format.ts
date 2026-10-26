@@ -21,6 +21,16 @@ const KEY: Record<ClaimRow["verdict"], VerdictKey> = { STANDS: "verified", AMEND
 /** The Desk's verdict key for a Trials verdict, so the existing stamp and tokens apply. */
 export const verdictKey = (v: ClaimRow["verdict"]): VerdictKey => KEY[v];
 
+/** "Judge (overclaim): x" and "Second reviewer (wrong_entity): x" read as "x". */
+export const plainReason = (reason: string): string => reason.replace(/^(?:Judge|Second reviewer) \([^)]*\):\s*/, "");
+
+/** "<bucket>: <reason>" for the first reason of a claim, or undefined when it has none. */
+export function reasonLine(row: Pick<ClaimRow, "reason_bucket" | "reasons">): string | undefined {
+  const first = row.reasons[0];
+  if (!first) return undefined;
+  return row.reason_bucket ? `${row.reason_bucket}: ${plainReason(first)}` : plainReason(first);
+}
+
 export interface AmendedParts {
   before: string;
   failed: string;

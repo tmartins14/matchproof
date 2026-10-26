@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { copy, fill } from "@/desk/copy";
-import { candidateById, clockOfWorst, firstTrapBeat, rankOf, summaryOf, tableOrder, web, worstOf, type SummaryRow } from "@/trials/data";
+import { candidateById, clockOfWorst, failTopOf, firstTrapBeat, rankOf, summaryOf, tableOrder, trapRecordOf, web, worstOf, type SummaryRow } from "@/trials/data";
 import { compactTokens, fixtureNumber, seconds } from "@/trials/format";
 import { FailBar } from "./FailBar";
 import { FormChips } from "./FormChips";
@@ -20,6 +20,9 @@ function Row({ row, leader }: { row: SummaryRow; leader: boolean }) {
   const self = candidateById(id)?.self_audited === true;
   const cleared = row.cleared && rank !== undefined;
   const state = !cleared && rank !== undefined ? " tr-row--out" : "";
+  const record = trapRecordOf(id);
+  const trapTotal = record ? record.STANDS + record.AMENDED + record.OVERTURNED + record.HELD : 0;
+  const top = failTopOf(id);
   const price = typeof row.usd_per_match === "string" ? t.table.priceNotSet : `$${row.usd_per_match.toFixed(4)}`;
   return (
     <div role="row" className={`tr-row${leader ? " tr-row--lead" : ""}${state}${rank === undefined ? " tr-row--unmeasured" : ""}`}>
@@ -58,6 +61,9 @@ function Row({ row, leader }: { row: SummaryRow; leader: boolean }) {
       <div role="cell" className="tr-num" data-label={t.table.cols.clean}>
         {row.clean_pct === null ? "n/a" : `${row.clean_pct}%`}
       </div>
+      <div role="cell" className={`tr-trap${record && record.OVERTURNED > 0 ? " tr-overturned" : ""}`} data-label={t.table.cols.traps}>
+        {record ? fill(t.table.trapsLine, { overturned: record.OVERTURNED, total: trapTotal }) : ""}
+      </div>
       <div role="cell" className="tr-num" data-label={t.table.cols.p90}>
         {seconds(row.p90_ms)} s
       </div>
@@ -67,6 +73,7 @@ function Row({ row, leader }: { row: SummaryRow; leader: boolean }) {
       </div>
       <div role="cell" className="tr-failcell" data-label={t.table.cols.fail}>
         <FailBar profile={row.fail_profile} measured={rank !== undefined} />
+        {top ? <div className="tr-sub tr-failtop">{fill(t.table.failTop, { bucket: t.buckets[top.bucket as keyof typeof t.buckets] ?? top.bucket, pct: Math.round(top.share * 100) })}</div> : null}
       </div>
       <div role="cell">
         <FormChips form={row.form} />
@@ -88,13 +95,13 @@ export function LeagueTable() {
   const rows = tableOrder.map((id) => summaryOf(id)).filter((r): r is SummaryRow => r !== undefined);
   const measured = rows.filter((r) => rankOf(r.candidate) !== undefined);
   const unmeasured = rows.filter((r) => rankOf(r.candidate) === undefined);
-  const heads = [t.table.cols.rank, t.table.cols.narrator, t.table.cols.claims, t.table.cols.stands, t.table.cols.amended, t.table.cols.overturned, t.table.cols.pts, t.table.cols.clean, t.table.cols.p90, t.table.cols.cost, t.table.cols.fail, t.table.cols.form, ""];
+  const heads = [t.table.cols.rank, t.table.cols.narrator, t.table.cols.claims, t.table.cols.stands, t.table.cols.amended, t.table.cols.overturned, t.table.cols.pts, t.table.cols.clean, t.table.cols.traps, t.table.cols.p90, t.table.cols.cost, t.table.cols.fail, t.table.cols.form, ""];
   return (
     <div className="tr-table-wrap">
       <div role="table" aria-label={t.table.label} className="tr-table">
         <div role="row" className="tr-row tr-head">
           {heads.map((h, i) => (
-            <div key={i} role="columnheader" className={`tr-hd${i >= 2 && i <= 8 ? " tr-hd--c" : ""}`}>
+            <div key={i} role="columnheader" className={`tr-hd${i >= 2 && i <= 9 ? " tr-hd--c" : ""}`}>
               {h}
             </div>
           ))}

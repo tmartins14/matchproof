@@ -11,11 +11,15 @@ from contracts.models import TrialsWeb
 from evals.trials import PACK_PATH, load_pack
 from evals.trials_web import (
     build_web,
+    fail_top_of,
     is_measured,
     live_narrator_of,
+    note_of,
     picks_of,
     ranks_of,
     shrink_to_limit,
+    trap_record_of,
+    trim,
     worst_of,
 )
 
@@ -44,6 +48,7 @@ def claim(verdict: str, minute: int, beat: str, **extra: Any) -> dict[str, Any]:
         "scored": True,
         "verdict": verdict,
         "reasons": ["Because."],
+        "reason_bucket": "overclaim",
         "failed_span": None,
         "corrected_span": None,
         "text": "Text.",
@@ -76,20 +81,43 @@ def test_worst_is_the_lowest_verdict_and_the_latest_on_a_tie() -> None:
         "fixture": "fx-01",
         "beat": "bt-2",
         "verdict": "OVERTURNED",
-        "note": "Because.",
+        "note": "overclaim: Because.",
     }
 
 
-def test_worst_orders_amended_below_held_and_shows_the_span() -> None:
+def test_worst_orders_amended_below_held() -> None:
     rows = [
         claim("HELD", 10, "bt-1"),
-        claim("AMENDED", 50, "bt-2", failed_span="nine", corrected_span="ten"),
+        claim("AMENDED", 50, "bt-2"),
         claim("STANDS", 60, "bt-3"),
     ]
     got = worst_of(rows, "a")
-    assert got and (got["beat"], got["note"]) == ("bt-2", "nine → ten")
-    only_stands = worst_of([claim("STANDS", 5, "bt-1", reasons=[])], "a")
-    assert only_stands and only_stands["note"] == "Text."
+    assert got and got["beat"] == "bt-2"
+
+
+def test_on_a_tie_a_code_caught_claim_beats_a_judge_caught_one() -> None:
+    rows = [
+        claim("OVERTURNED", 90, "bt-late", reason_bucket="overclaim"),
+        claim("OVERTURNED", 40, "bt-numbers", reason_bucket="numbers"),
+        claim("OVERTURNED", 30, "bt-names", reason_bucket="names"),
+    ]
+    got = worst_of(rows, "a")
+    assert got and got["beat"] == "bt-numbers"  # code first, then the latest of those
+
+
+def test_trap_claims_come_first_unless_they_all_stand() -> None:
+    traps = frozenset({("fx-01", "bt-trap")})
+    rows = [
+        claim("OVERTURNED", 90, "bt-other"),
+        claim("AMENDED", 20, "bt-trap"),
+    ]
+    got = worst_of(rows, "a", traps)
+    assert got and (got["beat"], got["verdict"]) == ("bt-trap", "AMENDED")
+    standing = [claim("OVERTURNED", 90, "bt-other"), claim("STANDS", 20, "bt-trap")]
+    got = worst_of(standing, "a", traps)
+    assert (
+        got and got["beat"] == "bt-other"
+    )  # every trap claim stands: all scored claims
 
 
 def test_unscored_rows_and_other_candidates_are_ignored() -> None:
@@ -103,9 +131,72 @@ def test_unscored_rows_and_other_candidates_are_ignored() -> None:
     assert worst_of(rows, "nobody") is None
 
 
-def test_note_is_trimmed_to_110_characters() -> None:
-    got = worst_of([claim("OVERTURNED", 1, "bt-1", reasons=["x" * 300])], "a")
-    assert got and len(got["note"]) == 110 and got["note"].endswith("…")
+def test_note_is_bucket_and_reason_with_the_reviewer_prefix_stripped() -> None:
+    judge = claim(
+        "OVERTURNED", 1, "bt-1", reasons=["Judge (motive): 'push' is intent."]
+    )
+    assert note_of(judge) == "overclaim: 'push' is intent."
+    second = claim(
+        "OVERTURNED",
+        1,
+        "bt-1",
+        reasons=["Second reviewer (wrong_entity): the other side."],
+    )
+    assert note_of(second) == "overclaim: the other side."
+    code = claim(
+        "OVERTURNED",
+        1,
+        "bt-1",
+        reasons=["The number 6 matches nothing."],
+        reason_bucket="numbers",
+    )
+    assert note_of(code) == "numbers: The number 6 matches nothing."
+    assert note_of(claim("STANDS", 1, "bt-1", reasons=[])) == "Text."
+
+
+def test_note_is_cut_at_a_word_boundary_near_90_characters() -> None:
+    text = "word " * 60
+    got = trim(text)
+    assert got.endswith("…") and 80 <= len(got) <= 91
+    assert not got[:-1].endswith("wor")  # never mid-word
+    assert trim("short") == "short"
+
+
+def test_trap_record_counts_scored_trap_claims_only() -> None:
+    traps = frozenset({("fx-01", "bt-t1"), ("fx-01", "bt-t2")})
+    rows = [
+        claim("STANDS", 1, "bt-t1"),
+        claim("OVERTURNED", 2, "bt-t2"),
+        claim("OVERTURNED", 3, "bt-t2", scored=False),
+        claim("OVERTURNED", 4, "bt-x"),
+        claim("HELD", 5, "bt-t1", candidate="b"),
+    ]
+    assert trap_record_of(rows, "a", traps) == {
+        "STANDS": 1,
+        "AMENDED": 0,
+        "OVERTURNED": 1,
+        "HELD": 0,
+    }
+
+
+def test_fail_top_is_the_biggest_bucket() -> None:
+    assert fail_top_of({"numbers": 0.2, "overclaim": 0.8}) == {
+        "bucket": "overclaim",
+        "share": 0.8,
+    }
+    assert fail_top_of({}) is None
+
+
+def test_sole_pick_is_set_only_when_one_measured_candidate_is_cleared() -> None:
+    one = picks_of(
+        [row("mini", p90_ms=2700, usd_per_match=0.017), row("nano", cleared=False)]
+    )
+    assert one["sole"] == {"candidate": "mini", "p90_ms": 2700, "usd_per_match": 0.017}
+    many = picks_of([row("a"), row("b")])
+    assert many["sole"] is None
+    unpriced = picks_of([row("free", usd_per_match="prices not set")])
+    assert unpriced["sole"] and unpriced["sole"]["usd_per_match"] is None
+    assert picks_of([row("grok", held=68)])["sole"] is None  # unmeasured does not count
 
 
 def test_picks_use_measured_cleared_rows_and_never_an_unpriced_budget() -> None:
@@ -128,6 +219,7 @@ def test_picks_are_null_when_nothing_qualifies() -> None:
         "live_feed": None,
         "budget": None,
         "not_cleared": None,
+        "sole": None,
     }
     only_unpriced = picks_of([row("free", usd_per_match="prices not set")])
     assert only_unpriced["budget"] is None
@@ -203,3 +295,30 @@ def test_unmeasured_candidates_have_no_rank_or_worst(web: dict[str, Any]) -> Non
     assert web["order"][: len(web["ranks"])] == sorted(
         web["ranks"], key=web["ranks"].get
     )
+
+
+def test_every_candidate_has_a_trap_record_and_a_fail_top(web: dict[str, Any]) -> None:
+    traps = {(f["id"], t["beat"]) for f in web["fixtures"] for t in f["trap_beats"]}
+    for c in web["results"]["summary"]:
+        name = c["candidate"]
+        scored = [
+            x
+            for x in web["results"]["claims"]
+            if x["candidate"] == name
+            and x["scored"]
+            and (x["fixture"], x["beat"]) in traps
+        ]
+        assert sum(web["trap_record"][name].values()) == len(scored)
+        assert (web["fail_top"][name] is None) == (not c["fail_profile"])
+
+
+def test_a_measured_worst_is_on_a_trap_beat_when_any_trap_failed(
+    web: dict[str, Any],
+) -> None:
+    traps = {(f["id"], t["beat"]) for f in web["fixtures"] for t in f["trap_beats"]}
+    for name, w in web["worst"].items():
+        if w is None:
+            continue
+        record = web["trap_record"][name]
+        if record["STANDS"] < sum(record.values()):  # some trap claim did not stand
+            assert (w["fixture"], w["beat"]) in traps

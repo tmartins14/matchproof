@@ -58,17 +58,25 @@ function Scoring() {
 
 function Picks() {
   const t = copy.en.trials.picks;
-  const { live_feed: live, budget, not_cleared: out } = web.picks;
+  const { live_feed: live, budget, not_cleared: out, sole } = web.picks;
   if (!live && !budget && !out) return null;
   return (
     <section className="tr-picks" aria-label="Picks">
-      {live ? (
+      {sole ? (
+        <div className="tr-card">
+          <div className="tr-hd">{t.sole}</div>
+          <div className="tr-line">
+            {fill(sole.usd_per_match === null ? t.soleLineNoPrice : t.soleLine, { id: sole.candidate, s: seconds(sole.p90_ms), usd: sole.usd_per_match?.toFixed(4) ?? "" })}
+          </div>
+        </div>
+      ) : null}
+      {!sole && live ? (
         <div className="tr-card">
           <div className="tr-hd">{t.live}</div>
           <div className="tr-line">{fill(t.liveLine, { id: live.candidate, s: seconds(live.p90_ms) })}</div>
         </div>
       ) : null}
-      {budget ? (
+      {!sole && budget ? (
         <div className="tr-card">
           <div className="tr-hd">{t.budget}</div>
           <div className="tr-line">{fill(t.budgetLine, { id: budget.candidate, usd: budget.usd_per_match.toFixed(4) })}</div>

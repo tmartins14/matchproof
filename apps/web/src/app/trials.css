@@ -31,8 +31,8 @@
 
 /* League table */
 .tr-table-wrap { overflow-x: auto; background: var(--mp-surface); border-top: 3px solid var(--mp-text); }
-.tr-table { min-width: 1240px; }
-.tr-row { position: relative; display: grid; grid-template-columns: 40px minmax(240px, 1.6fr) 64px 64px 72px 96px 56px 64px 64px 110px minmax(150px, 1fr) 120px 140px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
+.tr-table { min-width: 1300px; }
+.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(220px, 1.4fr) 58px 58px 68px 92px 52px 60px 92px 58px 100px minmax(150px, 1fr) 112px 128px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
 .tr-row:hover { background: var(--mp-raised); }
 .tr-head { min-height: 44px; background: var(--mp-input); }
 .tr-head:hover { background: var(--mp-input); }
@@ -50,6 +50,8 @@
 .tr-who-link { font-family: var(--mp-display); font-weight: 700; font-size: 24px; color: var(--mp-text); text-decoration: none; width: fit-content; }
 .tr-who-link::after { content: ""; position: absolute; inset: 0; }
 .tr-split { margin-top: 2px; font-family: var(--mp-body); font-weight: 400; }
+.tr-trap { font-family: var(--mp-display); font-weight: 700; font-size: 15px; text-align: center; }
+.tr-failtop { margin-top: 2px; text-transform: none; }
 .tr-cost { font-family: var(--mp-display); font-weight: 700; font-size: 17px; text-align: center; }
 .tr-cost .tr-sub { font-family: var(--mp-body); font-weight: 400; }
 .tr-act { text-align: right; position: relative; z-index: 2; white-space: nowrap; }
@@ -126,7 +128,7 @@
   .tr-row > .tr-act { flex: 1 1 100%; text-align: left; }
   .tr-row > [data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; font-family: var(--mp-display); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mp-muted); font-style: normal; }
   .tr-row.tr-head { display: none; }
-  .tr-num, .tr-cost { text-align: left; }
+  .tr-num, .tr-cost, .tr-trap { text-align: left; }
   .tr-divider { flex-wrap: wrap; }
   .tr-bar, .tr-main { padding-left: 16px; padding-right: 16px; }
   .tr-run { margin-left: 0; }

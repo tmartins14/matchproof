@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { copy, fill } from "@/desk/copy";
 import { candidateById, rankOf, scoredClaim, summaryOf, web } from "@/trials/data";
-import { amendedParts, seconds, verdictKey } from "@/trials/format";
+import { amendedParts, reasonLine, seconds, verdictKey } from "@/trials/format";
 import { VerdictStamp } from "../desk/VerdictStamp";
 
 function Prose({ fixture, beat, candidate }: { fixture: string; beat: string; candidate: string }) {
@@ -26,19 +26,22 @@ function Prose({ fixture, beat, candidate }: { fixture: string; beat: string; ca
     const parts = amendedParts(row);
     if (parts) {
       return (
-        <p className="tr-claim">
-          {parts.before}
-          <del className="tr-bad">{parts.failed}</del>
-          <ins className="tr-fix">{parts.corrected}</ins>
-          {parts.after}
-        </p>
+        <>
+          <p className="tr-claim">
+            {parts.before}
+            <del className="tr-bad">{parts.failed}</del>
+            <ins className="tr-fix">{parts.corrected}</ins>
+            {parts.after}
+          </p>
+          <p className="tr-reason">{reasonLine(row)}</p>
+        </>
       );
     }
   }
   return (
     <>
       <p className="tr-claim">{row.text}</p>
-      {row.verdict === "OVERTURNED" && row.reasons.length > 0 ? <p className="tr-reason">{row.reasons.join(" ")}</p> : null}
+      {row.verdict === "OVERTURNED" && row.reasons.length > 0 ? <p className="tr-reason">{reasonLine(row)}</p> : null}
     </>
   );
 }

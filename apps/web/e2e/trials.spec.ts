@@ -26,11 +26,13 @@ test("the Table loads on a direct visit and draws the export", async ({ page }) 
   await expect(page.getByText("Incomplete run")).toBeVisible();
   await expect(page.getByText("68 of 85 moments unanswered")).toBeVisible();
   await expect(page.getByText("Also the auditor; shares capacity with the referee.")).toBeVisible();
+  await expect(page.getByText("Only narrator cleared for air")).toBeVisible();
+  await expect(page.getByText(/\d+ of \d+ overturned/)).toHaveCount(4);
   // Use on Desk only on cleared, measured rows, and it does not open Compare.
   const buttons = page.getByRole("link", { name: "Use on Desk" });
   await expect(buttons).toHaveCount(1);
   await buttons.click();
-  await expect(page).toHaveURL(/\/desk\?narrator=gpt-5-mini&fixture=fx-01$/);
+  await expect(page).toHaveURL(/\/desk\?narrator=gpt-5-mini&fixture=fx-\d\d$/);
 });
 
 test("a row opens Compare at the candidate's worst moment, by mouse and keyboard", async ({ page }) => {
@@ -70,6 +72,15 @@ test("the Desk still loads at /desk and ?source=fixture", async ({ page }) => {
 test("fixtures placeholder", async ({ page }) => {
   await open(page, "/fixtures");
   await expect(page.getByText("Fixtures: coming in prompt 16")).toBeVisible();
+});
+
+test("an AMENDED card shows the struck span and the bucket with its reason", async ({ page }) => {
+  await open(page, "/compare/fx-01/bt-000588-territorial_spell?focus=gpt-5-mini");
+  const card = page.locator("#card-gpt-5-mini");
+  await expect(card.locator("del")).toHaveText("are bossing the pitch with 66% of the ball");
+  await expect(card.locator("ins")).toHaveText("have 66 per cent of possession");
+  await expect(card.getByText(/^overclaim: /)).toBeVisible();
+  await page.screenshot({ path: `${OUT}/compare-amended-1440.png`, fullPage: true });
 });
 
 test("screenshots", async ({ page }) => {

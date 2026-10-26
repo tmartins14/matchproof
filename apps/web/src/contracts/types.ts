@@ -682,7 +682,30 @@ fixture: string
  */
 beat: string
 verdict: ("STANDS" | "AMENDED" | "OVERTURNED" | "HELD")
+/**
+ * <bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters.
+ */
 note: string
+}
+}
+/**
+ * Per candidate, the verdicts of its scored claims on trap beats (every trap beat of every fixture). Present for unmeasured candidates too.
+ */
+trap_record: {
+[k: string]: {
+STANDS: number
+AMENDED: number
+OVERTURNED: number
+HELD: number
+}
+}
+/**
+ * Per candidate, the biggest bucket of its fail profile; null when nothing failed.
+ */
+fail_top: {
+[k: string]: null | {
+bucket: string
+share: number
 }
 }
 /**
@@ -704,6 +727,14 @@ candidate: string
 usd_per_match: number
 })
 not_cleared: (null | string[])
+/**
+ * Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air.
+ */
+sole: (null | {
+candidate: string
+p90_ms: number
+usd_per_match: (number | null)
+})
 }
 /**
  * The candidate whose deployment is the one config/models.yaml narrator uses live; null if none.

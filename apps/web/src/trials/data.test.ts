@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { beatsOf, candidateById, clockOfWorst, firstTrapBeat, momentOf, rankOf, scoredClaim, summaryOf, tableOrder, web, worstOf } from "./data";
-import { amendedParts, compactTokens, failParts, fixtureNumber, seconds, verdictKey } from "./format";
+import { beatsOf, candidateById, clockOfWorst, failTopOf, firstTrapBeat, momentOf, rankOf, scoredClaim, summaryOf, tableOrder, trapRecordOf, web, worstOf } from "./data";
+import { amendedParts, compactTokens, failParts, fixtureNumber, plainReason, reasonLine, seconds, verdictKey } from "./format";
 
 describe("trials data", () => {
   it("draws ranks and order from the export, unmeasured rows last and unranked", () => {
@@ -65,5 +65,30 @@ describe("trials format", () => {
 
   it("orders the fail profile biggest first", () => {
     expect(failParts({ numbers: 0.2, overclaim: 0.8 }).map((p) => p.bucket)).toEqual(["overclaim", "numbers"]);
+  });
+});
+
+describe("trials data, traps and picks", () => {
+  it("has a trap record and a fail top for every candidate", () => {
+    for (const id of tableOrder) {
+      const r = trapRecordOf(id);
+      expect(r).toBeDefined();
+      expect(failTopOf(id) === null || failTopOf(id)?.share !== undefined).toBe(true);
+    }
+  });
+
+  it("sets the sole pick only with one cleared measured candidate", () => {
+    const cleared = web.results.summary.filter((r) => r.cleared && web.measured[r.candidate]);
+    expect(web.picks.sole === null).toBe(cleared.length !== 1);
+  });
+});
+
+describe("trials format, reasons", () => {
+  it("strips the reviewer prefix and puts the bucket first", () => {
+    expect(plainReason("Judge (overclaim): 'push' is intent.")).toBe("'push' is intent.");
+    expect(plainReason("Second reviewer (wrong_entity): other side.")).toBe("other side.");
+    expect(plainReason("The number 6 matches nothing.")).toBe("The number 6 matches nothing.");
+    expect(reasonLine({ reason_bucket: "overclaim", reasons: ["Judge (motive): x."] })).toBe("overclaim: x.");
+    expect(reasonLine({ reason_bucket: null, reasons: [] })).toBeUndefined();
   });
 });

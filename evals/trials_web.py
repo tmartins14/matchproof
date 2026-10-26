@@ -10,6 +10,7 @@ uv run python -m evals.trials_web evals/reports/trials/pack-v1.json    # writes 
 import argparse
 import asyncio
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -30,11 +31,13 @@ WEB_FIXTURES_DIR = ROOT / "apps" / "web" / "fixtures" / "trials"
 MAX_HELD_SHARE = (
     0.10  # a candidate with more beats unanswered than this is not measured
 )
-NOTE_CHARS = 110
+NOTE_CHARS = 90
+CODE_BUCKETS = ("numbers", "names", "citation")  # caught in code, before any judge
 MAX_SOURCES = 6
 SIZE_LIMIT = 1_500_000
 # Lowest first: what the worst moment is picked from.
 VERDICT_ORDER = {"OVERTURNED": 0, "AMENDED": 1, "HELD": 2, "STANDS": 3}
+REVIEWER_PREFIX = re.compile(r"^(?:Judge|Second reviewer) \([^)]*\):\s*")
 
 Json = dict[str, Any]
 
@@ -53,32 +56,71 @@ def ranks_of(summary: list[Json]) -> tuple[Json, list[str]]:
 
 
 def trim(text: str, limit: int = NOTE_CHARS) -> str:
-    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+    """Cut at a word boundary to about `limit` characters, with an ellipsis."""
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    space = cut.rfind(" ")
+    if space > limit // 2:
+        cut = cut[:space]
+    return cut.rstrip(" ,;:.-") + "…"
 
 
-def worst_of(claims: list[Json], candidate: str) -> Json | None:
-    """The candidate's lowest scored verdict (OVERTURNED < AMENDED < HELD < STANDS); on a tie, the
-    latest beat. `note` is one short line."""
+def note_of(claim: Json) -> str:
+    """`<bucket>: <reason>` with the reviewer's prefix ("Judge (overclaim): ") stripped."""
+    reasons = claim["reasons"]
+    if not reasons:
+        return trim(claim["text"])
+    reason = REVIEWER_PREFIX.sub("", reasons[0])
+    bucket = claim["reason_bucket"]
+    return trim(f"{bucket}: {reason}" if bucket else reason)
+
+
+def worst_of(
+    claims: list[Json], candidate: str, traps: frozenset[tuple[str, str]] = frozenset()
+) -> Json | None:
+    """The candidate's worst scored claim. Trap-beat claims come first: if any of them is not STANDS,
+    the pick is from those, else from every scored claim. Lowest verdict first (OVERTURNED < AMENDED <
+    HELD < STANDS); on a tie, a claim code caught (numbers, names, citation) before a judge-caught
+    one; then the latest beat."""
     rows = [c for c in claims if c["candidate"] == candidate and c["scored"]]
     if not rows:
         return None
-    low = min(VERDICT_ORDER[c["verdict"]] for c in rows)
-    pick = max(
-        (c for c in rows if VERDICT_ORDER[c["verdict"]] == low),
-        key=lambda c: (c["minute"], c["beat"]),
-    )
-    if pick["verdict"] == "AMENDED" and pick["failed_span"] and pick["corrected_span"]:
-        note = f"{pick['failed_span']} → {pick['corrected_span']}"
-    elif pick["reasons"]:
-        note = pick["reasons"][0]
-    else:
-        note = pick["text"]
+    on_trap = [c for c in rows if (c["fixture"], c["beat"]) in traps]
+    pool = on_trap if any(c["verdict"] != "STANDS" for c in on_trap) else rows
+    low = min(VERDICT_ORDER[c["verdict"]] for c in pool)
+    lowest = [c for c in pool if VERDICT_ORDER[c["verdict"]] == low]
+    coded = [c for c in lowest if c["reason_bucket"] in CODE_BUCKETS]
+    pick = max(coded or lowest, key=lambda c: (c["minute"], c["beat"]))
     return {
         "fixture": pick["fixture"],
         "beat": pick["beat"],
         "verdict": pick["verdict"],
-        "note": trim(note),
+        "note": note_of(pick),
     }
+
+
+def trap_record_of(
+    claims: list[Json], candidate: str, traps: frozenset[tuple[str, str]]
+) -> Json:
+    """Counts of each verdict over the candidate's scored claims on trap beats."""
+    record = dict.fromkeys(VERDICT_ORDER, 0)
+    for c in claims:
+        if (
+            c["candidate"] == candidate
+            and c["scored"]
+            and (c["fixture"], c["beat"]) in traps
+        ):
+            record[c["verdict"]] += 1
+    return record
+
+
+def fail_top_of(profile: Json) -> Json | None:
+    """The biggest bucket of the fail profile, or null when nothing failed."""
+    if not profile:
+        return None
+    bucket = max(profile, key=lambda b: profile[b])
+    return {"bucket": bucket, "share": profile[bucket]}
 
 
 def picks_of(summary: list[Json]) -> Json:
@@ -99,6 +141,19 @@ def picks_of(summary: list[Json]) -> Json:
             else None
         ),
         "not_cleared": uncleared or None,
+        "sole": (
+            {
+                "candidate": cleared[0]["candidate"],
+                "p90_ms": cleared[0]["p90_ms"],
+                "usd_per_match": (
+                    None
+                    if isinstance(cleared[0]["usd_per_match"], str)
+                    else cleared[0]["usd_per_match"]
+                ),
+            }
+            if len(cleared) == 1
+            else None
+        ),
     }
 
 
@@ -196,12 +251,6 @@ def build_web(
     summary = results["summary"]
     ranks, order = ranks_of(summary)
     measured = {r["candidate"]: is_measured(r) for r in summary}
-    worst = {
-        r["candidate"]: worst_of(results["claims"], r["candidate"])
-        if measured[r["candidate"]]
-        else None
-        for r in summary
-    }
     wanted: dict[str, set[str]] = {}
     for c in results["claims"]:
         wanted.setdefault(c["fixture"], set()).add(c["beat"])
@@ -241,6 +290,15 @@ def build_web(
             moments[fixture.id][beat_id] = m
             clocks[(fixture.id, beat_id)] = m["clock"]
 
+    traps = frozenset(
+        (f["id"], t["beat"]) for f in fixture_rows for t in f["trap_beats"]
+    )
+    worst = {
+        r["candidate"]: worst_of(results["claims"], r["candidate"], traps)
+        if measured[r["candidate"]]
+        else None
+        for r in summary
+    }
     web: Json = {
         "pack": results["pack"],
         "results": results,
@@ -248,6 +306,11 @@ def build_web(
         "order": order,
         "measured": measured,
         "worst": worst,
+        "trap_record": {
+            r["candidate"]: trap_record_of(results["claims"], r["candidate"], traps)
+            for r in summary
+        },
+        "fail_top": {r["candidate"]: fail_top_of(r["fail_profile"]) for r in summary},
         "picks": picks_of(summary),
         "live_narrator": live_narrator_of(results["candidates"], narrator_deployment),
         "fixtures": fixture_rows,

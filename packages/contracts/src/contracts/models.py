@@ -718,7 +718,31 @@ class Worst(BaseModel):
     fixture: Annotated[str, Field(pattern='^fx-[0-9]{2}$')]
     beat: BeatId
     verdict: Verdict1
-    note: Annotated[str, Field(max_length=110)]
+    note: Annotated[
+        str,
+        Field(
+            description='<bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters.',
+            max_length=100,
+        ),
+    ]
+
+
+class TrapRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    STANDS: Annotated[int, Field(ge=0)]
+    AMENDED: Annotated[int, Field(ge=0)]
+    OVERTURNED: Annotated[int, Field(ge=0)]
+    HELD: Annotated[int, Field(ge=0)]
+
+
+class FailTop(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    bucket: str
+    share: Annotated[float, Field(ge=0.0, le=1.0)]
 
 
 class LiveFeed(BaseModel):
@@ -741,6 +765,15 @@ class NotCleared(RootModel[list[str]]):
     root: Annotated[list[str], Field(min_length=1)]
 
 
+class Sole(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidate: str
+    p90_ms: Annotated[int, Field(ge=0)]
+    usd_per_match: Annotated[float | None, Field(ge=0.0)]
+
+
 class Picks(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -753,6 +786,12 @@ class Picks(BaseModel):
         ),
     ]
     not_cleared: NotCleared | None
+    sole: Annotated[
+        Sole | None,
+        Field(
+            description='Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air.'
+        ),
+    ]
 
 
 class Trap1(BaseModel):
@@ -1268,6 +1307,18 @@ class TrialsWeb(BaseModel):
         dict[str, Worst | None],
         Field(
             description='Per candidate, its lowest scored verdict (OVERTURNED < AMENDED < HELD < STANDS), the latest beat on a tie; null for an unmeasured candidate.'
+        ),
+    ]
+    trap_record: Annotated[
+        dict[str, TrapRecord],
+        Field(
+            description='Per candidate, the verdicts of its scored claims on trap beats (every trap beat of every fixture). Present for unmeasured candidates too.'
+        ),
+    ]
+    fail_top: Annotated[
+        dict[str, FailTop | None],
+        Field(
+            description='Per candidate, the biggest bucket of its fail profile; null when nothing failed.'
         ),
     ]
     picks: Annotated[

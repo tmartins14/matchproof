@@ -16,7 +16,7 @@ from intel.registry import FactRegistry
 
 from .persist import ArchiveMissing, MatchArchive, load_record
 
-MAX_MATCHES = 6  # matches held at once; the least recently used goes first
+MAX_MATCHES = 3  # matches held at once; the least recently used goes first
 
 
 class UnknownMatch(KeyError):

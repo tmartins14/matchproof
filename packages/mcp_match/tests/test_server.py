@@ -412,7 +412,7 @@ def test_unknown_ids_are_tool_errors_not_traces() -> None:
     run(scenario())
 
 
-def test_seventh_match_evicts_the_least_recently_used() -> None:
+def test_match_past_the_cap_evicts_the_least_recently_used() -> None:
     store = InMemoryMatchStore()
     briefs = [
         make_brief(DEFAULT_HOME, DEFAULT_AWAY, "red_card_flip", seed)

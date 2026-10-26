@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/trials_results.schema.json",
+  "title": "TrialsResults",
+  "description": "One Narrator Trials run: a fixed pack of seeded matches, the candidate narrators, every claim the referee scored, and the league table computed from them. Written by evals/trials.py; the web app only draws it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pack", "run_at", "git_sha", "referee", "fixtures", "candidates", "claims", "errors", "summary"],
+  "properties": {
+    "pack": { "type": "string", "examples": ["pack-v1"] },
+    "run_at": { "type": "string", "format": "date-time" },
+    "git_sha": { "type": "string" },
+    "referee": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The fixed referee: the Checker's code and judge, then the auditor on settled claims. Its cost is reported once here, not per candidate.",
+      "required": ["checker", "judge", "auditor", "judge_prompt", "audited", "cost"],
+      "properties": {
+        "checker": { "type": "string", "examples": ["code"] },
+        "judge": { "type": "string" },
+        "auditor": { "type": "string" },
+        "judge_prompt": { "type": "string" },
+        "audited": { "type": "boolean", "description": "False for a --no-audit dry run: no claim has an auditor verdict." },
+        "cost": { "$ref": "#/$defs/cost" }
+      }
+    },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "seed", "match_id", "home", "away", "brief", "final_score", "traps"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^fx-[0-9]{2}$" },
+          "seed": { "type": "integer" },
+          "match_id": { "type": "string" },
+          "home": { "type": "string" },
+          "away": { "type": "string" },
+          "brief": { "type": "string" },
+          "final_score": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 0 }], "minItems": 2, "maxItems": 2 },
+          "traps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["minute", "kind", "note", "event_id"],
+              "properties": {
+                "minute": { "type": "integer", "minimum": 1, "description": "Read from the planted event in the generated match." },
+                "kind": { "type": "string" },
+                "note": { "type": "string" },
+                "event_id": { "$ref": "common.schema.json#/$defs/eventId" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "deployment", "model", "prompt_hash", "price_in", "price_out", "currency", "self_audited"],
+        "properties": {
+          "id": { "type": "string" },
+          "deployment": { "type": "string" },
+          "model": { "type": "string", "description": "Exact model name and version." },
+          "prompt_hash": { "type": "string", "pattern": "^[0-9a-f]{8}$", "description": "First 8 hex of the SHA-256 of the narrator prompt as loaded." },
+          "price_in": { "type": ["number", "null"], "description": "Per million tokens; null where no price is set." },
+          "price_out": { "type": ["number", "null"] },
+          "currency": { "type": ["string", "null"] },
+          "self_audited": { "type": "boolean", "description": "True where the auditor is this candidate's own model." }
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "fixture", "beat", "minute", "candidate", "scored", "text", "draft_text", "verdict", "reason_bucket", "reasons", "failed_span", "corrected_span", "fact_ids", "checker", "auditor", "corrected_by_consensus", "latency_ms", "tokens_in", "tokens_out"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/claimId" },
+          "fixture": { "type": "string" },
+          "beat": { "$ref": "common.schema.json#/$defs/beatId" },
+          "minute": { "type": "integer", "minimum": 1 },
+          "candidate": { "type": "string" },
+          "scored": { "type": "boolean", "description": "True for the first claim of each beat only." },
+          "text": { "type": "string", "description": "What would be on air after consensus." },
+          "draft_text": { "type": "string", "description": "The Narrator's first wording." },
+          "verdict": { "$ref": "#/$defs/trialVerdict" },
+          "reason_bucket": { "anyOf": [{ "$ref": "#/$defs/bucket" }, { "type": "null" }] },
+          "reasons": { "type": "array", "items": { "type": "string" }, "description": "The raw reasons behind a verdict other than STANDS." },
+          "failed_span": { "type": ["string", "null"], "description": "For AMENDED: the words of the draft that changed." },
+          "corrected_span": { "type": ["string", "null"], "description": "For AMENDED: the words that replaced them." },
+          "fact_ids": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/factId" } },
+          "checker": { "type": "string" },
+          "auditor": { "type": "string", "description": "agree, disagree (problem), unavailable, or not audited." },
+          "corrected_by_consensus": { "type": "boolean" },
+          "latency_ms": { "type": "integer", "minimum": 0, "description": "The beat's, from fact bundle to settled claims." },
+          "tokens_in": { "type": "integer", "minimum": 0, "description": "The Narrator's for the beat." },
+          "tokens_out": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "fixture", "error"],
+        "properties": {
+          "candidate": { "type": "string" },
+          "fixture": { "type": "string" },
+          "error": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "array",
+      "description": "One row per candidate, sorted by pts, then clean_pct, then p90_ms. Counts are over scored claims only.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "claims", "stands", "amended", "overturned", "held", "pts", "clean_pct", "p90_ms", "usd_per_match", "tokens_per_match", "cleared", "fail_profile", "form", "by_fixture", "audit_agreement"],
+        "properties": {
+          "candidate": { "type": "string" },
+          "claims": { "type": "integer", "minimum": 0 },
+          "stands": { "type": "integer", "minimum": 0 },
+          "amended": { "type": "integer", "minimum": 0 },
+          "overturned": { "type": "integer", "minimum": 0 },
+          "held": { "type": "integer", "minimum": 0 },
+          "pts": { "type": "integer" },
+          "clean_pct": { "type": ["number", "null"], "description": "stands / (claims - held), one decimal; null when nothing was scored." },
+          "p90_ms": { "type": "integer", "minimum": 0 },
+          "usd_per_match": { "anyOf": [{ "type": "number", "minimum": 0 }, { "const": "prices not set" }], "description": "The candidate's Narrator usage only, averaged over fixtures." },
+          "tokens_per_match": { "type": "integer", "minimum": 0 },
+          "cleared": { "type": "boolean", "description": "overturned <= amended; false reads Not cleared for air." },
+          "fail_profile": {
+            "type": "object",
+            "description": "Share of the non-STANDS, non-HELD scored claims in each bucket; sums to 1, empty when there are none.",
+            "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "form": { "type": "array", "items": { "enum": ["S", "A", "O", "H"] }, "maxItems": 5 },
+          "by_fixture": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["pts", "clean_pct"],
+              "properties": {
+                "pts": { "type": "integer" },
+                "clean_pct": { "type": ["number", "null"] }
+              }
+            }
+          },
+          "audit_agreement": { "type": ["number", "null"], "description": "Share of this candidate's audited claims the auditor agreed with; null when none were audited. Read it with self_audited." }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "trialVerdict": { "enum": ["STANDS", "AMENDED", "OVERTURNED", "HELD"] },
+    "bucket": { "enum": ["numbers", "names", "citation", "attribution", "timing", "overclaim", "wording", "other"] },
+    "cost": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["currency", "total", "by_role"],
+          "properties": {
+            "currency": { "type": ["string", "null"] },
+            "total": { "type": "number", "minimum": 0 },
+            "by_role": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } }
+          }
+        },
+        { "const": "prices not set" }
+      ]
+    }
+  }
+}

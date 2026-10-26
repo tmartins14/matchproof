@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from enum import IntEnum, StrEnum
+from enum import Enum, IntEnum, StrEnum
 from typing import Annotated, Any, Literal
 
 from pydantic import AnyUrl, AwareDatetime, BaseModel, ConfigDict, Field, RootModel
+from typing_extensions import TypeAliasType
 
 
 class Model(RootModel[Any]):
@@ -526,6 +527,146 @@ class Type1(StrEnum):
     verdict = 'verdict'
 
 
+class FinalScoreItem(RootModel[int]):
+    root: Annotated[int, Field(ge=0)]
+
+
+class Trap(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    minute: Annotated[
+        int,
+        Field(description='Read from the planted event in the generated match.', ge=1),
+    ]
+    kind: str
+    note: str
+    event_id: EventId
+
+
+class Fixture(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: Annotated[str, Field(pattern='^fx-[0-9]{2}$')]
+    seed: int
+    match_id: str
+    home: str
+    away: str
+    brief: str
+    final_score: tuple[FinalScoreItem, FinalScoreItem]
+    traps: list[Trap]
+
+
+class Candidate(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: str
+    deployment: str
+    model: Annotated[str, Field(description='Exact model name and version.')]
+    prompt_hash: Annotated[
+        str,
+        Field(
+            description='First 8 hex of the SHA-256 of the narrator prompt as loaded.',
+            pattern='^[0-9a-f]{8}$',
+        ),
+    ]
+    price_in: Annotated[
+        float | None,
+        Field(description='Per million tokens; null where no price is set.'),
+    ]
+    price_out: float | None
+    currency: str | None
+    self_audited: Annotated[
+        bool, Field(description="True where the auditor is this candidate's own model.")
+    ]
+
+
+class Error(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidate: str
+    fixture: str
+    error: str
+
+
+class UsdPerMatch(RootModel[float]):
+    root: Annotated[
+        float,
+        Field(
+            description="The candidate's Narrator usage only, averaged over fixtures.",
+            ge=0.0,
+        ),
+    ]
+
+
+FailProfileAdditionalProperty = TypeAliasType(
+    "FailProfileAdditionalProperty", Annotated[float, Field(ge=0.0, le=1.0)]
+)
+
+
+class FormEnum(Enum):
+    S = 'S'
+    A = 'A'
+    O = 'O'
+    H = 'H'
+
+
+class ByFixture(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    pts: int
+    clean_pct: float | None
+
+
+class SummaryItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidate: str
+    claims: Annotated[int, Field(ge=0)]
+    stands: Annotated[int, Field(ge=0)]
+    amended: Annotated[int, Field(ge=0)]
+    overturned: Annotated[int, Field(ge=0)]
+    held: Annotated[int, Field(ge=0)]
+    pts: int
+    clean_pct: Annotated[
+        float | None,
+        Field(
+            description='stands / (claims - held), one decimal; null when nothing was scored.'
+        ),
+    ]
+    p90_ms: Annotated[int, Field(ge=0)]
+    usd_per_match: Annotated[
+        UsdPerMatch | Literal['prices not set'],
+        Field(
+            description="The candidate's Narrator usage only, averaged over fixtures."
+        ),
+    ]
+    tokens_per_match: Annotated[int, Field(ge=0)]
+    cleared: Annotated[
+        bool,
+        Field(description='overturned <= amended; false reads Not cleared for air.'),
+    ]
+    fail_profile: Annotated[
+        dict[str, FailProfileAdditionalProperty],
+        Field(
+            description='Share of the non-STANDS, non-HELD scored claims in each bucket; sums to 1, empty when there are none.'
+        ),
+    ]
+    form: Annotated[list[FormEnum], Field(max_length=5)]
+    by_fixture: dict[str, ByFixture]
+    audit_agreement: Annotated[
+        float | None,
+        Field(
+            description="Share of this candidate's audited claims the auditor agreed with; null when none were audited. Read it with self_audited."
+        ),
+    ]
+
+
 class ByLang(RootModel[dict[Lang, dict[BeatId, str]]]):
     root: dict[Lang, dict[BeatId, str]]
 
@@ -619,6 +760,42 @@ class Status(BaseModel):
             description='Goals so far, from intel.score.match_score. On every score status and on full_time.'
         ),
     ] = None
+
+
+class Bucket(Enum):
+    numbers = 'numbers'
+    names = 'names'
+    citation = 'citation'
+    attribution = 'attribution'
+    timing = 'timing'
+    overclaim = 'overclaim'
+    wording = 'wording'
+    other = 'other'
+
+
+ByRoleAdditionalProperty = TypeAliasType(
+    "ByRoleAdditionalProperty", Annotated[float, Field(ge=0.0)]
+)
+
+
+class Cost1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    currency: str | None
+    total: Annotated[float, Field(ge=0.0)]
+    by_role: dict[str, ByRoleAdditionalProperty]
+
+
+class Cost(RootModel[Cost1 | Literal['prices not set']]):
+    root: Cost1 | Literal['prices not set']
+
+
+class TrialVerdict(Enum):
+    STANDS = 'STANDS'
+    AMENDED = 'AMENDED'
+    OVERTURNED = 'OVERTURNED'
+    HELD = 'HELD'
 
 
 class Highlight(BaseModel):
@@ -775,6 +952,89 @@ class StreamMessage(BaseModel):
         ),
     ] = None
     data: Status | Event | PositionFrame | Fact | Beat | Claim
+
+
+class Referee(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    checker: Annotated[str, Field(examples=['code'])]
+    judge: str
+    auditor: str
+    judge_prompt: str
+    audited: Annotated[
+        bool,
+        Field(
+            description='False for a --no-audit dry run: no claim has an auditor verdict.'
+        ),
+    ]
+    cost: Cost
+
+
+class Claim1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: ClaimId
+    fixture: str
+    beat: BeatId
+    minute: Annotated[int, Field(ge=1)]
+    candidate: str
+    scored: Annotated[
+        bool, Field(description='True for the first claim of each beat only.')
+    ]
+    text: Annotated[str, Field(description='What would be on air after consensus.')]
+    draft_text: Annotated[str, Field(description="The Narrator's first wording.")]
+    verdict: TrialVerdict
+    reason_bucket: Bucket | None
+    reasons: Annotated[
+        list[str],
+        Field(description='The raw reasons behind a verdict other than STANDS.'),
+    ]
+    failed_span: Annotated[
+        str | None,
+        Field(description='For AMENDED: the words of the draft that changed.'),
+    ]
+    corrected_span: Annotated[
+        str | None, Field(description='For AMENDED: the words that replaced them.')
+    ]
+    fact_ids: list[FactId]
+    checker: str
+    auditor: Annotated[
+        str,
+        Field(description='agree, disagree (problem), unavailable, or not audited.'),
+    ]
+    corrected_by_consensus: bool
+    latency_ms: Annotated[
+        int, Field(description="The beat's, from fact bundle to settled claims.", ge=0)
+    ]
+    tokens_in: Annotated[int, Field(description="The Narrator's for the beat.", ge=0)]
+    tokens_out: Annotated[int, Field(ge=0)]
+
+
+class TrialsResults(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    pack: Annotated[str, Field(examples=['pack-v1'])]
+    run_at: AwareDatetime
+    git_sha: str
+    referee: Annotated[
+        Referee,
+        Field(
+            description="The fixed referee: the Checker's code and judge, then the auditor on settled claims. Its cost is reported once here, not per candidate."
+        ),
+    ]
+    fixtures: list[Fixture]
+    candidates: list[Candidate]
+    claims: list[Claim1]
+    errors: list[Error]
+    summary: Annotated[
+        list[SummaryItem],
+        Field(
+            description='One row per candidate, sorted by pts, then clean_pct, then p90_ms. Counts are over scored claims only.'
+        ),
+    ]
 
 
 class ClaimGraph(BaseModel):

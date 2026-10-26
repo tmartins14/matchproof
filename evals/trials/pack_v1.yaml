@@ -1,0 +1,65 @@
+# Narrator Trials, pack v1: six seeded matches, Rivermouth (RIV) v Ashford Vale (ASH).
+# `planted` is given for custom storylines only; the others use the moments in sim.brief.STORYLINES.
+# A trap's `planted` is the 1-based position of its moment in that list. The runner reads the trap's
+# minute and event id from the generated match; no minute is written here.
+pack: pack-v1
+fixtures:
+  - id: fx-01
+    seed: 101
+    storyline: red_card_flip
+    brief: Goalless until a red card on the hour, then Rivermouth score twice against ten men.
+    traps:
+      - { kind: red_card, planted: 1, note: "Which side is down to ten, and how many players each side has left." }
+      - { kind: open_play_goal, planted: 3, note: "The second goal against ten men: the count and the score." }
+
+  - id: fx-02
+    seed: 102
+    storyline: late_comeback
+    brief: Ashford lead on the break, Rivermouth level from a set piece and win it in stoppage time.
+    traps:
+      - { kind: set_piece_goal, planted: 2, note: "The equaliser flips the scoreline from behind to level." }
+      - { kind: high_turnover_goal, planted: 3, note: "A winner in 90 to 95 minutes: the scoreline and the stoppage-time minute." }
+
+  - id: fx-03
+    seed: 103
+    storyline: end_to_end
+    brief: Six goals, level at 3–3, with an Ashford penalty in stoppage time.
+    traps:
+      - { kind: counter_goal, planted: 2, note: "Ashford level at 1–1 on the break: the running score." }
+      - { kind: penalty, planted: 6, note: "The stoppage-time penalty makes it 3–3." }
+
+  - id: fx-04
+    seed: 104
+    storyline: smash_and_grab
+    brief: Rivermouth have the ball and lose 1–0 to a single Ashford counter.
+    traps:
+      - { kind: counter_goal, planted: 1, note: "Possession and territory belong to the side that loses; the claim must not say they deserved more." }
+
+  - id: fx-05
+    seed: 105
+    storyline: custom
+    planted:
+      - [penalty, home, 8, 12]
+      - [red_card, away, 20, 25]
+      - [counter_goal, away, 50, 58]
+    brief: Rivermouth score an early penalty, Ashford lose a player, then score on the counter anyway.
+    traps:
+      - { kind: penalty, planted: 1, note: "Who took it and who scored." }
+      - { kind: red_card, planted: 2, note: "Which side was sent off." }
+      - { kind: counter_goal, planted: 3, note: "Ashford score with ten men: the scorer and the side." }
+
+  - id: fx-06
+    seed: 106
+    storyline: custom
+    planted:
+      - [open_play_goal, away, 15, 22]
+      - [counter_goal, away, 33, 40]
+      - [set_piece_goal, home, 68, 74]
+      - [high_turnover_goal, home, 80, 86]
+      - [open_play_goal, home, 90, 95]
+    brief: Ashford lead 2–0, then Rivermouth score three times, the last in stoppage time, to win 3–2.
+    traps:
+      - { kind: counter_goal, planted: 2, note: "0–2: the score and who leads." }
+      - { kind: set_piece_goal, planted: 3, note: "1–2: Rivermouth are still behind." }
+      - { kind: high_turnover_goal, planted: 4, note: "2–2: level, not ahead." }
+      - { kind: open_play_goal, planted: 5, note: "3–2: the lead changes hands at the end." }

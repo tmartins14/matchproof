@@ -50,11 +50,15 @@ def main() -> int:
         return 1
 
     registry = build_registry(schemas)
-    validator = Draft202012Validator(
-        schemas["claim_graph.schema.json"], registry=registry
-    )
     examples = sorted(EXAMPLES_DIR.glob("*.json"))
     for path in examples:
+        # An example is checked against the schema it is named for (trials_results.min.json), else the
+        # claim graph.
+        named = f"{path.name.split('.')[0]}.schema.json"
+        validator = Draft202012Validator(
+            schemas[named if named in schemas else "claim_graph.schema.json"],
+            registry=registry,
+        )
         for error in validator.iter_errors(json.loads(path.read_text())):
             location = "/".join(str(p) for p in error.absolute_path)
             errors.append(f"{path.name}: {location}: {error.message}")

@@ -22,6 +22,13 @@ COMPARISON_FACTS = (
 )  # a fact whose name has one of these holds a comparison
 SCORE_FACTS = ("score_after(", "lead(")
 
+# The parts of a reason that Narrator Trials matches on to bucket a failure (evals/trials.py).
+NO_FACTS_REASON = "The claim cites no facts."
+NOT_IN_BUNDLE_REASON = "is not in the beat's fact bundle."
+NUMBER_REASON_PREFIX = 'The number "'
+COMPARES_REASON = "compares, but no before or change fact is cited."
+PLAYER_REASON_PREFIX = 'The player "'
+
 _PART_RE = re.compile(r"(\d+(?:[.,]\d+)*)\s*(%|′|'|per cent|[^\W\d_]+)?", re.IGNORECASE)
 _UNIT_ALIASES = {
     "%": "pct",
@@ -136,10 +143,10 @@ def reconcile(
     roster's player names: one that appears in the text must be a cited fact's value."""
     reasons: list[str] = []
     if not fact_ids:
-        reasons.append("The claim cites no facts.")
+        reasons.append(NO_FACTS_REASON)
     unknown = [fid for fid in fact_ids if fid not in bundle]
     for fid in unknown:
-        reasons.append(f"Cited fact {fid} is not in the beat's fact bundle.")
+        reasons.append(f"Cited fact {fid} {NOT_IN_BUNDLE_REASON}")
     cited = [bundle[fid] for fid in fact_ids if fid in bundle]
     matched: list[NumberMatch] = []
     cursor = 0
@@ -159,19 +166,21 @@ def reconcile(
         )
         if found is None:
             reasons.append(
-                f'The number "{token}" matches no display rendering of the cited facts.'
+                f'{NUMBER_REASON_PREFIX}{token}" matches no display rendering of the cited facts.'
             )
         else:
             matched.append(NumberMatch(token, found.id.root))
     words = comparison_words(text)
     if words and not any(holds_comparison(f) for f in cited):
         for word in words[:3]:
-            reasons.append(f"'{word}' compares, but no before or change fact is cited.")
+            reasons.append(f"'{word}' {COMPARES_REASON}")
     named = {f.value for f in cited if isinstance(f.value, str)}
     for name in sorted(names):
         if (
             re.search(rf"(?<![\w-]){re.escape(name)}(?![\w-])", text)
             and name not in named
         ):
-            reasons.append(f'The player "{name}" is not named by any cited fact.')
+            reasons.append(
+                f'{PLAYER_REASON_PREFIX}{name}" is not named by any cited fact.'
+            )
     return Reconciliation(not reasons, matched, reasons)

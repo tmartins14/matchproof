@@ -26,6 +26,7 @@ DEFAULT_TIMEOUT_S = 15.0
 
 MODELS_PATH = runtime_root() / "packages" / "agents" / "config" / "models.yaml"
 JUDGE_DEPLOYMENT_ENV = "JUDGE_DEPLOYMENT"
+TRIAL_LABELS = ("id", "model")  # keys of a trial candidate that are not call settings
 
 Role = Literal["narrator", "judge", "producer", "auditor", "composer"]
 # How a deployment returns JSON: a response_format JSON schema, JSON mode, or only by prompt.
@@ -214,18 +215,31 @@ def judge_settings(
     return settings_for(entry)
 
 
+def trial_settings(models: dict[str, Any], candidate_id: str) -> ModelSettings:
+    """The Narrator settings of a Narrator Trials candidate, by its `id` in `trial_candidates`."""
+    entry = next(
+        (e for e in models.get("trial_candidates", []) if e["id"] == candidate_id),
+        None,
+    )
+    if entry is None:
+        raise LlmError("UnknownCandidate")
+    return settings_for({k: v for k, v in entry.items() if k not in TRIAL_LABELS})
+
+
 def client_for(role: Role, *, deployment: str | None = None) -> LlmClient:
     """A client for a role, configured from config/models.yaml. `deployment` picks another judge
-    (the bake-off); otherwise the judge is JUDGE_DEPLOYMENT or the one set in the file."""
+    (the bake-off) or, for the narrator, a Narrator Trials candidate id; otherwise the judge is
+    JUDGE_DEPLOYMENT or the one set in the file."""
     base_url = os.environ.get("MODEL_BASE_URL")
     if not base_url:
         raise LlmError("MissingModelConfig")
     models = load_models()
-    settings = (
-        judge_settings(models, deployment)
-        if role == "judge"
-        else settings_for(models[role])
-    )
+    if role == "judge":
+        settings = judge_settings(models, deployment)
+    elif role == "narrator" and deployment is not None:
+        settings = trial_settings(models, deployment)
+    else:
+        settings = settings_for(models[role])
     return LlmClient(
         base_url,
         settings.deployment,

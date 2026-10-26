@@ -30,6 +30,9 @@ JUDGE_MAX_TOKENS = 800
 MAX_WORKERS = 4  # claims of one beat checked at the same time
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 MAX_REASON_CHARS = 400
+VOICE_REASON_PREFIX = (
+    "Voice rule "  # Narrator Trials buckets a reason that starts with it as wording
+)
 _tracer = trace.get_tracer(__name__)
 
 Problem = Literal[
@@ -168,7 +171,7 @@ class Checker:
         rule_why = {r.id: r.why for r in self._rules}
         for v in violations:
             result.reasons.append(
-                f'Voice rule {v.rule_id} broken by "{v.excerpt}": {rule_why.get(v.rule_id, "")}'.strip()
+                f'{VOICE_REASON_PREFIX}{v.rule_id} broken by "{v.excerpt}": {rule_why.get(v.rule_id, "")}'.strip()
             )
         if result.reasons:
             return result

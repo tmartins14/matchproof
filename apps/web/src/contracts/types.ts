@@ -27,6 +27,7 @@ match_brief?: MatchBrief
 overlay?: Overlay
 position_frame?: PositionFrame
 stream_message?: StreamMessage
+trials_results?: TrialsResults
 }
 /**
  * One key moment worth explaining, either planted by the brief or found by the detector.
@@ -440,4 +441,179 @@ score?: {
 home: number
 away: number
 }
+}
+/**
+ * One Narrator Trials run: a fixed pack of seeded matches, the candidate narrators, every claim the referee scored, and the league table computed from them. Written by evals/trials.py; the web app only draws it.
+ */
+export interface TrialsResults {
+pack: string
+run_at: string
+git_sha: string
+/**
+ * The fixed referee: the Checker's code and judge, then the auditor on settled claims. Its cost is reported once here, not per candidate.
+ */
+referee: {
+checker: string
+judge: string
+auditor: string
+judge_prompt: string
+/**
+ * False for a --no-audit dry run: no claim has an auditor verdict.
+ */
+audited: boolean
+cost: ({
+currency: (string | null)
+total: number
+by_role: {
+[k: string]: number
+}
+} | "prices not set")
+}
+fixtures: {
+id: string
+seed: number
+match_id: string
+home: string
+away: string
+brief: string
+/**
+ * @minItems 2
+ * @maxItems 2
+ */
+final_score: [number, number]
+traps: {
+/**
+ * Read from the planted event in the generated match.
+ */
+minute: number
+kind: string
+note: string
+event_id: string
+}[]
+}[]
+candidates: {
+id: string
+deployment: string
+/**
+ * Exact model name and version.
+ */
+model: string
+/**
+ * First 8 hex of the SHA-256 of the narrator prompt as loaded.
+ */
+prompt_hash: string
+/**
+ * Per million tokens; null where no price is set.
+ */
+price_in: (number | null)
+price_out: (number | null)
+currency: (string | null)
+/**
+ * True where the auditor is this candidate's own model.
+ */
+self_audited: boolean
+}[]
+claims: {
+/**
+ * cl- plus the beat id without its bt- prefix and a two-digit number, e.g. cl-001484-card-01. The older cl-NNN-NN form is still accepted.
+ */
+id: string
+fixture: string
+/**
+ * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
+ */
+beat: string
+minute: number
+candidate: string
+/**
+ * True for the first claim of each beat only.
+ */
+scored: boolean
+/**
+ * What would be on air after consensus.
+ */
+text: string
+/**
+ * The Narrator's first wording.
+ */
+draft_text: string
+verdict: ("STANDS" | "AMENDED" | "OVERTURNED" | "HELD")
+reason_bucket: (("numbers" | "names" | "citation" | "attribution" | "timing" | "overclaim" | "wording" | "other") | null)
+/**
+ * The raw reasons behind a verdict other than STANDS.
+ */
+reasons: string[]
+/**
+ * For AMENDED: the words of the draft that changed.
+ */
+failed_span: (string | null)
+/**
+ * For AMENDED: the words that replaced them.
+ */
+corrected_span: (string | null)
+fact_ids: string[]
+checker: string
+/**
+ * agree, disagree (problem), unavailable, or not audited.
+ */
+auditor: string
+corrected_by_consensus: boolean
+/**
+ * The beat's, from fact bundle to settled claims.
+ */
+latency_ms: number
+/**
+ * The Narrator's for the beat.
+ */
+tokens_in: number
+tokens_out: number
+}[]
+errors: {
+candidate: string
+fixture: string
+error: string
+}[]
+/**
+ * One row per candidate, sorted by pts, then clean_pct, then p90_ms. Counts are over scored claims only.
+ */
+summary: {
+candidate: string
+claims: number
+stands: number
+amended: number
+overturned: number
+held: number
+pts: number
+/**
+ * stands / (claims - held), one decimal; null when nothing was scored.
+ */
+clean_pct: (number | null)
+p90_ms: number
+/**
+ * The candidate's Narrator usage only, averaged over fixtures.
+ */
+usd_per_match: (number | "prices not set")
+tokens_per_match: number
+/**
+ * overturned <= amended; false reads Not cleared for air.
+ */
+cleared: boolean
+/**
+ * Share of the non-STANDS, non-HELD scored claims in each bucket; sums to 1, empty when there are none.
+ */
+fail_profile: {
+[k: string]: number
+}
+form: ("S" | "A" | "O" | "H")[]
+by_fixture: {
+[k: string]: {
+pts: number
+clean_pct: (number | null)
+}
+}
+/**
+ * Share of this candidate's audited claims the auditor agreed with; null when none were audited. Read it with self_audited.
+ */
+audit_agreement: (number | null)
+}[]
 }

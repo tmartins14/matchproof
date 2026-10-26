@@ -337,7 +337,7 @@
   kind: overclaim
   match: { story: red_card_flip, seed: 3 }
   beat_id: bt-001484-momentum_swing
-  text: "Ashford Vale have dropped 9 m deeper since the red card and are defending in a tighter 730 square metres shape."
+  text: "Ashford Vale have dropped 9 m deeper since the red card and are defending in a tighter 755 square metres shape."
   fact_ids:
     - fx-back_line_change-away-ev-001484-to-t4671-00
     - fx-compactness-away-since-ev-001484-to-t4671-00

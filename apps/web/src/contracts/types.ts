@@ -530,6 +530,10 @@ candidate: string
  */
 scored: boolean
 /**
+ * Set on the one stand-in row of a beat that produced no checked claim: the store refused its claims (rejected), the output could not be read (unreadable), the model call failed (no_answer, HELD) or nothing was written (no_claim).
+ */
+lost: ("rejected" | "unreadable" | "no_answer" | "no_claim" | null)
+/**
  * What would be on air after consensus.
  */
 text: string
@@ -554,14 +558,22 @@ corrected_span: (string | null)
 fact_ids: string[]
 checker: string
 /**
- * agree, disagree (problem), unavailable, or not audited.
+ * agree, disagree (problem), unavailable or not audited; on an overturned claim the auditor double-checked, supports or confirms (problem).
  */
 auditor: string
+/**
+ * Only on a claim the judge alone overturned and the auditor also looked at (log-only): true when the auditor finds it supported, false when it confirms the overturn, null otherwise.
+ */
+referee_split: (boolean | null)
 corrected_by_consensus: boolean
 /**
- * The beat's, from fact bundle to settled claims.
+ * The beat's on-air time, from fact bundle to settled claims; null on a stand-in row.
  */
-latency_ms: number
+latency_ms: (number | null)
+/**
+ * The Narrator's first draft call, parse retries included; null where there was none.
+ */
+narrator_ms: (number | null)
 /**
  * The Narrator's for the beat.
  */
@@ -583,12 +595,31 @@ stands: number
 amended: number
 overturned: number
 held: number
+/**
+ * Scored stand-in rows: beats that produced no checked claim.
+ */
+lost: number
 pts: number
 /**
  * stands / (claims - held), one decimal; null when nothing was scored.
  */
 clean_pct: (number | null)
+/**
+ * The Narrator's first-draft call, 90th percentile.
+ */
 p90_ms: number
+/**
+ * The beat's on-air time, 90th percentile.
+ */
+on_air_p90_ms: number
+/**
+ * Scored claims the judge alone overturned and the auditor also looked at.
+ */
+double_checked: number
+/**
+ * Of those, how many the auditor would have let stand.
+ */
+referee_splits: number
 /**
  * The candidate's Narrator usage only, averaged over fixtures.
  */
@@ -612,7 +643,7 @@ clean_pct: (number | null)
 }
 }
 /**
- * Share of this candidate's audited claims the auditor agreed with; null when none were audited. Read it with self_audited.
+ * Share of this candidate's audited settled claims the auditor agreed with (double-checks excluded); null when none were audited. Read it with self_audited.
  */
 audit_agreement: (number | null)
 }[]

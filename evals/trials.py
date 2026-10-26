@@ -10,6 +10,7 @@ uv run python -m evals.trials --no-audit                                 # skip 
 """
 
 import argparse
+import ast
 import asyncio
 import difflib
 import hashlib
@@ -25,12 +26,13 @@ from typing import Any
 import yaml
 from agents.auditor import MAX_CONCURRENT_AUDITS, Auditor
 from agents.budget import MeteredClient, TokenBudget
-from agents.checker import VOICE_REASON_PREFIX, CheckedClaim
+from agents.checker import JUDGE_REASON_PREFIX, VOICE_REASON_PREFIX, CheckedClaim
 from agents.consensus import Consensus
 from agents.llm_client import LlmError, client_for, load_models
 from agents.narrator import PROMPT_PATH
 from agents.pipeline import BeatRun, Deps, run_beat
 from agents.prices import NOT_SET, cost_of, load_prices
+from agents.producer import Decision
 from agents.reconcile import (
     COMPARES_REASON,
     NO_FACTS_REASON,
@@ -79,6 +81,12 @@ FORM_LETTER = {"STANDS": "S", "AMENDED": "A", "OVERTURNED": "O", "HELD": "H"}
 FORM_LENGTH = 5
 OVERCLAIM_PROBLEMS = ("overclaim", "motive", "unsupported_cause", "outside_knowledge")
 SETTLED = ("verified", "rephrased")  # the claims the auditor looks at
+REJECTED_PREFIX = (
+    "put_claims rejected claims:"  # what the workflow raises when the store refuses
+)
+UNKNOWN_FACT_PREFIX = "Unknown fact id"
+UNREADABLE_ERROR = "Narrator: StructuredOutputError"
+NO_ANSWER_ERROR = "Narrator: LlmError"
 
 
 def trial_verdict(checker_verdict: str) -> str:
@@ -235,16 +243,54 @@ def describe_fixture(
 @dataclass
 class FixtureRun:
     claims: list[dict[str, Any]] = field(default_factory=list)
-    latencies: list[int] = field(default_factory=list)
+    narrator_latencies: list[int] = field(
+        default_factory=list
+    )  # the first draft call of each beat
+    on_air_latencies: list[int] = field(
+        default_factory=list
+    )  # each beat, draft to settled claims
     usage: dict[str, Any] = field(
         default_factory=dict
     )  # the candidate's Narrator usage
     errors: list[str] = field(default_factory=list)
 
 
-def audit_label(audit: Audit | None) -> str:
+class DraftCapture:
+    """Keeps the Narrator's first drafts by beat, so a beat the store refuses can still show what was
+    written. Changes nothing about the run."""
+
+    def __init__(self) -> None:
+        self.previews: dict[str, list[Claim]] = {}
+
+    def decided(self, beat_id: str, decision: Decision) -> None:
+        pass
+
+    def drafted(self, beat_id: str, previews: list[Claim]) -> None:
+        self.previews[beat_id] = previews
+
+    def settled(self, beat_id: str, run: BeatRun) -> None:
+        pass
+
+
+def is_judge_only(checked: CheckedClaim) -> bool:
+    """Blocked with no code check among its reasons: the judge alone caught it."""
+    reasons = checked.final.reasons
+    return (
+        checked.claim.verdict.value == "blocked"
+        and bool(reasons)
+        and all(r.startswith(JUDGE_REASON_PREFIX) for r in reasons)
+    )
+
+
+def audit_label(audit: Audit | None, *, double_check: bool = False) -> str:
     if audit is None:
         return "not audited"
+    if double_check:  # the meaning is inverted on an overturned claim
+        if audit.outcome.value == "agree":
+            return "supports"
+        if audit.outcome.value == "disagree":
+            return f"confirms ({audit.problem})"
+        return audit.outcome.value
     if audit.outcome.value == "disagree":
         return f"disagree ({audit.problem})"
     return audit.outcome.value
@@ -253,6 +299,13 @@ def audit_label(audit: Audit | None) -> str:
 def numbers_note(claim: Claim) -> str:
     total = len(numbers_in(claim.text))
     return f"{len(claim.numbers)}/{total} numbers matched" if total else "no numbers"
+
+
+def referee_split(audit: Audit | None) -> bool | None:
+    """The auditor would have let an overturned claim stand (True), or backs the overturn (False)."""
+    if audit is None or audit.outcome.value == "unavailable":
+        return None
+    return audit.outcome.value == "agree"
 
 
 def claim_row(
@@ -265,8 +318,10 @@ def claim_row(
     *,
     audit: Audit | None = None,
     corrected: Claim | None = None,
+    double_check: bool = False,
 ) -> dict[str, Any]:
-    """One claim as the results file records it. `corrected` is the replacement consensus made."""
+    """One claim as the results file records it. `corrected` is the replacement consensus made;
+    `double_check` marks an audit of an overturned claim, which is log-only."""
     claim = corrected or checked.claim
     verdict = trial_verdict(claim.verdict.value)
     draft = checked.claim.draft_text or checked.claim.text
@@ -289,6 +344,7 @@ def claim_row(
         "minute": minute,
         "candidate": candidate,
         "scored": index == 0,
+        "lost": None,
         "text": claim.text,
         "draft_text": draft,
         "verdict": verdict,
@@ -298,12 +354,105 @@ def claim_row(
         "corrected_span": repaired,
         "fact_ids": [f.root for f in claim.fact_ids],
         "checker": numbers_note(claim),
-        "auditor": audit_label(audit),
+        "auditor": audit_label(audit, double_check=double_check),
+        "referee_split": referee_split(audit) if double_check else None,
         "corrected_by_consensus": corrected is not None,
         "latency_ms": run.latency_ms,
+        "narrator_ms": run.narrator_calls[0].latency_ms if run.narrator_calls else None,
         "tokens_in": sum(c.input_tokens for c in run.narrator_calls),
         "tokens_out": sum(c.output_tokens for c in run.narrator_calls),
     }
+
+
+def lost_row(
+    fixture: str,
+    candidate: str,
+    beat_id: str,
+    minute: int,
+    lost: str,
+    previews: list[Claim],
+    reasons: list[str],
+    bucket: str | None,
+) -> dict[str, Any]:
+    """The one scored stand-in for a beat that produced no checked claim. A refusal or an unreadable
+    reply is the model's doing and costs points; a failed call is our infrastructure and is HELD."""
+    preview = previews[0] if previews else None
+    verdict = "HELD" if lost == "no_answer" else "OVERTURNED"
+    text = preview.text if preview else ""
+    return {
+        "id": preview.id.root if preview else f"cl-{beat_id.removeprefix('bt-')}-01",
+        "fixture": fixture,
+        "beat": beat_id,
+        "minute": minute,
+        "candidate": candidate,
+        "scored": True,
+        "lost": lost,
+        "text": text,
+        "draft_text": (preview.draft_text or preview.text) if preview else "",
+        "verdict": verdict,
+        "reason_bucket": bucket,
+        "reasons": reasons,
+        "failed_span": None,
+        "corrected_span": None,
+        "fact_ids": [f.root for f in preview.fact_ids] if preview else [],
+        "checker": "not checked",
+        "auditor": "not audited",
+        "referee_split": None,
+        "corrected_by_consensus": False,
+        "latency_ms": None,
+        "narrator_ms": None,
+        "tokens_in": 0,
+        "tokens_out": 0,
+    }
+
+
+def rejection_errors(message: str) -> list[str]:
+    """The store's errors from a `put_claims rejected claims: [...]` message."""
+    try:
+        rejected = ast.literal_eval(message.removeprefix(REJECTED_PREFIX).strip())
+    except (ValueError, SyntaxError):
+        return [message]
+    return [str(e) for r in rejected for e in r.get("errors", [])] or [message]
+
+
+def lost_beat(
+    fixture: str,
+    candidate: str,
+    beat_id: str,
+    minute: int,
+    previews: list[Claim],
+    *,
+    run: BeatRun | None = None,
+    exc: Exception | None = None,
+) -> dict[str, Any]:
+    """The stand-in row for a beat with no checked claim: from the exception it raised, or from the
+    empty run it returned."""
+
+    def make(lost: str, reasons: list[str], bucket: str | None) -> dict[str, Any]:
+        return lost_row(
+            fixture, candidate, beat_id, minute, lost, previews, reasons, bucket
+        )
+
+    if exc is not None and str(exc).startswith(REJECTED_PREFIX):
+        errors = rejection_errors(str(exc))
+        bucket = (
+            "citation"
+            if any(e.startswith(UNKNOWN_FACT_PREFIX) for e in errors)
+            else "other"
+        )
+        return make("rejected", errors, bucket)
+    if isinstance(exc, StructuredOutputError) or (
+        run is not None and run.error == UNREADABLE_ERROR
+    ):
+        return make(
+            "unreadable",
+            ["The Narrator's output could not be read as claims."],
+            "other",
+        )
+    if exc is not None or (run is not None and run.error == NO_ANSWER_ERROR):
+        name = type(exc).__name__ if exc is not None else "LlmError"
+        return make("no_answer", [name], None)
+    return make("no_claim", ["The Narrator wrote no claim for this beat."], "other")
 
 
 async def play_fixture(
@@ -324,22 +473,46 @@ async def play_fixture(
     narrator = MeteredClient(
         client_for("narrator", deployment=candidate), "narrator", counter=counter
     )
-    deps = Deps(server, narrator, judge_client)
+    capture = DraftCapture()
+    deps = Deps(server, narrator, judge_client, observer=capture)
     beats = {b.id.root: b for b in store.beats(match_id)}
     runs: list[tuple[str, BeatRun]] = []
+    lost: dict[
+        str, dict[str, Any]
+    ] = {}  # the stand-in row of each beat with no checked claim
     for beat in beats.values():
+        bid = beat.id.root
+        minute = minute_of(beat.t_detect.root)
         try:
-            async with _BEAT_LOCKS.setdefault(
-                f"{match_id}/{beat.id.root}", asyncio.Lock()
-            ):
-                run = await run_beat(match_id, beat.id.root, "fan", deps=deps)
+            async with _BEAT_LOCKS.setdefault(f"{match_id}/{bid}", asyncio.Lock()):
+                run = await run_beat(match_id, bid, "fan", deps=deps)
         except (LlmError, StructuredOutputError, OSError, ValueError) as exc:
-            out.errors.append(f"{beat.id.root}: {type(exc).__name__}({exc})")
+            out.errors.append(f"{bid}: {type(exc).__name__}({exc})")
+            lost[bid] = lost_beat(
+                fixture.id,
+                candidate,
+                bid,
+                minute,
+                capture.previews.get(bid, []),
+                exc=exc,
+            )
             continue
-        out.latencies.append(run.latency_ms)
+        out.on_air_latencies.append(run.latency_ms)
+        if run.narrator_calls:
+            out.narrator_latencies.append(run.narrator_calls[0].latency_ms)
         if run.error or not run.checked:
-            out.errors.append(f"{beat.id.root}: {run.error or 'no claims'}")
-        runs.append((beat.id.root, run))
+            out.errors.append(f"{bid}: {run.error or 'no claims'}")
+        if run.checked:
+            runs.append((bid, run))
+        else:
+            lost[bid] = lost_beat(
+                fixture.id,
+                candidate,
+                bid,
+                minute,
+                capture.previews.get(bid, []),
+                run=run,
+            )
 
     auditor = Auditor(auditor_client, server)
     consensus = Consensus(judge_client, narrator, server)
@@ -347,6 +520,11 @@ async def play_fixture(
     async def settle(
         beat_id: str, checked: CheckedClaim
     ) -> tuple[Audit | None, Claim | None]:
+        if audit and is_judge_only(checked):
+            async with (
+                gate
+            ):  # a second referee on an overturn the judge made alone; log-only
+                return await auditor.audit(match_id, checked.claim), None
         if not audit or checked.claim.verdict.value not in SETTLED:
             return None, None
         async with gate:
@@ -362,8 +540,16 @@ async def play_fixture(
         *(settle(bid, c) for bid, r in runs for c in r.checked)
     )
     results = iter(settled)
-    for beat_id, run in runs:
-        minute = minute_of(beats[beat_id].t_detect.root)
+    played = {bid: run for bid, run in runs}
+    for (
+        beat_id,
+        beat,
+    ) in beats.items():  # exactly one scored row per beat, in play order
+        if beat_id in lost:
+            out.claims.append(lost[beat_id])
+            continue
+        run = played[beat_id]
+        minute = minute_of(beat.t_detect.root)
         for i, checked in enumerate(run.checked):
             result, corrected = next(results)
             out.claims.append(
@@ -376,6 +562,7 @@ async def play_fixture(
                     i,
                     audit=result,
                     corrected=corrected,
+                    double_check=is_judge_only(checked),
                 )
             )
     out.usage = counter.snapshot()["usage"]
@@ -445,7 +632,8 @@ def summarize_candidate(
     candidate: str,
     claims: list[dict[str, Any]],
     fixture_ids: list[str],
-    latencies: list[int],
+    narrator_latencies: list[int],
+    on_air_latencies: list[int],
     usages: list[dict[str, Any]],
 ) -> dict[str, Any]:
     """The candidate's row of the league table. `usages` is its Narrator usage per fixture played."""
@@ -458,7 +646,13 @@ def summarize_candidate(
             sum(c["total"] for c in costs if isinstance(c, dict)) / len(costs), 4
         )
     tokens = [sum(r["input"] + r["output"] for r in u.values()) for u in usages]
-    verdicts = [c["auditor"] for c in claims if c["candidate"] == candidate]
+    # settled-claim audits only; a double-check on an overturn means the opposite
+    verdicts = [
+        c["auditor"]
+        for c in claims
+        if c["candidate"] == candidate and c.get("referee_split") is None
+    ]
+    checked_twice = [c for c in scored if c.get("referee_split") is not None]
     audited = [a for a in verdicts if a == "agree" or a.startswith("disagree")]
     by_fixture = {}
     form = []
@@ -482,7 +676,11 @@ def summarize_candidate(
         "held": count["HELD"],
         "pts": sum(POINTS[c["verdict"]] for c in scored),
         "clean_pct": clean_pct(scored),
-        "p90_ms": percentile(latencies, 0.9),
+        "lost": sum(c.get("lost") is not None for c in scored),
+        "p90_ms": percentile(narrator_latencies, 0.9),
+        "on_air_p90_ms": percentile(on_air_latencies, 0.9),
+        "double_checked": len(checked_twice),
+        "referee_splits": sum(c["referee_split"] is True for c in checked_twice),
         "usd_per_match": usd,
         "tokens_per_match": round(sum(tokens) / len(tokens)) if tokens else 0,
         "cleared": count["OVERTURNED"] <= count["AMENDED"],
@@ -517,8 +715,8 @@ def markdown(results: dict[str, Any]) -> str:
             f" auditor {results['referee']['auditor']}. Referee cost: {_money(results['referee']['cost'])}."
         ),
         "",
-        "| # | Candidate | Pts | Clean | Stands | Amended | Overturned | Held | p90 | USD/match | Auditor agrees | |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| # | Candidate | Pts | Clean | Stands | Amended | Overturned | Held | p90 | On-air p90 | USD/match | Auditor agrees | Split | |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     own = {c["id"]: c["self_audited"] for c in results["candidates"]}
     for i, r in enumerate(results["summary"], 1):
@@ -538,7 +736,8 @@ def markdown(results: dict[str, Any]) -> str:
         )
         lines.append(
             f"| {i} | {r['candidate']} | {r['pts']} | {clean} | {r['stands']} | {r['amended']} |"
-            f" {r['overturned']} | {r['held']} | {r['p90_ms']} ms | {usd} | {agree} | {note} |"
+            f" {r['overturned']} | {r['held']} | {r['p90_ms']} ms | {r['on_air_p90_ms']} ms | {usd} | {agree} |"
+            f" {r['referee_splits']}/{r['double_checked']} | {note} |"
         )
     if results["errors"]:
         lines += ["", "## Errors", ""]
@@ -549,7 +748,9 @@ def markdown(results: dict[str, Any]) -> str:
     lines += ["", "## Overturned", ""]
     overturned = [c for c in results["claims"] if c["verdict"] == "OVERTURNED"]
     for c in overturned:
-        stamp = "" if c["scored"] else " (not scored)"
+        stamp = ("" if c["scored"] else " (not scored)") + (
+            " [split]" if c.get("referee_split") else ""
+        )
         lines.append(
             f"- **{c['candidate']}** {c['fixture']} {c['minute']}′{stamp}: {c['text']}"
             f" [{c['reason_bucket']}] {'; '.join(c['reasons'])}"
@@ -628,7 +829,8 @@ async def run_trials(
     summary: list[dict[str, Any]] = []
     fixture_ids = [f.id for f in fixtures]
     for candidate, runs in zip(candidates, played, strict=True):
-        latencies: list[int] = []
+        narrator_latencies: list[int] = []
+        on_air_latencies: list[int] = []
         usages: list[dict[str, Any]] = []
         for fid in fixture_ids:
             run = runs[fid]
@@ -636,13 +838,21 @@ async def run_trials(
                 errors.append({"candidate": candidate, "fixture": fid, "error": run})
                 continue
             claims += run.claims
-            latencies += run.latencies
+            narrator_latencies += run.narrator_latencies
+            on_air_latencies += run.on_air_latencies
             usages.append(run.usage)
             errors += [
                 {"candidate": candidate, "fixture": fid, "error": e} for e in run.errors
             ]
         summary.append(
-            summarize_candidate(candidate, claims, fixture_ids, latencies, usages)
+            summarize_candidate(
+                candidate,
+                claims,
+                fixture_ids,
+                narrator_latencies,
+                on_air_latencies,
+                usages,
+            )
         )
     snapshot = referee.snapshot()
     judge_name = judge_client.deployment

@@ -33,6 +33,9 @@ MAX_REASON_CHARS = 400
 VOICE_REASON_PREFIX = (
     "Voice rule "  # Narrator Trials buckets a reason that starts with it as wording
 )
+JUDGE_REASON_PREFIX = (
+    "Judge ("  # Narrator Trials double-checks a claim only the judge caught
+)
 _tracer = trace.get_tracer(__name__)
 
 Problem = Literal[
@@ -220,7 +223,9 @@ class Checker:
         result.judge_reason = answer.reason
         if not answer.supported:
             problem = answer.problem or "unsupported"
-            result.reasons.append(f"Judge ({problem}): {answer.reason}".strip())
+            result.reasons.append(
+                f"{JUDGE_REASON_PREFIX}{problem}): {answer.reason}".strip()
+            )
         return result
 
     def check_all(

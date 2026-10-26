@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from agents.checker import CheckedClaim, ClaimCheck
+from agents.checker import JUDGE_REASON_PREFIX, CheckedClaim, ClaimCheck
 from agents.llm_client import LlmError, load_models, trial_settings
 from agents.pipeline import BeatRun
 from agents.reconcile import reconcile
@@ -18,11 +18,14 @@ from evals.trials import (
     claim_row,
     differing_span,
     fail_profile,
+    is_judge_only,
     load_pack,
+    lost_beat,
     markdown,
     prompt_hash,
     rank,
     reason_bucket,
+    referee_split,
     summarize_candidate,
     trial_verdict,
 )
@@ -175,6 +178,7 @@ def scored(
     verdict: str,
     bucket: str | None = None,
     agree: str = "agree",
+    **extra: Any,
 ) -> dict[str, Any]:
     return {
         "candidate": candidate,
@@ -183,6 +187,7 @@ def scored(
         "verdict": verdict,
         "reason_bucket": bucket,
         "auditor": agree,
+        **extra,
     }
 
 
@@ -203,7 +208,12 @@ def test_summary_maths() -> None:
         "narrator": {"deployment": "gpt-5-mini", "input": 1_000_000, "output": 500_000}
     }
     s = summarize_candidate(
-        "a", rows, ["fx-01", "fx-02"], [1000, 2000, 3000], [usage, usage]
+        "a",
+        rows,
+        ["fx-01", "fx-02"],
+        [1000, 2000, 3000],
+        [4000, 5000, 6000],
+        [usage, usage],
     )
     assert (s["claims"], s["stands"], s["amended"], s["overturned"], s["held"]) == (
         5,
@@ -215,7 +225,9 @@ def test_summary_maths() -> None:
     assert s["pts"] == 3 + 3 + 1 - 3
     assert s["clean_pct"] == 50.0  # 2 of the 4 that are not held
     assert s["cleared"] is True  # overturned 1 <= amended 1
-    assert s["p90_ms"] == 3000
+    assert s["p90_ms"] == 3000  # the narrator's call
+    assert s["on_air_p90_ms"] == 6000
+    assert (s["lost"], s["double_checked"], s["referee_splits"]) == (0, 0, 0)
     assert s["usd_per_match"] == 1.25  # 0.25 + 2.00 * 0.5
     assert s["tokens_per_match"] == 1_500_000
     assert s["fail_profile"] == {"numbers": 0.5, "attribution": 0.5}
@@ -227,10 +239,170 @@ def test_summary_maths() -> None:
     assert s["audit_agreement"] == 0.8  # every audited claim counts, scored or not
 
 
+def blocked_by(reasons: list[str], problem: str | None = None) -> CheckedClaim:
+    c = claim("blocked")
+    first = ClaimCheck(c.text, [], reasons=reasons, judge_problem=problem)
+    return CheckedClaim(c, first, first)
+
+
+def draft_preview() -> Claim:
+    return claim("verified", draft_text="Ashford are down to nine.")
+
+
+def test_rejected_beat_is_one_scored_citation_overturn() -> None:
+    exc = ValueError(
+        "put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000100-card-01',"
+        " 'accepted': False, 'errors': ['Unknown fact id fx-nope.']}]"
+    )
+    row = lost_beat("fx-01", "m", "bt-000100-card", 60, [draft_preview()], exc=exc)
+    assert (row["lost"], row["verdict"], row["reason_bucket"], row["scored"]) == (
+        "rejected",
+        "OVERTURNED",
+        "citation",
+        True,
+    )
+    assert row["reasons"] == ["Unknown fact id fx-nope."]
+    assert row["text"] == "Ashford are down to ten."  # from the captured preview
+    assert (row["latency_ms"], row["narrator_ms"], row["auditor"]) == (
+        None,
+        None,
+        "not audited",
+    )
+    other = ValueError("put_claims rejected claims: [{'errors': ['Too long.']}]")
+    assert (
+        lost_beat("fx-01", "m", "bt-000100-card", 60, [], exc=other)["reason_bucket"]
+        == "other"
+    )
+
+
+def test_rejection_is_classified_before_the_catch_all_value_error() -> None:
+    rejected = ValueError("put_claims rejected claims: []")
+    other = ValueError("something else broke")
+    assert lost_beat("fx-01", "m", "bt-000100-card", 60, [], exc=rejected)["lost"] == (
+        "rejected"
+    )
+    row = lost_beat("fx-01", "m", "bt-000100-card", 60, [], exc=other)
+    assert (row["lost"], row["verdict"]) == ("no_answer", "HELD")
+
+
+def test_stand_in_without_a_preview_is_empty() -> None:
+    run = BeatRun([], [], 5)
+    row = lost_beat("fx-01", "m", "bt-000100-card", 60, [], run=run)
+    assert (row["id"], row["text"], row["fact_ids"], row["lost"]) == (
+        "cl-000100-card-01",
+        "",
+        [],
+        "no_claim",
+    )
+    assert (row["verdict"], row["reason_bucket"]) == ("OVERTURNED", "other")
+
+
+def test_unreadable_costs_points_and_a_failed_call_does_not() -> None:
+    unreadable = lost_beat(
+        "fx-01",
+        "m",
+        "bt-000100-card",
+        60,
+        [],
+        run=BeatRun([], [], 5, error="Narrator: StructuredOutputError"),
+    )
+    assert (unreadable["lost"], unreadable["verdict"]) == ("unreadable", "OVERTURNED")
+    assert unreadable["reason_bucket"] == "other"
+    failed = lost_beat(
+        "fx-01",
+        "m",
+        "bt-000100-card",
+        60,
+        [],
+        run=BeatRun([], [], 5, error="Narrator: LlmError"),
+    )
+    assert (failed["lost"], failed["verdict"], failed["reason_bucket"]) == (
+        "no_answer",
+        "HELD",
+        None,
+    )
+    raised = lost_beat(
+        "fx-01", "m", "bt-000100-card", 60, [], exc=LlmError("APITimeoutError")
+    )
+    assert (raised["lost"], raised["verdict"]) == ("no_answer", "HELD")
+
+
+def test_equal_denominators_with_a_lost_beat() -> None:
+    lost = lost_beat(
+        "fx-01",
+        "a",
+        "bt-000100-card",
+        60,
+        [],
+        exc=ValueError("put_claims rejected claims: []"),
+    )
+    clean = {**scored("b", "fx-01", "STANDS"), "lost": None}
+    rows = [{**lost, "candidate": "a"}, clean]
+    a = summarize_candidate("a", rows, ["fx-01"], [], [], [])
+    b = summarize_candidate("b", rows, ["fx-01"], [], [], [])
+    assert a["claims"] == b["claims"] == 1
+    assert (a["lost"], a["overturned"], b["lost"]) == (1, 1, 0)
+
+
+def test_judge_only_overturn_is_double_checked() -> None:
+    judge = blocked_by([f"{JUDGE_REASON_PREFIX}wrong_entity): the other side."])
+    code = blocked_by(
+        [*reasons_of("They lead 3–0.", ["fx-goal"]), f"{JUDGE_REASON_PREFIX}x): y"]
+    )
+    assert is_judge_only(judge) is True
+    assert is_judge_only(code) is False
+    assert is_judge_only(checked(claim("verified"), [])) is False
+    audit = Audit.model_validate({"deployment": "d", "outcome": "agree"})
+    row = claim_row(
+        "fx-01", "m", 60, BeatRun([], [], 5), judge, 0, audit=audit, double_check=True
+    )
+    assert (row["referee_split"], row["auditor"], row["verdict"]) == (
+        True,
+        "supports",
+        "OVERTURNED",
+    )
+    confirm = Audit.model_validate(
+        {"deployment": "d", "outcome": "disagree", "problem": "wrong_entity"}
+    )
+    row = claim_row(
+        "fx-01", "m", 60, BeatRun([], [], 5), judge, 0, audit=confirm, double_check=True
+    )
+    assert (row["referee_split"], row["auditor"]) == (False, "confirms (wrong_entity)")
+    gone = Audit.model_validate({"deployment": "d", "outcome": "unavailable"})
+    assert referee_split(gone) is None
+    plain = claim_row("fx-01", "m", 60, BeatRun([], [], 5), code, 0)
+    assert plain["referee_split"] is None
+
+
+def test_audit_agreement_ignores_double_checks() -> None:
+    rows = [
+        scored("a", "fx-01", "STANDS"),
+        scored("a", "fx-01", "OVERTURNED", "other", "supports", referee_split=True),
+        scored(
+            "a", "fx-02", "OVERTURNED", "other", "confirms (x)", referee_split=False
+        ),
+    ]
+    s = summarize_candidate("a", rows, ["fx-01", "fx-02"], [], [], [])
+    assert s["audit_agreement"] == 1.0
+    assert (s["double_checked"], s["referee_splits"]) == (2, 1)
+
+
+def test_markdown_marks_a_split() -> None:
+    import json
+
+    example = json.loads(
+        (ROOT / "schemas" / "examples" / "trials_results.min.json").read_text("utf-8")
+    )
+    example["claims"][0].update(verdict="OVERTURNED", referee_split=True)
+    text = markdown(example)
+    assert "[split]" in text
+    assert "On-air p90" in text and "| Split |" in text
+
+
 def test_not_cleared_and_unpriced() -> None:
     rows = [scored("a", "fx-01", "OVERTURNED", "other"), scored("a", "fx-01", "STANDS")]
     usage = {"narrator": {"deployment": "gpt-5-nano", "input": 10, "output": 10}}
-    s = summarize_candidate("a", rows, ["fx-01"], [5], [usage])
+    s = summarize_candidate("a", rows, ["fx-01"], [5], [9], [usage])
     assert s["cleared"] is False
     assert s["usd_per_match"] == "prices not set"
 

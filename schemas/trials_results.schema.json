@@ -78,7 +78,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "fixture", "beat", "minute", "candidate", "scored", "text", "draft_text", "verdict", "reason_bucket", "reasons", "failed_span", "corrected_span", "fact_ids", "checker", "auditor", "corrected_by_consensus", "latency_ms", "tokens_in", "tokens_out"],
+        "required": ["id", "fixture", "beat", "minute", "candidate", "scored", "lost", "text", "draft_text", "verdict", "reason_bucket", "reasons", "failed_span", "corrected_span", "fact_ids", "checker", "auditor", "referee_split", "corrected_by_consensus", "latency_ms", "narrator_ms", "tokens_in", "tokens_out"],
         "properties": {
           "id": { "$ref": "common.schema.json#/$defs/claimId" },
           "fixture": { "type": "string" },
@@ -86,6 +86,7 @@
           "minute": { "type": "integer", "minimum": 1 },
           "candidate": { "type": "string" },
           "scored": { "type": "boolean", "description": "True for the first claim of each beat only." },
+          "lost": { "enum": ["rejected", "unreadable", "no_answer", "no_claim", null], "description": "Set on the one stand-in row of a beat that produced no checked claim: the store refused its claims (rejected), the output could not be read (unreadable), the model call failed (no_answer, HELD) or nothing was written (no_claim)." },
           "text": { "type": "string", "description": "What would be on air after consensus." },
           "draft_text": { "type": "string", "description": "The Narrator's first wording." },
           "verdict": { "$ref": "#/$defs/trialVerdict" },
@@ -95,9 +96,11 @@
           "corrected_span": { "type": ["string", "null"], "description": "For AMENDED: the words that replaced them." },
           "fact_ids": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/factId" } },
           "checker": { "type": "string" },
-          "auditor": { "type": "string", "description": "agree, disagree (problem), unavailable, or not audited." },
+          "auditor": { "type": "string", "description": "agree, disagree (problem), unavailable or not audited; on an overturned claim the auditor double-checked, supports or confirms (problem)." },
+          "referee_split": { "type": ["boolean", "null"], "description": "Only on a claim the judge alone overturned and the auditor also looked at (log-only): true when the auditor finds it supported, false when it confirms the overturn, null otherwise." },
           "corrected_by_consensus": { "type": "boolean" },
-          "latency_ms": { "type": "integer", "minimum": 0, "description": "The beat's, from fact bundle to settled claims." },
+          "latency_ms": { "type": ["integer", "null"], "minimum": 0, "description": "The beat's on-air time, from fact bundle to settled claims; null on a stand-in row." },
+          "narrator_ms": { "type": ["integer", "null"], "minimum": 0, "description": "The Narrator's first draft call, parse retries included; null where there was none." },
           "tokens_in": { "type": "integer", "minimum": 0, "description": "The Narrator's for the beat." },
           "tokens_out": { "type": "integer", "minimum": 0 }
         }
@@ -122,7 +125,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["candidate", "claims", "stands", "amended", "overturned", "held", "pts", "clean_pct", "p90_ms", "usd_per_match", "tokens_per_match", "cleared", "fail_profile", "form", "by_fixture", "audit_agreement"],
+        "required": ["candidate", "claims", "stands", "amended", "overturned", "held", "lost", "pts", "clean_pct", "p90_ms", "on_air_p90_ms", "double_checked", "referee_splits", "usd_per_match", "tokens_per_match", "cleared", "fail_profile", "form", "by_fixture", "audit_agreement"],
         "properties": {
           "candidate": { "type": "string" },
           "claims": { "type": "integer", "minimum": 0 },
@@ -130,9 +133,13 @@
           "amended": { "type": "integer", "minimum": 0 },
           "overturned": { "type": "integer", "minimum": 0 },
           "held": { "type": "integer", "minimum": 0 },
+          "lost": { "type": "integer", "minimum": 0, "description": "Scored stand-in rows: beats that produced no checked claim." },
           "pts": { "type": "integer" },
           "clean_pct": { "type": ["number", "null"], "description": "stands / (claims - held), one decimal; null when nothing was scored." },
-          "p90_ms": { "type": "integer", "minimum": 0 },
+          "p90_ms": { "type": "integer", "minimum": 0, "description": "The Narrator's first-draft call, 90th percentile." },
+          "on_air_p90_ms": { "type": "integer", "minimum": 0, "description": "The beat's on-air time, 90th percentile." },
+          "double_checked": { "type": "integer", "minimum": 0, "description": "Scored claims the judge alone overturned and the auditor also looked at." },
+          "referee_splits": { "type": "integer", "minimum": 0, "description": "Of those, how many the auditor would have let stand." },
           "usd_per_match": { "anyOf": [{ "type": "number", "minimum": 0 }, { "const": "prices not set" }], "description": "The candidate's Narrator usage only, averaged over fixtures." },
           "tokens_per_match": { "type": "integer", "minimum": 0 },
           "cleared": { "type": "boolean", "description": "overturned <= amended; false reads Not cleared for air." },
@@ -154,7 +161,7 @@
               }
             }
           },
-          "audit_agreement": { "type": ["number", "null"], "description": "Share of this candidate's audited claims the auditor agreed with; null when none were audited. Read it with self_audited." }
+          "audit_agreement": { "type": ["number", "null"], "description": "Share of this candidate's audited settled claims the auditor agreed with (double-checks excluded); null when none were audited. Read it with self_audited." }
         }
       }
     }

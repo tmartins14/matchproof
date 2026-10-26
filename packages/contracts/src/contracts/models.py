@@ -583,6 +583,14 @@ class Candidate(BaseModel):
     ]
 
 
+class Lost(Enum):
+    rejected = 'rejected'
+    unreadable = 'unreadable'
+    no_answer = 'no_answer'
+    no_claim = 'no_claim'
+    NoneType_None = None
+
+
 class Error(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -632,6 +640,13 @@ class SummaryItem(BaseModel):
     amended: Annotated[int, Field(ge=0)]
     overturned: Annotated[int, Field(ge=0)]
     held: Annotated[int, Field(ge=0)]
+    lost: Annotated[
+        int,
+        Field(
+            description='Scored stand-in rows: beats that produced no checked claim.',
+            ge=0,
+        ),
+    ]
     pts: int
     clean_pct: Annotated[
         float | None,
@@ -639,7 +654,24 @@ class SummaryItem(BaseModel):
             description='stands / (claims - held), one decimal; null when nothing was scored.'
         ),
     ]
-    p90_ms: Annotated[int, Field(ge=0)]
+    p90_ms: Annotated[
+        int,
+        Field(description="The Narrator's first-draft call, 90th percentile.", ge=0),
+    ]
+    on_air_p90_ms: Annotated[
+        int, Field(description="The beat's on-air time, 90th percentile.", ge=0)
+    ]
+    double_checked: Annotated[
+        int,
+        Field(
+            description='Scored claims the judge alone overturned and the auditor also looked at.',
+            ge=0,
+        ),
+    ]
+    referee_splits: Annotated[
+        int,
+        Field(description='Of those, how many the auditor would have let stand.', ge=0),
+    ]
     usd_per_match: Annotated[
         UsdPerMatch | Literal['prices not set'],
         Field(
@@ -662,7 +694,7 @@ class SummaryItem(BaseModel):
     audit_agreement: Annotated[
         float | None,
         Field(
-            description="Share of this candidate's audited claims the auditor agreed with; null when none were audited. Read it with self_audited."
+            description="Share of this candidate's audited settled claims the auditor agreed with (double-checks excluded); null when none were audited. Read it with self_audited."
         ),
     ]
 
@@ -983,6 +1015,12 @@ class Claim1(BaseModel):
     scored: Annotated[
         bool, Field(description='True for the first claim of each beat only.')
     ]
+    lost: Annotated[
+        Lost,
+        Field(
+            description='Set on the one stand-in row of a beat that produced no checked claim: the store refused its claims (rejected), the output could not be read (unreadable), the model call failed (no_answer, HELD) or nothing was written (no_claim).'
+        ),
+    ]
     text: Annotated[str, Field(description='What would be on air after consensus.')]
     draft_text: Annotated[str, Field(description="The Narrator's first wording.")]
     verdict: TrialVerdict
@@ -1002,11 +1040,30 @@ class Claim1(BaseModel):
     checker: str
     auditor: Annotated[
         str,
-        Field(description='agree, disagree (problem), unavailable, or not audited.'),
+        Field(
+            description='agree, disagree (problem), unavailable or not audited; on an overturned claim the auditor double-checked, supports or confirms (problem).'
+        ),
+    ]
+    referee_split: Annotated[
+        bool | None,
+        Field(
+            description='Only on a claim the judge alone overturned and the auditor also looked at (log-only): true when the auditor finds it supported, false when it confirms the overturn, null otherwise.'
+        ),
     ]
     corrected_by_consensus: bool
     latency_ms: Annotated[
-        int, Field(description="The beat's, from fact bundle to settled claims.", ge=0)
+        int | None,
+        Field(
+            description="The beat's on-air time, from fact bundle to settled claims; null on a stand-in row.",
+            ge=0,
+        ),
+    ]
+    narrator_ms: Annotated[
+        int | None,
+        Field(
+            description="The Narrator's first draft call, parse retries included; null where there was none.",
+            ge=0,
+        ),
     ]
     tokens_in: Annotated[int, Field(description="The Narrator's for the beat.", ge=0)]
     tokens_out: Annotated[int, Field(ge=0)]

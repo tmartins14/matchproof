@@ -33,3 +33,6 @@ data/
 playwright-report/
 test-results/
 .cache/
+
+# Captured stream used as the default claims input of scripts/make_desk_fixture.py
+match.sse

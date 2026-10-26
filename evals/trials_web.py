@@ -23,8 +23,9 @@ from agents.reconcile import (
     NOT_IN_BUNDLE_REASON,
     NUMBER_REASON_PREFIX,
     PLAYER_REASON_PREFIX,
+    reconcile,
 )
-from contracts.models import Beat, Event, TrialsWeb
+from contracts.models import Beat, Event, Fact, TrialsWeb
 from intel.display import render_minute
 from mcp_match import InMemoryMatchStore, build_server
 
@@ -226,6 +227,20 @@ async def bundles_of(
     }
 
 
+def aired_text(claim: Json) -> str:
+    """The wording the Desk's claim carries: a blocked claim keeps the Narrator's draft for audit."""
+    blocked = claim["verdict"] in ("OVERTURNED", "HELD")
+    return claim["draft_text"] if blocked and claim["draft_text"] else claim["text"]
+
+
+def numbers_of(claim: Json, bundle: Json) -> list[Json]:
+    """Each number in the claim's wording tied to the cited fact it matches: the deterministic
+    reconciler run on the row, no model. A lost row cites nothing and has none."""
+    facts = {f["id"]: Fact.model_validate(f) for f in bundle["facts"]}
+    found = reconcile(aired_text(claim), claim["fact_ids"], facts)
+    return [{"as_written": n.as_written, "fact_id": n.fact_id} for n in found.numbers]
+
+
 def moment_of(
     store: InMemoryMatchStore,
     match_id: str,
@@ -290,6 +305,7 @@ def build_web(
     meta = {f["id"]: f for f in results["fixtures"]}
     fixture_rows: list[Json] = []
     moments: Json = {}
+    all_bundles: dict[str, Json] = {}
     clocks: dict[tuple[str, str], str] = {}
     for fixture in fixtures:
         if fixture.id not in meta:
@@ -317,6 +333,7 @@ def build_web(
             wanted.get(fixture.id, ()), key=lambda b: beats[b].t_detect.root
         )
         bundles = asyncio.run(bundles_of(store, match_id, beat_ids))
+        all_bundles[fixture.id] = bundles
         for beat_id in beat_ids:
             m = moment_of(store, match_id, beats[beat_id], bundles[beat_id], events)
             moments[fixture.id][beat_id] = m
@@ -349,6 +366,10 @@ def build_web(
         "moments": moments,
         "claim_clock": {
             str(i): clocks[(c["fixture"], c["beat"])]
+            for i, c in enumerate(results["claims"])
+        },
+        "claim_numbers": {
+            str(i): numbers_of(c, all_bundles[c["fixture"]][c["beat"]])
             for i, c in enumerate(results["claims"])
         },
         "next_up": next_up,

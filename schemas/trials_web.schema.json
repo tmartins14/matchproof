@@ -5,7 +5,7 @@
   "description": "Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "live_narrator", "fixtures", "moments", "claim_clock", "next_up"],
+  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "next_up"],
   "properties": {
     "pack": { "type": "string" },
     "results": { "$ref": "trials_results.schema.json" },
@@ -173,6 +173,22 @@
       }
     },
     "claim_clock": { "type": "object", "description": "Broadcast clock of each claim row, keyed by its index in results.claims.", "additionalProperties": { "type": "string" } },
+    "claim_numbers": {
+      "type": "object",
+      "description": "Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Empty for a lost row. Fills claim.numbers on a cached replay.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["as_written", "fact_id"],
+          "properties": {
+            "as_written": { "type": "string" },
+            "fact_id": { "$ref": "common.schema.json#/$defs/factId" }
+          }
+        }
+      }
+    },
     "next_up": {
       "type": "array",
       "items": {

@@ -357,3 +357,18 @@ def test_a_measured_worst_is_on_a_trap_beat_when_any_trap_failed(
         record = web["trap_record"][name]
         if record["STANDS"] < sum(record.values()):  # some trap claim did not stand
             assert (w["fixture"], w["beat"]) in traps
+
+
+def test_claim_numbers_tie_each_number_to_a_fact_the_row_cites() -> None:
+    web = json.loads(
+        (ROOT / "apps" / "web" / "fixtures" / "trials" / "web-pack-v1.json").read_text(
+            "utf-8"
+        )
+    )
+    claims, numbers = web["results"]["claims"], web["claim_numbers"]
+    assert set(numbers) == {str(i) for i in range(len(claims))}
+    for i, c in enumerate(claims):
+        assert {n["fact_id"] for n in numbers[str(i)]} <= set(c["fact_ids"])
+        if c["lost"]:
+            assert numbers[str(i)] == []
+    assert any(numbers.values())

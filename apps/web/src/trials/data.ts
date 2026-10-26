@@ -1,4 +1,5 @@
 import type { TrialsWeb } from "@/contracts/types";
+import type { CachedRow } from "@/live/cached";
 import raw from "../../fixtures/trials/web-pack-v1.json";
 
 /**
@@ -37,3 +38,6 @@ export const clockOfWorst = (w: Worst): string => momentOf(w.fixture, w.beat)?.c
 /** Table order: measured rows by rank, then the unmeasured rows below the divider. */
 export const tableOrder: string[] = web.order;
 export const firstTrapBeat = (fixture: string): string | undefined => fixtureById(fixture)?.trap_beats[0]?.beat;
+/** The candidate's claim rows on a fixture, scored or not, in index order, each with the numbers the export tied to facts. */
+export const cachedRowsOf = (candidate: string, fixture: string): CachedRow[] =>
+  web.results.claims.flatMap((row, i) => (row.candidate === candidate && row.fixture === fixture ? [{ row, numbers: web.claim_numbers[String(i)] ?? [] }] : []));

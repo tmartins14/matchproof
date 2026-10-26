@@ -7,7 +7,7 @@ import { emptyDesk } from "@/desk/deskData";
 import { fixture } from "@/desk/fixture";
 import type { ClaimRow } from "@/trials/data";
 import { accumulate } from "./accumulate";
-import { buildTimeline, CachedPlayer, claimOf, DEFAULT_LATENCY_MS, parseNdjson, type CachedRow, type Clock } from "./cached";
+import { buildTimeline, CachedPlayer, claimOf, decodeRecording, DEFAULT_LATENCY_MS, parseNdjson, type CachedRow, type Clock } from "./cached";
 
 const claimSchema = JSON.parse(readFileSync(resolve(__dirname, "../../../../schemas/claim.schema.json"), "utf8")) as {
   required: string[];
@@ -205,5 +205,16 @@ describe("the player", () => {
     expect(f.waiting).toBe(false);
     f.advance(1_000_000);
     expect(batches).toEqual([]);
+  });
+});
+
+describe("decoding a recording", () => {
+  const packed = readFileSync(resolve(__dirname, "../../public/trials/streams/fx-04.ndjson.gz"));
+  it("decompresses the gzip file", async () => {
+    expect(parseNdjson(await decodeRecording(new Uint8Array(packed))).length).toBe(all.length);
+  });
+  it("accepts text the host or browser already decoded", async () => {
+    const text = gunzipSync(packed);
+    expect(parseNdjson(await decodeRecording(new Uint8Array(text))).length).toBe(all.length);
   });
 });

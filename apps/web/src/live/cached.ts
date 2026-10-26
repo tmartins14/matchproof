@@ -31,12 +31,21 @@ export function parseNdjson(text: string): RecordedLine[] {
     .map((line) => JSON.parse(line) as RecordedLine);
 }
 
-/** Reads `/trials/streams/<fixture>.ndjson.gz`; the browser decompresses it. */
+/**
+ * The recording's text from its bytes. The file is gzip, but a host that sees `Accept-Encoding` may add
+ * its own `Content-Encoding: gzip` (Static Web Apps does), and then the browser has already decoded it.
+ */
+export async function decodeRecording(bytes: Uint8Array): Promise<string> {
+  const gzip = bytes[0] === 0x1f && bytes[1] === 0x8b;
+  if (!gzip) return new TextDecoder().decode(bytes);
+  return new Response(new Blob([bytes as BlobPart]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+}
+
+/** Reads `/trials/streams/<fixture>.ndjson.gz`. */
 export async function loadRecording(fixture: string, base = ""): Promise<RecordedLine[]> {
   const reply = await fetch(`${base}/trials/streams/${fixture}.ndjson.gz`);
-  if (!reply.ok || !reply.body) throw new Error(`recording ${fixture}: ${reply.status}`);
-  const text = await new Response(reply.body.pipeThrough(new DecompressionStream("gzip"))).text();
-  return parseNdjson(text);
+  if (!reply.ok) throw new Error(`recording ${fixture}: ${reply.status}`);
+  return parseNdjson(await decodeRecording(new Uint8Array(await reply.arrayBuffer())));
 }
 
 /** The claim as the Desk shows it: still `checking` on the draft, or settled in the row's verdict. A lost row is a blocked claim with its reason. */

@@ -766,6 +766,10 @@ minute: number
 kind: string
 note: string
 event_id: string
+/**
+ * The chip text: what the trap is and its broadcast clock, such as RED CARD 61′.
+ */
+label: string
 }[]
 match_brief: MatchBrief1
 /**

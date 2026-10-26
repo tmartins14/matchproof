@@ -202,6 +202,48 @@ def clock_at(events: list[Event], t: float) -> str:
     return render_minute(t, "en", period)[0]
 
 
+# What each trap kind is called on the Fixtures page and the Desk, before the broadcast clock.
+TRAP_NAMES = {
+    "red_card": "RED CARD",
+    "penalty": "PENALTY",
+    "open_play_goal": "GOAL",
+    "set_piece_goal": "SET-PIECE GOAL",
+    "counter_goal": "COUNTER GOAL",
+    "high_turnover_goal": "TURNOVER GOAL",
+}
+
+
+def trap_label(kind: str, note: str, clock: str) -> str:
+    """The chip text of a trap, such as `RED CARD 61′` or `STOPPAGE-TIME PENALTY 90+8′`.
+
+    The kind names it; the note says when the moment is more than that (a winner, an equaliser); a
+    clock in stoppage time makes a penalty a stoppage-time penalty.
+    """
+    low = note.lower()
+    name = TRAP_NAMES[kind]
+    if kind != "red_card" and ("winner" in low or "lead changes hands" in low):
+        name = "LATE WINNER"
+    elif kind != "red_card" and ("equaliser" in low or " level" in low):
+        name = "EQUALISER"
+    elif kind == "penalty" and "+" in clock:
+        name = "STOPPAGE-TIME PENALTY"
+    return f"{name} {clock}"
+
+
+def labelled_traps(traps: list[Json], events: list[Event]) -> list[Json]:
+    """Each trap with its `label`, the clock read at the trap's own event."""
+    by_id = {e.id.root: e for e in events}
+    return [
+        {
+            **t,
+            "label": trap_label(
+                t["kind"], t["note"], clock_at(events, by_id[t["event_id"]].t.root)
+            ),
+        }
+        for t in traps
+    ]
+
+
 def trap_beats(fixture: Fixture, beats: list[Beat]) -> list[Json]:
     """The beat each trap sits on: the planted beat, whose anchor is the trap's event."""
     by_planted = {b.planted_beat_id: b for b in beats if b.planted_beat_id}
@@ -322,6 +364,7 @@ def build_web(
         fixture_rows.append(
             {
                 **meta[fixture.id],
+                "traps": labelled_traps(meta[fixture.id]["traps"], events),
                 "match_brief": json.loads(
                     fixture.make_brief().model_dump_json(
                         by_alias=True, exclude_none=True

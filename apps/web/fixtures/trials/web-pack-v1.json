@@ -13605,13 +13605,15 @@
      "minute": 61,
      "kind": "red_card",
      "note": "Which side is down to ten, and how many players each side has left.",
-     "event_id": "ev-001374"
+     "event_id": "ev-001374",
+     "label": "RED CARD 61′"
     },
     {
      "minute": 87,
      "kind": "open_play_goal",
      "note": "The second goal against ten men: the count and the score.",
-     "event_id": "ev-001962"
+     "event_id": "ev-001962",
+     "label": "GOAL 87′"
     }
    ],
    "match_brief": {
@@ -13847,13 +13849,15 @@
      "minute": 79,
      "kind": "set_piece_goal",
      "note": "The equaliser flips the scoreline from behind to level.",
-     "event_id": "ev-001815"
+     "event_id": "ev-001815",
+     "label": "EQUALISER 79′"
     },
     {
      "minute": 96,
      "kind": "high_turnover_goal",
      "note": "A winner in 90 to 95 minutes: the scoreline and the stoppage-time minute.",
-     "event_id": "ev-002202"
+     "event_id": "ev-002202",
+     "label": "LATE WINNER 90+6′"
     }
    ],
    "match_brief": {
@@ -14089,13 +14093,15 @@
      "minute": 34,
      "kind": "counter_goal",
      "note": "Ashford level at 1–1 on the break: the running score.",
-     "event_id": "ev-000776"
+     "event_id": "ev-000776",
+     "label": "EQUALISER 34′"
     },
     {
      "minute": 98,
      "kind": "penalty",
      "note": "The stoppage-time penalty makes it 3–3.",
-     "event_id": "ev-002199"
+     "event_id": "ev-002199",
+     "label": "STOPPAGE-TIME PENALTY 90+8′"
     }
    ],
    "match_brief": {
@@ -14352,7 +14358,8 @@
      "minute": 74,
      "kind": "counter_goal",
      "note": "Possession and territory belong to the side that loses; the claim must not say they deserved more.",
-     "event_id": "ev-001725"
+     "event_id": "ev-001725",
+     "label": "COUNTER GOAL 74′"
     }
    ],
    "match_brief": {
@@ -14570,19 +14577,22 @@
      "minute": 11,
      "kind": "penalty",
      "note": "Who took it and who scored.",
-     "event_id": "ev-000250"
+     "event_id": "ev-000250",
+     "label": "PENALTY 11′"
     },
     {
      "minute": 25,
      "kind": "red_card",
      "note": "Which side was sent off.",
-     "event_id": "ev-000536"
+     "event_id": "ev-000536",
+     "label": "RED CARD 25′"
     },
     {
      "minute": 56,
      "kind": "counter_goal",
      "note": "Ashford score with ten men: the scorer and the side.",
-     "event_id": "ev-001246"
+     "event_id": "ev-001246",
+     "label": "COUNTER GOAL 56′"
     }
    ],
    "match_brief": {
@@ -14822,25 +14832,29 @@
      "minute": 37,
      "kind": "counter_goal",
      "note": "0–2: the score and who leads.",
-     "event_id": "ev-000836"
+     "event_id": "ev-000836",
+     "label": "COUNTER GOAL 37′"
     },
     {
      "minute": 76,
      "kind": "set_piece_goal",
      "note": "1–2: Rivermouth are still behind.",
-     "event_id": "ev-001730"
+     "event_id": "ev-001730",
+     "label": "SET-PIECE GOAL 76′"
     },
     {
      "minute": 88,
      "kind": "high_turnover_goal",
      "note": "2–2: level, not ahead.",
-     "event_id": "ev-002020"
+     "event_id": "ev-002020",
+     "label": "EQUALISER 88′"
     },
     {
      "minute": 97,
      "kind": "open_play_goal",
      "note": "3–2: the lead changes hands at the end.",
-     "event_id": "ev-002191"
+     "event_id": "ev-002191",
+     "label": "LATE WINNER 90+7′"
     }
    ],
    "match_brief": {

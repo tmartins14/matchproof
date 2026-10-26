@@ -110,12 +110,13 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["minute", "kind", "note", "event_id"],
+              "required": ["minute", "kind", "note", "event_id", "label"],
               "properties": {
                 "minute": { "type": "integer", "minimum": 1 },
                 "kind": { "type": "string" },
                 "note": { "type": "string" },
-                "event_id": { "$ref": "common.schema.json#/$defs/eventId" }
+                "event_id": { "$ref": "common.schema.json#/$defs/eventId" },
+                "label": { "type": "string", "description": "The chip text: what the trap is and its broadcast clock, such as RED CARD 61′." }
               }
             }
           },

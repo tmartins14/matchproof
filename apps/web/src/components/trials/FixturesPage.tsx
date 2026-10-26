@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { copy, fill } from "@/desk/copy";
-import { cellOf, type Cell, tableOrder, trapClocks, web } from "@/trials/data";
+import { cellOf, type Cell, tableOrder, trapLabels, web } from "@/trials/data";
 import { fixtureNumber, runDate, verdictKey } from "@/trials/format";
 import { VerdictStamp } from "../desk/VerdictStamp";
 import { Shell } from "./Shell";
@@ -77,9 +77,9 @@ export function FixturesPage() {
                   </div>
                   <div className="tr-sub">{f.brief}</div>
                   <div className="tr-cand-traps">
-                    {trapClocks(f.id).map((clock, i) => (
+                    {trapLabels(f.id).map((label, i) => (
                       <span key={i} className="tr-chip">
-                        {fill(c.trials.desk.trap, { clock })}
+                        {label}
                       </span>
                     ))}
                   </div>

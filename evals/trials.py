@@ -415,6 +415,27 @@ def rejection_errors(message: str) -> list[str]:
     return [str(e) for r in rejected for e in r.get("errors", [])] or [message]
 
 
+class CauseRecorder:
+    """The Narrator's client, remembering why its last call failed.
+
+    The workflow keeps only the exception's class (`Narrator: LlmError`); the underlying cause
+    (`APITimeoutError`, `RateLimitError`) lives in `LlmError.cause_name`.
+    """
+
+    def __init__(self, inner: MeteredClient) -> None:
+        self._inner = inner
+        self.deployment = inner.deployment
+        self.response_format = inner.response_format
+        self.last_cause: str | None = None
+
+    def complete(self, prompt: str, **kwargs: Any) -> Any:
+        try:
+            return self._inner.complete(prompt, **kwargs)
+        except LlmError as exc:
+            self.last_cause = exc.cause_name
+            raise
+
+
 def lost_beat(
     fixture: str,
     candidate: str,
@@ -424,9 +445,10 @@ def lost_beat(
     *,
     run: BeatRun | None = None,
     exc: Exception | None = None,
+    cause: str | None = None,
 ) -> dict[str, Any]:
     """The stand-in row for a beat with no checked claim: from the exception it raised, or from the
-    empty run it returned."""
+    empty run it returned. `cause` is the name of the error underneath a failed Narrator call."""
 
     def make(lost: str, reasons: list[str], bucket: str | None) -> dict[str, Any]:
         return lost_row(
@@ -451,7 +473,9 @@ def lost_beat(
         )
     if exc is not None or (run is not None and run.error == NO_ANSWER_ERROR):
         name = type(exc).__name__ if exc is not None else "LlmError"
-        return make("no_answer", [name], None)
+        if isinstance(exc, LlmError):
+            cause = exc.cause_name
+        return make("no_answer", [name, *([cause] if cause else [])], None)
     return make("no_claim", ["The Narrator wrote no claim for this beat."], "other")
 
 
@@ -470,8 +494,10 @@ async def play_fixture(
     store, match_id = build_store_from_brief(fixture.make_brief())
     server = build_server(store, writable=True)
     counter = TokenBudget(NO_CAP)  # the candidate's own usage, for its cost
-    narrator = MeteredClient(
-        client_for("narrator", deployment=candidate), "narrator", counter=counter
+    narrator = CauseRecorder(
+        MeteredClient(
+            client_for("narrator", deployment=candidate), "narrator", counter=counter
+        )
     )
     capture = DraftCapture()
     deps = Deps(server, narrator, judge_client, observer=capture)
@@ -483,6 +509,7 @@ async def play_fixture(
     for beat in beats.values():
         bid = beat.id.root
         minute = minute_of(beat.t_detect.root)
+        narrator.last_cause = None
         try:
             async with _BEAT_LOCKS.setdefault(f"{match_id}/{bid}", asyncio.Lock()):
                 run = await run_beat(match_id, bid, "fan", deps=deps)
@@ -501,7 +528,12 @@ async def play_fixture(
         if run.narrator_calls:
             out.narrator_latencies.append(run.narrator_calls[0].latency_ms)
         if run.error or not run.checked:
-            out.errors.append(f"{bid}: {run.error or 'no claims'}")
+            note = (
+                f" ({narrator.last_cause})"
+                if run.error == NO_ANSWER_ERROR and narrator.last_cause
+                else ""
+            )
+            out.errors.append(f"{bid}: {run.error or 'no claims'}{note}")
         if run.checked:
             runs.append((bid, run))
         else:
@@ -512,6 +544,7 @@ async def play_fixture(
                 minute,
                 capture.previews.get(bid, []),
                 run=run,
+                cause=narrator.last_cause,
             )
 
     auditor = Auditor(auditor_client, server)

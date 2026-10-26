@@ -18,6 +18,7 @@ from evals.trials_web import (
     picks_of,
     ranks_of,
     shrink_to_limit,
+    trap_label,
     trap_record_of,
     trim,
     worst_of,
@@ -297,6 +298,57 @@ def web() -> dict[str, Any]:
     )
 
 
+@pytest.mark.parametrize(
+    ("kind", "note", "clock", "label"),
+    [
+        ("red_card", "Which side is down to ten.", "61′", "RED CARD 61′"),
+        (
+            "penalty",
+            "The stoppage-time penalty makes it 3–3.",
+            "90+8′",
+            "STOPPAGE-TIME PENALTY 90+8′",
+        ),
+        ("penalty", "Who took it and who scored.", "9′", "PENALTY 9′"),
+        (
+            "high_turnover_goal",
+            "A winner in 90 to 95 minutes.",
+            "90+7′",
+            "LATE WINNER 90+7′",
+        ),
+        (
+            "open_play_goal",
+            "3–2: the lead changes hands at the end.",
+            "90+3′",
+            "LATE WINNER 90+3′",
+        ),
+        (
+            "set_piece_goal",
+            "The equaliser flips the scoreline.",
+            "55′",
+            "EQUALISER 55′",
+        ),
+        ("counter_goal", "Ashford level at 1–1 on the break.", "27′", "EQUALISER 27′"),
+        ("counter_goal", "0–2: the score and who leads.", "36′", "COUNTER GOAL 36′"),
+        (
+            "set_piece_goal",
+            "1–2: Rivermouth are still behind.",
+            "70′",
+            "SET-PIECE GOAL 70′",
+        ),
+        ("open_play_goal", "The second goal against ten men.", "78′", "GOAL 78′"),
+    ],
+)
+def test_trap_label(kind: str, note: str, clock: str, label: str) -> None:
+    assert trap_label(kind, note, clock) == label
+
+
+def test_every_pack_trap_kind_has_a_name() -> None:
+    _, fixtures = load_pack(PACK_PATH)
+    for fixture in fixtures:
+        for trap in fixture.traps:
+            assert trap_label(trap["kind"], trap["note"], "1′").endswith(" 1′")
+
+
 def test_a_trap_beat_resolves_for_every_pack_fixture(web: dict[str, Any]) -> None:
     _, fixtures = load_pack(PACK_PATH)
     by_id = {f["id"]: f for f in web["fixtures"]}
@@ -306,6 +358,7 @@ def test_a_trap_beat_resolves_for_every_pack_fixture(web: dict[str, Any]) -> Non
         assert len(row_["trap_beats"]) == len(fixture.traps)
         for trap, beat in zip(row_["traps"], row_["trap_beats"], strict=True):
             assert beat["event_id"] == trap["event_id"]
+            assert "′" in trap["label"]
             assert beat["beat"] in web["moments"][fixture.id]
 
 

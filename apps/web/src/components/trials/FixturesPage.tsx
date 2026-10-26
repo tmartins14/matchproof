@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { copy, fill } from "@/desk/copy";
-import { cellOf, tableOrder, trapClocks, web } from "@/trials/data";
+import { cellOf, type Cell, tableOrder, trapClocks, web } from "@/trials/data";
 import { fixtureNumber, runDate, verdictKey } from "@/trials/format";
 import { VerdictStamp } from "../desk/VerdictStamp";
 import { Shell } from "./Shell";
@@ -34,6 +34,13 @@ function Header() {
       </div>
     </section>
   );
+}
+
+/** The stamp's words, so the link's accessible name contains them. */
+function cellText(cell: Cell | undefined): string {
+  const t = copy.en.trials.fixtures;
+  if (!cell) return "";
+  return cell.noAnswer ? t.noAnswer : copy.en.verdict[verdictKey(cell.verdict)];
 }
 
 export function FixturesPage() {
@@ -82,16 +89,12 @@ export function FixturesPage() {
                   return (
                     <div key={id} role="cell" className={`tr-fx-cell${focus === id ? " tr-fx-focus" : ""}`}>
                       {trap ? (
-                        <Link href={`/compare/${f.id}/${trap}?focus=${id}`} className="tr-fx-link" aria-label={fill(t.open, { id, fixture: fixtureNumber(f.id) })}>
-                          {cell ? (
-                            <span className="tr-fx-stamp">
-                              <VerdictStamp verdict={verdictKey(cell.verdict)} copy={c} reason={cell.why} label={cell.noAnswer ? t.noAnswer : undefined} />
-                              {cell.why ? <span className="tr-sub">{cell.why}</span> : null}
-                            </span>
-                          ) : (
-                            <span className="tr-sub">—</span>
-                          )}
-                        </Link>
+                        <span className="tr-fx-stamp">
+                          <Link href={`/compare/${f.id}/${trap}?focus=${id}`} className="tr-fx-link" aria-label={`${cellText(cell)}. ${fill(t.open, { id, fixture: fixtureNumber(f.id) })}`}>
+                            {cell ? <VerdictStamp verdict={verdictKey(cell.verdict)} copy={c} reason={cell.why} label={cell.noAnswer ? t.noAnswer : undefined} /> : <span className="tr-sub">—</span>}
+                          </Link>
+                          {cell?.why ? <span className="tr-sub">{cell.why}</span> : null}
+                        </span>
                       ) : null}
                     </div>
                   );

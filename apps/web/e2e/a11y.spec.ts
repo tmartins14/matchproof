@@ -25,3 +25,26 @@ for (const size of SIZES) {
     });
   }
 }
+
+// The Narrator Trials pages and the live (not fixture) desk.
+const PAGES = [
+  { name: "table", path: "/", ready: ".tr-table" },
+  { name: "compare", path: "/compare/fx-06/bt-002191-open_play_goal", ready: ".tr-main" },
+  { name: "fixtures", path: "/fixtures", ready: ".tr-fx" },
+  { name: "desk", path: "/desk", ready: ".tr-cand" },
+];
+
+for (const size of SIZES.slice(0, 2)) {
+  for (const p of PAGES) {
+    test(`axe ${p.name} ${size.name}`, async ({ page }) => {
+      await page.setViewportSize(size);
+      await page.goto(p.path);
+      await page.locator(p.ready).first().waitFor();
+      const results = await new AxeBuilder({ page }).analyze();
+      const blocking = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+      console.log(`axe ${p.name} ${size.name}: ${results.violations.length} violations, ${blocking.length} serious or critical`);
+      for (const v of results.violations) console.log(`  ${v.impact} ${v.id}: ${v.nodes.length} nodes, e.g. ${v.nodes[0]?.target.join(" ")}`);
+      expect(blocking).toEqual([]);
+    });
+  }
+}

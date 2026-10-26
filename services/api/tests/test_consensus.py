@@ -334,6 +334,12 @@ def test_a_correction_that_lands_late_after_full_time_reaches_the_stream(
             loop = asyncio.get_running_loop()
             out: list[dict[str, Any]] = []
             full_time_at: list[float] = []
+            released_at: list[float] = []
+
+            def release() -> None:
+                released_at.append(loop.time())
+                gate.set()
+
             async for m in run_live(
                 brief(),
                 SPEED,
@@ -345,9 +351,10 @@ def test_a_correction_that_lands_late_after_full_time_reaches_the_stream(
                 out.append(dump(m))
                 if m.type.value == "status" and m.data.state.value == "full_time":  # type: ignore[union-attr]
                     full_time_at.append(loop.time())
-                    loop.call_later(0.75 * post_full_time_s, gate.set)
+                    loop.call_later(0.75 * post_full_time_s, release)
             assert full_time_at, "no full_time status"
-            ended_after = loop.time() - full_time_at[0]
+            ended_at = loop.time()
+            ended_after = ended_at - full_time_at[0]
             full_time_seq = next(
                 m["seq"]
                 for m in out
@@ -357,8 +364,18 @@ def test_a_correction_that_lands_late_after_full_time_reaches_the_stream(
             assert late, "the correction landed after full time and was never sent"
             assert all(m["seq"] > full_time_seq for m in late)
             assert run.ledger.pending == 0
-            assert ended_after >= 0.75 * post_full_time_s
-            assert ended_after < post_full_time_s, "the stream ran out the clock"
+            # Compare with the release time the test recorded, not with a fixed 0.75 of the window:
+            # the correction cannot exist before the audits are released, so the stream must have
+            # stayed open until then, and it must have ended on the ledger, not at the deadline.
+            # (CI once measured 5.7 s against a fixed 6.0 s floor; locally the stream ends 6.05 to
+            # 6.08 s after full time, so the fixed floor had almost no margin.)
+            assert released_at, "the audits were never released"
+            assert ended_at >= released_at[0], (
+                f"ended {released_at[0] - ended_at:.2f} s before the release"
+            )
+            assert ended_after < post_full_time_s, (
+                f"the stream ran out the clock ({ended_after:.2f} s)"
+            )
 
     asyncio.run(go())
 

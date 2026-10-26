@@ -52,6 +52,8 @@
 .tr-who-link::after { content: ""; position: absolute; inset: 0; }
 .tr-split { margin-top: 2px; font-family: var(--mp-body); font-weight: 400; }
 .tr-trap { font-family: var(--mp-display); font-weight: 700; font-size: 15px; text-align: center; }
+/* The red is too dim for 15px text on the row (3.7:1); text stays light and the red underlines it. */
+.tr-trap.tr-overturned { color: var(--mp-text); text-decoration: underline 2px var(--mp-overturned); text-underline-offset: 3px; }
 .tr-failtop { margin-top: 2px; text-transform: none; }
 .tr-cost { font-family: var(--mp-display); font-weight: 700; font-size: 17px; text-align: center; }
 .tr-cost .tr-sub { font-family: var(--mp-body); font-weight: 400; }

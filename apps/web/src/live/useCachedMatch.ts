@@ -29,7 +29,9 @@ export function useCachedMatch(initial: MatchBrief, source: CachedSource): LiveM
   const run = useRef(0);
   const problems = useRef(0);
   const sourceRef = useRef(source);
-  sourceRef.current = source;
+  useEffect(() => {
+    sourceRef.current = source;
+  }, [source]);
 
   const publish = useCallback((next: DeskData): void => {
     dataRef.current = next;

@@ -737,6 +737,15 @@ usd_per_match: (number | null)
 })
 }
 /**
+ * The Table's scale: points per scored verdict. The Desk's RECORD tile adds landed claims with it.
+ */
+points: {
+STANDS: number
+AMENDED: number
+OVERTURNED: number
+HELD: number
+}
+/**
  * The candidate whose deployment is the one config/models.yaml narrator uses live; null if none.
  */
 live_narrator: (string | null)

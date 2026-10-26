@@ -403,8 +403,19 @@
       "title": "Next up"
     },
     "fixtures": {
-      "title": "Fixtures",
-      "soon": "Fixtures: coming in prompt 16"
+      "title": "The exam paper. Six seeded matches. Each one plants a trap.",
+      "pack": "{pack} · seeds {from}–{to}",
+      "scored": "{n} scored moments per narrator",
+      "lastRun": "Last run {date}",
+      "refereeNote": "The referee is fixed: code checks every number and name, then a judge and an auditor read the wording. Every narrator sits the same paper.",
+      "howTitle": "How a fixture is written",
+      "how": "A fixture is a seed and a plan: the moments the match must contain, such as a red card on the hour or a stoppage-time penalty. The generator plays it out, so every narrator sees the same events and the same facts.",
+      "stampTitle": "What a stamp means",
+      "stamp": "STANDS: the claim matches the facts. AMENDED: the wording was fixed. OVERTURNED: the claim was withdrawn. NO CLAIM: the narrator gave no answer for the moment.",
+      "colFixture": "Fixture",
+      "trapMoment": "Stamp on the first trap moment",
+      "noClaim": "NO CLAIM",
+      "open": "Compare {id} on fixture {fixture}"
     },
     "compare": {
       "crumb": "Fixture {fixture} · {home} v {away} · moment",
@@ -440,6 +451,31 @@
       "position": "Moment {i} of {n}",
       "redirecting": "Opening the first trap moment",
       "refereeNoteTitle": "Referee note"
+    },
+    "desk": {
+      "label": "DESK · running {model} ({rank})",
+      "narrator": "Narrator",
+      "narratorHelp": "Only narrators cleared for air in {pack}.",
+      "live": "LIVE",
+      "cachedOption": "CACHED · {pack}",
+      "noLive": "Live narrator not cleared; replays only",
+      "referee": "Referee",
+      "refereeLine": "code checker + {judge} judge + {auditor} auditor · fixed",
+      "fixture": "Fixture",
+      "fixtureOption": "Fixture {n} · {home} v {away} · {brief}",
+      "trap": "TRAP {clock}",
+      "runLive": "Run narrator",
+      "runCached": "Replay cached",
+      "cachedChip": "CACHED · {pack}",
+      "cachedSpeed": "Cached replays run at 6×",
+      "cachedOnly": "Cached runs play pack fixtures only",
+      "fallback": "Live unavailable. Replay this fixture from {pack}?",
+      "fallbackButton": "Replay cached",
+      "recordTitle": "RECORD · {model} · THIS FIXTURE",
+      "recordLine": "{stands} stands · {amended} amended · {overturned} overturned · {checking} checking",
+      "recordPts": "{pts} pts so far",
+      "badge": "NARRATOR · {model}",
+      "seeOthers": "See how the others called it →"
     },
     "verdictLong": {
       "STANDS": "Stands",

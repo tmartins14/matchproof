@@ -794,6 +794,16 @@ class Picks(BaseModel):
     ]
 
 
+class Points(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    STANDS: int
+    AMENDED: int
+    OVERTURNED: int
+    HELD: int
+
+
 class Trap1(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1333,6 +1343,12 @@ class TrialsWeb(BaseModel):
         Picks,
         Field(
             description='Over measured candidates only; each is null when nothing qualifies.'
+        ),
+    ]
+    points: Annotated[
+        Points,
+        Field(
+            description="The Table's scale: points per scored verdict. The Desk's RECORD tile adds landed claims with it."
         ),
     ]
     live_narrator: Annotated[

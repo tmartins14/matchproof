@@ -31,7 +31,7 @@ from mcp_match import InMemoryMatchStore, build_server
 
 from .golden import build_store_from_brief
 from .run import ROOT
-from .trials import PACK_PATH, UNKNOWN_FACT_PREFIX, Fixture, load_pack
+from .trials import PACK_PATH, POINTS, UNKNOWN_FACT_PREFIX, Fixture, load_pack
 
 NEXT_UP_PATH = Path(__file__).parent / "trials" / "next_up.yaml"
 WEB_FIXTURES_DIR = ROOT / "apps" / "web" / "fixtures" / "trials"
@@ -363,6 +363,7 @@ def build_web(
         },
         "fail_top": {r["candidate"]: fail_top_of(r["fail_profile"]) for r in summary},
         "picks": picks_of(summary),
+        "points": dict(POINTS),
         "live_narrator": live_narrator_of(results["candidates"], narrator_deployment),
         "fixtures": fixture_rows,
         "moments": moments,

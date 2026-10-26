@@ -41,3 +41,17 @@ export const firstTrapBeat = (fixture: string): string | undefined => fixtureByI
 /** The candidate's claim rows on a fixture, scored or not, in index order, each with the numbers the export tied to facts. */
 export const cachedRowsOf = (candidate: string, fixture: string): CachedRow[] =>
   web.results.claims.flatMap((row, i) => (row.candidate === candidate && row.fixture === fixture ? [{ row, numbers: web.claim_numbers[String(i)] ?? [] }] : []));
+
+/** The narrators the Desk offers: measured and cleared for air, in Table order. Nobody else is listed. */
+export const deskCandidates: string[] = tableOrder.filter((id) => isMeasured(id) && summaryOf(id)?.cleared === true);
+export const liveNarrator: string | null = web.live_narrator;
+export const fixtureIds: string[] = web.fixtures.map((f) => f.id);
+/** The `TRAP <clock>` chips of a fixture, in trap order. */
+export const trapClocks = (fixture: string): string[] =>
+  (fixtureById(fixture)?.trap_beats ?? []).map((t) => momentOf(fixture, t.beat)?.clock ?? "");
+/** The Compare page for a beat of a pack fixture, or undefined when the export has no such moment. */
+export const compareHref = (fixture: string, beat: string, focus: string): string | undefined =>
+  momentOf(fixture, beat) ? `/compare/${fixture}/${beat}?focus=${focus}` : undefined;
+/** Claim id to Table verdict, for the candidate's scored rows on a fixture. */
+export const scoredVerdicts = (candidate: string, fixture: string): Map<string, ClaimRow["verdict"]> =>
+  new Map(web.results.claims.filter((c) => c.candidate === candidate && c.fixture === fixture && c.scored).map((c) => [c.id, c.verdict]));

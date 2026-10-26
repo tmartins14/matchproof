@@ -5,7 +5,7 @@
   "description": "Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "next_up"],
+  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "next_up"],
   "properties": {
     "pack": { "type": "string" },
     "results": { "$ref": "trials_results.schema.json" },
@@ -76,6 +76,18 @@
         "budget": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "usd_per_match": { "type": "number", "minimum": 0 } } }], "description": "Cleared, lowest numeric usd_per_match; an unpriced candidate is never the budget pick." },
         "not_cleared": { "anyOf": [{ "type": "null" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }] },
         "sole": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "p90_ms", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "p90_ms": { "type": "integer", "minimum": 0 }, "usd_per_match": { "type": ["number", "null"], "minimum": 0 } } }], "description": "Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air." }
+      }
+    },
+    "points": {
+      "type": "object",
+      "description": "The Table's scale: points per scored verdict. The Desk's RECORD tile adds landed claims with it.",
+      "additionalProperties": false,
+      "required": ["STANDS", "AMENDED", "OVERTURNED", "HELD"],
+      "properties": {
+        "STANDS": { "type": "integer" },
+        "AMENDED": { "type": "integer" },
+        "OVERTURNED": { "type": "integer" },
+        "HELD": { "type": "integer" }
       }
     },
     "live_narrator": { "type": ["string", "null"], "description": "The candidate whose deployment is the one config/models.yaml narrator uses live; null if none." },

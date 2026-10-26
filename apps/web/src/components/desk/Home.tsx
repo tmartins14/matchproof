@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { fixture } from "@/desk/fixture";
 import { parseReviewParams } from "@/desk/reviewParams";
 import { Desk } from "./Desk";
-import { LiveDesk } from "./LiveDesk";
+import { TrialsDesk } from "./TrialsDesk";
 
 /** Reads the URL on the client, since the export is static. Live is the default. */
 export function Home() {
@@ -19,5 +19,5 @@ export function Home() {
     const data = labels ? { ...fixture, clock: Math.max(fixture.clock, reveal), beats: fixture.beats.map((b, i) => ({ ...b, label: labels[i] ?? b.label })) } : fixture;
     return <Desk data={data} initial={initial} />;
   }
-  return <LiveDesk initial={parseReviewParams({ lang: params.lang, mode: params.mode })} />;
+  return <TrialsDesk initial={parseReviewParams({ lang: params.lang, mode: params.mode })} narrator={params.narrator} fixture={params.fixture} />;
 }

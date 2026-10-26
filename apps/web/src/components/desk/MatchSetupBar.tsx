@@ -26,6 +26,10 @@ interface MatchSetupBarProps {
 export interface SetupActions {
   /** a match is connecting or playing: the brief and the speed are fixed */
   locked: boolean;
+  /** the narrator strip owns Kick off and New match */
+  inStrip?: boolean;
+  /** a cached run plays pack fixtures only: Randomize, Read brief, tactics and speed are off */
+  cachedOnly?: boolean;
   /** the match is over or the connection broke: New match is offered */
   finished: boolean;
   reading: boolean;
@@ -58,8 +62,10 @@ function Button({ primary, children, ...rest }: ButtonProps) {
 
 export function MatchSetupBar(props: MatchSetupBarProps) {
   const { copy, summary, custom, brief, note, tactics, open, actions } = props;
-  const locked = actions?.locked ?? false;
+  const cachedOnly = actions?.cachedOnly ?? false;
+  const locked = (actions?.locked ?? false) || cachedOnly;
   const s = copy.setup;
+  const cachedWhy = cachedOnly ? copy.trials.desk.cachedOnly : undefined;
   const storylineText = s.storylines[props.storylineId as keyof typeof s.storylines] ?? s.storylines.custom;
   return (
     <section className="mp-setup mp-above" aria-label={s.label}>
@@ -78,13 +84,14 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
               <path d="M6 9l6 6 6-6" />
             </svg>
           </Button>
-          <Button onClick={actions?.onRandomize} disabled={locked}>
+          <Button onClick={actions?.onRandomize} disabled={locked} title={cachedWhy}>
             {s.randomize}
           </Button>
           {actions ? (
             <SegmentedControl label={s.speed} value={String(actions.speed) as "1" | "3" | "6"} disabled={locked} onChange={(v) => actions.onSpeed(Number(v) as 1 | 3 | 6)} options={[{ value: "1", label: "1×" }, { value: "3", label: "3×" }, { value: "6", label: "6×" }]} />
           ) : null}
-          {actions?.finished ? (
+          {cachedOnly ? <span className="tr-sub">{copy.trials.desk.cachedSpeed}</span> : null}
+          {actions?.inStrip ? null : actions?.finished ? (
             <Button primary onClick={actions.onNewMatch}>
               {s.newMatch}
             </Button>
@@ -94,9 +101,11 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
               {s.kickoff}
             </Button>
           )}
-          <Button disabled title={s.cachedSoon}>
-            {s.cached}
-          </Button>
+          {actions?.inStrip ? null : (
+            <Button disabled title={s.cachedSoon}>
+              {s.cached}
+            </Button>
+          )}
         </div>
       </div>
       {note ? (
@@ -112,7 +121,7 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
             </label>
             <textarea id="mp-brief" className="mp-input" rows={3} value={brief} disabled={locked} onChange={(e) => props.onBrief(e.target.value)} />
             <div className="mp-btns">
-              <Button onClick={actions?.onRead} disabled={locked || actions?.reading}>
+              <Button onClick={actions?.onRead} disabled={locked || actions?.reading} title={cachedWhy}>
                 {actions?.reading ? s.reading : s.readBrief}
               </Button>
             </div>

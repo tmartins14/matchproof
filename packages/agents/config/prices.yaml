@@ -27,6 +27,25 @@ judge-grok:
   source: "https://prices.azure.com/api/retail/prices?$filter=contains(productName,'Grok') (meters 4.7 Inp glbl, 4.7 Outp glbl, eastus2)"
   as_of: "2026-10-23"
 
+gpt-5-nano:
+  # Not sourced: the Azure pricing page lists GPT-5-nano Global as "$-" and the Retail Prices API has
+  # no GPT-5-nano meter (only 5.4 nano). Left unset until a price can be read.
+  input_per_million: null
+  output_per_million: null
+  currency: null
+  source: null
+  as_of: null
+
+phi-4-mini:
+  # Azure Retail Prices API, product "Azure Phi Models", meters "Phi-4-Mini-Input Tokens" (0.000075 per
+  # 1K) and "Phi-4-Mini-Output Tokens" (0.0003 per 1K), eastus2. The meter is named for Phi-4-mini, not
+  # the -instruct variant we deploy; assumed to be the same price.
+  input_per_million: 0.075
+  output_per_million: 0.30
+  currency: USD
+  source: "https://prices.azure.com/api/retail/prices?$filter=productName eq 'Azure Phi Models' (meters Phi-4-Mini-Input Tokens, Phi-4-Mini-Output Tokens, eastus2)"
+  as_of: "2026-10-26"
+
 judge-mai:
   # Not in use (bake-off only). Left unset.
   input_per_million: null

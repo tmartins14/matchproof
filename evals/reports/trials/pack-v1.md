@@ -1,0 +1,329 @@
+# Narrator Trials, pack-v1
+
+Run 2026-10-26T13:44:29Z at 23c7f64. Judge gpt-5-mini, auditor judge-grok (grok-4.7). Referee cost: 0.6336 USD.
+
+| # | Candidate | Pts | Clean | Stands | Amended | Overturned | Held | p90 | On-air p90 | USD/match | Auditor agrees | Split | |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | gpt-5-mini | 121 | 35.3% | 30 | 49 | 6 | 0 | 2749 ms | 8365 ms | 0.0171 | 83% | 1/4 | Cleared for air |
+| 2 | grok-4.7 | 51 | 100.0% | 17 | 0 | 0 | 68 | 29509 ms | 30717 ms | 0.0128 | 100% | 0/0 | Cleared for air; audited by its own model |
+| 3 | gpt-5-nano | -145 | 10.6% | 9 | 14 | 62 | 0 | 2997 ms | 8403 ms | prices not set | 64% | 5/20 | Not cleared for air |
+| 4 | phi-4-mini | -186 | 0.0% | 0 | 0 | 62 | 23 | 5717 ms | 22166 ms | 0.0043 | 100% | 0/1 | Not cleared for air |
+
+## Errors
+
+- grok-4.7 fx-01: bt-000544-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-01: bt-000970-big_chance: Narrator: LlmError
+- grok-4.7 fx-01: bt-000996-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-01: bt-001053-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-01: bt-000996-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-01: bt-001100-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-01: bt-001664-counter_goal: Narrator: LlmError
+- grok-4.7 fx-01: bt-001374-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-01: bt-001962-open_play_goal: Narrator: LlmError
+- grok-4.7 fx-01: bt-001981-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-01: bt-001664-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-01: bt-001962-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-02: bt-000481-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-02: bt-000831-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-02: bt-000894-counter_goal: Narrator: LlmError
+- grok-4.7 fx-02: bt-000585-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-02: bt-001022-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-02: bt-000894-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-02: bt-001563-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-02: bt-001715-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-02: bt-001815-set_piece_goal: Narrator: LlmError
+- grok-4.7 fx-02: bt-001815-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-02: bt-002184-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-02: bt-002202-high_turnover_goal: Narrator: LlmError
+- grok-4.7 fx-02: bt-002235-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-03: bt-000199-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-03: bt-000239-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-03: bt-000390-open_play_goal: Narrator: LlmError
+- grok-4.7 fx-03: bt-000390-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-03: bt-000776-counter_goal: Narrator: LlmError
+- grok-4.7 fx-03: bt-000722-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-03: bt-000977-set_piece_goal: Narrator: LlmError
+- grok-4.7 fx-03: bt-000776-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-03: bt-000977-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-03: bt-001280-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-03: bt-001531-open_play_goal: Narrator: LlmError
+- grok-4.7 fx-03: bt-001800-high_turnover_goal: Narrator: LlmError
+- grok-4.7 fx-03: bt-001800-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-03: bt-002199-open_play_goal: Narrator: LlmError
+- grok-4.7 fx-03: bt-002007-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-04: bt-000240-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-04: bt-000416-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-04: bt-001282-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-04: bt-001725-counter_goal: Narrator: LlmError
+- grok-4.7 fx-04: bt-001838-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-05: bt-000250-open_play_goal: Narrator: LlmError
+- grok-4.7 fx-05: bt-000516-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-05: bt-000250-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-05: bt-000754-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-05: bt-000536-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-05: bt-001246-counter_goal: Narrator: LlmError
+- grok-4.7 fx-05: bt-001246-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-05: bt-001542-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-05: bt-001737-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-05: bt-001844-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-05: bt-002083-high_turnover_chance: Narrator: LlmError
+- grok-4.7 fx-05: bt-002079-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-06: bt-000426-open_play_goal: Narrator: LlmError
+- grok-4.7 fx-06: bt-000266-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-06: bt-000426-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-06: bt-000836-counter_goal: Narrator: LlmError
+- grok-4.7 fx-06: bt-000836-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-06: bt-001296-territorial_spell: Narrator: LlmError
+- grok-4.7 fx-06: bt-001730-set_piece_goal: Narrator: LlmError
+- grok-4.7 fx-06: bt-002020-high_turnover_goal: Narrator: LlmError
+- grok-4.7 fx-06: bt-001730-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-06: bt-002020-momentum_swing: Narrator: LlmError
+- grok-4.7 fx-06: bt-002174-territorial_spell: Narrator: LlmError
+- gpt-5-nano fx-01: bt-002178-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002178-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-002178-shot_clock.', 'Unknown fact id fx-sequence-ev-002178-shots.']}])
+- gpt-5-nano fx-02: bt-001815-set_piece_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001815-set_piece_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-001815-shot_clock.']}])
+- gpt-5-nano fx-03: bt-001531-open_play_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001531-open_play_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-001531-shot_clock.']}])
+- gpt-5-nano fx-05: bt-000754-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 1, 'claim_id': 'cl-000754-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-sequence-ev-000754-minute.']}])
+- gpt-5-nano fx-06: bt-000426-open_play_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000426-open_play_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-000426-seconds.']}])
+- gpt-5-nano fx-06: bt-002191-open_play_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002191-open_play_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-002191-seconds.']}])
+- phi-4-mini fx-01: bt-000544-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000544-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.']}, {'index': 1, 'claim_id': 'cl-000544-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-0801.', 'Unknown fact id fx-sequence-ev-000544-minute.']}])
+- phi-4-mini fx-01: bt-000588-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000588-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-1301.']}])
+- phi-4-mini fx-01: bt-000970-big_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000970-big_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-000970-shot_clock.', 'Unknown fact id fx-shot-ev-000970-shooters_time_from_beg_of_move.']}])
+- phi-4-mini fx-01: bt-000996-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000996-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.']}, {'index': 1, 'claim_id': 'cl-000996-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-0601.', 'Unknown fact id fx-0602.']}])
+- phi-4-mini fx-01: bt-001053-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001053-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.']}])
+- phi-4-mini fx-01: bt-000996-territorial_spell: Narrator: LlmError
+- phi-4-mini fx-01: bt-001100-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001100-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.']}])
+- phi-4-mini fx-01: bt-001374-card: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001374-card-01', 'accepted': False, 'errors': ['Unknown fact id fx-0301.']}, {'index': 1, 'claim_id': 'cl-001374-card-02', 'accepted': False, 'errors': ['Unknown fact id fx-0302.']}])
+- phi-4-mini fx-01: bt-001489-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001489-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-1301.', 'Unknown fact id fx-touch_space.']}])
+- phi-4-mini fx-01: bt-001664-counter_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001664-counter_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-0501.', 'Unknown fact id fx-1301.']}, {'index': 1, 'claim_id': 'cl-001664-counter_goal-02', 'accepted': False, 'errors': ['Unknown fact id fx-0501.', 'Unknown fact id fx-1301.']}])
+- phi-4-mini fx-01: bt-001374-momentum_swing: Narrator: StructuredOutputError
+- phi-4-mini fx-01: bt-001767-high_turnover_chance: Narrator: LlmError
+- phi-4-mini fx-01: bt-001962-open_play_goal: ValueError(put_claims rejected claims: [{'index': 1, 'claim_id': 'cl-001962-open_play_goal-02', 'accepted': False, 'errors': ['Unknown fact id fx-match-score-ev-001962.']}])
+- phi-4-mini fx-01: bt-001981-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001981-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0101.', 'Unknown fact id fx-0201.', 'Unknown fact id fx-0301.', 'Unknown fact id fx-0401.', 'Unknown fact id fx-0501.']}, {'index': 1, 'claim_id': 'cl-001981-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-0801.', 'Unknown fact id fx-0102.', 'Unknown fact id fx-0302.', 'Unknown fact id fx-0402.', 'Unknown fact id fx-0502.']}])
+- phi-4-mini fx-01: bt-001664-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001664-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-back_line_change-home-after-t5300-00.']}, {'index': 1, 'claim_id': 'cl-001664-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-possession_share-home-after-t5300-00.']}])
+- phi-4-mini fx-01: bt-002101-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002101-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.']}, {'index': 1, 'claim_id': 'cl-002101-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}])
+- phi-4-mini fx-01: bt-002178-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002178-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-sequence-ev-002178-minute.', 'Unknown fact id fx-sequence-ev-002178-move_speed.', 'Unknown fact id fx-freeze_frame-ev-002178-defenders_ahead_of_ball.', 'Unknown fact id fx-freeze_frame-ev-002178-assist_ahead.', 'Unknown fact id fx-freeze_frame-ev-002178-zeal_kills.', 'Unknown fact id fx-freeze_frame-ev-002178-15m_ball_dont_miss.', 'Unknown fact id fx-freeze_frame-ev-002178-1m_heat_efficient.', 'Unknown fact id fx-sequence-ev-002178-withdraw.', 'Unknown fact id fx-freeze_frame-ev-002178-backs_ahead.', 'Unknown fact id fx-freeze_frame-ev-002178-braiders.']}])
+- phi-4-mini fx-01: bt-001962-momentum_swing: ValueError(put_claims rejected claims: [{'index': 1, 'claim_id': 'cl-001962-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-t5899.']}])
+- phi-4-mini fx-02: bt-000481-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000481-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-000481-distance_from_goal.']}])
+- phi-4-mini fx-02: bt-000831-high_turnover_chance: ValidationError(1 validation error for Claim
+fact_ids.2
+  String should match pattern '^fx-[a-z0-9_-]+$' [type=string_pattern_mismatch, input_value='fx-event-timeline-E1-14', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/string_pattern_mismatch)
+- phi-4-mini fx-02: bt-000894-counter_goal: Narrator: LlmError
+- phi-4-mini fx-02: bt-000585-territorial_spell: Narrator: LlmError
+- phi-4-mini fx-02: bt-001022-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001022-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.']}, {'index': 1, 'claim_id': 'cl-001022-territorial_spell-02', 'accepted': False, 'errors': ['Unknown fact id fx-0402.']}])
+- phi-4-mini fx-02: bt-000894-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000894-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0412.']}, {'index': 1, 'claim_id': 'cl-000894-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-1303.']}])
+- phi-4-mini fx-02: bt-001563-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001563-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}, {'index': 1, 'claim_id': 'cl-001563-territorial_spell-02', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}])
+- phi-4-mini fx-02: bt-001715-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001715-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.']}, {'index': 1, 'claim_id': 'cl-001715-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.', 'Unknown fact id fx-0401-2.']}])
+- phi-4-mini fx-02: bt-001815-set_piece_goal: Narrator: LlmError
+- phi-4-mini fx-02: bt-001815-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001815-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-1301.', 'Unknown fact id fx-1302.']}, {'index': 1, 'claim_id': 'cl-001815-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-1301.']}])
+- phi-4-mini fx-02: bt-002202-high_turnover_goal: Narrator: StructuredOutputError
+- phi-4-mini fx-03: bt-000199-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000199-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shooter-near-miss-defender.']}])
+- phi-4-mini fx-03: bt-000390-open_play_goal: Narrator: LlmError
+- phi-4-mini fx-03: bt-000449-high_turnover_chance: Narrator: StructuredOutputError
+- phi-4-mini fx-03: bt-000390-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000390-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0601.', 'Unknown fact id fx-0602.']}, {'index': 1, 'claim_id': 'cl-000390-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-0701.', 'Unknown fact id fx-0702.']}])
+- phi-4-mini fx-03: bt-000776-counter_goal: Narrator: StructuredOutputError
+- phi-4-mini fx-03: bt-000722-territorial_spell: Narrator: StructuredOutputError
+- phi-4-mini fx-03: bt-000977-set_piece_goal: Narrator: LlmError
+- phi-4-mini fx-03: bt-000776-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000776-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0501.', 'Unknown fact id fx-0401.', 'Unknown fact id fx-0402.', 'Unknown fact id fx-1301.']}, {'index': 1, 'claim_id': 'cl-000776-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-0402.', 'Unknown fact id fx-0301.', 'Unknown fact id fx-0401.']}])
+- phi-4-mini fx-03: bt-000977-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000977-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0301.', 'Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}])
+- phi-4-mini fx-03: bt-001444-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001444-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-xg-log-xg-statistic-001397-xg.']}, {'index': 1, 'claim_id': 'cl-001444-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-001444-balls_won_distance.']}])
+- phi-4-mini fx-03: bt-001280-territorial_spell: Narrator: LlmError
+- phi-4-mini fx-03: bt-001531-open_play_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001531-open_play_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-freeze_frame-ev-001531-shooters_nearest_defender.']}, {'index': 1, 'claim_id': 'cl-001531-open_play_goal-02', 'accepted': False, 'errors': ['Unknown fact id fx-freeze_frame-ev-001531-shooters_nearest_defender.', 'Unknown fact id fx-freeze_frame-ev-001531-developments_second_yellow_card.']}])
+- phi-4-mini fx-03: bt-001800-high_turnover_goal: Narrator: LlmError
+- phi-4-mini fx-03: bt-001531-momentum_swing: Narrator: LlmError
+- phi-4-mini fx-03: bt-001800-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001800-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0601.', 'Unknown fact id fx-0402.']}, {'index': 1, 'claim_id': 'cl-001800-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-1301.', 'Unknown fact id fx-1302.', 'Unknown fact id fx-1303.']}])
+- phi-4-mini fx-03: bt-002199-open_play_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002199-open_play_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-sequence-ev-002199-shots_clock.']}, {'index': 1, 'claim_id': 'cl-002199-open_play_goal-02', 'accepted': False, 'errors': ['Unknown fact id fx-game-ev-000001-possession.']}])
+- phi-4-mini fx-03: bt-002007-territorial_spell: Narrator: LlmError
+- phi-4-mini fx-04: bt-000240-territorial_spell: Narrator: LlmError
+- phi-4-mini fx-04: bt-000440-high_turnover_chance: ValidationError(1 validation error for Claim
+fact_ids.1
+  String should match pattern '^fx-[a-z0-9_-]+$' [type=string_pattern_mismatch, input_value='fx-shot-ev-000440 outside_defenders_left', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/string_pattern_mismatch)
+- phi-4-mini fx-04: bt-000416-territorial_spell: Narrator: LlmError
+- phi-4-mini fx-04: bt-001282-territorial_spell: Narrator: StructuredOutputError
+- phi-4-mini fx-04: bt-001725-counter_goal: Narrator: LlmError
+- phi-4-mini fx-04: bt-001838-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001838-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-0301.']}, {'index': 1, 'claim_id': 'cl-001838-territorial_spell-02', 'accepted': False, 'errors': ['Unknown fact id fx-0401.']}])
+- phi-4-mini fx-04: bt-001725-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001725-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.', 'Unknown fact id fx-0701.']}, {'index': 1, 'claim_id': 'cl-001725-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-0701.']}])
+- phi-4-mini fx-05: bt-000250-open_play_goal: Narrator: LlmError
+- phi-4-mini fx-05: bt-000516-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000516-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}])
+- phi-4-mini fx-05: bt-000536-card: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000536-card-01', 'accepted': False, 'errors': ['Unknown fact id fx-op-002021-defensive_diff.', 'Unknown fact id fx-op-002021-defensive_achieved.', 'Unknown fact id fx-op-002021-main_plays_achieved.', 'Unknown fact id fx-op-002021-fx_op_achieved.', 'Unknown fact id fx-op-002021-time_remaining.', 'Unknown fact id fx-op-002021-action_finished.']}])
+- phi-4-mini fx-05: bt-000754-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000754-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.', 'Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}])
+- phi-4-mini fx-05: bt-000533-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000533-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-024.']}, {'index': 1, 'claim_id': 'cl-000533-territorial_spell-02', 'accepted': False, 'errors': ['Unknown fact id fx-0702.']}])
+- phi-4-mini fx-05: bt-000536-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000536-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-1301.']}, {'index': 1, 'claim_id': 'cl-000536-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-0501.', 'Unknown fact id fx-0502.']}])
+- phi-4-mini fx-05: bt-000937-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000937-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.', 'Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}, {'index': 1, 'claim_id': 'cl-000937-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-0301.']}])
+- phi-4-mini fx-05: bt-001159-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001159-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.', 'Unknown fact id fx-0403.']}])
+- phi-4-mini fx-05: bt-001246-counter_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001246-counter_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-001246-seconds.']}, {'index': 1, 'claim_id': 'cl-001246-counter_goal-02', 'accepted': False, 'errors': ['Unknown fact id fx-freeze_frame-ev-001245-minute.', 'Unknown fact id fx-score_after-ev-001245.']}])
+- phi-4-mini fx-05: bt-001246-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001246-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0701.', 'Unknown fact id fx-0702.']}])
+- phi-4-mini fx-05: bt-001542-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001542-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}])
+- phi-4-mini fx-05: bt-001737-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001737-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-001737-distance.']}])
+- phi-4-mini fx-05: bt-001844-territorial_spell: Narrator: LlmError
+- phi-4-mini fx-05: bt-002079-territorial_spell: Narrator: LlmError
+- phi-4-mini fx-06: bt-000426-open_play_goal: ValueError(put_claims rejected claims: [{'index': 1, 'claim_id': 'cl-000426-open_play_goal-02', 'accepted': False, 'errors': ['Unknown fact id fx-sequence-ev-000426-shooters_v_defenders.', 'Unknown fact id fx-sequence-ev-000426-attackers_ahead_of_ball.']}])
+- phi-4-mini fx-06: bt-000266-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000266-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-0301.', 'Unknown fact id fx-0401.']}, {'index': 1, 'claim_id': 'cl-000266-territorial_spell-02', 'accepted': False, 'errors': ['Unknown fact id fx-1301.']}])
+- phi-4-mini fx-06: bt-000426-momentum_swing: Narrator: LlmError
+- phi-4-mini fx-06: bt-000836-counter_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000836-counter_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.']}, {'index': 1, 'claim_id': 'cl-000836-counter_goal-02', 'accepted': False, 'errors': ['Unknown fact id fx-0504.', 'Unknown fact id fx-0505.']}])
+- phi-4-mini fx-06: bt-000836-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000836-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0701.']}, {'index': 1, 'claim_id': 'cl-000836-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-0702.']}])
+- phi-4-mini fx-06: bt-001296-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001296-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-0401.', 'Unknown fact id fx-0402.', 'Unknown fact id fx-3719-43.']}, {'index': 1, 'claim_id': 'cl-001296-territorial_spell-02', 'accepted': False, 'errors': ['Unknown fact id fx-0501.', 'Unknown fact id fx-0502.']}])
+- phi-4-mini fx-06: bt-001730-set_piece_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001730-set_piece_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-001730-shooter_nearest_defender.']}])
+- phi-4-mini fx-06: bt-001926-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001926-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-0801.']}, {'index': 1, 'claim_id': 'cl-001926-high_turnover_chance-02', 'accepted': False, 'errors': ['Unknown fact id fx-1301.', 'Unknown fact id fx-0601.', 'Unknown fact id fx-0602.']}])
+- phi-4-mini fx-06: bt-002020-high_turnover_goal: ValueError(put_claims rejected claims: [{'index': 1, 'claim_id': 'cl-002020-high_turnover_goal-02', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-002020-time_limit.']}])
+- phi-4-mini fx-06: bt-001730-momentum_swing: Narrator: LlmError
+- phi-4-mini fx-06: bt-002191-open_play_goal: Narrator: LlmError
+- phi-4-mini fx-06: bt-002020-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002020-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0701.', 'Unknown fact id fx-0401.']}, {'index': 1, 'claim_id': 'cl-002020-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-0502.', 'Unknown fact id fx-0701.']}])
+- phi-4-mini fx-06: bt-002174-territorial_spell: ValidationError(3 validation errors for Claim
+fact_ids.0
+  String should match pattern '^fx-[a-z0-9_-]+$' [type=string_pattern_mismatch, input_value='fx_0301', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/string_pattern_mismatch
+fact_ids.1
+  String should match pattern '^fx-[a-z0-9_-]+$' [type=string_pattern_mismatch, input_value='fx_0401', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/string_pattern_mismatch
+fact_ids.2
+  String should match pattern '^fx-[a-z0-9_-]+$' [type=string_pattern_mismatch, input_value='fx_0402', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/string_pattern_mismatch)
+
+## Overturned
+
+- **gpt-5-mini** fx-01 24′: Rivermouth win it 29 metres out and their shot is blocked after an 8-second, two-pass move. [overclaim] Second reviewer (overclaim): No cited fact gives a pass count, so 'two-pass' goes beyond the facts.; Judge, asked again (overclaim): The sentence claims a 'two-pass' move but no cited fact gives a pass count, so that detail is unsupported.
+- **gpt-5-mini** fx-01 76′: Rivermouth have grabbed control since the red card, holding 60 per cent of the ball while Ashford's back line sits 27 metres. [overclaim] 'deeper' compares, but no before or change fact is cited.
+- **gpt-5-mini** fx-01 99′ [split]: Rivermouth lead 2–0 and have kept the bulk of possession, with 56% since their goal. [overclaim] Judge (motive): 'as Ashford chase a route back in' assigns intent/motive to Ashford that the facts do not state.
+- **gpt-5-mini** fx-03 68′: Wexley scores for Ashford Vale, bringing the game to 2–2 with a composed finish from 5 metres. [overclaim] 'level' compares, but no before or change fact is cited.
+- **gpt-5-mini** fx-04 88′ (not scored): Ashford have mustered 2 shots and 47 touches in the opposition half in this spell, keeping play chiefly in Rivermouth's final third. [overclaim] Judge (overclaim): Calling Ashford 'still dangerous' is an evaluative claim about their state not directly stated by the shot and touch counts.
+- **gpt-5-mini** fx-05 71′: Rivermouth have dominated possession since the equaliser, with 69% of the ball and the score at 1–1. [overclaim] Judge (motive): 'are probing for a winner' attributes intent/motive not stated in the facts (possession figure alone doesn't prove they are seeking a winner).
+- **gpt-5-mini** fx-06 52′: Rivermouth have had 80% of the ball since Ashford Vale's second and are keeping possession high. [overclaim] Judge (overclaim): ‘dominated’ and ‘piling pressure on the visitors’ claim control and pressure not stated by the possession fact (which only gives share of possession).
+- **gpt-5-mini** fx-06 52′ (not scored) [split]: Ashford Vale still lead Rivermouth 0–2 despite that possession swing. [overclaim] Judge (overclaim): 'snatched control of possession' is a state claim; facts only give Rivermouth's possession share (about 80%) so calling it 'control' is an evaluative overclaim.
+- **gpt-5-nano** fx-01 24′: Rivermouth attack ends with Pryce firing from 29 metres, a blocked effort at goal. [names] The player "Pryce" is not named by any cited fact.
+- **gpt-5-nano** fx-01 33′: Ashford Vale press high, Rivermouth drop back as the ball stays in Ashford's half. [attribution] Judge (wrong_entity): Facts are about Ashford Vale in the opposition half and their press rate, not Rivermouth; the sentence attributes them to Rivermouth.
+- **gpt-5-nano** fx-01 33′ (not scored): Ashford Vale won the ball high up and keep 57% of the play in the latest spell. [overclaim] Judge (overclaim): Calling Rivermouth 'dominate the territory' is a superlative about control not supported by the facts (they show a 34% possession share and 42% in the opposition half).
+- **gpt-5-nano** fx-01 42′: Ashford Vale have a big chance at 42′ as Kowal shoots from 22 m, but it's saved. [names] 'level' compares, but no before or change fact is cited.; The player "Kowal" is not named by any cited fact.
+- **gpt-5-nano** fx-01 43′: Ashford Vale win it high up, Throgmorton shoots from 43′ for a 0.3 xG chance. [overclaim] Second reviewer (overclaim): No cited fact says Ashford Vale won the ball high up; only the 43′ minute, Throgmorton and 0.3 xG are given.; Judge, asked again (overclaim): No fact states Ashford Vale won possession high up; only shooter, minute and xG are given.
+- **gpt-5-nano** fx-01 46′: Rivermouth win it and Pryce shoots for a 0.3 xG chance at 45+1′, saved on target. [names] The player "Pryce" is not named by any cited fact.
+- **gpt-5-nano** fx-01 48′: Rivermouth press as Ashford Vale struggle to clear, 57% possession in the latest spell. [overclaim] Judge (overclaim): 'push in the Ashford half' claims territorial action in the opposition half beyond the facts which only give a share of play in the opposition half (53%) — that percentage doesn't by itself support 'push in' as a state or dominance.
+- **gpt-5-nano** fx-01 48′: Rivermouth attack as Whitcombe shoots from 48′, a 0.1 xG chance. [names] Cited fact fx-freeze_frame-ev-001100-ball_won_distance is not in the beat's fact bundle.; The player "Whitcombe" is not named by any cited fact.
+- **gpt-5-nano** fx-01 71′ (not scored) [split]: Rivermouth push, 72% of possession in the latest spell. [overclaim] Judge (overclaim): 'Lay on pressure' implies sustained territorial pressure or control, which the fact does not state; only a pressing rate is given.
+- **gpt-5-nano** fx-01 74′: Rivermouth strike on the counter, Whitcombe finishes it for 1–0, a 0.17 xG moment. [names] The player "Whitcombe" is not named by any cited fact.
+- **gpt-5-nano** fx-01 76′: Rivermouth move ahead of the red card, with 60% of the ball since then. [overclaim] Judge (overclaim): Saying they 'take control' is a claim of dominance not supported by the possession figure (60%).
+- **gpt-5-nano** fx-01 78′: Rivermouth win it, Fenwick-Ode shoots from 26 metres, a 0.2 xG chance. [names] Cited fact fx-freeze_frame-ev-001767-start_clock is not in the beat's fact bundle.; The player "Fenwick-Ode" is not named by any cited fact.
+- **gpt-5-nano** fx-01 87′: Rivermouth extend their lead as Quain finishes from 87′, after a 77-second move. [names] The player "Quain" is not named by any cited fact.; Voice rule evaluative-adjective broken by "composed": A judgement the data cannot support; say what happened.
+- **gpt-5-nano** fx-01 94′: Rivermouth push late, Pryce shoots at 90+4′ from 25 m, blocked on target. [numbers] The number "25" matches no display rendering of the cited facts.; The player "Pryce" is not named by any cited fact.
+- **gpt-5-nano** fx-01 98′: Ashford Vale win it at 90+8′ and Dunmore shoots, a 0.23 xG chance that nearlybenches Rivermouth. [citation] Unknown fact id fx-shot-ev-002178-shot_clock.; Unknown fact id fx-sequence-ev-002178-shots.
+- **gpt-5-nano** fx-01 99′: Rivermouth lead as they go 2–0 after the goal, and they keep it up with the ball in the opposite half. [overclaim] Judge (unsupported_cause): The sentence says they 'seize back possession' and 'shifting the momentum' which assert causes/consequences not present in the facts (only the lead/score is given).
+- **gpt-5-nano** fx-02 21′: Rivermouth win it high up and Oyelaran shoots from 8 metres, blocked on 21′, a sharp early chance. [numbers] The number "8" matches no display rendering of the cited facts.
+- **gpt-5-nano** fx-02 37′: Rivermouth attack starts with Oyelaran firing a 0.3 xG chance from 37′, but the shot goes wide. [overclaim] Judge (overclaim): Calling it an 'attack' implies a sustained team action or momentum beyond the single shot sequence; facts only describe a single shot event.
+- **gpt-5-nano** fx-02 39′: Ashford Vale lead as Nordahl finishes a quick break, 39′, after a 25-second move starting in the Ashford half. [names] The player "Nordahl" is not named by any cited fact.
+- **gpt-5-nano** fx-02 54′: Ashford Vale lead as Rivermouth push to level, the deficit stays. [overclaim] Judge (motive): 'Rivermouth push to level' attributes intent/effort not stated in the facts (motive).
+- **gpt-5-nano** fx-02 72′ [split]: Rivermouth push as they have 54% of territory in the latest spell. [numbers] The number "69" matches no display rendering of the cited facts.; The number "72′" matches no display rendering of the cited facts.
+- **gpt-5-nano** fx-02 75′: Ashford Vale win a high-quality chance as Tavares-Gill shoots in 2 seconds from 13 m, but the effort misses the target. [overclaim] Judge (overclaim): Saying Ashford Vale 'win a high chance' claims a state/quality beyond the facts; the facts give xG and shot details but not that they 'won' a high chance.
+- **gpt-5-nano** fx-02 79′: Rivermouth take the set piece, and Oyelaran smashes home from the near post for 1–1 at 79′. [citation] Unknown fact id fx-shot-ev-001815-shot_clock.
+- **gpt-5-nano** fx-02 94′: Rivermouth go level after the equaliser, Ashford Vale sit 60% of play since Rivermouth's goal. [timing] Judge (wrong_time): The fact says Ashford's 60% share is since Rivermouth's goal (the equaliser at 79′); sentence claims Ashford sat 60% since the equaliser but misstates timing by implying Rivermouth level came from that period rather than being the equaliser itself.
+- **gpt-5-nano** fx-02 95′ [split]: Rivermouth win it 38 m out and Oyelaran fires at 90+5′, saved, a late chance. [overclaim] Judge (overclaim): 'Rivermouth win it at 38 metres out' claims a distance (38 metres) not given by the facts.
+- **gpt-5-nano** fx-02 98′: Ashford Vale push the ball 18 metres into the box and Tavares-Gill shoots, but the ball is blocked at the near post. [overclaim] Judge (overclaim): 'win a late move' claims they 'won' possession or a move, which is a state/control description not stated in the facts (only shot, distance, time and blocked outcome are given).
+- **gpt-5-nano** fx-03 9′: Rivermouth break as Quigley-Moss shoots 9′ after winning it, but the effort is blocked on the line. [names] The player "Quigley-Moss" is not named by any cited fact.
+- **gpt-5-nano** fx-03 20′: Ashford Vale win it 19 m from goal and Wexley shoots wide, a 0.3 xG moment from 8 s of the move. [numbers] The number "19 m" matches no display rendering of the cited facts.; The player "Wexley" is not named by any cited fact.
+- **gpt-5-nano** fx-03 32′: Rivermouth lead as the goal puts them in front, 17 minutes in. [numbers] The number "17" matches no display rendering of the cited facts.
+- **gpt-5-nano** fx-03 34′: Ashford Vale breaks through on the counter, Underhill nets to put Rivermouth level at 34′. [names] The player "Underhill" is not named by any cited fact.
+- **gpt-5-nano** fx-03 38′: Ashford Vale push Rivermouth back as the spell ends, with 65% possession in this period. [attribution] Judge (wrong_entity): Fact shows Rivermouth had ~65% possession in the spell, not Ashford Vale, so saying Ashford pushed Rivermouth back is the wrong team.
+- **gpt-5-nano** fx-03 44′: Rivermouth take the lead from a set piece as Ibarra-Cole glances it in from close range. [overclaim] Second reviewer (overclaim): "from close range" is not measured by any cited fact; zero defenders between ball and goal is not shot distance.; Judge, asked again (overclaim): 'from close range' is a distance claim not supported by the facts (zero defenders between ball and goal is not a measure of shot distance).
+- **gpt-5-nano** fx-03 49′ [split]: Ashford Vale level at Rivermouth 1–1 after the goal, and the visitors push higher at the back. [overclaim] Judge (unsupported_cause): The sentence says Rivermouth's back line is pulled higher after the goal as a cause, but the fact states Ashford Vale's back line pushed higher (6 m) since the goal, not that Rivermouth's back line was pulled higher.
+- **gpt-5-nano** fx-03 49′ (not scored): Ashford Vale lead is level at 1–1, with Rivermouth's share of play dipping in the last spell. [attribution] Judge (wrong_entity): Score fact shows the score is 1–1 (level), so saying Ashford Vale lead 1–1 is incorrect.
+- **gpt-5-nano** fx-03 59′ (not scored): Rivermouth lead after Rivermouth 2–1 Ashford Vale, with the hosts staking their advantage in the Ashford half. [overclaim] Judge (unsupported_cause): The sentence says the goal came after a 'measured spell in the Ashford half' (claiming a period of pressure) but the facts only give Ashford's share in the opposition half since the earlier goal, not that Rivermouth had a sustained spell in Ashford's half.
+- **gpt-5-nano** fx-03 68′: Ashford Vale break at 68′, Wexley finishes with a 0.12 xG chance for a level score [citation] Unknown fact id fx-shot-ev-001531-shot_clock.
+- **gpt-5-nano** fx-03 80′: Rivermouth lead as Carrow finishes after 8 seconds, a 0.1 xG chance. [names] The player "Carrow" is not named by any cited fact.
+- **gpt-5-nano** fx-03 83′: Rivermouth keep the ball after the goal, with 41% of possession since the equaliser. [overclaim] Second reviewer (overclaim): "Keep the ball" claims Rivermouth are retaining possession, but 41% means they have less of the ball than Ashford Vale.; Judge, asked again (overclaim): Saying Rivermouth 'keep the ball' implies they retain possession, but the fact shows they have only 41% possession since the equaliser (less than Ashford Vale), so it overstates their control.
+- **gpt-5-nano** fx-03 98′: Ashford Vale press high and win it back, then keep the ball in Rivermouth's half with 61% of play in the latest spell. [overclaim] Second reviewer (overclaim): The 61 figure is a touch count in the opposition half, not 61% of play, so “keep the ball” with that share overstates the fact.; Judge, asked again (overclaim): The facts give Ashford Vale's presses and 61 touches in the opposition half, not a 61% share of play or that they 'keep the ball' in Rivermouth's half, so the sentence overstates the 61 figure as a percentage o
+- **gpt-5-nano** fx-04 13′: Rivermouth press in the Ashford Vale half, and Rivermouth control the latest spell. [overclaim] Judge (motive): 'Rivermouth press and probe as the spell starts' attributes intent ('press and probe') which is a motive not stated by the facts; only territorial percentages are given.
+- **gpt-5-nano** fx-04 19′: Rivermouth win it and Yarrow shoots from 9 metres, 0.30 xG, [numbers] The number "9" matches no display rendering of the cited facts.
+- **gpt-5-nano** fx-04 26′ (not scored): Rivermouth press kicks in as they win the ball high up, and Ashford Vale defend deeper after the red card. [overclaim] Judge (unsupported_cause): Saying the pressure 'pays off' (pressure causing the two high turnovers) asserts a causal link not stated by the fact, which only records two high turnovers.
+- **gpt-5-nano** fx-04 67′ (not scored): Rivermouth push in the latest spell as they hold 53% and bite deeper into Ashford Vale's half. [overclaim] 'deeper' compares, but no before or change fact is cited.
+- **gpt-5-nano** fx-04 88′: Rivermouth push from Ashford Vale's 9m spell, Rivermouth with 55% share of possession in the latest spell. [overclaim] Judge (overclaim): 'control the spell' and 'press Ashford Vale high up the pitch' claim dominance/positioning beyond facts; possession and press rate numbers don't justify 'control' or 'high up the pitch'.
+- **gpt-5-nano** fx-04 89′: Ashford Vale lead after the goal as the back line drops 6 m since 74′. [numbers] The number "74′" matches no display rendering of the cited facts.
+- **gpt-5-nano** fx-05 11′: Rivermouth lead as Jessop finishes from 11′ after a clean move. [names] The player "Jessop" is not named by any cited fact.
+- **gpt-5-nano** fx-05 23′: Ashford Vale win it high up and Dunmore tests the keeper from 23′, a 0.06 xG chance. [names] The player "Dunmore" is not named by any cited fact.
+- **gpt-5-nano** fx-05 26′: Rivermouth lead as they keep 63% of the ball since the equaliser, 1–0 to Rivermouth. [timing] Second reviewer (wrong_time): The 11′ goal left it 1–0, so it was not an equaliser; 'since the equaliser' misstates the time point.; Judge, asked again (wrong_time): The fact is possession measured since Rivermouth's goal (11′); calling that goal an 'equaliser' misstates the timing of the reference point.
+- **gpt-5-nano** fx-05 34′: Rivermouth attack, Okafor-Lind shoots from 23 metres after 6 seconds, 0.1 xG. [citation] Unknown fact id fx-sequence-ev-000754-minute.
+- **gpt-5-nano** fx-05 39′: Rivermouth presses high, 78 per cent in the latest spell, and keeps Ashford Vale on the back foot. [overclaim] Judge (overclaim): 'presses and dominates' overclaims: pressing (allowed) is fine but 'dominates' is a state of control not stated by the facts.
+- **gpt-5-nano** fx-05 39′ (not scored): Rivermouth flood the opposition half with 97 touches in that spell, as they dominate the Territoy. [numbers] The number "16" matches no display rendering of the cited facts.
+- **gpt-5-nano** fx-05 40′ [split]: Rivermouth keep 53% of possession since the red card, and the clock ticks on. [overclaim] Judge (overclaim): 'keep control' claims a state of control not established by the possession percentage fact.
+- **gpt-5-nano** fx-05 40′ (not scored) [split]: Ashford Vale drop 9 m deeper since the red card, the defence reshapes. [overclaim] Judge (overclaim): No fact says Rivermouth moved higher at the back; only Ashford Vale dropping 9 m is given.
+- **gpt-5-nano** fx-05 42′: Rivermouth win it at 27 m and Okafor-Lind fires a 4 s move that ends with a blocked shot on the line. [numbers] The number "27 m" matches no display rendering of the cited facts.; The player "Okafor-Lind" is not named by any cited fact.
+- **gpt-5-nano** fx-05 52′: Rivermouth win it high up and Okafor-Lind shoots, a 0.30 xG chance. [names] The player "Okafor-Lind" is not named by any cited fact.
+- **gpt-5-nano** fx-05 56′: Ashford Vale go on the break, Dunmore shoots in at 56′ from 13 seconds of play. [overclaim] Judge (unsupported_cause): 'changes the mood' asserts a consequence not supported by the facts.
+- **gpt-5-nano** fx-05 72′: Rivermouth press sends Ashford Vale back, with Rivermouth holding 39% of possession in the latest spell. [numbers] The number "39%" matches no display rendering of the cited facts.
+- **gpt-5-nano** fx-05 89′: Rivermouth push continues as they hold 71% of possession in this spell, Ashford Vale pressured in their own half. [overclaim] Judge (overclaim): 'press and dominate' asserts Rivermouth are dominating, which is an evaluative state not given by possession/territory facts.
+- **gpt-5-nano** fx-05 89′ (not scored): Rivermouth still bossing the play with a high press, Ashford Vale lack of high turnovers keeps them pinned. [overclaim] Judge (motive): Phrase 'keeping Ashford Vale under pressure' implies intent/state not in the high-turnover fact; only the turnover count is given.
+- **gpt-5-nano** fx-05 91′: Ashford Vale push a late shot at 90+1′, Dunmore pings wide from 13 metres after three seconds. [overclaim] Judge (overclaim): 'force a late chance' implies creating/forcing a chance late in the game beyond the factual shot event wording; while facts show a single shot at 90+1, 'force' and 'late chance' imply sustained pressure or creation that the facts do not state.
+- **gpt-5-nano** fx-05 98′: Rivermouth press with 60% and win it high up, then a burst in the Ashford Vale half. [overclaim] Judge (overclaim): Saying Rivermouth 'control the spell' is a state of control not supported by possession or press-rate figures alone.
+- **gpt-5-nano** fx-06 19′: Ashford Vale strike 19′, Tolliver shoots in 9 seconds from 1 v 1 to put Rivermouth behind. [citation] Unknown fact id fx-shot-ev-000426-seconds.
+- **gpt-5-nano** fx-06 27′: Ashford Vale push Rivermouth back and keep control in the final third, with 79% of touches in the opposition half in the latest spell. [overclaim] Judge (overclaim): Saying they 'press high and keep Rivermouth in their half' claims territorial control beyond the facts; only press rate and touches in opponent half are given.
+- **gpt-5-nano** fx-06 34′: Ashford Vale lead, Rivermouth push to respond. [overclaim] Judge (motive): 'Rivermouth push back after Ashford Vale score' implies Rivermouth are trying or pushing to respond (intent/motive) that the facts do not state.
+- **gpt-5-nano** fx-06 37′ [split]: Ashford Vale counter ends with a shot at goal from Jessop in the 37th minute, a 0.16 xG chance. [names] The player "Jessop" is not named by any cited fact.
+- **gpt-5-nano** fx-06 52′: Ashford Vale lead as Rivermouth chase, after their goal at 37′ the visitors hold the edge. [overclaim] Judge (motive): 'Rivermouth chase' attributes intent/behaviour (chasing) not stated in the facts.
+- **gpt-5-nano** fx-06 52′ (not scored): Rivermouth push to respond, but Ashford Vale's defence keeps them at bay in the moment. [overclaim] Judge (motive): Saying Rivermouth 'push to respond' attributes intent/attempts not stated by the facts (only possession share and score are given).
+- **gpt-5-nano** fx-06 88′: Rivermouth level from a 1-0 move as Haldane finishes after a 6-second buildup. [names] The player "Haldane" is not named by any cited fact.
+- **gpt-5-nano** fx-06 91′: Ashford Vale lead as Rivermouth reel from the goal, their back line drops 4 m since the strike. [overclaim] Judge (overclaim): 'Rivermouth reel from a goal' asserts Rivermouth are rattled or affected, which is an evaluative state not stated in the facts.
+- **gpt-5-nano** fx-06 97′: Rivermouth wins it in the 90+7′ move, Haldane finishes from 18 seconds of build-up, 0.2 xG. [citation] Unknown fact id fx-shot-ev-002191-seconds.
+- **gpt-5-nano** fx-06 98′: Rivermouth push to take the lead as they move. 62% possession since Rivermouth's goal says the spell is on. [overclaim] 'take the lead' compares, but no before or change fact is cited.
+- **gpt-5-nano** fx-06 98′: Rivermouth push maintains 73% of the ball in the final spell, Ashford Vale give ground in their half. [overclaim] Judge (overclaim): 'taking control in the final minutes' claims control/dominance not supported by the possession percentage and shot count facts.
+- **phi-4-mini** fx-01 24′: Rivermouth's shot in the box is blocked, giving Ashford a prime chance to capitalize from 7 meters. [citation] Unknown fact id fx-0801.; Unknown fact id fx-0801.; Unknown fact id fx-sequence-ev-000544-minute.
+- **phi-4-mini** fx-01 33′: Ashford are defending 8 m deeper than before the red card [citation] Unknown fact id fx-1301.
+- **phi-4-mini** fx-01 42′: Okoro shoots 4 seconds after winning it, a 0.30 xG chance. [citation] Unknown fact id fx-shot-ev-000970-shot_clock.; Unknown fact id fx-shot-ev-000970-shooters_time_from_beg_of_move.
+- **phi-4-mini** fx-01 43′: Okoro steals Asante's ball 31 m from goal and Rivermouth are in gun for a chance. [citation] Unknown fact id fx-0801.; Unknown fact id fx-0601.; Unknown fact id fx-0602.
+- **phi-4-mini** fx-01 46′: Pryce robs Ashford 31 m from goal and Rivermouth are in, Varga's shot is blocked on the line. [citation] Unknown fact id fx-0801.
+- **phi-4-mini** fx-01 48′:  [citation] Unknown fact id fx-0801.
+- **phi-4-mini** fx-01 61′: Rymsha Levels the Tower [citation] Unknown fact id fx-0301.; Unknown fact id fx-0302.
+- **phi-4-mini** fx-01 71′: Ashford Vale level after the play. Haldane denies Byrne's shot. [citation] Unknown fact id fx-1301.; Unknown fact id fx-touch_space.
+- **phi-4-mini** fx-01 74′: Ashford look tired and are back [citation] Unknown fact id fx-0501.; Unknown fact id fx-1301.; Unknown fact id fx-0501.; Unknown fact id fx-1301.
+- **phi-4-mini** fx-01 76′:  [other] The Narrator's output could not be read as claims.
+- **phi-4-mini** fx-01 87′: Okoro levels the game with a stunning shot after winning it 77 seconds into the half. [citation] Unknown fact id fx-match-score-ev-001962.
+- **phi-4-mini** fx-01 89′: Kemp steals the ball 7 m out, Ashford shift urgently and Varga shoots 3 s later, a 0.1 xG chance. [citation] Unknown fact id fx-0101.; Unknown fact id fx-0201.; Unknown fact id fx-0301.; Unknown fact id fx-0401.; Unknown fact id fx-0501.; Unknown fact id fx-0801.; Unknown fact id fx-0102.; Unknown fact id fx-0302.; Unknown fact id fx-0402.; Unknown fact id fx-0502.
+- **phi-4-mini** fx-01 89′: Rivermouth dwindle to 30m behind Ashford, and Ashford build 6m deeper [citation] Unknown fact id fx-back_line_change-home-after-t5300-00.; Unknown fact id fx-possession_share-home-after-t5300-00.
+- **phi-4-mini** fx-01 94′: Kemp robs Asante 31 m from goal and Rivermouth are in. [citation] Unknown fact id fx-0801.; Unknown fact id fx-0401.; Unknown fact id fx-0402.
+- **phi-4-mini** fx-01 98′: Ashford Massey Dunmore robs the Ashford Vale goalkeeper 7m out, a 0.23 xG chance and 1st half remaining. [citation] Unknown fact id fx-sequence-ev-002178-minute.; Unknown fact id fx-sequence-ev-002178-move_speed.; Unknown fact id fx-freeze_frame-ev-002178-defenders_ahead_of_ball.; Unknown fact id fx-freeze_frame-ev-002178-assist_ahead.; Unknown fact id fx-freeze_frame-ev-002178-zeal_kills.; Unknown fact id fx-freeze_frame-ev-002178-15m_ball_dont_miss.; Unknown fact id fx-freeze_frame-ev-002178-1m_heat_efficient.; Unknown fact id fx-sequence-ev-002178-withdraw.; Unknown fact id fx-freeze_frame-ev-002178-backs_ahead.; Unknown fact id fx-freeze_frame-ev-002178-braiders.
+- **phi-4-mini** fx-01 99′: Ashford move the ball 84 m in 63 seconds [citation] Unknown fact id fx-t5899.
+- **phi-4-mini** fx-02 21′: Kemp steals the ball 8 m from goal, Rivermouth now on the attack, Varga's shot is off target. [citation] Unknown fact id fx-shot-ev-000481-distance_from_goal.
+- **phi-4-mini** fx-02 53′: Ashford Rule the Clock Out From Under Rivermouth. [citation] Unknown fact id fx-0401.; Unknown fact id fx-0402.
+- **phi-4-mini** fx-02 54′: Ashford poke shot to near post, Ricardos unable to reach [citation] Unknown fact id fx-0412.; Unknown fact id fx-1303.
+- **phi-4-mini** fx-02 72′: Ashford Forte.Direct Toward the goal, forcing a Rivermouth shot anxiously. [citation] Unknown fact id fx-0401.; Unknown fact id fx-0402.; Unknown fact id fx-0401.; Unknown fact id fx-0402.
+- **phi-4-mini** fx-02 75′: Kemp robs Ashford's Asante 31 meters from goal and Rivermouth are in. Varga's shot is blocked on the line. [citation] Unknown fact id fx-0801.; Unknown fact id fx-0401.; Unknown fact id fx-0402.; Unknown fact id fx-0401-2.
+- **phi-4-mini** fx-02 94′: Ashford lead after draw [citation] Unknown fact id fx-1301.; Unknown fact id fx-1302.; Unknown fact id fx-1301.
+- **phi-4-mini** fx-02 95′: Ashford win it 7 m out, Okoro shoots 4 seconds later, a chance [numbers] Cited fact fx-shooters-ev-002184-shooter is not in the beat's fact bundle.; The number "4" matches no display rendering of the cited facts.; The number "0.30" matches no display rendering of the cited facts.; The number "38" matches no display rendering of the cited facts.
+- **phi-4-mini** fx-02 95′ (not scored): Ashford defense deeper since red card [citation] Cited fact fx-sequence-ev-002184-pass-outcome is not in the beat's fact bundle.; Cited fact fx-sequence-ev-002184-expert-calculator-sound is not in the beat's fact bundle.; Cited fact fx-sequence-ev-002184-shooters-ev-002184-proximity is not in the beat's fact bundle.
+- **phi-4-mini** fx-02 96′:  [other] The Narrator's output could not be read as claims.
+- **phi-4-mini** fx-02 98′: Ashford find team-mate for shot. [overclaim] Judge (overclaim): Calling it the 'second-best chance of the match' compares across match chances which the facts do not provide.
+- **phi-4-mini** fx-02 98′ (not scored): Ashford shoot from just 8m out. [overclaim] Judge (overclaim): Saying they 'repeat the formula they ran to victory' claims a pattern or prior successful method not supported by the single chance facts.
+- **phi-4-mini** fx-03 9′: Quigley-Moss finds a hot option, with just 4 m out, a dangerous 0.30 shot quality / xG. [citation] Unknown fact id fx-shooter-near-miss-defender.
+- **phi-4-mini** fx-03 15′: Ashford Vale score a goal looking tired from a corner, regaining the lead with 15′ left [overclaim] Judge (overclaim): Describing the goal as 'looking tired' is an evaluative adjective about the team's state not supported by the facts.
+- **phi-4-mini** fx-03 20′:  [other] The Narrator's output could not be read as claims.
+- **phi-4-mini** fx-03 32′: Ashford Vale level from a corner. Byrne has 2 m of space at the near post and glances it in. [citation] Unknown fact id fx-0601.; Unknown fact id fx-0602.; Unknown fact id fx-0701.; Unknown fact id fx-0702.
+- **phi-4-mini** fx-03 34′:  [other] The Narrator's output could not be read as claims.
+- **phi-4-mini** fx-03 38′:  [other] The Narrator's output could not be read as claims.
+- **phi-4-mini** fx-03 49′: Ashford transfer the ball deeper, 8 m from half again after the red. [citation] Unknown fact id fx-0501.; Unknown fact id fx-0401.; Unknown fact id fx-0402.; Unknown fact id fx-1301.; Unknown fact id fx-0402.; Unknown fact id fx-0301.; Unknown fact id fx-0401.
+- **phi-4-mini** fx-03 59′: Rivermouth lead on 2–1, Ashford Vale dominant in half-time numbers. [citation] Unknown fact id fx-0301.; Unknown fact id fx-0401.; Unknown fact id fx-0402.
+- **phi-4-mini** fx-03 64′: Okoro shoots, beating the defense only 3 meters from goal by for 4 seconds, 0.13 xG chance by Ashford Vale at 63° [citation] Unknown fact id fx-xg-log-xg-statistic-001397-xg.; Unknown fact id fx-shot-ev-001444-balls_won_distance.
+- **phi-4-mini** fx-03 68′: Varga scores for Rivermouth, first goal in 68th minute. [citation] Unknown fact id fx-freeze_frame-ev-001531-shooters_nearest_defender.; Unknown fact id fx-freeze_frame-ev-001531-shooters_nearest_defender.; Unknown fact id fx-freeze_frame-ev-001531-developments_second_yellow_card.
+- **phi-4-mini** fx-03 95′: Okoro shoots 4 seconds after winning it 7 m out, a 0.30 xG chance. [citation] Unknown fact id fx-0401.; Unknown fact id fx-0601.; Unknown fact id fx-0402.; Unknown fact id fx-1301.; Unknown fact id fx-1302.; Unknown fact id fx-1303.
+- **phi-4-mini** fx-03 98′: Ashford go 73 seconds, pulls in two with 68% of the ball since half-time. [citation] Unknown fact id fx-sequence-ev-002199-shots_clock.; Unknown fact id fx-game-ev-000001-possession.
+- **phi-4-mini** fx-04 67′:  [other] The Narrator's output could not be read as claims.
+- **phi-4-mini** fx-04 88′: Ashford take control with 6 touches, 2 shots. [citation] Unknown fact id fx-0301.; Unknown fact id fx-0401.
+- **phi-4-mini** fx-04 89′: Rivermouth go 20m, Okoro fires 4m from the by-line, Haldane barely scrapes in S184 and twists the ball towards the easy winner. [citation] Unknown fact id fx-0401.; Unknown fact id fx-0402.; Unknown fact id fx-0701.; Unknown fact id fx-0701.
+- **phi-4-mini** fx-05 23′: Ashford player draws two defenders and slips during a high-chance moment. [citation] Unknown fact id fx-0401.; Unknown fact id fx-0402.
+- **phi-4-mini** fx-05 25′: Ashford are supporting well after receiving the pass. Milkman delivers it over to Okoro, who charges 22 m across the width and scores. [citation] Unknown fact id fx-op-002021-defensive_diff.; Unknown fact id fx-op-002021-defensive_achieved.; Unknown fact id fx-op-002021-main_plays_achieved.; Unknown fact id fx-op-002021-fx_op_achieved.; Unknown fact id fx-op-002021-time_remaining.; Unknown fact id fx-op-002021-action_finished.
+- **phi-4-mini** fx-05 26′: Rivermouth build a lead, leading 1–0 after 11 minutes. [timing] Judge (wrong_time): Facts show Rivermouth scored to make it 1–0 at 11′, not Ashford Vale scoring after which play shifted.
+- **phi-4-mini** fx-05 34′: After winning the ball, Okoro takes 4 seconds before shooting, a 0.30 xG chance. [citation] Unknown fact id fx-0801.; Unknown fact id fx-0401.; Unknown fact id fx-0402.
+- **phi-4-mini** fx-05 39′: Ashford win it 7 m out and Okoro shoots 4 seconds later, a risky rush. [citation] Unknown fact id fx-024.; Unknown fact id fx-0702.
+- **phi-4-mini** fx-05 40′: Ashford push deeper [citation] Unknown fact id fx-1301.; Unknown fact id fx-0501.; Unknown fact id fx-0502.
+- **phi-4-mini** fx-05 42′: Kemp robs Asante at 31 m from the goal, giving Rivermouth control. [citation] Unknown fact id fx-0801.; Unknown fact id fx-0401.; Unknown fact id fx-0402.; Unknown fact id fx-0301.
+- **phi-4-mini** fx-05 52′: Risborough's greatest chance yet. Okoro draws 2 and slips Varga in, the cut-back finds Colclough, and he gets a blistering shot on target. [citation] Unknown fact id fx-0401.; Unknown fact id fx-0402.; Unknown fact id fx-0403.
+- **phi-4-mini** fx-05 56′: Okoro shoots 4 seconds after winning it, a 0.30 xG chance [citation] Unknown fact id fx-shot-ev-001246-seconds.; Unknown fact id fx-freeze_frame-ev-001245-minute.; Unknown fact id fx-score_after-ev-001245.
+- **phi-4-mini** fx-05 71′: Ashford are running the clock with the ball. Ashford lead by 1. [citation] Unknown fact id fx-0701.; Unknown fact id fx-0702.
+- **phi-4-mini** fx-05 72′: Okoro scores 4 seconds after winning the ball, a 0.30 xG chance. [citation] Unknown fact id fx-0401.; Unknown fact id fx-0402.
+- **phi-4-mini** fx-05 77′: Shoddy pass by Ashford results in blocked shot 7 m out. [citation] Unknown fact id fx-shot-ev-001737-distance.
+- **phi-4-mini** fx-05 91′: Ashford Vale wins the ball 6m from goal, delivering a 0.30 xG shot 3s later. [numbers] The number "3" matches no display rendering of the cited facts.
+- **phi-4-mini** fx-06 19′: Varga scores for Ashford Vale 19 seconds after driving from Armond's corner. [citation] Unknown fact id fx-sequence-ev-000426-shooters_v_defenders.; Unknown fact id fx-sequence-ev-000426-attackers_ahead_of_ball.
+- **phi-4-mini** fx-06 27′: Ashford lead with 7m, Okoro scores 4 seconds later. [citation] Unknown fact id fx-0301.; Unknown fact id fx-0401.; Unknown fact id fx-1301.
+- **phi-4-mini** fx-06 37′: Okoro shoots 4 seconds after winning the ball, a 0.30 xG chance. [citation] Unknown fact id fx-0401.; Unknown fact id fx-0402.; Unknown fact id fx-0504.; Unknown fact id fx-0505.
+- **phi-4-mini** fx-06 52′: Ashford Vale level from the corner. [citation] Unknown fact id fx-0701.; Unknown fact id fx-0702.
+- **phi-4-mini** fx-06 62′: Rivermouth lead 7m out, Okoro might score in 4s for 0.30 xG chance [citation] Unknown fact id fx-0401.; Unknown fact id fx-0402.; Unknown fact id fx-3719-43.; Unknown fact id fx-0501.; Unknown fact id fx-0502.
+- **phi-4-mini** fx-06 76′: Marchetti-Roe scores, 6 m from Varga [citation] Unknown fact id fx-001730-shooter_nearest_defender.
+- **phi-4-mini** fx-06 84′: Kemp robs Asante 31 m from goal, Rivermouth are in. Varga's shot is blocked on the line. [citation] Unknown fact id fx-0801.; Unknown fact id fx-1301.; Unknown fact id fx-0601.; Unknown fact id fx-0602.
+- **phi-4-mini** fx-06 88′: Rivermouth scores on a world-class chance. [citation] Unknown fact id fx-shot-ev-002020-time_limit.
+- **phi-4-mini** fx-06 98′: Ashford, now missing 2 players, are still leading; Ashford cover the 6 m they let go at the corner, and Ishakov beats Dunmore and scores. [citation] Unknown fact id fx-0701.; Unknown fact id fx-0401.; Unknown fact id fx-0502.; Unknown fact id fx-0701.

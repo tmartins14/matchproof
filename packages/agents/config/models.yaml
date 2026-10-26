@@ -69,3 +69,40 @@ judge_fallback:
   timeout_s: 30
   response_format: json_schema
   reasoning_effort: minimal
+
+# Narrator Trials: every candidate gets narrator.v2.md and the same referee (the active judge inline,
+# the auditor on settled claims). `id` is what the Table shows; `model` is the exact name and version.
+# Checked 2026-10-26 against /openai/v1 (prompt 14, Part A):
+#   gpt-5-nano   takes json_schema, json_object and none; rejects temperature (400); takes reasoning_effort.
+#   phi-4-mini   rejects json_schema (422); takes json_object and none, and temperature; reasoning_effort
+#                made the call time out, so it is left out.
+#   mistral-small (mistral-small-2503) was dropped: the deployment rejects max_completion_tokens (422),
+#                which the client sends on every call. Not worked around in code; the deployment was deleted.
+trial_candidates:
+  - id: gpt-5-mini
+    model: gpt-5-mini 2025-08-07
+    deployment: gpt-5-mini
+    max_output_tokens: 700
+    timeout_s: 20
+    response_format: json_schema
+    reasoning_effort: minimal
+  - id: grok-4.7
+    model: grok-4.7 1
+    deployment: judge-grok
+    max_output_tokens: 700
+    timeout_s: 30
+    response_format: json_schema
+    temperature: 0
+  - id: gpt-5-nano
+    model: gpt-5-nano 2025-08-07
+    deployment: gpt-5-nano
+    max_output_tokens: 700
+    timeout_s: 20
+    response_format: json_schema
+    reasoning_effort: minimal
+  - id: phi-4-mini
+    model: Phi-4-mini-instruct 1
+    deployment: phi-4-mini
+    max_output_tokens: 700
+    timeout_s: 20
+    response_format: json_object

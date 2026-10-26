@@ -20,7 +20,7 @@ azd env set BUDGET_EMAIL <you@example.com>
 azd up
 ```
 
-Optional overrides: `MODEL_DEPLOYMENT_NAME` (default `gpt-5-mini`), `MODEL_NAME` (`gpt-5-mini`), `MODEL_VERSION` (`2025-08-07`), `MODEL_CAPACITY` (`50`, thousands of tokens per minute), `BUDGET_AMOUNT` (`50`, in the subscription currency), `CUSTOM_WEB_ORIGIN` (empty), `API_MIN_REPLICAS` (`1`).
+Optional overrides: `MODEL_DEPLOYMENT_NAME` (default `gpt-5-mini`), `MODEL_NAME` (`gpt-5-mini`), `MODEL_VERSION` (`2025-08-07`), `MODEL_CAPACITY` (`50`, thousands of tokens per minute), `BUDGET_AMOUNT` (`75`, in the subscription currency), `CUSTOM_WEB_ORIGIN` (empty), `API_MIN_REPLICAS` (`1`).
 
 `azd up` builds the image in Azure Container Registry (`remoteBuild`), so no local architecture match is needed.
 
@@ -37,7 +37,7 @@ With `API_MIN_REPLICAS=0` the first request after idle is slow while the app sca
 
 ## Container size and streams
 
-The API container has 1 vCPU and 2 GiB (`infra/modules/containerapp.bicep`). Each live stream runs a generator, fact engine and beat detector on a worker thread, so one replica serves at most `MAX_LIVE_STREAMS = 3` streams at once. A fourth gets HTTP 503 with `Retry-After: 30` and the body `{"fallback": "cached"}`; the cached replay that answers it comes Sunday.
+The API container has 2 vCPU and 4 GiB and exactly one replica (`maxReplicas: 1`, because the match store is in memory and a second replica would split matches; `infra/modules/containerapp.bicep`). The store keeps three matches. Each live stream runs a generator, fact engine and beat detector on a worker thread, so one replica serves at most `MAX_LIVE_STREAMS = 3` streams at once. A fourth gets HTTP 503 with `Retry-After: 30` and the body `{"fallback": "cached"}`; the cached replay that answers it comes Sunday.
 
 ## Connect with an MCP client
 
@@ -119,13 +119,13 @@ The browser bundle has the API URL baked in at build time. A `prepackage` hook o
 
 `apiMinReplicas` (`azd env set API_MIN_REPLICAS`) defaults to `1` so the first click in judging does not wait for a cold start.
 
-Rates, from the Azure Retail Prices API for `eastus2` (the pricing page itself renders its rates as placeholders): idle usage is $0.000003 per vCPU-second and $0.000003 per GiB-second; active usage is $0.000024 per vCPU-second and $0.000003 per GiB-second. For 1 vCPU and 2 GiB over a 30-day month (2,592,000 s) fully idle:
+Rates, from the Azure Retail Prices API for `eastus2` (the pricing page itself renders its rates as placeholders): idle usage is $0.000003 per vCPU-second and $0.000003 per GiB-second; active usage is $0.000024 per vCPU-second and $0.000003 per GiB-second. For 2 vCPU and 4 GiB over a 30-day month (2,592,000 s) fully idle:
 
-- vCPU: 2,592,000 × 0.000003 = $7.78
-- memory: 2 × 2,592,000 × 0.000003 = $15.55
-- about **$23.3 a month** before the free grants (180,000 vCPU-seconds and 360,000 GiB-seconds per subscription per month), about $21.7 after them.
+- vCPU: 2 × 2,592,000 × 0.000003 = $15.55
+- memory: 4 × 2,592,000 × 0.000003 = $31.10
+- about **$46.7 a month** before the free grants (180,000 vCPU-seconds and 360,000 GiB-seconds per subscription per month), about $45.0 after them. It was $23.3 at 1 vCPU and 2 GiB.
 
-A replica is idle only while it serves no request, uses under 0.01 vCPU and receives under 1,000 bytes per second; streams and matches bill at the active rate, so the real figure is a little higher. Requests are $0.40 per million after the first 2 million. Static Web Apps Free tier and Application Insights availability tests are separate (tests are billed per Azure Monitor pricing). The $50 `BUDGET_AMOUNT` stays: the idle estimate is under 80% of it ($40).
+A replica is idle only while it serves no request, uses under 0.01 vCPU and receives under 1,000 bytes per second; streams and matches bill at the active rate, so the real figure is a little higher. Requests are $0.40 per million after the first 2 million. Static Web Apps Free tier and Application Insights availability tests are separate (tests are billed per Azure Monitor pricing). `BUDGET_AMOUNT` is raised from $50 to $75: at $50 the idle estimate alone ($46.7) would pass the 80% alert ($40) before any model use; at $75 it is about 62% of the budget and 80% is $60.
 
 After Nov 10, to go back to scale-to-zero:
 
@@ -184,7 +184,7 @@ Open; the cause is not found. Twice on Oct 25 (19:34:05 and 20:19:44 UTC) the AP
 
 The API now logs a JSON `vitals` line every 5 s (`api/vitals.py`), the cgroup limits once at startup, a `sigterm` line on SIGTERM, and enables `faulthandler`. `GET /livez` touches nothing. Read them with `ContainerAppConsoleLogs_CL | where Log_s has "vitals"`; `scripts/poll_health.py` polls `/livez` and `/health` every 2 s.
 
-- **Effective config.** The active revision has no probes defined (`properties.template.containers[0].probes` is null). Microsoft Learn ("Health probes in Azure Container Apps", Default configuration) says ingress adds TCP probes on the target port: startup (timeout 3 s, period 1 s, failure threshold 240), liveness (TCP, no other values given on the page), readiness (timeout 5 s, period 5 s, failure threshold 48). A TCP probe succeeds when the socket accepts a connection, which the kernel does even while the event loop is busy. Resources are 1 vCPU and 2 GiB, `minReplicas` 1, `maxReplicas` 2. In the container: `memory.max` 2147483648 and `cpu.max` 100000 100000.
+- **Effective config.** The active revision has no probes defined (`properties.template.containers[0].probes` is null). Microsoft Learn ("Health probes in Azure Container Apps", Default configuration) says ingress adds TCP probes on the target port: startup (timeout 3 s, period 1 s, failure threshold 240), liveness (TCP, no other values given on the page), readiness (timeout 5 s, period 5 s, failure threshold 48). A TCP probe succeeds when the socket accepts a connection, which the kernel does even while the event loop is busy. Resources were 1 vCPU and 2 GiB, `minReplicas` 1, `maxReplicas` 2 (now 2 vCPU, 4 GiB and `maxReplicas` 1). In the container: `memory.max` 2147483648 and `cpu.max` 100000 100000.
 - **Local, with agents (macOS, no CPU cap; Docker could not use `az login` and macOS has no `taskset`).** One match at 6x reached full time, 2 to 0, 4,025 messages. Event-loop lag p50 1.1 ms, p95 7.7 ms, max 254 ms; `/livez` p95 15 ms, max 637 ms; `/health` max 96 ms; at most 9 threads.
 - **Production, one stream at a time.** One match at 6x reached full time, 2 to 0, in 149 s. RSS rose from 134 MiB at startup to 410 MiB; lag max 385 ms.
 - **Production, two streams at once.** Three pairs of matches, then a third pair of which one finished: seven more completed matches, eight on production in all, all reaching full time. The longest stream ran about 360 s, past the 240 s ingress figure, so ingress did not cut it. `/health` p95 0.3 s, max 3.3 s; `/livez` p95 1.1 s, max 3.0 s. Event-loop lag reached 1.0 to 3.7 s at 50 to 100% CPU, mid-match as well as at full time. No restart, no `sigterm` line and no system event in any run.

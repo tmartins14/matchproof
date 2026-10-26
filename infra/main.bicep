@@ -23,7 +23,7 @@ param modelCapacity int = 50
 
 // --- Budget -------------------------------------------------------------------
 @description('Monthly budget in the subscription billing currency.')
-param budgetAmount int = 50
+param budgetAmount int = 75
 
 @description('Email that receives budget alerts.')
 param budgetEmail string

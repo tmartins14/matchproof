@@ -10,7 +10,7 @@ test.beforeAll(() => mkdirSync(OUT, { recursive: true }));
 
 async function open(page: Page, query: string, size = DESK): Promise<void> {
   await page.setViewportSize(size);
-  await page.goto(`/${query}${query ? "&" : "?"}source=fixture`);
+  await page.goto(`/desk${query}${query ? "&" : "?"}source=fixture`);
   await page.evaluate(() => document.fonts.ready);
 }
 

@@ -25,7 +25,7 @@ async function serveRecording(page: Page): Promise<string[]> {
 test("kicking off plays the recorded match to full time", async ({ page }) => {
   const calls = await serveRecording(page);
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
+  await page.goto("/desk");
   await expect(page.getByRole("button", { name: "Watch cached replay" })).toBeDisabled();
   await page.getByRole("button", { name: "6×" }).click();
   await page.getByRole("button", { name: "Kick off live" }).click();
@@ -45,14 +45,14 @@ test("a refused stream leaves the desk in pre-match with a notice", async ({ pag
     if (url.pathname === "/matches") return route.fulfill({ json: { match_id: "m-red-card-flip-3" }, headers: CORS });
     return route.fulfill({ status: 503, json: { fallback: "cached" }, headers: CORS });
   });
-  await page.goto("/");
+  await page.goto("/desk");
   await page.getByRole("button", { name: "Kick off live" }).click();
   await expect(page.getByRole("status").filter({ hasText: "The desk is full right now" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Kick off live" })).toBeEnabled();
 });
 
 test("fixture mode still renders the static desk", async ({ page }) => {
-  await page.goto("/?source=fixture&beat=bt-000993-territorial_spell");
+  await page.goto("/desk?source=fixture&beat=bt-000993-territorial_spell");
   await expect(page.locator('aside .mp-stamp[data-verdict="blocked"]').first()).toHaveText("OVERTURNED");
 });
 
@@ -61,7 +61,7 @@ const LABELS = ["9′", "63′", "42–52′", "90+4′", "45+3–52′"];
 for (const size of [{ name: "1440", width: 1440, height: 900 }, { name: "390", width: 390, height: 844 }]) {
   test(`headlines line up whatever the minute label, at ${size.name}`, async ({ page }) => {
     await page.setViewportSize(size);
-    await page.goto(`/?source=fixture&labels=${encodeURIComponent(LABELS.join("|"))}`);
+    await page.goto(`/desk?source=fixture&labels=${encodeURIComponent(LABELS.join("|"))}`);
     await page.evaluate(() => document.fonts.ready);
     const rows = page.locator(".mp-bar-head");
     expect(await rows.count()).toBeGreaterThanOrEqual(LABELS.length);

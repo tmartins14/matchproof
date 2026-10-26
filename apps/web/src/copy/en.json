@@ -302,5 +302,156 @@
     "comparative": "Unsupported comparison",
     "unsupported": "Not in the facts",
     "other": "Wording"
+  },
+  "trials": {
+    "lockup": {
+      "first": "Matchproof",
+      "second": "Narrator Trials"
+    },
+    "nav": {
+      "label": "Narrator Trials",
+      "table": "Table",
+      "fixtures": "Fixtures",
+      "compare": "Compare",
+      "desk": "Desk"
+    },
+    "stepper": {
+      "label": "Where you are",
+      "rank": "Rank",
+      "inspect": "Inspect",
+      "deploy": "Deploy"
+    },
+    "run": "{pack} · run {date}",
+    "smokeChip": "Smoke data",
+    "hero": {
+      "kicker": "Who do you put on air?",
+      "headline": "{models} narrator models. {fixtures} rigged fixtures. One fixed referee.",
+      "how": "Every model commentates the same seeded matches, each with planted traps. Code checks every number and name. A second model checks the wording. Nothing a model says counts until it survives review."
+    },
+    "referee": {
+      "title": "Referee",
+      "checker": "Checker · {name}",
+      "judge": "Judge · {name}",
+      "auditor": "Auditor · {name}",
+      "fixed": "Fixed for every narrator.",
+      "selfAudited": "{name} is audited by its own model; read its row with that in mind."
+    },
+    "scoring": {
+      "title": "Scoring",
+      "held": "HELD (no answer from the model): not scored"
+    },
+    "table": {
+      "label": "League table",
+      "cols": {
+        "rank": "#",
+        "narrator": "Narrator",
+        "claims": "Claims",
+        "stands": "Stands",
+        "amended": "Amended",
+        "overturned": "Overturned",
+        "pts": "Pts",
+        "clean": "Clean",
+        "p90": "p90",
+        "cost": "$ / match",
+        "fail": "Fail profile",
+        "form": "Form, last 5",
+        "traps": "Traps"
+      },
+      "provider": "Microsoft Foundry",
+      "worst": "worst: {note} (Fixture {fixture}, {clock})",
+      "unanswered": "{held} of {claims} moments unanswered",
+      "incomplete": "Incomplete run",
+      "incompleteNote": "These models did not answer enough moments to be ranked.",
+      "notCleared": "Not cleared for air",
+      "split": "referees split on {n}",
+      "priceNotSet": "price not set",
+      "tokens": "{n} tokens",
+      "useOnDesk": "Use on Desk",
+      "selfAuditedNote": "Also the auditor; shares capacity with the referee.",
+      "failAria": "Fail profile: {parts}",
+      "noFails": "No failures",
+      "trapsLine": "{overturned} of {total} overturned",
+      "failTop": "{bucket} {pct}%"
+    },
+    "buckets": {
+      "numbers": "numbers",
+      "names": "names",
+      "citation": "citation",
+      "attribution": "attribution",
+      "timing": "timing",
+      "overclaim": "overclaim",
+      "wording": "wording",
+      "other": "other"
+    },
+    "picks": {
+      "live": "Live feed pick",
+      "liveLine": "{id} · p90 {s} s",
+      "budget": "Budget pick",
+      "budgetLine": "{id} · ${usd} per match",
+      "notCleared": "Not cleared for air",
+      "sole": "Only narrator cleared for air",
+      "soleLine": "{id} · p90 {s} s · ${usd} per match",
+      "soleLineNoPrice": "{id} · p90 {s} s · price not set"
+    },
+    "footer": {
+      "relegation": "Relegation rule",
+      "relegationBody": "More OVERTURNED than AMENDED: not cleared for air.",
+      "rerun": "Re-run on update",
+      "rerunBody": "Same six seeds, same referee. When a vendor ships an update, the table runs again."
+    },
+    "nextUp": {
+      "title": "Next up"
+    },
+    "fixtures": {
+      "title": "Fixtures",
+      "soon": "Fixtures: coming in prompt 16"
+    },
+    "compare": {
+      "crumb": "Fixture {fixture} · {home} v {away} · moment",
+      "chip": "{clock} {label}",
+      "freeze": "Freeze frame · {clock}",
+      "sameFrame": "Same frame for every narrator.",
+      "factsTitle": "Computed facts (the only numbers allowed)",
+      "sourcesTitle": "Source events",
+      "headline": "Same moment. {n} narrators. One referee.",
+      "note": "Prose is not ranked. Only what failed is highlighted.",
+      "narrator": "Narrator · {rank}",
+      "notRanked": "Not ranked",
+      "ordinal": [
+        "1st",
+        "2nd",
+        "3rd",
+        "4th",
+        "5th",
+        "6th",
+        "7th",
+        "8th"
+      ],
+      "checker": "checker: {checker} · auditor: {auditor} · {s} s",
+      "split": "referees split",
+      "noClaim": "No claim aired: {reason}",
+      "draftLabel": "Draft:",
+      "badCitation": "cited a fact that does not exist",
+      "noRow": "No result for this moment.",
+      "refereeNote": "Code reconciles every number and name against the fact registry before any model reads the sentence. The judge and the auditor only judge wording.",
+      "fixtureLink": "See the fixture this came from",
+      "prev": "Previous moment",
+      "next": "Next moment",
+      "position": "Moment {i} of {n}",
+      "redirecting": "Opening the first trap moment",
+      "refereeNoteTitle": "Referee note"
+    },
+    "verdictLong": {
+      "STANDS": "Stands",
+      "AMENDED": "Amended",
+      "OVERTURNED": "Overturned",
+      "HELD": "Held"
+    },
+    "lost": {
+      "rejected": "the store refused its claims",
+      "unreadable": "the output could not be read as claims",
+      "no_answer": "the model call failed",
+      "no_claim": "it wrote no claim for this beat"
+    }
   }
 }

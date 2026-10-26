@@ -699,6 +699,170 @@ class SummaryItem(BaseModel):
     ]
 
 
+RanksAdditionalProperty = TypeAliasType(
+    "RanksAdditionalProperty", Annotated[int, Field(ge=1)]
+)
+
+
+class Verdict1(Enum):
+    STANDS = 'STANDS'
+    AMENDED = 'AMENDED'
+    OVERTURNED = 'OVERTURNED'
+    HELD = 'HELD'
+
+
+class Worst(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    fixture: Annotated[str, Field(pattern='^fx-[0-9]{2}$')]
+    beat: BeatId
+    verdict: Verdict1
+    note: Annotated[
+        str,
+        Field(
+            description='<bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters.',
+            max_length=100,
+        ),
+    ]
+
+
+class TrapRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    STANDS: Annotated[int, Field(ge=0)]
+    AMENDED: Annotated[int, Field(ge=0)]
+    OVERTURNED: Annotated[int, Field(ge=0)]
+    HELD: Annotated[int, Field(ge=0)]
+
+
+class FailTop(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    bucket: str
+    share: Annotated[float, Field(ge=0.0, le=1.0)]
+
+
+class LiveFeed(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidate: str
+    p90_ms: Annotated[int, Field(ge=0)]
+
+
+class Budget(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidate: str
+    usd_per_match: Annotated[float, Field(ge=0.0)]
+
+
+class NotCleared(RootModel[list[str]]):
+    root: Annotated[list[str], Field(min_length=1)]
+
+
+class Sole(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidate: str
+    p90_ms: Annotated[int, Field(ge=0)]
+    usd_per_match: Annotated[float | None, Field(ge=0.0)]
+
+
+class Picks(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    live_feed: Annotated[LiveFeed | None, Field(description='Cleared, lowest p90_ms.')]
+    budget: Annotated[
+        Budget | None,
+        Field(
+            description='Cleared, lowest numeric usd_per_match; an unpriced candidate is never the budget pick.'
+        ),
+    ]
+    not_cleared: NotCleared | None
+    sole: Annotated[
+        Sole | None,
+        Field(
+            description='Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air.'
+        ),
+    ]
+
+
+class Trap1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    minute: Annotated[int, Field(ge=1)]
+    kind: str
+    note: str
+    event_id: EventId
+
+
+class TrapBeat(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    beat: BeatId
+    event_id: EventId
+
+
+class Fact1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: FactId
+    label: str
+    text: Annotated[
+        str, Field(description='The English display rendering the Desk uses.')
+    ]
+
+
+class Source(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: EventId
+    type: str
+    player: str | None
+    clock: str
+
+
+class Moments(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: str
+    label: str
+    clock: Annotated[
+        str, Field(description="Broadcast clock of the beat's detection, e.g. 90+4′.")
+    ]
+    t: MatchClock
+    facts: Annotated[
+        list[Fact1], Field(description='The beat bundle the Narrator read.')
+    ]
+    sources: Annotated[list[Source], Field(max_length=6)]
+    freeze: Annotated[
+        PositionFrame | None,
+        Field(
+            description="The anchor event's freeze frame; null where it was dropped to keep the file small."
+        ),
+    ]
+
+
+class NextUpItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    model: str
+    reason: str
+
+
 class ByLang(RootModel[dict[Lang, dict[BeatId, str]]]):
     root: dict[Lang, dict[BeatId, str]]
 
@@ -1092,6 +1256,97 @@ class TrialsResults(BaseModel):
             description='One row per candidate, sorted by pts, then clean_pct, then p90_ms. Counts are over scored claims only.'
         ),
     ]
+
+
+class Fixture1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: Annotated[str, Field(pattern='^fx-[0-9]{2}$')]
+    seed: int
+    match_id: str
+    home: str
+    away: str
+    brief: str
+    final_score: tuple[FinalScoreItem, FinalScoreItem]
+    traps: list[Trap1]
+    match_brief: Annotated[
+        MatchBrief,
+        Field(
+            description='The full brief, so a custom fixture can be POSTed to /matches.'
+        ),
+    ]
+    trap_beats: Annotated[
+        list[TrapBeat],
+        Field(description="The beat anchored on each trap's event, in trap order."),
+    ]
+
+
+class TrialsWeb(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    pack: str
+    results: TrialsResults
+    ranks: Annotated[
+        dict[str, RanksAdditionalProperty],
+        Field(
+            description='1-based rank in summary order, over measured candidates only. An unmeasured candidate has no entry.'
+        ),
+    ]
+    order: Annotated[
+        list[str],
+        Field(
+            description="The Table's row order: measured candidates by rank, then the unmeasured ones below the Incomplete run divider."
+        ),
+    ]
+    measured: Annotated[
+        dict[str, bool], Field(description='held / claims <= 0.10, per candidate.')
+    ]
+    worst: Annotated[
+        dict[str, Worst | None],
+        Field(
+            description='Per candidate, its lowest scored verdict (OVERTURNED < AMENDED < HELD < STANDS), the latest beat on a tie; null for an unmeasured candidate.'
+        ),
+    ]
+    trap_record: Annotated[
+        dict[str, TrapRecord],
+        Field(
+            description='Per candidate, the verdicts of its scored claims on trap beats (every trap beat of every fixture). Present for unmeasured candidates too.'
+        ),
+    ]
+    fail_top: Annotated[
+        dict[str, FailTop | None],
+        Field(
+            description='Per candidate, the biggest bucket of its fail profile; null when nothing failed.'
+        ),
+    ]
+    picks: Annotated[
+        Picks,
+        Field(
+            description='Over measured candidates only; each is null when nothing qualifies.'
+        ),
+    ]
+    live_narrator: Annotated[
+        str | None,
+        Field(
+            description='The candidate whose deployment is the one config/models.yaml narrator uses live; null if none.'
+        ),
+    ]
+    fixtures: list[Fixture1]
+    moments: Annotated[
+        dict[str, dict[str, Moments]],
+        Field(
+            description='Keyed by fixture id, then beat id, for every beat any candidate was scored on.'
+        ),
+    ]
+    claim_clock: Annotated[
+        dict[str, str],
+        Field(
+            description='Broadcast clock of each claim row, keyed by its index in results.claims.'
+        ),
+    ]
+    next_up: list[NextUpItem]
 
 
 class ClaimGraph(BaseModel):

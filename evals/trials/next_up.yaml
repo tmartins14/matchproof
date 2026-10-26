@@ -1,0 +1,7 @@
+# Models that are not in the table yet, and the true reason. Shown on the Table's "Next up" strip.
+- model: Claude Sonnet 5.5
+  reason: awaiting Marketplace access
+- model: mistral-small
+  reason: rejects a required call parameter (max_completion_tokens)
+- model: Your model
+  reason: one line of config, then run the pack

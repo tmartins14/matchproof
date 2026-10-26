@@ -1,10 +1,5 @@
-import { Suspense } from "react";
-import { Home } from "@/components/desk/Home";
+import { TablePage } from "@/components/trials/TablePage";
 
 export default function Page() {
-  return (
-    <Suspense>
-      <Home />
-    </Suspense>
-  );
+  return <TablePage />;
 }

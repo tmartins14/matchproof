@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matchproof.tylermartins.com/schemas/trials_web.schema.json",
+  "title": "TrialsWeb",
+  "description": "Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "live_narrator", "fixtures", "moments", "claim_clock", "next_up"],
+  "properties": {
+    "pack": { "type": "string" },
+    "results": { "$ref": "trials_results.schema.json" },
+    "ranks": {
+      "type": "object",
+      "description": "1-based rank in summary order, over measured candidates only. An unmeasured candidate has no entry.",
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "order": { "type": "array", "items": { "type": "string" }, "description": "The Table's row order: measured candidates by rank, then the unmeasured ones below the Incomplete run divider." },
+    "measured": { "type": "object", "additionalProperties": { "type": "boolean" }, "description": "held / claims <= 0.10, per candidate." },
+    "worst": {
+      "type": "object",
+      "description": "Per candidate, its lowest scored verdict (OVERTURNED < AMENDED < HELD < STANDS), the latest beat on a tie; null for an unmeasured candidate.",
+      "additionalProperties": {
+        "anyOf": [
+          { "type": "null" },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["fixture", "beat", "verdict", "note"],
+            "properties": {
+              "fixture": { "type": "string", "pattern": "^fx-[0-9]{2}$" },
+              "beat": { "$ref": "common.schema.json#/$defs/beatId" },
+              "verdict": { "enum": ["STANDS", "AMENDED", "OVERTURNED", "HELD"] },
+              "note": { "type": "string", "maxLength": 100, "description": "<bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters." }
+            }
+          }
+        ]
+      }
+    },
+    "trap_record": {
+      "type": "object",
+      "description": "Per candidate, the verdicts of its scored claims on trap beats (every trap beat of every fixture). Present for unmeasured candidates too.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["STANDS", "AMENDED", "OVERTURNED", "HELD"],
+        "properties": {
+          "STANDS": { "type": "integer", "minimum": 0 },
+          "AMENDED": { "type": "integer", "minimum": 0 },
+          "OVERTURNED": { "type": "integer", "minimum": 0 },
+          "HELD": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "fail_top": {
+      "type": "object",
+      "description": "Per candidate, the biggest bucket of its fail profile; null when nothing failed.",
+      "additionalProperties": {
+        "anyOf": [
+          { "type": "null" },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["bucket", "share"],
+            "properties": { "bucket": { "type": "string" }, "share": { "type": "number", "minimum": 0, "maximum": 1 } }
+          }
+        ]
+      }
+    },
+    "picks": {
+      "type": "object",
+      "description": "Over measured candidates only; each is null when nothing qualifies.",
+      "additionalProperties": false,
+      "required": ["live_feed", "budget", "not_cleared", "sole"],
+      "properties": {
+        "live_feed": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "p90_ms"], "properties": { "candidate": { "type": "string" }, "p90_ms": { "type": "integer", "minimum": 0 } } }], "description": "Cleared, lowest p90_ms." },
+        "budget": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "usd_per_match": { "type": "number", "minimum": 0 } } }], "description": "Cleared, lowest numeric usd_per_match; an unpriced candidate is never the budget pick." },
+        "not_cleared": { "anyOf": [{ "type": "null" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }] },
+        "sole": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "p90_ms", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "p90_ms": { "type": "integer", "minimum": 0 }, "usd_per_match": { "type": ["number", "null"], "minimum": 0 } } }], "description": "Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air." }
+      }
+    },
+    "live_narrator": { "type": ["string", "null"], "description": "The candidate whose deployment is the one config/models.yaml narrator uses live; null if none." },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "seed", "match_id", "home", "away", "brief", "final_score", "traps", "match_brief", "trap_beats"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^fx-[0-9]{2}$" },
+          "seed": { "type": "integer" },
+          "match_id": { "type": "string" },
+          "home": { "type": "string" },
+          "away": { "type": "string" },
+          "brief": { "type": "string" },
+          "final_score": { "type": "array", "prefixItems": [{ "type": "integer", "minimum": 0 }, { "type": "integer", "minimum": 0 }], "minItems": 2, "maxItems": 2 },
+          "traps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["minute", "kind", "note", "event_id"],
+              "properties": {
+                "minute": { "type": "integer", "minimum": 1 },
+                "kind": { "type": "string" },
+                "note": { "type": "string" },
+                "event_id": { "$ref": "common.schema.json#/$defs/eventId" }
+              }
+            }
+          },
+          "match_brief": { "$ref": "match_brief.schema.json", "description": "The full brief, so a custom fixture can be POSTed to /matches." },
+          "trap_beats": {
+            "type": "array",
+            "description": "The beat anchored on each trap's event, in trap order.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["beat", "event_id"],
+              "properties": {
+                "beat": { "$ref": "common.schema.json#/$defs/beatId" },
+                "event_id": { "$ref": "common.schema.json#/$defs/eventId" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "moments": {
+      "type": "object",
+      "description": "Keyed by fixture id, then beat id, for every beat any candidate was scored on.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "label", "clock", "t", "facts", "sources", "freeze"],
+          "properties": {
+            "kind": { "type": "string" },
+            "label": { "type": "string" },
+            "clock": { "type": "string", "description": "Broadcast clock of the beat's detection, e.g. 90+4′." },
+            "t": { "$ref": "common.schema.json#/$defs/matchClock" },
+            "facts": {
+              "type": "array",
+              "description": "The beat bundle the Narrator read.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "label", "text"],
+                "properties": {
+                  "id": { "$ref": "common.schema.json#/$defs/factId" },
+                  "label": { "type": "string" },
+                  "text": { "type": "string", "description": "The English display rendering the Desk uses." }
+                }
+              }
+            },
+            "sources": {
+              "type": "array",
+              "maxItems": 6,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "type", "player", "clock"],
+                "properties": {
+                  "id": { "$ref": "common.schema.json#/$defs/eventId" },
+                  "type": { "type": "string" },
+                  "player": { "type": ["string", "null"] },
+                  "clock": { "type": "string" }
+                }
+              }
+            },
+            "freeze": { "anyOf": [{ "type": "null" }, { "$ref": "position_frame.schema.json" }], "description": "The anchor event's freeze frame; null where it was dropped to keep the file small." }
+          }
+        }
+      }
+    },
+    "claim_clock": { "type": "object", "description": "Broadcast clock of each claim row, keyed by its index in results.claims.", "additionalProperties": { "type": "string" } },
+    "next_up": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model", "reason"],
+        "properties": { "model": { "type": "string" }, "reason": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -28,6 +28,7 @@ overlay?: Overlay
 position_frame?: PositionFrame
 stream_message?: StreamMessage
 trials_results?: TrialsResults
+trials_web?: TrialsWeb
 }
 /**
  * One key moment worth explaining, either planted by the brief or found by the detector.
@@ -646,5 +647,204 @@ clean_pct: (number | null)
  * Share of this candidate's audited settled claims the auditor agreed with (double-checks excluded); null when none were audited. Read it with self_audited.
  */
 audit_agreement: (number | null)
+}[]
+}
+/**
+ * Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.
+ */
+export interface TrialsWeb {
+pack: string
+results: TrialsResults
+/**
+ * 1-based rank in summary order, over measured candidates only. An unmeasured candidate has no entry.
+ */
+ranks: {
+[k: string]: number
+}
+/**
+ * The Table's row order: measured candidates by rank, then the unmeasured ones below the Incomplete run divider.
+ */
+order: string[]
+/**
+ * held / claims <= 0.10, per candidate.
+ */
+measured: {
+[k: string]: boolean
+}
+/**
+ * Per candidate, its lowest scored verdict (OVERTURNED < AMENDED < HELD < STANDS), the latest beat on a tie; null for an unmeasured candidate.
+ */
+worst: {
+[k: string]: null | {
+fixture: string
+/**
+ * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
+ */
+beat: string
+verdict: ("STANDS" | "AMENDED" | "OVERTURNED" | "HELD")
+/**
+ * <bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters.
+ */
+note: string
+}
+}
+/**
+ * Per candidate, the verdicts of its scored claims on trap beats (every trap beat of every fixture). Present for unmeasured candidates too.
+ */
+trap_record: {
+[k: string]: {
+STANDS: number
+AMENDED: number
+OVERTURNED: number
+HELD: number
+}
+}
+/**
+ * Per candidate, the biggest bucket of its fail profile; null when nothing failed.
+ */
+fail_top: {
+[k: string]: null | {
+bucket: string
+share: number
+}
+}
+/**
+ * Over measured candidates only; each is null when nothing qualifies.
+ */
+picks: {
+/**
+ * Cleared, lowest p90_ms.
+ */
+live_feed: (null | {
+candidate: string
+p90_ms: number
+})
+/**
+ * Cleared, lowest numeric usd_per_match; an unpriced candidate is never the budget pick.
+ */
+budget: (null | {
+candidate: string
+usd_per_match: number
+})
+not_cleared: (null | string[])
+/**
+ * Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air.
+ */
+sole: (null | {
+candidate: string
+p90_ms: number
+usd_per_match: (number | null)
+})
+}
+/**
+ * The candidate whose deployment is the one config/models.yaml narrator uses live; null if none.
+ */
+live_narrator: (string | null)
+fixtures: {
+id: string
+seed: number
+match_id: string
+home: string
+away: string
+brief: string
+/**
+ * @minItems 2
+ * @maxItems 2
+ */
+final_score: [number, number]
+traps: {
+minute: number
+kind: string
+note: string
+event_id: string
+}[]
+match_brief: MatchBrief1
+/**
+ * The beat anchored on each trap's event, in trap order.
+ */
+trap_beats: {
+/**
+ * bt- plus the anchor event's six digits and the beat kind, e.g. bt-000321-counter_goal. The older bt-NNN form is still accepted.
+ */
+beat: string
+event_id: string
+}[]
+}[]
+/**
+ * Keyed by fixture id, then beat id, for every beat any candidate was scored on.
+ */
+moments: {
+[k: string]: {
+[k: string]: {
+kind: string
+label: string
+/**
+ * Broadcast clock of the beat's detection, e.g. 90+4′.
+ */
+clock: string
+/**
+ * Seconds since kickoff on the match clock, stoppage time included.
+ */
+t: number
+/**
+ * The beat bundle the Narrator read.
+ */
+facts: {
+id: string
+label: string
+/**
+ * The English display rendering the Desk uses.
+ */
+text: string
+}[]
+sources: {
+id: string
+type: string
+player: (string | null)
+clock: string
+}[]
+/**
+ * The anchor event's freeze frame; null where it was dropped to keep the file small.
+ */
+freeze: (null | PositionFrame)
+}
+}
+}
+/**
+ * Broadcast clock of each claim row, keyed by its index in results.claims.
+ */
+claim_clock: {
+[k: string]: string
+}
+next_up: {
+model: string
+reason: string
+}[]
+}
+/**
+ * The canonical generator input (ADR 0004). Same tactics and seed produce the same match.
+ */
+export interface MatchBrief1 {
+match_id: string
+seed: number
+/**
+ * The human-readable brief shown to the user. Derived from tactics by template, or written by the user.
+ */
+brief_text?: string
+home: Team
+away: Team
+storyline: {
+id: ("late_comeback" | "red_card_flip" | "smash_and_grab" | "end_to_end" | "custom")
+text: string
+}
+/**
+ * Moments the generator must produce. Detected beats are found later by the beat detector.
+ */
+planted_beats: {
+id: string
+kind: ("counter_goal" | "set_piece_goal" | "high_turnover_goal" | "open_play_goal" | "red_card" | "penalty")
+side: ("home" | "away")
+minute_from: number
+minute_to: number
 }[]
 }

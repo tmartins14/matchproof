@@ -161,7 +161,7 @@ scripts/smoke_prod.sh                # reads WEB_URL and API_URL from azd env
 scripts/smoke_prod.sh <WEB_URL> <API_URL>
 ```
 
-It checks, and exits non-zero naming the failing one: (1) the web root is 200 with the desk's HTML, (2) `/health` is 200 with `agents` ready, (3) CORS is allowed from the web origin and refused from `https://example.com`, (4) `POST /matches/random` then `GET /matches/{id}/stream?speed=6` delivers a `status` and an `event` within 30 s, (5) `GET /matches` is 200. It starts one real match, so it costs a few model calls when agents are on.
+It checks, and exits non-zero naming the failing one: (1) the web root is 200 with the Table's HTML and `/desk` is 200 with the desk's, (2) `/health` is 200 with `agents` ready, (3) CORS is allowed from the web origin and refused from `https://example.com`, (4) `POST /matches/random` then `GET /matches/{id}/stream?speed=6` delivers a `status` and an `event` within 30 s, (5) `GET /matches` is 200. It starts one real match, so it costs a few model calls when agents are on.
 
 ## Availability tests
 

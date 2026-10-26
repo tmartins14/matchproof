@@ -3,8 +3,9 @@ import type { CSSProperties } from "react";
 import localFont from "next/font/local";
 import { tokenCssVars } from "@/theme/tokens";
 import "./desk.css";
+import "./trials.css";
 
-export const metadata = { title: "Matchproof live desk" };
+export const metadata = { title: "Matchproof Narrator Trials" };
 
 // Latin subsets, committed under ./fonts (SIL Open Font License; texts in docs/compliance/fonts), so a build never reaches a font service.
 const display = localFont({

@@ -392,6 +392,9 @@ class AgentRuntime:
     def existing(self, match_id: str) -> MatchRun | None:
         return self._runs.get(match_id)
 
+    def pending_audits(self) -> int:
+        return sum(run.ledger.pending for run in list(self._runs.values()))
+
 
 class DownRun:
     """Stands in for a MatchRun when the agent workflow could not be started: beats stream without

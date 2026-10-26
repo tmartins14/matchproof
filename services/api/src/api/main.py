@@ -44,6 +44,7 @@ from sim.positions import iter_frames, iter_freeze_frames
 from starlette.background import BackgroundTask
 from starlette.routing import Route
 
+from api import vitals
 from api.agents_runtime import AgentRuntime, DownRun, MatchRun, SessionServer
 from api.archiving import schedule_save
 from api.live import (
@@ -99,8 +100,27 @@ def build_agent_runtime(session: ClientSession) -> AgentRuntime:
     )
 
 
+def open_streams() -> int:
+    return sum(_streams.values())
+
+
+def pending_audits() -> int:
+    return agent_runtime.pending_audits() if agent_runtime is not None else 0
+
+
 @asynccontextmanager
-async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app_: FastAPI) -> AsyncIterator[None]:
+    vitals.install(open_streams, pending_audits)
+    sampler = asyncio.create_task(vitals.sample(open_streams, pending_audits))
+    try:
+        async with serving(app_):
+            yield
+    finally:
+        sampler.cancel()
+
+
+@asynccontextmanager
+async def serving(_: FastAPI) -> AsyncIterator[None]:
     global agent_runtime, agents_configured, agents_error
     server = public_mcp.start(store)
     async with server.session_manager.run():
@@ -162,6 +182,12 @@ def agents_status() -> str:
     if agent_runtime is not None:
         return "ready"
     return f"unavailable: {agents_error or 'no model configured'}"
+
+
+@app.get("/livez")
+async def livez() -> dict[str, bool]:
+    """Touches nothing: answers as long as the event loop turns. No probe points here yet."""
+    return {"ok": True}
 
 
 @app.get("/health")

@@ -40,6 +40,7 @@
 .tr-row--lead { border-left-color: var(--mp-lime); }
 .tr-row--out { border-left-color: var(--mp-overturned); }
 .tr-row--unmeasured { opacity: 0.9; }
+.tr-row--unmeasured .tr-pts { opacity: 0.45; }
 .tr-divider { padding: 12px 16px; background: var(--mp-input); border-bottom: 1px solid var(--mp-line2); display: flex; gap: 12px; }
 .tr-num { font-family: var(--mp-display); font-weight: 700; font-size: 22px; text-align: center; }
 .tr-stands { color: var(--mp-verified); }

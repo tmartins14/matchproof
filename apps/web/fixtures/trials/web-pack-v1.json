@@ -13511,14 +13511,14 @@
    "fixture": "fx-04",
    "beat": "bt-001725-counter_goal",
    "verdict": "AMENDED",
-   "note": "numbers: Cited fact fx-shot-ev-001725-seconds is not in the beat's fact bundle."
+   "note": "numbers: The number \"12\" matches no display rendering of the cited facts."
   },
   "grok-4.7": null,
   "gpt-5-nano": {
    "fixture": "fx-06",
    "beat": "bt-002191-open_play_goal",
    "verdict": "OVERTURNED",
-   "note": "citation: Unknown fact id fx-shot-ev-002191-seconds."
+   "note": "citation: cited a fact that doesn't exist"
   },
   "phi-4-mini": null
  },

@@ -39,7 +39,7 @@ WEB_FIXTURES_DIR = ROOT / "apps" / "web" / "fixtures" / "trials"
 MAX_HELD_SHARE = (
     0.10  # a candidate with more beats unanswered than this is not measured
 )
-NOTE_CHARS = 90
+NOTE_CHARS = 120
 CODE_BUCKETS = ("numbers", "names", "citation")  # caught in code, before any judge
 MAX_SOURCES = 6
 SIZE_LIMIT = 1_500_000
@@ -85,6 +85,23 @@ def citation_words(reason: str) -> str | None:
     return None
 
 
+NAME_REASON = re.compile(r'^The player "(.+)" is not named by any cited fact\.$')
+NUMBER_REASON = re.compile(r'^The number "(.+)" matches no display rendering')
+
+
+def code_words(reason: str) -> str | None:
+    """What the code caught, said plainly in a sentence of its own, for a name or a number; None for
+    any other reason. These need no bucket label in front."""
+    if (name := NAME_REASON.match(reason)) is not None:
+        return (
+            f"Named {name.group(1)} without citing the fact that names him. "
+            "Right or wrong, an untraceable name doesn't air."
+        )
+    if (number := NUMBER_REASON.match(reason)) is not None:
+        return f"Said {number.group(1)}, which no cited fact gives."
+    return None
+
+
 def reason_for(bucket: str | None, reasons: list[str]) -> str:
     """The first reason that belongs to the bucket, else the first reason."""
     if bucket == "numbers":
@@ -107,6 +124,8 @@ def reason_line_of(claim: Json) -> str | None:
         return None
     bucket = claim["reason_bucket"]
     reason = reason_for(bucket, reasons)
+    if (plain := code_words(reason)) is not None:
+        return plain
     reason = citation_words(reason) or REVIEWER_PREFIX.sub("", reason)
     return f"{bucket}: {reason}" if bucket else reason
 

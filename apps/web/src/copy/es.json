@@ -346,6 +346,7 @@
     },
     "scoring": {
       "title": "Scoring",
+      "blocked": "couldn't be backed by its facts",
       "held": "HELD (no answer from the model): not scored"
     },
     "table": {
@@ -459,6 +460,7 @@
       "sourcesTitle": "Source events",
       "headline": "Same moment. {n} narrators. One referee.",
       "note": "Prose is not ranked. Only what failed is highlighted.",
+      "overturnedNote": "OVERTURNED means the claim couldn't be traced to its cited facts, even if it happens to be true.",
       "narrator": "Narrator · {rank}",
       "notRanked": "Not ranked",
       "ordinal": [

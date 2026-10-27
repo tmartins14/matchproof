@@ -67,9 +67,12 @@ function Scoring() {
     <section className="tr-card">
       <div className="tr-hd">{t.trials.scoring.title}</div>
       {rows.map(([key, label, pts]) => (
-        <div key={key} className="tr-score">
-          <span className={`mp-stamp mp-stamp--${key}`}>{label}</span>
-          <span className="tr-score-pts">{pts}</span>
+        <div key={key}>
+          <div className="tr-score">
+            <span className={`mp-stamp mp-stamp--${key}`}>{label}</span>
+            <span className="tr-score-pts">{pts}</span>
+          </div>
+          {key === "blocked" ? <div className="tr-sub">{t.trials.scoring.blocked}</div> : null}
         </div>
       ))}
       <div className="tr-body">{t.trials.scoring.held}</div>

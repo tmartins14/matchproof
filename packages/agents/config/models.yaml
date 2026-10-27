@@ -37,6 +37,7 @@ composer:
 # judge-grok was accurate on the v2 bake-off (38 of 38) but too slow for the inline check (p50 7.8 s).
 auditor:
   deployment: judge-grok
+  model: grok-4.7  # for the Trials label and the self-audited flag; the deployment above is what is called
   max_output_tokens: 800
   timeout_s: 45
   response_format: json_schema
@@ -88,9 +89,9 @@ trial_candidates:
     reasoning_effort: minimal
   - id: grok-4.7
     model: grok-4.7 1
-    deployment: judge-grok
+    deployment: narrator-grok
     max_output_tokens: 700
-    timeout_s: 60
+    timeout_s: 120
     response_format: json_schema
     temperature: 0
   - id: gpt-5-nano

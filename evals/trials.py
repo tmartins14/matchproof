@@ -802,7 +802,9 @@ def _money(cost: Any) -> str:
 # ---- the run -----------------------------------------------------------------------------------
 
 
-def candidate_entry(entry: dict[str, Any], auditor_deployment: str) -> dict[str, Any]:
+def candidate_entry(
+    entry: dict[str, Any], auditor_deployment: str, auditor_model: str = ""
+) -> dict[str, Any]:
     price = load_prices().get(entry["deployment"])
     return {
         "id": entry["id"],
@@ -812,7 +814,9 @@ def candidate_entry(entry: dict[str, Any], auditor_deployment: str) -> dict[str,
         "price_in": price.input_per_million if price else None,
         "price_out": price.output_per_million if price else None,
         "currency": price.currency if price else None,
-        "self_audited": entry["deployment"] == auditor_deployment,
+        # The same model as the auditor, on the auditor's own deployment or another one.
+        "self_audited": entry["deployment"] == auditor_deployment
+        or (bool(auditor_model) and entry["model"].split()[0] == auditor_model),
     }
 
 
@@ -826,6 +830,7 @@ async def run_trials(
 ) -> dict[str, Any]:
     models = load_models()
     auditor_deployment = str(models["auditor"]["deployment"])
+    auditor_model = str(models["auditor"].get("model", ""))
     entries = {e["id"]: e for e in models["trial_candidates"]}
     unknown = [c for c in candidates if c not in entries]
     if unknown:
@@ -895,7 +900,9 @@ async def run_trials(
             for e in entries.values()
             if e["deployment"] == auditor_deployment
         ),
-        auditor_deployment,
+        f"{auditor_deployment} ({auditor_model})"
+        if auditor_model
+        else auditor_deployment,
     )
     return {
         "pack": pack,
@@ -913,7 +920,8 @@ async def run_trials(
         },
         "fixtures": meta,
         "candidates": [
-            candidate_entry(entries[c], auditor_deployment) for c in candidates
+            candidate_entry(entries[c], auditor_deployment, auditor_model)
+            for c in candidates
         ],
         "claims": claims,
         "errors": errors,

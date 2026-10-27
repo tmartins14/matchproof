@@ -392,7 +392,7 @@
       "priceNotSet": "price not set",
       "tokens": "{n} tokens",
       "useOnDesk": "Use on Desk",
-      "selfAuditedNote": "Also the auditor; shares capacity with the referee.",
+      "selfAuditedNote": "Also the auditor.",
       "failAria": "Fail profile: {parts}",
       "noFails": "No failures",
       "trapsLine": "{overturned} of {total} overturned",

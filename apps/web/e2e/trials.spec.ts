@@ -198,3 +198,12 @@ for (const width of [1440, 1280, 1024]) {
     expect(clashes).toEqual([]);
   });
 }
+
+test("a code-caught name overturn says why in plain words, and OVERTURNED is explained", async ({ page }) => {
+  await open(page, "/compare/fx-02/bt-001815-set_piece_goal?focus=gpt-5-nano");
+  await expect(page.getByText("OVERTURNED means the claim couldn't be traced to its cited facts, even if it happens to be true.")).toBeVisible();
+  await expect(page.locator("#card-gpt-5-nano").getByText("Named Oyelaran without citing the fact that names him. Right or wrong, an untraceable name doesn't air.")).toBeVisible();
+  await page.screenshot({ path: `${OUT}/compare-plain-reason-1440.png`, fullPage: true });
+  await open(page, "/");
+  await expect(page.getByText("couldn't be backed by its facts")).toBeVisible();
+});

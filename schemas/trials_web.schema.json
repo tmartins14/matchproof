@@ -42,7 +42,7 @@
               "fixture": { "type": "string", "pattern": "^fx-[0-9]{2}$" },
               "beat": { "$ref": "common.schema.json#/$defs/beatId" },
               "verdict": { "enum": ["STANDS", "AMENDED", "OVERTURNED", "HELD"] },
-              "note": { "type": "string", "maxLength": 100, "description": "<bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters." }
+              "note": { "type": "string", "maxLength": 130, "description": "The claim's reason line (`<bucket>: <reason>`, or a plain sentence for a name or number the code caught), the reviewer prefix stripped, cut at a word boundary to about 120 characters." }
             }
           }
         ]

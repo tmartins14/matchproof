@@ -730,8 +730,8 @@ class Worst(BaseModel):
     note: Annotated[
         str,
         Field(
-            description='<bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters.',
-            max_length=100,
+            description="The claim's reason line (`<bucket>: <reason>`, or a plain sentence for a name or number the code caught), the reviewer prefix stripped, cut at a word boundary to about 120 characters.",
+            max_length=130,
         ),
     ]
 

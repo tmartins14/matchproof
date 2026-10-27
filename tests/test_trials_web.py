@@ -190,13 +190,37 @@ def test_note_uses_the_reason_that_matches_the_bucket() -> None:
         ],
         reason_bucket="numbers",
     )
-    assert note_of(both).startswith("numbers: The number")
+    assert note_of(both) == "Said 6, which no cited fact gives."
 
 
-def test_note_is_cut_at_a_word_boundary_near_90_characters() -> None:
+def test_a_name_or_number_the_code_caught_is_said_plainly() -> None:
+    name = claim(
+        "OVERTURNED",
+        1,
+        "bt-1",
+        reasons=['The player "Oyelaran" is not named by any cited fact.'],
+        reason_bucket="names",
+    )
+    assert reason_line_of(name) == (
+        "Named Oyelaran without citing the fact that names him. "
+        "Right or wrong, an untraceable name doesn't air."
+    )
+    number = claim(
+        "OVERTURNED",
+        1,
+        "bt-1",
+        reasons=['The number "45" matches no display rendering of the cited facts.'],
+        reason_bucket="numbers",
+    )
+    assert reason_line_of(number) == "Said 45, which no cited fact gives."
+    assert note_of(number) == "Said 45, which no cited fact gives."
+    assert note_of(name) == reason_line_of(name)  # fits the Table's note uncut
+
+
+def test_note_is_cut_at_a_word_boundary_near_the_limit() -> None:
     text = "word " * 60
     got = trim(text)
-    assert got.endswith("…") and 80 <= len(got) <= 91
+    assert got.endswith("…") and 100 <= len(got) <= 121
     assert not got[:-1].endswith("wor")  # never mid-word
     assert trim("short") == "short"
 

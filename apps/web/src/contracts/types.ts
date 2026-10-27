@@ -691,7 +691,7 @@ fixture: string
 beat: string
 verdict: ("STANDS" | "AMENDED" | "OVERTURNED" | "HELD")
 /**
- * <bucket>: <reason>, the reviewer prefix stripped, cut at a word boundary to about 90 characters.
+ * The claim's reason line (`<bucket>: <reason>`, or a plain sentence for a name or number the code caught), the reviewer prefix stripped, cut at a word boundary to about 120 characters.
  */
 note: string
 }

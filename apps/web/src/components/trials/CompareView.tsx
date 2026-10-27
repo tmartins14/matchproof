@@ -153,6 +153,7 @@ export function CompareView({ fixture, beat }: { fixture: string; beat: string }
           <div className="tr-narrators-head">
             <h1 className="tr-h1 tr-h1--sm">{fill(t.headline, { n: web.order.length })}</h1>
             <p className="tr-sub">{t.note}</p>
+            <p className="tr-sub">{t.overturnedNote}</p>
           </div>
           <div className="tr-cards">
             {web.order.map((id) => (

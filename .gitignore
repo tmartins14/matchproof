@@ -36,3 +36,6 @@ test-results/
 
 # Captured stream used as the default claims input of scripts/make_desk_fixture.py
 match.sse
+
+# Video (never committed)
+*.mp4

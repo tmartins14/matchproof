@@ -5,7 +5,7 @@
   "description": "Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "hero", "trap_verdicts", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "claim_diff", "next_up"],
+  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "hero", "trap_verdicts", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "claim_diff", "claim_reason", "next_up"],
   "$defs": {
     "heroPart": {
       "type": "object",
@@ -249,6 +249,11 @@
           }
         }
       }
+    },
+    "claim_reason": {
+      "type": "object",
+      "description": "The one reason line of each claim row that has a reason, keyed by its index in results.claims: `<bucket>: <reason>`, the reviewer's prefix stripped and citation reasons in plain English. The Table's worst-moment note is this line cut to length, so the Table and Compare give the same explanation.",
+      "additionalProperties": { "type": "string", "minLength": 1 }
     },
     "claim_diff": {
       "type": "object",

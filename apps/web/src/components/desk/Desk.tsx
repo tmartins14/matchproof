@@ -21,7 +21,6 @@ import { compareHref, scoredVerdicts, web } from "@/trials/data";
 import { landedOf, recordOf } from "@/trials/record";
 import { Pitch } from "@/viz/Pitch";
 import { PitchLegend } from "@/viz/PitchLegend";
-import { Backdrop } from "./Backdrop";
 import { CandidateStrip, ordinal, type TrialsDeskProps } from "./CandidateStrip";
 import { EvidenceRail } from "./EvidenceRail";
 import { HeaderBar } from "./HeaderBar";
@@ -224,8 +223,7 @@ export function Desk({ data, initial, live, trials }: DeskProps) {
   const headerStatus = !live ? "live" : phase === "pre" || phase === "connecting" ? "pre" : phase === "half_time" ? "halfTime" : phase === "full_time" ? "fullTime" : phase === "error" ? "off" : "live";
 
   return (
-    <div className="mp-root">
-      <Backdrop />
+    <div className="mp-above">
       <div className="mp-shell mp-above">
       <HeaderBar copy={c} deskLabel={trials ? fill(c.trials.desk.label, { model: trials.narrator, rank: ordinal(rankOf(trials.narrator)) }) : undefined} replayText={trials?.playingCached ? fill(c.trials.desk.replay, { pack: web.pack }) : undefined} cachedChip={trials?.playingCached ? fill(c.trials.desk.cachedChip, { pack: web.pack }) : undefined} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
       {trials ? (

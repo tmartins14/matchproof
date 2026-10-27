@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { copy, fill } from "@/desk/copy";
-import { candidateById, diffOf, rankOf, scoredClaim, summaryOf, web } from "@/trials/data";
-import { reasonLine, seconds, verdictKey } from "@/trials/format";
+import { candidateById, diffOf, rankOf, reasonOf, scoredClaim, summaryOf, web } from "@/trials/data";
+import { seconds, verdictKey } from "@/trials/format";
 import { VerdictStamp } from "../desk/VerdictStamp";
 
 function Prose({ fixture, beat, candidate }: { fixture: string; beat: string; candidate: string }) {
@@ -42,7 +42,7 @@ function Prose({ fixture, beat, candidate }: { fixture: string; beat: string; ca
               ),
             )}
           </p>
-          <p className="tr-reason">{reasonLine(row)}</p>
+          <p className="tr-reason">{reasonOf(row)}</p>
         </>
       );
     }
@@ -50,7 +50,7 @@ function Prose({ fixture, beat, candidate }: { fixture: string; beat: string; ca
   return (
     <>
       <p className="tr-claim">{row.text}</p>
-      {row.verdict === "OVERTURNED" && row.reasons.length > 0 ? <p className="tr-reason">{reasonLine(row)}</p> : null}
+      {row.verdict === "OVERTURNED" && row.reasons.length > 0 ? <p className="tr-reason">{reasonOf(row)}</p> : null}
     </>
   );
 }
@@ -75,6 +75,11 @@ export function NarratorCard({ candidate, fixture, beat, focused }: { candidate:
         <VerdictStamp verdict={verdictKey(verdict)} copy={c} />
       </header>
       <Prose fixture={fixture} beat={beat} candidate={candidate} />
+      {row && row.lost === null && row.verdict !== "STANDS" && row.fact_ids.length > 0 ? (
+        <p className="tr-sub tr-cited">
+          {t.cited} <span className="tr-mono">{row.fact_ids.join(", ")}</span>
+        </p>
+      ) : null}
       {row && row.lost === null ? (
         <div className="tr-mono">
           {fill(t.checker, {

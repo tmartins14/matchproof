@@ -98,16 +98,23 @@ def reason_for(bucket: str | None, reasons: list[str]) -> str:
     return match or reasons[0]
 
 
-def note_of(claim: Json) -> str:
-    """`<bucket>: <reason>` with the reviewer's prefix ("Judge (overclaim): ") stripped. The reason
-    is the one that matches the bucket; citation reasons are plain English, never a fact id."""
+def reason_line_of(claim: Json) -> str | None:
+    """`<bucket>: <reason>` with the reviewer's prefix ("Judge (overclaim): ") stripped, or None when the
+    claim has no reason. The reason is the one that matches the bucket; citation reasons are plain
+    English, never a fact id. The Table's note and the Compare card both read this one string."""
     reasons = claim["reasons"]
     if not reasons:
-        return trim(claim["text"])
+        return None
     bucket = claim["reason_bucket"]
     reason = reason_for(bucket, reasons)
     reason = citation_words(reason) or REVIEWER_PREFIX.sub("", reason)
-    return trim(f"{bucket}: {reason}" if bucket else reason)
+    return f"{bucket}: {reason}" if bucket else reason
+
+
+def note_of(claim: Json) -> str:
+    """The claim's reason line cut to a Table note; the aired text when it has no reason."""
+    line = reason_line_of(claim)
+    return trim(line if line is not None else claim["text"])
 
 
 def worst_of(
@@ -528,6 +535,11 @@ def build_web(
         "claim_numbers": {
             str(i): numbers_of(c, all_bundles[c["fixture"]][c["beat"]])
             for i, c in enumerate(results["claims"])
+        },
+        "claim_reason": {
+            str(i): line
+            for i, c in enumerate(results["claims"])
+            if (line := reason_line_of(c)) is not None
         },
         "claim_diff": {
             str(i): word_diff(c["draft_text"], c["text"])

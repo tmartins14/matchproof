@@ -46,7 +46,7 @@ export function FixturesPage() {
   return (
     <Shell>
       <Header />
-      <p className="tr-body tr-gridnote">{t.gridNote}</p>
+      <p className="tr-body tr-gridnote">{fill(t.gridNote, { traps: web.fixtures.reduce((n, f) => n + f.trap_beats.length, 0) })}</p>
       <div className="tr-table-wrap">
         <div role="table" aria-label={t.title} className="tr-fx" style={{ ["--cols" as string]: tableOrder.length }}>
           <div role="row" className="tr-fx-row tr-head">
@@ -77,7 +77,7 @@ export function FixturesPage() {
                   </div>
                 </div>
                 {tableOrder.map((id) => (
-                  <div key={id} role="cell" className={`tr-fx-cell${focus === id ? " tr-fx-focus" : ""}`}>
+                  <div key={id} role="cell" data-label={id} className={`tr-fx-cell${focus === id ? " tr-fx-focus" : ""}`}>
                     <span className="tr-fx-stamps">
                       {(web.trap_verdicts[id]?.[f.id] ?? []).map((v) => {
                         const word = v.verdict === "HELD" ? t.noAnswer : c.verdict[verdictKey(v.verdict)];

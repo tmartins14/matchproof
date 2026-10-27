@@ -138,6 +138,7 @@ export function LeagueTable() {
           <Row key={r.candidate} row={r} leader={false} />
         ))}
       </div>
+      <div className="tr-sub tr-caption tr-caption--hint">{t.table.key}</div>
     </div>
   );
 }

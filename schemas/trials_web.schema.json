@@ -64,15 +64,17 @@
       }
     },
     "hero": {
-      "description": "The Table's headline parts. Null when there is no sole cleared narrator.",
+      "description": "The Table's headline parts. Null when no measured narrator is cleared. One cleared narrator is `sole` (and `fewest` is null); two or more are listed in `cleared` in rank order, `sole` is null and `fewest` is the one that fell for the fewest traps.",
       "anyOf": [
         { "type": "null" },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["sole", "worst"],
+          "required": ["cleared", "sole", "fewest", "worst"],
           "properties": {
-            "sole": { "$ref": "#/$defs/heroPart" },
+            "cleared": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "Every measured narrator that is cleared, in rank order." },
+            "sole": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/heroPart" }] },
+            "fewest": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/heroPart" }] },
             "worst": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/heroPart" }], "description": "The measured narrator that is not cleared with the most overturned trap moments." }
           }
         }

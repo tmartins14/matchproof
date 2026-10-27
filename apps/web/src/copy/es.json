@@ -330,7 +330,10 @@
       "how": "Every model commentates the same seeded matches, each with planted traps. Code checks every number and name. A second model checks the wording. Nothing a model says counts until it survives review.",
       "trapDef": "A trap is a planted moment where a plausible sentence is wrong.",
       "cleared": "Cleared for air: {id}, overturned on {o} of {n} traps.",
-      "worst": "{id}: {o} of {n}. Not cleared."
+      "worst": "{id}: {o} of {n}. Not cleared.",
+      "clearedMany": "Cleared for air: {ids}.",
+      "fewest": "Fewest traps fallen for: {id}, {o} of {n}.",
+      "worstMany": "{id}: {o} of {n}, not cleared."
     },
     "referee": {
       "title": "Referee",

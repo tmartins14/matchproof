@@ -1339,7 +1339,15 @@ class Hero(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    sole: HeroPart
+    cleared: Annotated[
+        list[str],
+        Field(
+            description='Every measured narrator that is cleared, in rank order.',
+            min_length=1,
+        ),
+    ]
+    sole: HeroPart | None
+    fewest: HeroPart | None
     worst: Annotated[
         HeroPart | None,
         Field(
@@ -1408,7 +1416,7 @@ class TrialsWeb(BaseModel):
     hero: Annotated[
         Hero | None,
         Field(
-            description="The Table's headline parts. Null when there is no sole cleared narrator."
+            description="The Table's headline parts. Null when no measured narrator is cleared. One cleared narrator is `sole` (and `fewest` is null); two or more are listed in `cleared` in rank order, `sole` is null and `fewest` is the one that fell for the fewest traps."
         ),
     ]
     trap_verdicts: Annotated[

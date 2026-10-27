@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { beatsOf, candidateById, clockOfWorst, failTopOf, firstTrapBeat, momentOf, rankOf, scoredClaim, summaryOf, tableOrder, trapRecordOf, web, worstOf } from "./data";
-import { amendedParts, compactTokens, failParts, fixtureNumber, plainReason, reasonLine, seconds, verdictKey } from "./format";
+import { beatsOf, candidateById, clockOfWorst, diffOf, failTopOf, firstTrapBeat, momentOf, rankOf, scoredClaim, summaryOf, tableOrder, trapRecordOf, web, worstOf } from "./data";
+import { compactTokens, failParts, fixtureNumber, plainReason, reasonLine, seconds, verdictKey } from "./format";
 
 describe("trials data", () => {
   it("draws ranks and order from the export, unmeasured rows last and unranked", () => {
@@ -56,11 +56,15 @@ describe("trials format", () => {
     expect([verdictKey("STANDS"), verdictKey("AMENDED"), verdictKey("OVERTURNED"), verdictKey("HELD")]).toEqual(["verified", "rephrased", "blocked", "delayed"]);
   });
 
-  it("splits an amended draft only when the pieces rebuild the aired text", () => {
-    const row = { draft_text: "Ashford are down to nine men now", text: "Ashford are down to ten men now", failed_span: "nine", corrected_span: "ten" };
-    expect(amendedParts(row)).toEqual({ before: "Ashford are down to ", failed: "nine", corrected: "ten", after: " men now" });
-    expect(amendedParts({ ...row, text: "Something else entirely" })).toBeUndefined();
-    expect(amendedParts({ ...row, failed_span: null })).toBeUndefined();
+  it("draws every amended claim from a diff that rebuilds both the draft and the aired text", () => {
+    const amended = web.results.claims.filter((c) => c.verdict === "AMENDED" && c.lost === null);
+    expect(amended.length).toBeGreaterThan(0);
+    for (const row of amended) {
+      const ops = diffOf(row);
+      expect(ops).toBeDefined();
+      expect(ops!.filter((o) => o.op !== "insert").map((o) => o.text).join("")).toBe(row.draft_text);
+      expect(ops!.filter((o) => o.op !== "delete").map((o) => o.text).join("")).toBe(row.text);
+    }
   });
 
   it("orders the fail profile biggest first", () => {

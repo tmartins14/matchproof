@@ -864,6 +864,15 @@ as_written: string
 fact_id: string
 }[]
 }
+/**
+ * For each AMENDED claim row that aired, keyed by its index in results.claims: the draft turned into the aired text, word by word (difflib). `equal` text is in both, `delete` only in the draft, `insert` only in the aired text. Joining equal and delete gives draft_text; joining equal and insert gives text.
+ */
+claim_diff: {
+[k: string]: {
+op: ("equal" | "delete" | "insert")
+text: string
+}[]
+}
 next_up: {
 model: string
 reason: string

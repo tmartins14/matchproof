@@ -3,7 +3,6 @@ import { copy, fill } from "@/desk/copy";
 import { candidateById, clockOfWorst, failTopOf, firstTrapBeat, rankOf, summaryOf, tableOrder, trapRecordOf, web, worstOf, type SummaryRow } from "@/trials/data";
 import { compactTokens, fixtureNumber, seconds } from "@/trials/format";
 import { FailBar } from "./FailBar";
-import { FormChips } from "./FormChips";
 
 function compareHref(id: string): string {
   const worst = worstOf(id);
@@ -46,14 +45,24 @@ function Row({ row, leader }: { row: SummaryRow; leader: boolean }) {
         {self && !auditorNote ? <div className="tr-sub tr-note">{t.table.selfAuditedNote}</div> : null}
         {rank !== undefined && !row.cleared ? <span className="tr-tag tr-tag--out">{t.table.notCleared}</span> : null}
       </div>
-      <div role="cell" className={`tr-trap${record && record.OVERTURNED > 0 ? " tr-overturned" : ""}`} data-label={t.table.cols.traps}>
-        {record ? fill(t.table.trapsLine, { overturned: record.OVERTURNED, total: trapTotal }) : ""}
+      <div role="cell" className="tr-num tr-stands" data-label={t.table.cols.stands}>
+        {row.stands}
+      </div>
+      <div role="cell" className="tr-num tr-amended" data-label={t.table.cols.amended}>
+        {row.amended}
+      </div>
+      <div role="cell" className="tr-num tr-overturned" data-label={t.table.cols.overturned}>
+        {row.overturned}
+        {row.referee_splits > 0 ? <div className="tr-sub tr-split">{fill(t.table.split, { n: row.referee_splits })}</div> : null}
       </div>
       <div role="cell" className="tr-num tr-pts" data-label={t.table.cols.pts}>
         {row.pts}
       </div>
       <div role="cell" className="tr-num" data-label={t.table.cols.clean}>
         {row.clean_pct === null || rank === undefined ? "n/a" : `${row.clean_pct}%`}
+      </div>
+      <div role="cell" className={`tr-trap${record && record.OVERTURNED > 0 ? " tr-overturned" : ""}`} data-label={t.table.cols.traps}>
+        {record ? fill(t.table.trapsLine, { overturned: record.OVERTURNED, total: trapTotal }) : ""}
       </div>
       <div role="cell" className="tr-num" data-label={t.table.cols.p90}>
         {seconds(row.p90_ms)} s
@@ -62,22 +71,9 @@ function Row({ row, leader }: { row: SummaryRow; leader: boolean }) {
         <div>{price}</div>
         <div className="tr-sub">{fill(t.table.tokens, { n: compactTokens(row.tokens_per_match) })}</div>
       </div>
-      <div role="cell" className="tr-num tr-minor tr-stands" data-label={t.table.cols.stands}>
-        {row.stands}
-      </div>
-      <div role="cell" className="tr-num tr-minor tr-amended" data-label={t.table.cols.amended}>
-        {row.amended}
-      </div>
-      <div role="cell" className="tr-num tr-minor tr-overturned" data-label={t.table.cols.overturned}>
-        {row.overturned}
-        {row.referee_splits > 0 ? <div className="tr-sub tr-split">{fill(t.table.split, { n: row.referee_splits })}</div> : null}
-      </div>
-      <div role="cell" className="tr-failcell tr-minor" data-label={t.table.cols.fail}>
+      <div role="cell" className="tr-failcell" data-label={t.table.cols.fail}>
         <FailBar profile={row.fail_profile} measured={rank !== undefined} />
         {top ? <div className="tr-sub tr-failtop">{fill(t.table.failTop, { bucket: t.buckets[top.bucket as keyof typeof t.buckets] ?? top.bucket, pct: Math.round(top.share * 100) })}</div> : null}
-      </div>
-      <div role="cell" className="tr-minor">
-        <FormChips form={row.form} />
       </div>
       <div role="cell" className="tr-act">
         {cleared ? (
@@ -90,7 +86,7 @@ function Row({ row, leader }: { row: SummaryRow; leader: boolean }) {
   );
 }
 
-/** One row per summary row, in the export's order: measured rows by rank, then the Incomplete run divider. */
+/** One row per summary row, in the export's order: measured rows by rank, then the not-ranked divider. */
 export function LeagueTable() {
   const t = copy.en.trials;
   const rows = tableOrder.map((id) => summaryOf(id)).filter((r): r is SummaryRow => r !== undefined);
@@ -99,22 +95,22 @@ export function LeagueTable() {
   const heads: [string, string][] = [
     ["rank", t.table.cols.rank],
     ["narrator", t.table.cols.narrator],
-    ["traps", t.table.cols.traps],
-    ["pts", t.table.cols.pts],
-    ["clean", t.table.cols.clean],
-    ["p90", t.table.cols.p90],
-    ["cost", t.table.cols.cost],
     ["stands", t.table.cols.stands],
     ["amended", t.table.cols.amended],
     ["overturned", t.table.cols.overturned],
+    ["pts", t.table.cols.pts],
+    ["clean", t.table.cols.clean],
+    ["traps", t.table.cols.traps],
+    ["p90", t.table.cols.p90],
+    ["cost", t.table.cols.cost],
     ["fail", t.table.cols.fail],
-    ["form", t.table.cols.form],
     ["", ""],
   ];
   const per = web.results.summary[0]?.claims ?? 0;
   return (
     <div className="tr-table-wrap">
       <div className="tr-sub tr-caption">{fill(t.table.caption, { n: per })}</div>
+      <div className="tr-sub tr-caption tr-caption--hint">{t.table.hint}</div>
       <div role="table" aria-label={t.table.label} className="tr-table">
         <div role="row" className="tr-row tr-head">
           {heads.map(([key, label], i) => (
@@ -122,7 +118,7 @@ export function LeagueTable() {
               key={i}
               role="columnheader"
               title={key ? t.table.tips[key as keyof typeof t.table.tips] : undefined}
-              className={`tr-hd${i >= 2 && i <= 9 ? " tr-hd--c" : ""}${i >= 7 && i <= 11 ? " tr-hd--minor" : ""}`}
+              className={`tr-hd${i >= 2 && i <= 9 ? " tr-hd--c" : ""}`}
             >
               {label}
             </div>
@@ -134,7 +130,7 @@ export function LeagueTable() {
         {unmeasured.length > 0 ? (
           <div role="row" className="tr-divider">
             <div role="cell">
-              <span className="tr-hd">{t.table.incomplete}</span> <span className="tr-sub">{t.table.incompleteNote}</span>
+              <span className="tr-hd">{t.table.incompleteNote}</span>
             </div>
           </div>
         ) : null}

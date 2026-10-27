@@ -889,6 +889,20 @@ class ClaimNumber(BaseModel):
     fact_id: FactId
 
 
+class Op(Enum):
+    equal = 'equal'
+    delete = 'delete'
+    insert = 'insert'
+
+
+class ClaimDiffItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    op: Op
+    text: Annotated[str, Field(min_length=1)]
+
+
 class NextUpItem(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1424,6 +1438,12 @@ class TrialsWeb(BaseModel):
         dict[str, list[ClaimNumber]],
         Field(
             description="Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Fills claim.numbers on a cached replay."
+        ),
+    ]
+    claim_diff: Annotated[
+        dict[str, list[ClaimDiffItem]],
+        Field(
+            description='For each AMENDED claim row that aired, keyed by its index in results.claims: the draft turned into the aired text, word by word (difflib). `equal` text is in both, `delete` only in the draft, `insert` only in the aired text. Joining equal and delete gives draft_text; joining equal and insert gives text.'
         ),
     ]
     next_up: list[NextUpItem]

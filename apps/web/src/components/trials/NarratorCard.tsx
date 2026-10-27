@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { copy, fill } from "@/desk/copy";
-import { candidateById, rankOf, scoredClaim, summaryOf, web } from "@/trials/data";
-import { amendedParts, reasonLine, seconds, verdictKey } from "@/trials/format";
+import { candidateById, diffOf, rankOf, scoredClaim, summaryOf, web } from "@/trials/data";
+import { reasonLine, seconds, verdictKey } from "@/trials/format";
 import { VerdictStamp } from "../desk/VerdictStamp";
 
 function Prose({ fixture, beat, candidate }: { fixture: string; beat: string; candidate: string }) {
@@ -23,15 +23,24 @@ function Prose({ fixture, beat, candidate }: { fixture: string; beat: string; ca
     );
   }
   if (row.verdict === "AMENDED") {
-    const parts = amendedParts(row);
-    if (parts) {
+    const ops = diffOf(row);
+    if (ops) {
       return (
         <>
           <p className="tr-claim">
-            {parts.before}
-            <del className="tr-bad">{parts.failed}</del>
-            <ins className="tr-fix">{parts.corrected}</ins>
-            {parts.after}
+            {ops.map((o, i) =>
+              o.op === "delete" ? (
+                <del key={i} className="tr-bad">
+                  {o.text}
+                </del>
+              ) : o.op === "insert" ? (
+                <ins key={i} className="tr-fix">
+                  {o.text}
+                </ins>
+              ) : (
+                <span key={i}>{o.text}</span>
+              ),
+            )}
           </p>
           <p className="tr-reason">{reasonLine(row)}</p>
         </>

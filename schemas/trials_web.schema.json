@@ -5,7 +5,7 @@
   "description": "Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "hero", "trap_verdicts", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "next_up"],
+  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "hero", "trap_verdicts", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "claim_diff", "next_up"],
   "$defs": {
     "heroPart": {
       "type": "object",
@@ -246,6 +246,22 @@
           "properties": {
             "as_written": { "type": "string" },
             "fact_id": { "$ref": "common.schema.json#/$defs/factId" }
+          }
+        }
+      }
+    },
+    "claim_diff": {
+      "type": "object",
+      "description": "For each AMENDED claim row that aired, keyed by its index in results.claims: the draft turned into the aired text, word by word (difflib). `equal` text is in both, `delete` only in the draft, `insert` only in the aired text. Joining equal and delete gives draft_text; joining equal and insert gives text.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["op", "text"],
+          "properties": {
+            "op": { "enum": ["equal", "delete", "insert"] },
+            "text": { "type": "string", "minLength": 1 }
           }
         }
       }

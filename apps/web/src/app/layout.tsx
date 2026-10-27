@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { CSSProperties } from "react";
 import localFont from "next/font/local";
 import { tokenCssVars } from "@/theme/tokens";
+import { TopBar } from "@/components/trials/TopBar";
 import "./desk.css";
 import "./trials.css";
 
@@ -40,7 +41,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const vars = tokenCssVars("broadcast") as CSSProperties;
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`} style={vars}>
-      <body>{children}</body>
+      <body>
+        <TopBar />
+        {children}
+      </body>
     </html>
   );
 }

@@ -49055,6 +49055,3844 @@
   "473": [],
   "474": []
  },
+ "claim_diff": {
+  "0": [
+   {
+    "op": "equal",
+    "text": "Rivermouth win it 29 metres out and Pryce fires a blocked "
+   },
+   {
+    "op": "delete",
+    "text": "shot,"
+   },
+   {
+    "op": "insert",
+    "text": "shot after"
+   },
+   {
+    "op": "equal",
+    "text": " an 8 s "
+   },
+   {
+    "op": "delete",
+    "text": "move that nearly mattered."
+   },
+   {
+    "op": "insert",
+    "text": "build-up."
+   }
+  ],
+  "1": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "are bossing the ball in Rivermouth's half, with"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " 66 per cent possession and 57 touches in "
+   },
+   {
+    "op": "delete",
+    "text": "the opposition"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth's"
+   },
+   {
+    "op": "equal",
+    "text": " half in this spell."
+   }
+  ],
+  "2": [
+   {
+    "op": "equal",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "delete",
+    "text": " are forcing the press but"
+   },
+   {
+    "op": "equal",
+    "text": " have "
+   },
+   {
+    "op": "delete",
+    "text": "managed"
+   },
+   {
+    "op": "insert",
+    "text": "34"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "just"
+   },
+   {
+    "op": "insert",
+    "text": "per cent possession and"
+   },
+   {
+    "op": "equal",
+    "text": " 34 touches in the opponent half "
+   },
+   {
+    "op": "delete",
+    "text": "and 34 per cent possession "
+   },
+   {
+    "op": "equal",
+    "text": "in "
+   },
+   {
+    "op": "delete",
+    "text": "that"
+   },
+   {
+    "op": "insert",
+    "text": "the same"
+   },
+   {
+    "op": "equal",
+    "text": " period."
+   }
+  ],
+  "3": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale's Kowal "
+   },
+   {
+    "op": "delete",
+    "text": "fires"
+   },
+   {
+    "op": "insert",
+    "text": "sees"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "on"
+   },
+   {
+    "op": "insert",
+    "text": "his"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "target from distance but it's"
+   },
+   {
+    "op": "insert",
+    "text": "shot"
+   },
+   {
+    "op": "equal",
+    "text": " saved, a 0.30 xG "
+   },
+   {
+    "op": "delete",
+    "text": "effort"
+   },
+   {
+    "op": "insert",
+    "text": "chance"
+   },
+   {
+    "op": "equal",
+    "text": " in the "
+   },
+   {
+    "op": "delete",
+    "text": "42′ chance."
+   },
+   {
+    "op": "insert",
+    "text": "42′."
+   }
+  ],
+  "5": [
+   {
+    "op": "equal",
+    "text": "Rivermouth's Pryce "
+   },
+   {
+    "op": "delete",
+    "text": "hits"
+   },
+   {
+    "op": "insert",
+    "text": "fires"
+   },
+   {
+    "op": "equal",
+    "text": " a 0.30 xG shot "
+   },
+   {
+    "op": "delete",
+    "text": "from the rebound "
+   },
+   {
+    "op": "equal",
+    "text": "and it's "
+   },
+   {
+    "op": "delete",
+    "text": "saved,"
+   },
+   {
+    "op": "insert",
+    "text": "saved"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "a frantic end to"
+   },
+   {
+    "op": "insert",
+    "text": "as"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "half."
+   },
+   {
+    "op": "insert",
+    "text": "half ends."
+   }
+  ],
+  "6": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "are"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "pushing in the Ashford half, with"
+   },
+   {
+    "op": "insert",
+    "text": "had"
+   },
+   {
+    "op": "equal",
+    "text": " 57 per cent "
+   },
+   {
+    "op": "delete",
+    "text": "possession"
+   },
+   {
+    "op": "insert",
+    "text": "of"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "and"
+   },
+   {
+    "op": "insert",
+    "text": "the"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "two shots"
+   },
+   {
+    "op": "insert",
+    "text": "ball"
+   },
+   {
+    "op": "equal",
+    "text": " in this "
+   },
+   {
+    "op": "delete",
+    "text": "spell."
+   },
+   {
+    "op": "insert",
+    "text": "spell and fired two shots."
+   }
+  ],
+  "7": [
+   {
+    "op": "equal",
+    "text": "Rivermouth win it 39 metres out and Whitcombe "
+   },
+   {
+    "op": "delete",
+    "text": "shoots"
+   },
+   {
+    "op": "insert",
+    "text": "fires wide"
+   },
+   {
+    "op": "equal",
+    "text": " after an 11 s "
+   },
+   {
+    "op": "delete",
+    "text": "break in play, the effort flying wide,"
+   },
+   {
+    "op": "insert",
+    "text": "move,"
+   },
+   {
+    "op": "equal",
+    "text": " a 0.10 xG chance."
+   }
+  ],
+  "9": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "are"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "pinning Ashford back with"
+   },
+   {
+    "op": "insert",
+    "text": "had"
+   },
+   {
+    "op": "equal",
+    "text": " 72% of the ball and 64% of the play in "
+   },
+   {
+    "op": "delete",
+    "text": "the opposition"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford's"
+   },
+   {
+    "op": "equal",
+    "text": " half in this spell."
+   }
+  ],
+  "12": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have "
+   },
+   {
+    "op": "delete",
+    "text": "taken"
+   },
+   {
+    "op": "insert",
+    "text": "60"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "control"
+   },
+   {
+    "op": "insert",
+    "text": "per cent of the ball"
+   },
+   {
+    "op": "equal",
+    "text": " since the red card, "
+   },
+   {
+    "op": "delete",
+    "text": "rising to 60 per cent of possession "
+   },
+   {
+    "op": "equal",
+    "text": "and"
+   },
+   {
+    "op": "delete",
+    "text": " pressing an"
+   },
+   {
+    "op": "equal",
+    "text": " Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "side"
+   },
+   {
+    "op": "insert",
+    "text": "are"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "playing"
+   },
+   {
+    "op": "insert",
+    "text": "defending"
+   },
+   {
+    "op": "equal",
+    "text": " 9 metres deeper."
+   }
+  ],
+  "15": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale win it 30 metres out and Throgmorton fires a wide 0.08 xG "
+   },
+   {
+    "op": "delete",
+    "text": "attempt"
+   },
+   {
+    "op": "insert",
+    "text": "shot"
+   },
+   {
+    "op": "equal",
+    "text": " after a "
+   },
+   {
+    "op": "delete",
+    "text": "5-second"
+   },
+   {
+    "op": "insert",
+    "text": "5"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "break"
+   },
+   {
+    "op": "insert",
+    "text": "s"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "in play."
+   },
+   {
+    "op": "insert",
+    "text": "move."
+   }
+  ],
+  "16": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead 1–0 and have "
+   },
+   {
+    "op": "delete",
+    "text": "taken control, keeping"
+   },
+   {
+    "op": "insert",
+    "text": "kept"
+   },
+   {
+    "op": "equal",
+    "text": " 74% of the ball since the "
+   },
+   {
+    "op": "delete",
+    "text": "goal"
+   },
+   {
+    "op": "insert",
+    "text": "goal,"
+   },
+   {
+    "op": "equal",
+    "text": " while"
+   },
+   {
+    "op": "delete",
+    "text": " dropping"
+   },
+   {
+    "op": "equal",
+    "text": " their back line "
+   },
+   {
+    "op": "insert",
+    "text": "has dropped "
+   },
+   {
+    "op": "equal",
+    "text": "6 metres deeper."
+   }
+  ],
+  "19": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead 2–0 and have"
+   },
+   {
+    "op": "delete",
+    "text": " eased their grip, with"
+   },
+   {
+    "op": "equal",
+    "text": " 56 per cent of the ball since the late goal."
+   }
+  ],
+  "24": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "are"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "on top in this spell with"
+   },
+   {
+    "op": "insert",
+    "text": "had"
+   },
+   {
+    "op": "equal",
+    "text": " 69 per cent of the ball "
+   },
+   {
+    "op": "insert",
+    "text": "in this spell "
+   },
+   {
+    "op": "equal",
+    "text": "and"
+   },
+   {
+    "op": "insert",
+    "text": " have made"
+   },
+   {
+    "op": "equal",
+    "text": " 39 touches in the Ashford half."
+   }
+  ],
+  "25": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "take"
+   },
+   {
+    "op": "insert",
+    "text": "lead"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the lead,"
+   },
+   {
+    "op": "insert",
+    "text": "1–0,"
+   },
+   {
+    "op": "equal",
+    "text": " and Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "push"
+   },
+   {
+    "op": "insert",
+    "text": "have pushed"
+   },
+   {
+    "op": "equal",
+    "text": " their back line 5 m higher "
+   },
+   {
+    "op": "delete",
+    "text": "in"
+   },
+   {
+    "op": "insert",
+    "text": "since"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "response."
+   },
+   {
+    "op": "insert",
+    "text": "the goal."
+   }
+  ],
+  "27": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have "
+   },
+   {
+    "op": "delete",
+    "text": "pressed hard, winning"
+   },
+   {
+    "op": "insert",
+    "text": "won"
+   },
+   {
+    "op": "equal",
+    "text": " one high up the pitch and "
+   },
+   {
+    "op": "delete",
+    "text": "forcing"
+   },
+   {
+    "op": "insert",
+    "text": "registered"
+   },
+   {
+    "op": "equal",
+    "text": " 22 touches in Ashford's half "
+   },
+   {
+    "op": "delete",
+    "text": "as"
+   },
+   {
+    "op": "insert",
+    "text": "in"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "they"
+   },
+   {
+    "op": "insert",
+    "text": "this"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "pile on the pressure."
+   },
+   {
+    "op": "insert",
+    "text": "spell."
+   }
+  ],
+  "28": [
+   {
+    "op": "equal",
+    "text": "Ashford "
+   },
+   {
+    "op": "delete",
+    "text": "are"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "holding"
+   },
+   {
+    "op": "insert",
+    "text": "had"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "66%"
+   },
+   {
+    "op": "insert",
+    "text": "66 per cent"
+   },
+   {
+    "op": "equal",
+    "text": " of the ball in "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "this"
+   },
+   {
+    "op": "equal",
+    "text": " spell "
+   },
+   {
+    "op": "delete",
+    "text": "but have managed only"
+   },
+   {
+    "op": "insert",
+    "text": "and"
+   },
+   {
+    "op": "equal",
+    "text": " 21 touches in the "
+   },
+   {
+    "op": "delete",
+    "text": "opponent"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "equal",
+    "text": " half."
+   }
+  ],
+  "33": [
+   {
+    "op": "insert",
+    "text": "Rivermouth's "
+   },
+   {
+    "op": "equal",
+    "text": "Oyelaran "
+   },
+   {
+    "op": "delete",
+    "text": "fires"
+   },
+   {
+    "op": "insert",
+    "text": "has"
+   },
+   {
+    "op": "equal",
+    "text": " a 0.06 xG "
+   },
+   {
+    "op": "delete",
+    "text": "shot that's"
+   },
+   {
+    "op": "insert",
+    "text": "attempt"
+   },
+   {
+    "op": "equal",
+    "text": " saved in the 90+5′ "
+   },
+   {
+    "op": "delete",
+    "text": "stoppage, a frantic late chance for Rivermouth."
+   },
+   {
+    "op": "insert",
+    "text": "stoppage."
+   }
+  ],
+  "36": [
+   {
+    "op": "equal",
+    "text": "Ashford"
+   },
+   {
+    "op": "delete",
+    "text": " Vale"
+   },
+   {
+    "op": "equal",
+    "text": " win it 18 metres out and "
+   },
+   {
+    "op": "delete",
+    "text": "Tavares-Gill shoots"
+   },
+   {
+    "op": "insert",
+    "text": "shoot"
+   },
+   {
+    "op": "equal",
+    "text": " 2 seconds "
+   },
+   {
+    "op": "delete",
+    "text": "later,"
+   },
+   {
+    "op": "insert",
+    "text": "later;"
+   },
+   {
+    "op": "equal",
+    "text": " the effort "
+   },
+   {
+    "op": "delete",
+    "text": "blocked"
+   },
+   {
+    "op": "insert",
+    "text": "is"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "and"
+   },
+   {
+    "op": "insert",
+    "text": "blocked,"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "it's only"
+   },
+   {
+    "op": "insert",
+    "text": "a"
+   },
+   {
+    "op": "equal",
+    "text": " 0.05 "
+   },
+   {
+    "op": "delete",
+    "text": "xG."
+   },
+   {
+    "op": "insert",
+    "text": "xG chance."
+   }
+  ],
+  "38": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "are bossing territory, with"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " 64 per cent of play in Rivermouth's half and 45 touches there in the latest spell."
+   }
+  ],
+  "39": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "are"
+   },
+   {
+    "op": "insert",
+    "text": "register"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "pressing hard but struggling to break through,"
+   },
+   {
+    "op": "insert",
+    "text": "a"
+   },
+   {
+    "op": "equal",
+    "text": " 100 per cent press rate "
+   },
+   {
+    "op": "delete",
+    "text": "but only"
+   },
+   {
+    "op": "insert",
+    "text": "with"
+   },
+   {
+    "op": "equal",
+    "text": " 8 touches in the opponent "
+   },
+   {
+    "op": "delete",
+    "text": "half."
+   },
+   {
+    "op": "insert",
+    "text": "half in that spell."
+   }
+  ],
+  "45": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "are pinning Ashford back with"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " 65 per cent of the ball "
+   },
+   {
+    "op": "insert",
+    "text": "in this spell "
+   },
+   {
+    "op": "equal",
+    "text": "and 31 touches in the "
+   },
+   {
+    "op": "delete",
+    "text": "opposition"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "half in this spell."
+   },
+   {
+    "op": "insert",
+    "text": "half."
+   }
+  ],
+  "47": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead 2–1 as Ibarra-Cole "
+   },
+   {
+    "op": "delete",
+    "text": "smashes"
+   },
+   {
+    "op": "insert",
+    "text": "fires"
+   },
+   {
+    "op": "equal",
+    "text": " home a 0.10 xG "
+   },
+   {
+    "op": "delete",
+    "text": "finish,"
+   },
+   {
+    "op": "insert",
+    "text": "strike after"
+   },
+   {
+    "op": "equal",
+    "text": " a "
+   },
+   {
+    "op": "delete",
+    "text": "quick "
+   },
+   {
+    "op": "equal",
+    "text": "4-second "
+   },
+   {
+    "op": "delete",
+    "text": "move that catches Ashford out."
+   },
+   {
+    "op": "insert",
+    "text": "move."
+   }
+  ],
+  "49": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have "
+   },
+   {
+    "op": "delete",
+    "text": "taken control since that goal, spending"
+   },
+   {
+    "op": "insert",
+    "text": "spent"
+   },
+   {
+    "op": "equal",
+    "text": " 62% of play in Ashford's half "
+   },
+   {
+    "op": "insert",
+    "text": "since that goal "
+   },
+   {
+    "op": "equal",
+    "text": "and"
+   },
+   {
+    "op": "delete",
+    "text": " now"
+   },
+   {
+    "op": "equal",
+    "text": " lead 2–1."
+   }
+  ],
+  "50": [
+   {
+    "op": "delete",
+    "text": "Ashford's"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "Wexley fires"
+   },
+   {
+    "op": "insert",
+    "text": "fire"
+   },
+   {
+    "op": "equal",
+    "text": " a 0.08 xG effort from 24 metres but it's "
+   },
+   {
+    "op": "delete",
+    "text": "blocked,"
+   },
+   {
+    "op": "insert",
+    "text": "blocked after"
+   },
+   {
+    "op": "equal",
+    "text": " a swift 5 s move from when they won the ball."
+   }
+  ],
+  "51": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "are"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "on"
+   },
+   {
+    "op": "insert",
+    "text": "had"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "top"
+   },
+   {
+    "op": "insert",
+    "text": "69% of the ball"
+   },
+   {
+    "op": "equal",
+    "text": " in the "
+   },
+   {
+    "op": "delete",
+    "text": "middle"
+   },
+   {
+    "op": "insert",
+    "text": "latest"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "third, with 69% possession"
+   },
+   {
+    "op": "insert",
+    "text": "spell"
+   },
+   {
+    "op": "equal",
+    "text": " and 69 touches in the opposition "
+   },
+   {
+    "op": "delete",
+    "text": "half in the latest spell."
+   },
+   {
+    "op": "insert",
+    "text": "half."
+   }
+  ],
+  "52": [
+   {
+    "op": "equal",
+    "text": "Ashford have "
+   },
+   {
+    "op": "delete",
+    "text": "barely "
+   },
+   {
+    "op": "equal",
+    "text": "had"
+   },
+   {
+    "op": "delete",
+    "text": " the ball, just"
+   },
+   {
+    "op": "equal",
+    "text": " 31% possession "
+   },
+   {
+    "op": "delete",
+    "text": "and 4 shots "
+   },
+   {
+    "op": "equal",
+    "text": "in that "
+   },
+   {
+    "op": "delete",
+    "text": "same"
+   },
+   {
+    "op": "insert",
+    "text": "period"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "period."
+   },
+   {
+    "op": "insert",
+    "text": "and have managed 4 shots."
+   }
+  ],
+  "53": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale level "
+   },
+   {
+    "op": "delete",
+    "text": "through"
+   },
+   {
+    "op": "insert",
+    "text": "as"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "Wexley's"
+   },
+   {
+    "op": "insert",
+    "text": "Wexley"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "goal, a tidy 0.12 xG finish"
+   },
+   {
+    "op": "insert",
+    "text": "finishes"
+   },
+   {
+    "op": "equal",
+    "text": " after a 13 s "
+   },
+   {
+    "op": "delete",
+    "text": "move."
+   },
+   {
+    "op": "insert",
+    "text": "move, 0.12 xG."
+   }
+  ],
+  "54": [
+   {
+    "op": "delete",
+    "text": "Carrow"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "finishes"
+   },
+   {
+    "op": "insert",
+    "text": "finish"
+   },
+   {
+    "op": "equal",
+    "text": " an 8-second turnover "
+   },
+   {
+    "op": "delete",
+    "text": "to put Rivermouth in front; it's"
+   },
+   {
+    "op": "insert",
+    "text": "with"
+   },
+   {
+    "op": "equal",
+    "text": " a 0.10 xG strike "
+   },
+   {
+    "op": "delete",
+    "text": "that"
+   },
+   {
+    "op": "insert",
+    "text": "to"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "makes"
+   },
+   {
+    "op": "insert",
+    "text": "go"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "it"
+   },
+   {
+    "op": "insert",
+    "text": "3–2"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "3–2."
+   },
+   {
+    "op": "insert",
+    "text": "up."
+   }
+  ],
+  "56": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead 3–2 and have pulled their back line 6 metres deeper since the "
+   },
+   {
+    "op": "delete",
+    "text": "goal, inviting Ashford to push up the pitch."
+   },
+   {
+    "op": "insert",
+    "text": "goal."
+   }
+  ],
+  "57": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "are now dominating territory with"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " 68 per cent"
+   },
+   {
+    "op": "insert",
+    "text": " of the play"
+   },
+   {
+    "op": "equal",
+    "text": " in the opposition half and have pushed their back line 10 metres higher."
+   }
+  ],
+  "58": [
+   {
+    "op": "equal",
+    "text": "Bellamy-Cruz "
+   },
+   {
+    "op": "delete",
+    "text": "levels it for Ashford Vale with"
+   },
+   {
+    "op": "insert",
+    "text": "scores"
+   },
+   {
+    "op": "equal",
+    "text": " a 0.8 xG "
+   },
+   {
+    "op": "delete",
+    "text": "strike"
+   },
+   {
+    "op": "insert",
+    "text": "finish"
+   },
+   {
+    "op": "equal",
+    "text": " in the "
+   },
+   {
+    "op": "delete",
+    "text": "90+8′, a dramatic finish"
+   },
+   {
+    "op": "insert",
+    "text": "90+8′"
+   },
+   {
+    "op": "equal",
+    "text": " to "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "make"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "move."
+   },
+   {
+    "op": "insert",
+    "text": "it 3–3."
+   }
+  ],
+  "60": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "are camped in the Ashford half, with"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " 75% of the play "
+   },
+   {
+    "op": "delete",
+    "text": "there"
+   },
+   {
+    "op": "insert",
+    "text": "in Ashford's half"
+   },
+   {
+    "op": "equal",
+    "text": " and 20 touches "
+   },
+   {
+    "op": "insert",
+    "text": "there "
+   },
+   {
+    "op": "equal",
+    "text": "in the "
+   },
+   {
+    "op": "delete",
+    "text": "attack."
+   },
+   {
+    "op": "insert",
+    "text": "latest spell."
+   }
+  ],
+  "61": [
+   {
+    "op": "equal",
+    "text": "Ashford have"
+   },
+   {
+    "op": "delete",
+    "text": " barely threatened, with"
+   },
+   {
+    "op": "equal",
+    "text": " 56% possession but only 7 touches in Rivermouth's "
+   },
+   {
+    "op": "delete",
+    "text": "half."
+   },
+   {
+    "op": "insert",
+    "text": "half in that same spell."
+   }
+  ],
+  "64": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have "
+   },
+   {
+    "op": "delete",
+    "text": "bossed"
+   },
+   {
+    "op": "insert",
+    "text": "had 53% of"
+   },
+   {
+    "op": "equal",
+    "text": " the ball in the last "
+   },
+   {
+    "op": "delete",
+    "text": "spell, with 53% possession"
+   },
+   {
+    "op": "insert",
+    "text": "spell"
+   },
+   {
+    "op": "equal",
+    "text": " and 47 touches in "
+   },
+   {
+    "op": "delete",
+    "text": "the Ashford"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford's"
+   },
+   {
+    "op": "equal",
+    "text": " half."
+   }
+  ],
+  "65": [
+   {
+    "op": "equal",
+    "text": "Ashford have "
+   },
+   {
+    "op": "delete",
+    "text": "flooded Rivermouth's half too, registering 64 touches there and keeping"
+   },
+   {
+    "op": "insert",
+    "text": "spent"
+   },
+   {
+    "op": "equal",
+    "text": " 57% of the territorial "
+   },
+   {
+    "op": "delete",
+    "text": "play."
+   },
+   {
+    "op": "insert",
+    "text": "play in Rivermouth's half and registered 64 touches there."
+   }
+  ],
+  "68": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale lead and have dropped their back line 5 metres deeper since their "
+   },
+   {
+    "op": "delete",
+    "text": "goal, pulling Rivermouth further from the penalty area."
+   },
+   {
+    "op": "insert",
+    "text": "goal."
+   }
+  ],
+  "72": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead 1–0 "
+   },
+   {
+    "op": "delete",
+    "text": "after that goal "
+   },
+   {
+    "op": "equal",
+    "text": "and have "
+   },
+   {
+    "op": "delete",
+    "text": "taken control of the ball, with"
+   },
+   {
+    "op": "insert",
+    "text": "had"
+   },
+   {
+    "op": "equal",
+    "text": " 63 per cent "
+   },
+   {
+    "op": "insert",
+    "text": "of the "
+   },
+   {
+    "op": "equal",
+    "text": "possession since the "
+   },
+   {
+    "op": "delete",
+    "text": "strike."
+   },
+   {
+    "op": "insert",
+    "text": "goal."
+   }
+  ],
+  "74": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "are"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "probing"
+   },
+   {
+    "op": "insert",
+    "text": "spent 63 per cent of this spell"
+   },
+   {
+    "op": "equal",
+    "text": " in Ashford's "
+   },
+   {
+    "op": "delete",
+    "text": "half,"
+   },
+   {
+    "op": "insert",
+    "text": "half"
+   },
+   {
+    "op": "equal",
+    "text": " with"
+   },
+   {
+    "op": "delete",
+    "text": " 63% of the play there and"
+   },
+   {
+    "op": "equal",
+    "text": " 97 touches "
+   },
+   {
+    "op": "delete",
+    "text": "inside the opposition area in this spell."
+   },
+   {
+    "op": "insert",
+    "text": "there."
+   }
+  ],
+  "75": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have pushed their back line 5 metres higher since the red "
+   },
+   {
+    "op": "delete",
+    "text": "card and are stretching the game."
+   },
+   {
+    "op": "insert",
+    "text": "card."
+   }
+  ],
+  "76": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale have dropped 9 metres deeper and tightened their shape by 224 square metres "
+   },
+   {
+    "op": "delete",
+    "text": "in"
+   },
+   {
+    "op": "insert",
+    "text": "since"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "response."
+   },
+   {
+    "op": "insert",
+    "text": "the red card."
+   }
+  ],
+  "81": [
+   {
+    "op": "delete",
+    "text": "Ashford's"
+   },
+   {
+    "op": "insert",
+    "text": "Since"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "goal"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "has"
+   },
+   {
+    "op": "insert",
+    "text": "Vale's"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "dragged"
+   },
+   {
+    "op": "insert",
+    "text": "leveller"
+   },
+   {
+    "op": "equal",
+    "text": " their back line"
+   },
+   {
+    "op": "insert",
+    "text": " has pushed"
+   },
+   {
+    "op": "equal",
+    "text": " 4 metres higher while "
+   },
+   {
+    "op": "delete",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth's"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "have"
+   },
+   {
+    "op": "insert",
+    "text": "has"
+   },
+   {
+    "op": "equal",
+    "text": " dropped 8 "
+   },
+   {
+    "op": "delete",
+    "text": "metres deeper."
+   },
+   {
+    "op": "insert",
+    "text": "metres."
+   }
+  ],
+  "82": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have spent 60% of this spell in Ashford's half and "
+   },
+   {
+    "op": "delete",
+    "text": "earned"
+   },
+   {
+    "op": "insert",
+    "text": "forced"
+   },
+   {
+    "op": "equal",
+    "text": " a "
+   },
+   {
+    "op": "delete",
+    "text": "shot, piling on the pressure late in the period."
+   },
+   {
+    "op": "insert",
+    "text": "shot."
+   }
+  ],
+  "85": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have "
+   },
+   {
+    "op": "delete",
+    "text": "dominated"
+   },
+   {
+    "op": "insert",
+    "text": "had 71 per cent of"
+   },
+   {
+    "op": "equal",
+    "text": " the ball in this "
+   },
+   {
+    "op": "delete",
+    "text": "spell, with 71 per cent possession"
+   },
+   {
+    "op": "insert",
+    "text": "spell"
+   },
+   {
+    "op": "equal",
+    "text": " and 43 touches in the Ashford half."
+   }
+  ],
+  "86": [
+   {
+    "op": "equal",
+    "text": "Ashford have"
+   },
+   {
+    "op": "delete",
+    "text": " cramped Rivermouth into their half less often, managing"
+   },
+   {
+    "op": "equal",
+    "text": " 29 per cent possession "
+   },
+   {
+    "op": "insert",
+    "text": "in the latest spell "
+   },
+   {
+    "op": "equal",
+    "text": "and 25 touches in "
+   },
+   {
+    "op": "delete",
+    "text": "the opposition"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth's"
+   },
+   {
+    "op": "equal",
+    "text": " half."
+   }
+  ],
+  "91": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "are"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "owning"
+   },
+   {
+    "op": "insert",
+    "text": "spent 66 per cent of"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "opponent"
+   },
+   {
+    "op": "insert",
+    "text": "latest"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "half,"
+   },
+   {
+    "op": "insert",
+    "text": "spell"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "with"
+   },
+   {
+    "op": "insert",
+    "text": "in"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "66%"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth's"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "of play there"
+   },
+   {
+    "op": "insert",
+    "text": "half"
+   },
+   {
+    "op": "equal",
+    "text": " and"
+   },
+   {
+    "op": "insert",
+    "text": " have"
+   },
+   {
+    "op": "equal",
+    "text": " 79 touches "
+   },
+   {
+    "op": "delete",
+    "text": "in Rivermouth's box area during the latest spell."
+   },
+   {
+    "op": "insert",
+    "text": "there."
+   }
+  ],
+  "92": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "lead"
+   },
+   {
+    "op": "insert",
+    "text": "lead,"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "after"
+   },
+   {
+    "op": "insert",
+    "text": "and"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "that"
+   },
+   {
+    "op": "insert",
+    "text": "since their"
+   },
+   {
+    "op": "equal",
+    "text": " goal "
+   },
+   {
+    "op": "delete",
+    "text": "and"
+   },
+   {
+    "op": "insert",
+    "text": "they"
+   },
+   {
+    "op": "equal",
+    "text": " have "
+   },
+   {
+    "op": "delete",
+    "text": "nudged possession up to"
+   },
+   {
+    "op": "insert",
+    "text": "held"
+   },
+   {
+    "op": "equal",
+    "text": " 57% "
+   },
+   {
+    "op": "delete",
+    "text": "since, leaving Rivermouth chasing"
+   },
+   {
+    "op": "insert",
+    "text": "of"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "ball more than before."
+   },
+   {
+    "op": "insert",
+    "text": "possession."
+   }
+  ],
+  "93": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have pushed their back line 6 metres higher since "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "that"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "goal, trying to regain territory."
+   },
+   {
+    "op": "insert",
+    "text": "goal."
+   }
+  ],
+  "99": [
+   {
+    "op": "equal",
+    "text": "Rivermouth level through Haldane, who fires in after a 6 s "
+   },
+   {
+    "op": "delete",
+    "text": "turnover"
+   },
+   {
+    "op": "insert",
+    "text": "move"
+   },
+   {
+    "op": "equal",
+    "text": " to make it 2–2."
+   }
+  ],
+  "103": [
+   {
+    "op": "equal",
+    "text": "Ashford have pushed their back line 6 m higher while Rivermouth have dropped 6 "
+   },
+   {
+    "op": "delete",
+    "text": "m, shifting the battle upfield."
+   },
+   {
+    "op": "insert",
+    "text": "m."
+   }
+  ],
+  "104": [
+   {
+    "op": "equal",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "delete",
+    "text": " press the final minutes and"
+   },
+   {
+    "op": "equal",
+    "text": " have 73% of the ball in this "
+   },
+   {
+    "op": "delete",
+    "text": "spell,"
+   },
+   {
+    "op": "insert",
+    "text": "spell"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "forcing"
+   },
+   {
+    "op": "insert",
+    "text": "and"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "have"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "action"
+   },
+   {
+    "op": "insert",
+    "text": "had"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "with eight"
+   },
+   {
+    "op": "insert",
+    "text": "8"
+   },
+   {
+    "op": "equal",
+    "text": " touches in "
+   },
+   {
+    "op": "delete",
+    "text": "the Ashford"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford's"
+   },
+   {
+    "op": "equal",
+    "text": " half."
+   }
+  ],
+  "172": [
+   {
+    "op": "equal",
+    "text": "Rivermouth have 65% of the ball, "
+   },
+   {
+    "op": "delete",
+    "text": "but"
+   },
+   {
+    "op": "insert",
+    "text": "with"
+   },
+   {
+    "op": "equal",
+    "text": " 45% of the play "
+   },
+   {
+    "op": "delete",
+    "text": "is "
+   },
+   {
+    "op": "equal",
+    "text": "in the "
+   },
+   {
+    "op": "delete",
+    "text": "Ashford Vale"
+   },
+   {
+    "op": "insert",
+    "text": "opposition"
+   },
+   {
+    "op": "equal",
+    "text": " half."
+   }
+  ],
+  "177": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale's back line is 6 m "
+   },
+   {
+    "op": "delete",
+    "text": "higher,"
+   },
+   {
+    "op": "insert",
+    "text": "higher since the goal,"
+   },
+   {
+    "op": "equal",
+    "text": " and the sides are level."
+   }
+  ],
+  "201": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale have "
+   },
+   {
+    "op": "delete",
+    "text": "more"
+   },
+   {
+    "op": "insert",
+    "text": "57%"
+   },
+   {
+    "op": "equal",
+    "text": " of the play in the opposition "
+   },
+   {
+    "op": "delete",
+    "text": "half, 57% to Rivermouth's 42%."
+   },
+   {
+    "op": "insert",
+    "text": "half."
+   }
+  ],
+  "250": [
+   {
+    "op": "delete",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth's"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "win"
+   },
+   {
+    "op": "insert",
+    "text": "Haldane"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "it"
+   },
+   {
+    "op": "insert",
+    "text": "scores 6 seconds after the ball is won"
+   },
+   {
+    "op": "equal",
+    "text": " 19 m "
+   },
+   {
+    "op": "delete",
+    "text": "out"
+   },
+   {
+    "op": "insert",
+    "text": "from"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "and Haldane scores inside 6 seconds."
+   },
+   {
+    "op": "insert",
+    "text": "goal."
+   }
+  ],
+  "272": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "hit on"
+   },
+   {
+    "op": "insert",
+    "text": "take"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "counter,"
+   },
+   {
+    "op": "insert",
+    "text": "lead as"
+   },
+   {
+    "op": "equal",
+    "text": " Whitcombe finishes in "
+   },
+   {
+    "op": "delete",
+    "text": "74′ for"
+   },
+   {
+    "op": "insert",
+    "text": "74′,"
+   },
+   {
+    "op": "equal",
+    "text": " Rivermouth 1–0 Ashford Vale."
+   }
+  ],
+  "278": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "build"
+   },
+   {
+    "op": "insert",
+    "text": "89′,"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "a"
+   },
+   {
+    "op": "insert",
+    "text": "Throgmorton"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "late move, and Throgmorton's shot at 89′ goes wide"
+   },
+   {
+    "op": "insert",
+    "text": "shoots"
+   },
+   {
+    "op": "equal",
+    "text": " from 30 metres after "
+   },
+   {
+    "op": "delete",
+    "text": "5"
+   },
+   {
+    "op": "insert",
+    "text": "a"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "seconds"
+   },
+   {
+    "op": "insert",
+    "text": "5-second"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "of"
+   },
+   {
+    "op": "insert",
+    "text": "move,"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "shot"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "move."
+   },
+   {
+    "op": "insert",
+    "text": "goes wide."
+   }
+  ],
+  "279": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead as the back line drops 6 m after the "
+   },
+   {
+    "op": "delete",
+    "text": "goal, and they hold 74% of the ball since then."
+   },
+   {
+    "op": "insert",
+    "text": "goal."
+   }
+  ],
+  "282": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "win it in"
+   },
+   {
+    "op": "insert",
+    "text": "push"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "90+8th,"
+   },
+   {
+    "op": "insert",
+    "text": "ball forward as"
+   },
+   {
+    "op": "equal",
+    "text": " Dunmore fires on target from 10 "
+   },
+   {
+    "op": "delete",
+    "text": "metres"
+   },
+   {
+    "op": "insert",
+    "text": "metres, two seconds"
+   },
+   {
+    "op": "equal",
+    "text": " after "
+   },
+   {
+    "op": "delete",
+    "text": "two"
+   },
+   {
+    "op": "insert",
+    "text": "the"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "seconds."
+   },
+   {
+    "op": "insert",
+    "text": "move starts, in the 90+8th minute."
+   }
+  ],
+  "283": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead as they "
+   },
+   {
+    "op": "delete",
+    "text": "convert"
+   },
+   {
+    "op": "insert",
+    "text": "win"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "it"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "moment"
+   },
+   {
+    "op": "insert",
+    "text": "back"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "after"
+   },
+   {
+    "op": "insert",
+    "text": "and"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "their goal, keeping"
+   },
+   {
+    "op": "insert",
+    "text": "keep"
+   },
+   {
+    "op": "equal",
+    "text": " 56% of the ball since "
+   },
+   {
+    "op": "delete",
+    "text": "then."
+   },
+   {
+    "op": "insert",
+    "text": "the goal."
+   }
+  ],
+  "287": [
+   {
+    "op": "equal",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "delete",
+    "text": " look to"
+   },
+   {
+    "op": "equal",
+    "text": " attack "
+   },
+   {
+    "op": "delete",
+    "text": "as"
+   },
+   {
+    "op": "insert",
+    "text": "ends with"
+   },
+   {
+    "op": "equal",
+    "text": " Oyelaran's 37′ "
+   },
+   {
+    "op": "delete",
+    "text": "attempt"
+   },
+   {
+    "op": "insert",
+    "text": "effort"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "ends wide, with the shot clock at 37′."
+   },
+   {
+    "op": "insert",
+    "text": "wide."
+   }
+  ],
+  "292": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale lead as Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "push and "
+   },
+   {
+    "op": "equal",
+    "text": "back line shifts"
+   },
+   {
+    "op": "insert",
+    "text": " 5 m"
+   },
+   {
+    "op": "equal",
+    "text": " higher after the goal."
+   }
+  ],
+  "304": [
+   {
+    "op": "equal",
+    "text": "Ashford "
+   },
+   {
+    "op": "delete",
+    "text": "Vale's"
+   },
+   {
+    "op": "insert",
+    "text": "Vale hold"
+   },
+   {
+    "op": "equal",
+    "text": " 64% "
+   },
+   {
+    "op": "delete",
+    "text": "share"
+   },
+   {
+    "op": "insert",
+    "text": "of the spell"
+   },
+   {
+    "op": "equal",
+    "text": " in the "
+   },
+   {
+    "op": "delete",
+    "text": "latest"
+   },
+   {
+    "op": "insert",
+    "text": "opposition"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "spell shows the pressure paying off."
+   },
+   {
+    "op": "insert",
+    "text": "half."
+   }
+  ],
+  "307": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead as they "
+   },
+   {
+    "op": "delete",
+    "text": "seize"
+   },
+   {
+    "op": "insert",
+    "text": "hold"
+   },
+   {
+    "op": "equal",
+    "text": " 62% of "
+   },
+   {
+    "op": "delete",
+    "text": "the ball"
+   },
+   {
+    "op": "insert",
+    "text": "possession"
+   },
+   {
+    "op": "equal",
+    "text": " since the "
+   },
+   {
+    "op": "delete",
+    "text": "goal, their spell of pressure matters now."
+   },
+   {
+    "op": "insert",
+    "text": "goal."
+   }
+  ],
+  "311": [
+   {
+    "op": "delete",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "keep"
+   },
+   {
+    "op": "insert",
+    "text": "Vale level from"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "ball"
+   },
+   {
+    "op": "insert",
+    "text": "goal,"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "in"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "1–1"
+   },
+   {
+    "op": "equal",
+    "text": " Ashford "
+   },
+   {
+    "op": "delete",
+    "text": "half as the goal levels the score at 1–1."
+   },
+   {
+    "op": "insert",
+    "text": "Vale."
+   }
+  ],
+  "316": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale take a 68′ shot "
+   },
+   {
+    "op": "delete",
+    "text": "from Wexley "
+   },
+   {
+    "op": "equal",
+    "text": "that finds the net, "
+   },
+   {
+    "op": "delete",
+    "text": "5"
+   },
+   {
+    "op": "insert",
+    "text": "level"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "metres"
+   },
+   {
+    "op": "insert",
+    "text": "at"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "from"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "Rivermouth's keeper."
+   },
+   {
+    "op": "insert",
+    "text": "2–2."
+   }
+  ],
+  "318": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "presses"
+   },
+   {
+    "op": "insert",
+    "text": "level with"
+   },
+   {
+    "op": "equal",
+    "text": " Ashford Vale "
+   },
+   {
+    "op": "delete",
+    "text": "as"
+   },
+   {
+    "op": "insert",
+    "text": "after"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "game"
+   },
+   {
+    "op": "insert",
+    "text": "goal, the score"
+   },
+   {
+    "op": "equal",
+    "text": " stays "
+   },
+   {
+    "op": "delete",
+    "text": "level at "
+   },
+   {
+    "op": "equal",
+    "text": "2–2."
+   }
+  ],
+  "330": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "dominate"
+   },
+   {
+    "op": "insert",
+    "text": "hold"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "territory, 42%"
+   },
+   {
+    "op": "insert",
+    "text": "53%"
+   },
+   {
+    "op": "equal",
+    "text": " of "
+   },
+   {
+    "op": "delete",
+    "text": "play"
+   },
+   {
+    "op": "insert",
+    "text": "possession"
+   },
+   {
+    "op": "equal",
+    "text": " in"
+   },
+   {
+    "op": "delete",
+    "text": " the opposition half"
+   },
+   {
+    "op": "equal",
+    "text": " this spell."
+   }
+  ],
+  "333": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "dominate"
+   },
+   {
+    "op": "insert",
+    "text": "press"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "at"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "spell with 55% of possession"
+   },
+   {
+    "op": "insert",
+    "text": "100%"
+   },
+   {
+    "op": "equal",
+    "text": " in the "
+   },
+   {
+    "op": "delete",
+    "text": "latest"
+   },
+   {
+    "op": "insert",
+    "text": "last"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "period."
+   },
+   {
+    "op": "insert",
+    "text": "spell, Ashford Vale win it high once."
+   }
+  ],
+  "335": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "must"
+   },
+   {
+    "op": "insert",
+    "text": "trail"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "chase"
+   },
+   {
+    "op": "insert",
+    "text": "0–1"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "now after the blue-and-black side go 1 up,"
+   },
+   {
+    "op": "insert",
+    "text": "as"
+   },
+   {
+    "op": "equal",
+    "text": " the score "
+   },
+   {
+    "op": "delete",
+    "text": "reads"
+   },
+   {
+    "op": "insert",
+    "text": "shows"
+   },
+   {
+    "op": "equal",
+    "text": " Rivermouth 0–1 Ashford Vale."
+   }
+  ],
+  "336": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "break through"
+   },
+   {
+    "op": "insert",
+    "text": "lead"
+   },
+   {
+    "op": "equal",
+    "text": " as Jessop "
+   },
+   {
+    "op": "delete",
+    "text": "scores,"
+   },
+   {
+    "op": "insert",
+    "text": "scores"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "minutes"
+   },
+   {
+    "op": "insert",
+    "text": "at"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "after"
+   },
+   {
+    "op": "insert",
+    "text": "11′"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the move begins,"
+   },
+   {
+    "op": "insert",
+    "text": "from"
+   },
+   {
+    "op": "equal",
+    "text": " a 0.78 xG chance."
+   }
+  ],
+  "339": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale go down to 10 after Penhallow is sent "
+   },
+   {
+    "op": "delete",
+    "text": "off"
+   },
+   {
+    "op": "insert",
+    "text": "off,"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "for"
+   },
+   {
+    "op": "insert",
+    "text": "25′"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "a"
+   },
+   {
+    "op": "insert",
+    "text": "at"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "second"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "yellow, and Rivermouth push to take control."
+   },
+   {
+    "op": "insert",
+    "text": "Vale."
+   }
+  ],
+  "340": [
+   {
+    "op": "equal",
+    "text": "Rivermouth lead as they "
+   },
+   {
+    "op": "delete",
+    "text": "seize"
+   },
+   {
+    "op": "insert",
+    "text": "keep"
+   },
+   {
+    "op": "equal",
+    "text": " the ball after the goal, moving to 63% possession since "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "Rivermouth's"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "equaliser."
+   },
+   {
+    "op": "insert",
+    "text": "goal."
+   }
+  ],
+  "342": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "keep"
+   },
+   {
+    "op": "insert",
+    "text": "press at 78%, winning"
+   },
+   {
+    "op": "equal",
+    "text": " the ball high "
+   },
+   {
+    "op": "delete",
+    "text": "up, 97 touches"
+   },
+   {
+    "op": "insert",
+    "text": "up"
+   },
+   {
+    "op": "equal",
+    "text": " in the Ashford "
+   },
+   {
+    "op": "delete",
+    "text": "half this spell."
+   },
+   {
+    "op": "insert",
+    "text": "half."
+   }
+  ],
+  "345": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "tighten"
+   },
+   {
+    "op": "insert",
+    "text": "back"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the"
+   },
+   {
+    "op": "insert",
+    "text": "line"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "unit"
+   },
+   {
+    "op": "insert",
+    "text": "is"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "after"
+   },
+   {
+    "op": "insert",
+    "text": "5 m higher since"
+   },
+   {
+    "op": "equal",
+    "text": " the red "
+   },
+   {
+    "op": "delete",
+    "text": "card, back line 5 m higher."
+   },
+   {
+    "op": "insert",
+    "text": "card."
+   }
+  ],
+  "350": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale break into 56′ "
+   },
+   {
+    "op": "delete",
+    "text": "with"
+   },
+   {
+    "op": "insert",
+    "text": "and Dunmore scores from 13 seconds into the move,"
+   },
+   {
+    "op": "equal",
+    "text": " a "
+   },
+   {
+    "op": "delete",
+    "text": "Dunmore shot that hits "
+   },
+   {
+    "op": "equal",
+    "text": "0.17 "
+   },
+   {
+    "op": "delete",
+    "text": "xG,"
+   },
+   {
+    "op": "insert",
+    "text": "xG"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "and they drive it in at the near post."
+   },
+   {
+    "op": "insert",
+    "text": "chance."
+   }
+  ],
+  "352": [
+   {
+    "op": "delete",
+    "text": "Rivermouth"
+   },
+   {
+    "op": "insert",
+    "text": "Ashford"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "go"
+   },
+   {
+    "op": "insert",
+    "text": "Vale"
+   },
+   {
+    "op": "equal",
+    "text": " level "
+   },
+   {
+    "op": "delete",
+    "text": "after Ashford Vale's goal, with"
+   },
+   {
+    "op": "insert",
+    "text": "from"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "score"
+   },
+   {
+    "op": "insert",
+    "text": "set piece, Rivermouth stare at a"
+   },
+   {
+    "op": "equal",
+    "text": " 1–1 "
+   },
+   {
+    "op": "delete",
+    "text": "as"
+   },
+   {
+    "op": "insert",
+    "text": "score"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "the clock ticks on."
+   },
+   {
+    "op": "insert",
+    "text": "line."
+   }
+  ],
+  "355": [
+   {
+    "op": "equal",
+    "text": "Rivermouth "
+   },
+   {
+    "op": "delete",
+    "text": "push"
+   },
+   {
+    "op": "insert",
+    "text": "finish the spell with 71% of the ball and 43% of play"
+   },
+   {
+    "op": "equal",
+    "text": " in the "
+   },
+   {
+    "op": "delete",
+    "text": "final spell, 71% of possession in the latest period, with pressure across the opponent's"
+   },
+   {
+    "op": "insert",
+    "text": "opposition"
+   },
+   {
+    "op": "equal",
+    "text": " half."
+   }
+  ],
+  "358": [
+   {
+    "op": "equal",
+    "text": "Rivermouth press 60% "
+   },
+   {
+    "op": "delete",
+    "text": "as"
+   },
+   {
+    "op": "insert",
+    "text": "in"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "they"
+   },
+   {
+    "op": "insert",
+    "text": "the"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "drive"
+   },
+   {
+    "op": "insert",
+    "text": "latest"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "a territorial spell"
+   },
+   {
+    "op": "insert",
+    "text": "spell,"
+   },
+   {
+    "op": "equal",
+    "text": " and "
+   },
+   {
+    "op": "delete",
+    "text": "keep "
+   },
+   {
+    "op": "equal",
+    "text": "Ashford "
+   },
+   {
+    "op": "delete",
+    "text": "on"
+   },
+   {
+    "op": "insert",
+    "text": "Vale have 15 touches in"
+   },
+   {
+    "op": "equal",
+    "text": " the "
+   },
+   {
+    "op": "delete",
+    "text": "back"
+   },
+   {
+    "op": "insert",
+    "text": "opposition"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "foot."
+   },
+   {
+    "op": "insert",
+    "text": "half."
+   }
+  ],
+  "363": [
+   {
+    "op": "equal",
+    "text": "Ashford Vale lead as Rivermouth's back line "
+   },
+   {
+    "op": "delete",
+    "text": "steps"
+   },
+   {
+    "op": "insert",
+    "text": "pushes"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "up"
+   },
+   {
+    "op": "insert",
+    "text": "higher"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "after"
+   },
+   {
+    "op": "insert",
+    "text": "since"
+   },
+   {
+    "op": "equal",
+    "text": " the goal."
+   }
+  ],
+  "472": [
+   {
+    "op": "insert",
+    "text": "Rivermouth leads "
+   },
+   {
+    "op": "equal",
+    "text": "Ashford "
+   },
+   {
+    "op": "delete",
+    "text": "lead"
+   },
+   {
+    "op": "insert",
+    "text": "Vale"
+   },
+   {
+    "op": "equal",
+    "text": " "
+   },
+   {
+    "op": "delete",
+    "text": "3–2 over Rivermouth"
+   },
+   {
+    "op": "insert",
+    "text": "3–2."
+   }
+  ]
+ },
  "next_up": [
   {
    "model": "Claude Sonnet 5.5",

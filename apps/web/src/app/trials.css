@@ -12,7 +12,6 @@
 .tr-run { display: flex; align-items: center; gap: 10px; margin-left: auto; }
 .tr-mono { font-family: var(--mp-mono); font-size: 12px; color: var(--mp-muted); }
 .tr-chip { padding: 4px 10px; background: var(--mp-raised); color: var(--mp-muted); font-family: var(--mp-display); font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
-.tr-chip--light { background: var(--mp-chip); color: var(--mp-ink); font-size: 16px; letter-spacing: 0.02em; padding: 6px 18px 6px 12px; clip-path: var(--mp-cutTab); }
 .tr-main { display: flex; flex-direction: column; gap: 20px; padding: 20px; max-width: 1440px; margin: 0 auto; }
 .tr-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 16px 18px; background: var(--mp-surface); border-top: 3px solid var(--mp-line); }
 .tr-hd { font-family: var(--mp-display); font-weight: 600; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mp-muted); }
@@ -31,9 +30,10 @@
 
 /* League table */
 .tr-table-wrap { overflow-x: auto; background: var(--mp-surface); border-top: 3px solid var(--mp-text); }
-.tr-table { min-width: 1260px; }
+.tr-table { min-width: 1190px; }
 .tr-caption { padding: 8px 16px 0; }
-.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(220px, 1.4fr) 112px 60px 64px 64px 100px 56px 70px 96px minmax(130px, 0.9fr) 112px 128px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
+.tr-caption--hint { padding-top: 2px; padding-bottom: 8px; }
+.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(220px, 1.4fr) 64px 76px 124px 56px 64px 104px 70px 96px minmax(130px, 0.9fr) 128px; column-gap: 8px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
 .tr-row:hover { background: var(--mp-raised); }
 .tr-head { min-height: 44px; background: var(--mp-input); }
 .tr-head:hover { background: var(--mp-input); }
@@ -51,7 +51,7 @@
 .tr-who { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; min-width: 0; }
 .tr-who-link { font-family: var(--mp-display); font-weight: 700; font-size: 24px; color: var(--mp-text); text-decoration: none; width: fit-content; }
 .tr-who-link::after { content: ""; position: absolute; inset: 0; }
-.tr-split { margin-top: 2px; font-family: var(--mp-body); font-weight: 400; }
+.tr-split { margin-top: 2px; color: var(--mp-muted); font-family: var(--mp-body); font-weight: 400; }
 .tr-trap { font-family: var(--mp-display); font-weight: 700; font-size: 15px; text-align: center; }
 /* The red is too dim for 15px text on the row (3.7:1); text stays light and the red underlines it. */
 .tr-trap.tr-overturned { color: var(--mp-text); text-decoration: underline 2px var(--mp-overturned); text-underline-offset: 3px; }
@@ -99,6 +99,8 @@
 /* Compare */
 .tr-crumb { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
 .tr-steps-nav { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.tr-crumb .mp-select { min-width: 0; max-width: 100%; }
+.tr-brief { margin: -10px 0 0; max-width: 80ch; }
 .tr-compare { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
 .tr-evidence { flex: 0 1 380px; min-width: 300px; display: flex; flex-direction: column; gap: 16px; }
 .tr-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -171,14 +173,6 @@
 /* Table: answer first, then how to read it */
 .tr-h1-line { display: block; }
 .tr-h1-line--sub { margin-top: 6px; font-size: 26px; color: var(--mp-text2); }
-.tr-read { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--mp-line2); }
-.tr-read-list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; font-size: 14px; color: var(--mp-text2); }
-.tr-read-list strong { font-family: var(--mp-display); text-transform: uppercase; letter-spacing: 0.04em; color: var(--mp-text); }
-.tr-how { display: flex; flex-direction: column; gap: 12px; }
-.tr-how h2 { margin: 0; }
-/* Primary columns carry the weight; the breakdown is smaller and muted. */
-.tr-num.tr-minor { font-size: 16px; font-weight: 600; color: var(--mp-muted); }
-.tr-hd--minor { font-size: 11px; }
 
 /* Fixtures cells: one compact stamp per trap */
 .tr-fx-stamps { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
@@ -197,6 +191,8 @@
 /* One top bar, one height, on every page; the desk's own controls sit in a strip directly under it. */
 html { scrollbar-gutter: stable; }
 .mp-header--strip { min-height: 64px; padding-top: 0; padding-bottom: 0; background: var(--mp-surface); }
+/* The strip's fill runs edge to edge while its controls stay in the 1440 column. */
+.mp-header--strip { box-shadow: 0 0 0 100vmax var(--mp-surface); clip-path: inset(0 -100vmax); }
 @media (max-width: 1100px) {
   .tr-bar { --tr-bar-h: 148px; flex-wrap: wrap; align-content: center; gap: 8px 16px; }
   .tr-bar .tr-run { display: none; }
@@ -209,5 +205,3 @@ html { scrollbar-gutter: stable; }
   .tr-bar .tr-nav { flex-wrap: nowrap; gap: 2px; }
   .tr-bar .tr-nav-link { padding: 0 11px; font-size: 14px; }
 }
-.tr-crumb-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.tr-crumb-field .mp-select { max-width: 100%; }

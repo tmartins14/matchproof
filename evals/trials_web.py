@@ -9,6 +9,7 @@ uv run python -m evals.trials_web evals/reports/trials/pack-v1.json    # writes 
 
 import argparse
 import asyncio
+import difflib
 import json
 import re
 import sys
@@ -356,6 +357,31 @@ def numbers_of(claim: Json, bundle: Json) -> list[Json]:
     return [{"as_written": n.as_written, "fact_id": n.fact_id} for n in found.numbers]
 
 
+def word_diff(draft: str, text: str) -> list[Json]:
+    """The draft turned into the aired text, word by word: `equal`, `delete` (draft only) and `insert`
+    (aired only) runs. Joining equal and delete gives the draft; joining equal and insert gives the text."""
+    a, b = re.findall(r"\s+|\S+", draft), re.findall(r"\s+|\S+", text)
+    ops: list[Json] = []
+
+    def add(op: str, words: list[str]) -> None:
+        if not words:
+            return
+        if ops and ops[-1]["op"] == op:
+            ops[-1]["text"] += "".join(words)
+        else:
+            ops.append({"op": op, "text": "".join(words)})
+
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(
+        None, a, b, autojunk=False
+    ).get_opcodes():
+        if tag == "equal":
+            add("equal", a[i1:i2])
+        else:
+            add("delete", a[i1:i2])
+            add("insert", b[j1:j2])
+    return ops
+
+
 def moment_of(
     store: InMemoryMatchStore,
     match_id: str,
@@ -502,6 +528,11 @@ def build_web(
         "claim_numbers": {
             str(i): numbers_of(c, all_bundles[c["fixture"]][c["beat"]])
             for i, c in enumerate(results["claims"])
+        },
+        "claim_diff": {
+            str(i): word_diff(c["draft_text"], c["text"])
+            for i, c in enumerate(results["claims"])
+            if c["verdict"] == "AMENDED" and c["lost"] is None
         },
         "next_up": next_up,
     }

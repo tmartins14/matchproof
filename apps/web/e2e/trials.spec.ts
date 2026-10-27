@@ -23,11 +23,14 @@ test("the Table loads on a direct visit and draws the export", async ({ page }) 
   await expect(page).toHaveTitle("Matchproof Narrator Trials");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(/Cleared for air: gpt-5-mini, overturned on \d+ of 14 traps\./);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(/gpt-5-nano: \d+ of 14\. Not cleared\./);
-  await expect(page.getByText("How to read this")).toBeVisible();
+  await expect(page.getByText("How to read this")).toHaveCount(0);
+  await expect(page.getByText("Click a narrator to see its worst moment beside the others. Use on Desk puts a cleared narrator on air.")).toBeVisible();
   await expect(page.getByText("85 scored moments each")).toBeVisible();
   await expect(page.getByRole("row")).toHaveCount(1 + 4 + 1); // head, four candidates, the divider
-  await expect(page.getByText("Incomplete run")).toBeVisible();
-  await expect(page.getByText(/Most accurate when it answered, but \d+ of 85 moments unanswered/)).toBeVisible();
+  await expect(page.getByText("Not ranked: missed more than 1 in 10 moments")).toBeVisible();
+  await expect(page.getByText(/Most accurate when it answered, but missed \d+ of 85 moments and takes \d+\.\d s per claim\. Also the auditor\./)).toBeVisible();
+  const heads = await page.getByRole("columnheader").allTextContents();
+  expect(heads.filter(Boolean)).toEqual(["#", "Narrator", "Stands", "Amended", "Overturned", "Pts", "Clean", "Traps", "p90", "$ / match", "Fail profile"]);
   await expect(page.getByText("Only narrator cleared for air")).toBeVisible();
   await expect(page.getByText(/\d+ of \d+ overturned/)).toHaveCount(4);
   // Use on Desk only on cleared, measured rows, and it does not open Compare.
@@ -83,8 +86,8 @@ test("a Fixtures cell shows one stamp per trap and each opens Compare at that tr
 test("an AMENDED card shows the struck span and the bucket with its reason", async ({ page }) => {
   await open(page, "/compare/fx-01/bt-000588-territorial_spell?focus=gpt-5-mini");
   const card = page.locator("#card-gpt-5-mini");
-  await expect(card.locator("del")).toContainText("are bossing the ball");
-  await expect(card.locator("ins")).toHaveText(/\S/);
+  await expect(card.locator("del").first()).toHaveText(/\S/);
+  await expect(card.locator("ins").first()).toHaveText(/\S/);
   await expect(card.getByText(/^overclaim: /)).toBeVisible();
   await page.screenshot({ path: `${OUT}/compare-amended-1440.png`, fullPage: true });
 });
@@ -115,22 +118,60 @@ test("Compare reaches every match: the Fixture select goes to its first trap, th
   await expect(page).toHaveURL(new RegExp(`/compare/fx-03/${other}\\?focus=gpt-5-nano$`));
 });
 
-test("the top bar is the same height and place on every page, and the desk's controls sit under it", async ({ page }) => {
+test("the top bar is pixel-identical on every page apart from the active nav item and stepper step", async ({ page }) => {
   for (const [name, size] of [["1440", DESK], ["390", PHONE]] as const) {
+    const shots: Buffer[] = [];
+    for (const path of ["/", "/fixtures", COMPARE, "/desk"]) {
+      await open(page, path, size);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      // Only the lit item and step may differ, so draw them as the unlit ones.
+      await page.addStyleTag({ content: '.tr-nav-link[aria-current]{background:var(--mp-raised)!important;color:var(--mp-text)!important}.tr-step[aria-current]{color:var(--mp-muted)!important;border-bottom-color:transparent!important}' });
+      shots.push(await page.locator("header.tr-bar").screenshot({ animations: "disabled" }));
+    }
+    for (const shot of shots) expect(shot.equals(shots[0]!), `top bar pixels at ${name}`).toBe(true);
     const boxes: number[][] = [];
     for (const path of ["/", "/fixtures", COMPARE, "/desk"]) {
       await open(page, path, size);
       await page.evaluate(() => window.scrollTo(0, 0));
       const box = await page.locator("header.tr-bar").boundingBox();
-      const below = await page.locator("header.tr-bar + *").first().boundingBox();
-      expect(box).not.toBeNull();
-      boxes.push([box?.x ?? -1, box?.y ?? -1, box?.width ?? -1, box?.height ?? -1, below?.y ?? -1]);
-      if (path === "/" || path === "/desk") await page.screenshot({ path: `${OUT}/${path === "/" ? "shift-table" : "shift-desk"}-${name}.png` });
+      boxes.push([box?.x ?? -1, box?.y ?? -1, box?.width ?? -1, box?.height ?? -1]);
     }
-    for (const b of boxes) expect(b, `top bar at ${name}`).toEqual(boxes[0]);
+    for (const b of boxes) expect(b, `top bar box at ${name}`).toEqual(boxes[0]);
   }
   await open(page, "/desk");
   const strip = await page.locator("header.mp-header--strip").boundingBox();
   const bar = await page.locator("header.tr-bar").boundingBox();
   expect(strip?.y).toBe((bar?.y ?? 0) + (bar?.height ?? 0));
+  // No Desk backdrop behind the bar, and one bar on the page.
+  await expect(page.locator("header.tr-bar")).toHaveCount(1);
+  expect(await page.locator("header.tr-bar").evaluate((el) => el.closest(".mp-root") === null)).toBe(true);
 });
+
+for (const width of [1440, 1280, 1024]) {
+  test(`no two text boxes in a Table row intersect at ${width}`, async ({ page }) => {
+    await open(page, "/", { width, height: 900 });
+    const clashes = await page.evaluate(() => {
+      const out: string[] = [];
+      for (const row of Array.from(document.querySelectorAll('[role="row"]'))) {
+        const boxes: { cell: number; text: string; r: DOMRect }[] = [];
+        Array.from(row.children).forEach((cell, i) => {
+          const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+          for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+            if (!n.textContent?.trim()) continue;
+            const range = document.createRange();
+            range.selectNodeContents(n);
+            for (const r of Array.from(range.getClientRects())) boxes.push({ cell: i, text: n.textContent.trim().slice(0, 30), r });
+          }
+        });
+        for (let a = 0; a < boxes.length; a++)
+          for (let b = a + 1; b < boxes.length; b++) {
+            const x = boxes[a]!, y = boxes[b]!;
+            if (x.cell === y.cell) continue;
+            if (Math.min(x.r.right, y.r.right) - Math.max(x.r.left, y.r.left) > 1 && Math.min(x.r.bottom, y.r.bottom) - Math.max(x.r.top, y.r.top) > 1) out.push(`${x.text} / ${y.text}`);
+          }
+      }
+      return out;
+    });
+    expect(clashes).toEqual([]);
+  });
+}

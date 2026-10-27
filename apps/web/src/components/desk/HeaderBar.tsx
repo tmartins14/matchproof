@@ -1,9 +1,7 @@
 import type { Copy, Lang } from "@/desk/copy";
 import type { Mode } from "@/desk/reviewParams";
-import { TopBar } from "../trials/TopBar";
 import { Scorebug } from "./Scorebug";
 import { SegmentedControl } from "./SegmentedControl";
-import { Wordmark } from "./Wordmark";
 
 interface HeaderBarProps {
   copy: Copy;
@@ -18,21 +16,17 @@ interface HeaderBarProps {
   lang: Lang;
   onMode: (mode: Mode) => void;
   onLang: (lang: Lang) => void;
-  /** The Trials top bar (lockup, nav, stepper) sits above the header; the header's own wordmark goes. */
-  topBar?: boolean;
   /** `DESK · running <model> (<rank>)` */
   deskLabel?: string;
   /** `CACHED · pack-v1`, shown next to the clock while a cached replay runs */
   cachedChip?: string;
 }
 
-export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mode, lang, onMode, onLang, topBar, deskLabel, cachedChip, replayText }: HeaderBarProps) {
+export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mode, lang, onMode, onLang, deskLabel, cachedChip, replayText }: HeaderBarProps) {
   const h = copy.header;
   return (
-    <>
-      {topBar ? <TopBar /> : null}
-    <header className={`mp-header mp-above${topBar ? " mp-header--strip" : ""}`}>
-      {topBar ? deskLabel ? <span className="tr-hd tr-desk-label">{deskLabel}</span> : null : <Wordmark first={copy.wordmark.first} second={copy.wordmark.second} />}
+    <header className="mp-header mp-header--strip mp-above">
+      {deskLabel ? <span className="tr-hd tr-desk-label">{deskLabel}</span> : null}
       <Scorebug
         label={h.score}
         homeShort={homeShort}
@@ -66,6 +60,5 @@ export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mo
         />
       </div>
     </header>
-    </>
   );
 }

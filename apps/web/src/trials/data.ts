@@ -35,6 +35,8 @@ export const beatsOf = (fixture: string): string[] => Object.keys(web.moments[fi
 /** The candidate's scored claim on a beat. */
 export const scoredClaim = (candidate: string, fixture: string, beat: string): ClaimRow | undefined =>
   web.results.claims.find((c) => c.candidate === candidate && c.fixture === fixture && c.beat === beat && c.scored);
+/** The word-level diff of an AMENDED claim, draft to aired text, as the export wrote it; undefined for any other row. */
+export const diffOf = (row: ClaimRow): TrialsWeb["claim_diff"][string] | undefined => web.claim_diff[String(web.results.claims.indexOf(row))];
 export const clockOfWorst = (w: Worst): string => momentOf(w.fixture, w.beat)?.clock ?? "";
 /** Table order: measured rows by rank, then the unmeasured rows below the divider. */
 export const tableOrder: string[] = web.order;

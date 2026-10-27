@@ -31,27 +31,6 @@ export function reasonLine(row: Pick<ClaimRow, "reason_bucket" | "reasons">): st
   return row.reason_bucket ? `${row.reason_bucket}: ${plainReason(first)}` : plainReason(first);
 }
 
-export interface AmendedParts {
-  before: string;
-  failed: string;
-  corrected: string;
-  after: string;
-}
-
-/**
- * Splits the draft around the words that changed. Returns undefined unless the pieces put back together
- * give exactly the aired text, so the card never shows a diff that does not match what went to air.
- */
-export function amendedParts(row: Pick<ClaimRow, "draft_text" | "text" | "failed_span" | "corrected_span">): AmendedParts | undefined {
-  const { draft_text: draft, text, failed_span: failed, corrected_span: corrected } = row;
-  if (!failed || !corrected) return undefined;
-  const at = draft.indexOf(failed);
-  if (at < 0) return undefined;
-  const before = draft.slice(0, at);
-  const after = draft.slice(at + failed.length);
-  return before + corrected + after === text ? { before, failed, corrected, after } : undefined;
-}
-
 /** Pairs each fail-profile bucket with its share, biggest first, for the bar and its legend. */
 export function failParts(profile: Record<string, number>): { bucket: string; share: number }[] {
   return Object.entries(profile)

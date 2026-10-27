@@ -227,7 +227,7 @@ export function Desk({ data, initial, live, trials }: DeskProps) {
     <div className="mp-root">
       <Backdrop />
       <div className="mp-shell mp-above">
-      <HeaderBar copy={c} topBar={trials !== undefined} deskLabel={trials ? fill(c.trials.desk.label, { model: trials.narrator, rank: ordinal(rankOf(trials.narrator)) }) : undefined} replayText={trials?.playingCached ? fill(c.trials.desk.replay, { pack: web.pack }) : undefined} cachedChip={trials?.playingCached ? fill(c.trials.desk.cachedChip, { pack: web.pack }) : undefined} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
+      <HeaderBar copy={c} deskLabel={trials ? fill(c.trials.desk.label, { model: trials.narrator, rank: ordinal(rankOf(trials.narrator)) }) : undefined} replayText={trials?.playingCached ? fill(c.trials.desk.replay, { pack: web.pack }) : undefined} cachedChip={trials?.playingCached ? fill(c.trials.desk.cachedChip, { pack: web.pack }) : undefined} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
       {trials ? (
         <CandidateStrip {...trials} copy={c} locked={streaming} finished={phase === "full_time" || phase === "error"} onKickoff={actions?.onKickoff ?? (() => undefined)} onNewMatch={actions?.onNewMatch ?? (() => undefined)} />
       ) : null}

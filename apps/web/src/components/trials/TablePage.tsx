@@ -21,16 +21,6 @@ function Hero() {
           <p className="tr-body">{t.hero.how}</p>
         </>
       )}
-      <div className="tr-read" aria-label={t.hero.read.title}>
-        <div className="tr-hd">{t.hero.read.title}</div>
-        <ol className="tr-read-list">
-          {(["rank", "inspect", "deploy"] as const).map((k, i) => (
-            <li key={k}>
-              <span className="tr-step-n">{i + 1}</span> <strong>{t.stepper[k]}</strong> — {t.hero.read[k]}
-            </li>
-          ))}
-        </ol>
-      </div>
     </section>
   );
 }
@@ -148,19 +138,13 @@ function NextUp() {
 export function TablePage() {
   return (
     <Shell>
-      <Hero />
+      <div className="tr-strip">
+        <Hero />
+        <Referee />
+        <Scoring />
+      </div>
       <LeagueTable />
       <Picks />
-      <section className="tr-how" aria-labelledby="how-scored">
-        <h2 id="how-scored" className="tr-hd">
-          {copy.en.trials.howScored.title}
-        </h2>
-        <p className="tr-body">{copy.en.trials.hero.how}</p>
-        <div className="tr-strip">
-          <Referee />
-          <Scoring />
-        </div>
-      </section>
       <Footer />
       <NextUp />
     </Shell>

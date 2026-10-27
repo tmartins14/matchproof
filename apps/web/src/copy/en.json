@@ -328,16 +328,7 @@
       "headline": "{models} narrator models. {fixtures} rigged fixtures. One fixed referee.",
       "how": "Every model commentates the same seeded matches, each with planted traps. Code checks every number and name. A second model checks the wording. Nothing a model says counts until it survives review.",
       "cleared": "Cleared for air: {id}, overturned on {o} of {n} traps.",
-      "worst": "{id}: {o} of {n}. Not cleared.",
-      "read": {
-        "title": "How to read this",
-        "rank": "Traps and Pts decide who's cleared.",
-        "inspect": "Click any row to see its worst moment next to the others.",
-        "deploy": "Use on Desk puts a cleared narrator on air."
-      }
-    },
-    "howScored": {
-      "title": "How it's scored"
+      "worst": "{id}: {o} of {n}. Not cleared."
     },
     "referee": {
       "title": "Referee",
@@ -354,6 +345,7 @@
     "table": {
       "label": "League table",
       "caption": "{n} scored moments each",
+      "hint": "Click a narrator to see its worst moment beside the others. Use on Desk puts a cleared narrator on air.",
       "tips": {
         "rank": "Rank among narrators that answered enough moments to be measured",
         "narrator": "The model that wrote the commentary",
@@ -368,7 +360,7 @@
         "fail": "What the failed claims got wrong",
         "form": "Verdicts on the last five moments"
       },
-      "auditorNote": "Most accurate when it answered, but {held} of {claims} moments unanswered (p90 {s} s). Also the auditor.",
+      "auditorNote": "Most accurate when it answered, but missed {held} of {claims} moments and takes {s} s per claim. Also the auditor.",
       "cols": {
         "rank": "#",
         "narrator": "Narrator",
@@ -388,7 +380,7 @@
       "worst": "worst: {note} (Fixture {fixture}, {clock})",
       "unanswered": "{held} of {claims} moments unanswered",
       "incomplete": "Incomplete run",
-      "incompleteNote": "These models did not answer enough moments to be ranked.",
+      "incompleteNote": "Not ranked: missed more than 1 in 10 moments",
       "notCleared": "Not cleared for air",
       "split": "referees split on {n}",
       "priceNotSet": "price not set",
@@ -451,10 +443,9 @@
       "crumb": "Fixture {fixture} · {home} v {away} · moment",
       "fixtureSelect": "Fixture",
       "momentSelect": "Moment",
-      "fixtureOption": "{n} · {home} v {away} · {brief}",
+      "fixtureOption": "{n} · {home} v {away}",
       "momentOption": "{clock} {label}",
       "trapOption": "{clock} TRAP · {label}",
-      "chip": "{clock} {label}",
       "freeze": "Freeze frame · {clock}",
       "sameFrame": "Same frame for every narrator.",
       "factsTitle": "Computed facts (the only numbers allowed)",

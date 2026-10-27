@@ -22,6 +22,7 @@ from evals.trials_web import (
     trap_label,
     trap_record_of,
     trim,
+    word_diff,
     worst_of,
 )
 
@@ -424,6 +425,46 @@ def test_claim_numbers_tie_each_number_to_a_fact_the_row_cites() -> None:
     for i, c in enumerate(claims):
         assert {n["fact_id"] for n in numbers[str(i)]} <= set(c["fact_ids"])
     assert any(numbers.values())
+
+
+def test_word_diff_marks_only_the_words_that_changed() -> None:
+    ops = word_diff("Ashford are down to nine men", "Ashford are down to ten men")
+    assert ops == [
+        {"op": "equal", "text": "Ashford are down to "},
+        {"op": "delete", "text": "nine"},
+        {"op": "insert", "text": "ten"},
+        {"op": "equal", "text": " men"},
+    ]
+    assert word_diff("same words", "same words") == [
+        {"op": "equal", "text": "same words"}
+    ]
+
+
+def test_claim_diff_rebuilds_the_draft_and_the_aired_text_of_every_amended_claim() -> (
+    None
+):
+    web = json.loads(
+        (ROOT / "apps" / "web" / "fixtures" / "trials" / "web-pack-v1.json").read_text(
+            "utf-8"
+        )
+    )
+    claims, diffs = web["results"]["claims"], web["claim_diff"]
+    amended = {
+        str(i)
+        for i, c in enumerate(claims)
+        if c["verdict"] == "AMENDED" and c["lost"] is None
+    }
+    assert amended and set(diffs) == amended
+    for i in amended:
+        ops = diffs[i]
+        assert (
+            "".join(o["text"] for o in ops if o["op"] != "insert")
+            == claims[int(i)]["draft_text"]
+        )
+        assert (
+            "".join(o["text"] for o in ops if o["op"] != "delete")
+            == claims[int(i)]["text"]
+        )
 
 
 def summary_row(

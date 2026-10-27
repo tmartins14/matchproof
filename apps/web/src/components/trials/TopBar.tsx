@@ -22,9 +22,12 @@ export function pageOf(pathname: string): Page {
 
 export function TopBar() {
   const t = copy.en.trials;
-  const page = pageOf(usePathname());
+  const pathname = usePathname();
+  const page = pageOf(pathname);
   const lit = STEP[page];
   const steps = [t.stepper.rank, t.stepper.inspect, t.stepper.deploy];
+  // The review screens are design checks, not Trials pages.
+  if (pathname.startsWith("/review")) return null;
   return (
     <header className="tr-bar mp-above">
       <Wordmark first={t.lockup.first} second={t.lockup.second} />

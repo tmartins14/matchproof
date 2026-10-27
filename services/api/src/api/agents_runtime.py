@@ -79,8 +79,15 @@ class AuditLedger:
 class MatchRun:
     """The agents' state for one match. Lives on the event loop."""
 
-    def __init__(self, runtime: "AgentRuntime", brief: MatchBrief) -> None:
+    def __init__(
+        self,
+        runtime: "AgentRuntime",
+        brief: MatchBrief,
+        narrator_id: str | None = None,
+        narrator: ChatClient | None = None,
+    ) -> None:
         self.match_id = brief.match_id
+        self.narrator_id = narrator_id  # None: the process-wide Narrator
         self._runtime = runtime
         self.producer = Producer(runtime.producer_client)
         self._tracks: dict[str, BeatTrack] = {}
@@ -100,12 +107,16 @@ class MatchRun:
         self.ledger = AuditLedger()
         self.down = False
         self.span: Span = runtime.tracer.start_span(
-            "match", attributes={"matchproof.match_id": self.match_id}
+            "match",
+            attributes={
+                "matchproof.match_id": self.match_id,
+                **({"matchproof.narrator": narrator_id} if narrator_id else {}),
+            },
         )
         self.context: Context = trace.set_span_in_context(self.span)
         self.deps = Deps(
             runtime.server,
-            runtime.narrator,
+            narrator or runtime.narrator,
             runtime.judge,
             producer=self.producer,
             observer=self,
@@ -359,8 +370,10 @@ class AgentRuntime:
         producer: ChatClient,
         auditor: ChatClient | None,
         clock: Callable[[str], float] = lambda _: 0.0,
+        narrator_for: Callable[[str], ChatClient] | None = None,
     ) -> None:
         self.server = server
+        self._narrator_for = narrator_for  # a live-ready candidate id to its own client
         self.clock = (
             clock  # match time viewers have reached, for the time of a correction
         )
@@ -378,11 +391,17 @@ class AgentRuntime:
         self.tracer = trace.get_tracer("matchproof.match")
         self._runs: OrderedDict[str, MatchRun] = OrderedDict()
 
-    def match(self, brief: MatchBrief) -> MatchRun:
-        """The agents' run for a match; a reconnect to the same match gets the same one."""
+    def match(self, brief: MatchBrief, narrator_id: str | None = None) -> MatchRun:
+        """The agents' run for a match; a reconnect to the same match gets the same one. With
+        `narrator_id` the match's Narrator is its own client; the referee stays shared."""
         run = self._runs.get(brief.match_id)
         if run is None:
-            run = MatchRun(self, brief)
+            client = None
+            if narrator_id is not None:
+                if self._narrator_for is None:
+                    raise ValueError("no per-match narrators are configured")
+                client = MeteredClient(self._narrator_for(narrator_id), "narrator")
+            run = MatchRun(self, brief, narrator_id, client)
             self._runs[brief.match_id] = run
             while len(self._runs) > MAX_RUNS:
                 self._runs.popitem(last=False)[1].close()

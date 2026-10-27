@@ -33,7 +33,7 @@
 .tr-table { min-width: 1200px; }
 .tr-caption { padding: 8px 16px 0; }
 .tr-caption--hint { padding-top: 2px; padding-bottom: 8px; }
-.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(190px, 1.4fr) 64px 76px 120px 56px 64px 100px 70px 96px minmax(110px, 0.9fr) 120px; column-gap: 6px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
+.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(190px, 1.4fr) 64px 76px 120px 56px 64px 100px 70px 84px 96px minmax(110px, 0.9fr) 120px; column-gap: 6px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
 .tr-row:hover { background: var(--mp-raised); }
 .tr-head { min-height: 44px; background: var(--mp-input); }
 .tr-head:hover { background: var(--mp-input); }

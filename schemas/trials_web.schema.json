@@ -5,7 +5,7 @@
   "description": "Everything the Narrator Trials pages draw: the results file plus the ranks, worst moments, picks and per-moment facts worked out in Python (seam rule 3). Written by evals/trials_web.py.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "hero", "trap_verdicts", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "claim_diff", "claim_reason", "next_up"],
+  "required": ["pack", "results", "ranks", "order", "measured", "worst", "trap_record", "fail_top", "picks", "live_ready", "live_p90_ms", "hero", "trap_verdicts", "points", "live_narrator", "fixtures", "moments", "claim_clock", "claim_numbers", "claim_diff", "claim_reason", "next_up"],
   "$defs": {
     "heroPart": {
       "type": "object",
@@ -120,14 +120,17 @@
       "type": "object",
       "description": "Over measured candidates only; each is null when nothing qualifies.",
       "additionalProperties": false,
-      "required": ["live_feed", "budget", "not_cleared", "sole"],
+      "required": ["live", "budget", "most_accurate", "not_cleared", "sole"],
       "properties": {
-        "live_feed": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "p90_ms"], "properties": { "candidate": { "type": "string" }, "p90_ms": { "type": "integer", "minimum": 0 } } }], "description": "Cleared, lowest p90_ms." },
-        "budget": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "usd_per_match": { "type": "number", "minimum": 0 } } }], "description": "Cleared, lowest numeric usd_per_match; an unpriced candidate is never the budget pick." },
+        "live": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "pts", "p90_ms"], "properties": { "candidate": { "type": "string" }, "pts": { "type": "integer" }, "p90_ms": { "type": "integer", "minimum": 0 } } }], "description": "Live-ready, highest Pts." },
+        "budget": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "usd_per_match": { "type": "number", "minimum": 0 } } }], "description": "Live-ready, lowest numeric usd_per_match; an unpriced candidate is never the budget pick." },
+        "most_accurate": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "clean_pct", "p90_ms"], "properties": { "candidate": { "type": "string" }, "clean_pct": { "type": "number" }, "p90_ms": { "type": "integer", "minimum": 0 } } }], "description": "Cleared with at least 70 answered moments, highest clean_pct; shown with its p90 even when not live-ready." },
         "not_cleared": { "anyOf": [{ "type": "null" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }] },
-        "sole": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "p90_ms", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "p90_ms": { "type": "integer", "minimum": 0 }, "usd_per_match": { "type": ["number", "null"], "minimum": 0 } } }], "description": "Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air." }
+        "sole": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["candidate", "p90_ms", "usd_per_match"], "properties": { "candidate": { "type": "string" }, "p90_ms": { "type": "integer", "minimum": 0 }, "usd_per_match": { "type": ["number", "null"], "minimum": 0 } } }], "description": "Set when exactly one measured candidate is cleared and fewer than two are live-ready: the page shows one card, Only narrator cleared for air." }
       }
     },
+    "live_ready": { "type": "object", "description": "Per candidate: cleared AND measured AND p90_ms <= live_p90_ms.", "additionalProperties": { "type": "boolean" } },
+    "live_p90_ms": { "type": "integer", "minimum": 0, "description": "The live gate, LIVE_P90_MS in evals/trials_web.py." },
     "points": {
       "type": "object",
       "description": "The Table's scale: points per scored verdict. The Desk's RECORD tile adds landed claims with it.",

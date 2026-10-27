@@ -5,16 +5,20 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import yaml
 from agents.llm_client import load_models
 from contracts.models import TrialsWeb
 
 from evals.trials import PACK_PATH, load_pack
 from evals.trials_web import (
+    LIVE_P90_MS,
     build_web,
     fail_top_of,
     hero_of,
+    is_live_ready,
     is_measured,
     live_narrator_of,
+    live_ready_ids,
     note_of,
     picks_of,
     ranks_of,
@@ -25,6 +29,7 @@ from evals.trials_web import (
     trim,
     word_diff,
     worst_of,
+    write_live_narrators,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +41,8 @@ def row(name: str, **extra: Any) -> dict[str, Any]:
         "candidate": name,
         "claims": 85,
         "held": 0,
+        "pts": 100,
+        "clean_pct": 80.0,
         "cleared": True,
         "p90_ms": 3000,
         "usd_per_match": 0.02,
@@ -257,36 +264,61 @@ def test_sole_pick_is_set_only_when_one_measured_candidate_is_cleared() -> None:
     assert one["sole"] == {"candidate": "mini", "p90_ms": 2700, "usd_per_match": 0.017}
     many = picks_of([row("a"), row("b")])
     assert many["sole"] is None
+    slow = picks_of([row("a"), row("b", p90_ms=9000)])  # two cleared, one live-ready
+    assert slow["sole"] is None
     unpriced = picks_of([row("free", usd_per_match="prices not set")])
     assert unpriced["sole"] and unpriced["sole"]["usd_per_match"] is None
     assert picks_of([row("grok", held=68)])["sole"] is None  # unmeasured does not count
 
 
-def test_picks_use_measured_cleared_rows_and_never_an_unpriced_budget() -> None:
+def test_picks_use_live_ready_rows_and_never_an_unpriced_budget() -> None:
     summary = [
-        row("mini", p90_ms=2700, usd_per_match=0.017),
+        row("mini", p90_ms=2700, usd_per_match=0.017, pts=119, clean_pct=43.5),
         row("nano", cleared=False, p90_ms=100),
-        row("free", p90_ms=4000, usd_per_match="prices not set"),
-        row(
-            "grok", held=68, p90_ms=1, usd_per_match=0.001
-        ),  # fast and cheap, unmeasured
+        row("free", p90_ms=4000, usd_per_match="prices not set", pts=150),
+        row("grok", held=68, p90_ms=1, usd_per_match=0.001),  # unmeasured
+        row("big", p90_ms=70000, pts=246, clean_pct=96.4, usd_per_match=0.07),
     ]
     picks = picks_of(summary)
-    assert picks["live_feed"] == {"candidate": "mini", "p90_ms": 2700}
+    assert picks["live"] == {"candidate": "free", "pts": 150, "p90_ms": 4000}
     assert picks["budget"] == {"candidate": "mini", "usd_per_match": 0.017}
+    assert picks["most_accurate"] == {
+        "candidate": "big",
+        "clean_pct": 96.4,
+        "p90_ms": 70000,
+    }  # not live-ready, still shown
     assert picks["not_cleared"] == ["nano"]
+    assert picks["sole"] is None
 
 
-def test_picks_are_null_when_nothing_qualifies() -> None:
-    assert picks_of([row("grok", held=68)]) == {
-        "live_feed": None,
-        "budget": None,
-        "not_cleared": None,
-        "sole": None,
-    }
-    only_unpriced = picks_of([row("free", usd_per_match="prices not set")])
-    assert only_unpriced["budget"] is None
-    assert only_unpriced["live_feed"] is not None
+def test_live_ready_is_cleared_measured_and_p90_at_most_the_gate() -> None:
+    assert LIVE_P90_MS == 6000
+    assert is_live_ready(row("a", p90_ms=6000))
+    assert not is_live_ready(row("a", p90_ms=6001))
+    assert not is_live_ready(row("a", cleared=False))
+    assert not is_live_ready(row("a", held=68))
+    assert live_ready_ids([row("a"), row("b", p90_ms=9000), row("c")]) == ["a", "c"]
+
+
+def test_most_accurate_needs_seventy_answered_moments() -> None:
+    thin = row("thin", claims=75, held=6, clean_pct=99.0)  # 69 answered
+    ok = row("ok", clean_pct=90.0)
+    assert picks_of([thin, ok])["most_accurate"]["candidate"] == "ok"
+    assert picks_of([thin])["most_accurate"] is None
+
+
+def test_live_pick_is_null_when_nothing_is_live_ready() -> None:
+    picks = picks_of([row("slow", p90_ms=9000)])
+    assert picks["live"] is None and picks["budget"] is None
+    assert picks["most_accurate"]["candidate"] == "slow"
+
+
+def test_live_narrators_file_lists_the_live_ready_ids(tmp_path: Path) -> None:
+    out = tmp_path / "live.yaml"
+    write_live_narrators(["a", "b"], out)
+    assert yaml.safe_load(out.read_text()) == {"live_ready": ["a", "b"]}
+    write_live_narrators([], out)
+    assert yaml.safe_load(out.read_text()) == {"live_ready": []}
 
 
 def test_live_narrator_is_the_candidate_on_the_models_yaml_deployment() -> None:

@@ -436,6 +436,10 @@ event_id?: string
  */
 message?: string
 /**
+ * The Narrator candidate id this match is narrated by. Only on the first status of a stream that asked for one with ?narrator=.
+ */
+narrator?: string
+/**
  * Goals so far, from intel.score.match_score. On every score status and on full_time.
  */
 score?: {
@@ -752,22 +756,31 @@ share: number
  */
 picks: {
 /**
- * Cleared, lowest p90_ms.
+ * Live-ready, highest Pts.
  */
-live_feed: (null | {
+live: (null | {
 candidate: string
+pts: number
 p90_ms: number
 })
 /**
- * Cleared, lowest numeric usd_per_match; an unpriced candidate is never the budget pick.
+ * Live-ready, lowest numeric usd_per_match; an unpriced candidate is never the budget pick.
  */
 budget: (null | {
 candidate: string
 usd_per_match: number
 })
+/**
+ * Cleared with at least 70 answered moments, highest clean_pct; shown with its p90 even when not live-ready.
+ */
+most_accurate: (null | {
+candidate: string
+clean_pct: number
+p90_ms: number
+})
 not_cleared: (null | string[])
 /**
- * Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air.
+ * Set when exactly one measured candidate is cleared and fewer than two are live-ready: the page shows one card, Only narrator cleared for air.
  */
 sole: (null | {
 candidate: string
@@ -775,6 +788,16 @@ p90_ms: number
 usd_per_match: (number | null)
 })
 }
+/**
+ * Per candidate: cleared AND measured AND p90_ms <= live_p90_ms.
+ */
+live_ready: {
+[k: string]: boolean
+}
+/**
+ * The live gate, LIVE_P90_MS in evals/trials_web.py.
+ */
+live_p90_ms: number
 /**
  * The Table's scale: points per scored verdict. The Desk's RECORD tile adds landed claims with it.
  */

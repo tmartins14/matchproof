@@ -13,7 +13,14 @@ from typing import Annotated, Any
 
 from agents.budget import MeteredClient, budget
 from agents.composer import compose
-from agents.llm_client import ChatClient, LlmClient, LlmError, client_for, from_env
+from agents.llm_client import (
+    ChatClient,
+    LlmClient,
+    LlmError,
+    client_for,
+    from_env,
+    live_narrator_ids,
+)
 from contracts.models import Event, Fact, MatchBrief, StreamMessage
 from fastapi import Body, FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -97,6 +104,7 @@ def build_agent_runtime(session: ClientSession) -> AgentRuntime:
         producer=client_for("producer"),
         auditor=client_for("auditor"),
         clock=store.last_playback,
+        narrator_for=lambda candidate: client_for("narrator", deployment=candidate),
     )
 
 
@@ -527,8 +535,14 @@ async def stream_match(
     match_id: str,
     speed: Annotated[int, Query()] = SPEED_FAST,
     last_event_id: Annotated[str | None, Header()] = None,
+    narrator: Annotated[str | None, Query()] = None,
 ) -> Response:
     brief = brief_of(match_id)
+    if narrator is not None and narrator not in live_narrator_ids():
+        raise HTTPException(
+            status_code=422,
+            detail=f"narrator must be one of {live_narrator_ids()}",
+        )
     if is_archived(match_id):
         return JSONResponse(
             status_code=409, content={"replay": f"/matches/{match_id}/replay"}
@@ -565,7 +579,13 @@ async def stream_match(
 
     agents: MatchRun | DownRun | None = None
     if agent_runtime is not None:
-        agents = agent_runtime.match(brief)
+        agents = agent_runtime.match(brief, narrator)
+        if narrator is not None and agents.narrator_id != narrator:
+            release()
+            raise HTTPException(
+                status_code=409,
+                detail=f"{match_id} is already narrated by {agents.narrator_id or 'the default'}",
+            )
     elif agents_configured:
         agents = DownRun()  # models are configured but the workflow did not start
 
@@ -580,6 +600,7 @@ async def stream_match(
                     after_seq=after,
                     store=store,
                     agents=agents,
+                    narrator=narrator,
                 )
             ):
                 yield chunk

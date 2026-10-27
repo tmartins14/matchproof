@@ -44,6 +44,7 @@
         "speed": { "type": "integer", "enum": [1, 3, 6], "description": "Match minutes per real second while cruising. Absent in focus and freeze." },
         "event_id": { "$ref": "common.schema.json#/$defs/eventId", "description": "The anchor event, on a freeze status only." },
         "message": { "type": "string", "description": "Viewer-facing text; follows docs/VOICE.md." },
+        "narrator": { "type": "string", "description": "The Narrator candidate id this match is narrated by. Only on the first status of a stream that asked for one with ?narrator=." },
         "score": {
           "type": "object",
           "additionalProperties": false,

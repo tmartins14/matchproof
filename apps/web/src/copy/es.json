@@ -347,7 +347,8 @@
     "scoring": {
       "title": "Scoring",
       "blocked": "couldn't be backed by its facts",
-      "held": "HELD (no answer from the model): not scored"
+      "held": "HELD (no answer from the model): not scored",
+      "gate": "Los puntos miden solo la precisión. La velocidad y el costo son requisitos de despliegue: en vivo exige p90 ≤ 6 s."
     },
     "table": {
       "label": "League table",
@@ -365,7 +366,8 @@
         "p90": "The narrator's own response time, 9 in 10 calls",
         "cost": "Cost of narrating one match",
         "fail": "What the failed claims got wrong",
-        "form": "Verdicts on the last five moments"
+        "form": "Verdicts on the last five moments",
+        "liveReady": "p90 ≤ 6 s: lo bastante rápido para una transmisión en vivo"
       },
       "auditorNote": "Most accurate when it answered, but missed {held} of {claims} moments and takes {s} s per claim. Also the auditor.",
       "cols": {
@@ -381,7 +383,8 @@
         "cost": "$ / match",
         "fail": "Fail profile",
         "form": "Form, last 5",
-        "traps": "Traps"
+        "traps": "Traps",
+        "liveReady": "Listo en vivo"
       },
       "provider": "Microsoft Foundry",
       "worst": "worst: {note} (Fixture {fixture}, {clock})",
@@ -398,7 +401,8 @@
       "noFails": "No failures",
       "trapsLine": "{overturned} of {total} overturned",
       "key": "Clean: stood with no fix. Referees split: the judge and the auditor disagreed. Fail profile: what the failed claims got wrong, as a share of them.",
-      "failTop": "{bucket} {pct}%"
+      "failTop": "{bucket} {pct}%",
+      "liveReadyTip": "p90 ≤ 6 s: lo bastante rápido para una transmisión en vivo"
     },
     "buckets": {
       "numbers": "numbers",
@@ -411,14 +415,16 @@
       "other": "other"
     },
     "picks": {
-      "live": "Live feed pick",
-      "liveLine": "{id} · p90 {s} s",
-      "budget": "Budget pick",
-      "budgetLine": "{id} · ${usd} per match",
       "notCleared": "Not cleared for air",
       "sole": "Only narrator cleared for air",
       "soleLine": "{id} · p90 {s} s · ${usd} per match",
-      "soleLineNoPrice": "{id} · p90 {s} s · price not set"
+      "soleLineNoPrice": "{id} · p90 {s} s · price not set",
+      "live": "Opción en vivo",
+      "liveLine": "{id} · {pts} pts · p90 {s} s",
+      "budget": "Opción económica",
+      "budgetLine": "{id} · ${usd} por partido",
+      "accurate": "Más preciso",
+      "accurateLine": "{id} · {pct}% limpio · p90 {s} s"
     },
     "footer": {
       "relegation": "Relegation rule",
@@ -500,14 +506,14 @@
       "fixture": "Fixture",
       "fixtureOption": "Fixture {n} · {home} v {away} · {brief}",
       "trap": "TRAP {clock}",
-      "runLive": "Run narrator",
-      "runCached": "Replay cached",
+      "runLive": "Ejecutar en vivo",
+      "runCached": "Reproducir ejecución del paquete",
       "cachedChip": "CACHED · {pack}",
       "replay": "REPLAY · {pack}",
       "cachedSpeed": "Cached replays run at 6×",
       "cachedOnly": "Cached runs play pack fixtures only",
-      "fallback": "Live unavailable. Replay this fixture from {pack}?",
-      "fallbackButton": "Replay cached",
+      "fallback": "La narración en vivo no está disponible ahora. ¿Reproducir la ejecución del paquete de este modelo?",
+      "fallbackButton": "Reproducir ejecución del paquete",
       "recordTitle": "RECORD · {model} · THIS FIXTURE",
       "recordLine": "{stands} stands · {amended} amended · {overturned} overturned · {checking} checking",
       "recordPts": "{pts} pts so far",

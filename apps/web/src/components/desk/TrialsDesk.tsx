@@ -4,8 +4,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { MatchBrief } from "@/contracts/types";
 import type { ReviewState } from "@/desk/reviewParams";
-import { deskCandidates, fixtureById, fixtureIds, liveNarrator } from "@/trials/data";
+import { deskCandidates, fixtureById, fixtureIds, isLiveReady } from "@/trials/data";
 import { useCachedMatch } from "@/live/useCachedMatch";
+import { PAUSED_NOTICE } from "@/live/accumulate";
 import { useLiveMatch, type LiveMatch } from "@/live/useLiveMatch";
 import type { Failure } from "@/live/api";
 import { Desk } from "./Desk";
@@ -50,9 +51,12 @@ export function TrialsDesk({ initial, narrator: wantedNarrator, fixture: wantedF
   const [playing, setPlaying] = useState<"live" | "cached" | undefined>(undefined);
   // The live failure we already offered a replay for, so a new failure offers it again.
   const [dismissed, setDismissed] = useState(0);
-  const cachedMode = narrator !== liveNarrator;
+  const liveReady = isLiveReady(narrator);
+  const cachedMode = !liveReady;
   const failed = live.problem && FALLBACK_REASONS.includes(live.problem.reason) ? live.problem : undefined;
-  const fallback = !cachedMode && failed !== undefined && failed.id !== dismissed && playing !== "cached";
+  // Narration paused by the daily token cap means a live run that airs no claims: offer the replay too.
+  const paused = playing === "live" && live.data.notices.some((n) => n.text === PAUSED_NOTICE);
+  const fallback = liveReady && ((failed !== undefined && failed.id !== dismissed) || paused) && playing !== "cached";
 
   const go = (next: { narrator: string; fixture: string }): void => {
     live.reset(briefOf(next.fixture));
@@ -74,13 +78,14 @@ export function TrialsDesk({ initial, narrator: wantedNarrator, fixture: wantedF
       cached.reset(brief);
       setPlaying(undefined);
     },
-    kickoff: async (brief, speed) => {
-      if (cachedMode) {
+    // The run is the viewer's choice: "live" streams with ?narrator=<id>, "cached" replays the pack run.
+    kickoff: async (brief, speed, mode) => {
+      if (cachedMode || mode === "cached") {
         setPlaying("cached");
         return cached.kickoff(brief, speed);
       }
       setPlaying("live");
-      return live.kickoff(brief, speed);
+      return live.kickoff(brief, speed, narrator);
     },
   };
 
@@ -94,7 +99,10 @@ export function TrialsDesk({ initial, narrator: wantedNarrator, fixture: wantedF
         narrator,
         fixture,
         cachedMode,
+        liveReady,
         playingCached: playing === "cached",
+        playingLive: playing === "live",
+        streamNarrator: playing === "live" ? live.data.narrator : undefined,
         fallback,
         onNarrator: (id) => go({ narrator: id, fixture }),
         onFixture: (id) => go({ narrator, fixture: id }),

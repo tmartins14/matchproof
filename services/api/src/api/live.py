@@ -393,8 +393,9 @@ class _Feed:
 class _Builder:
     """Numbers messages and keeps their match clock from running backwards."""
 
-    def __init__(self, speed: int) -> None:
+    def __init__(self, speed: int, narrator: str | None = None) -> None:
         self.speed = speed
+        self._narrator = narrator  # said once, on the first status
         self._seq = 0
         self._t = 0.0
 
@@ -424,6 +425,9 @@ class _Builder:
             data["message"] = text
         if score is not None:
             data["score"] = score
+        if self._narrator is not None:
+            data["narrator"] = self._narrator
+            self._narrator = None
         return self.message("status", t, data)
 
 
@@ -486,10 +490,11 @@ class _Timeline:
 
 
 async def schedule(
-    feed: _Feed, speed: int, control: _Control
+    feed: _Feed, speed: int, control: _Control, narrator: str | None = None
 ) -> AsyncGenerator[tuple[float, StreamMessage], None]:
-    """Messages with the real second (from the start) each is due, in order."""
-    builder = _Builder(speed)
+    """Messages with the real second (from the start) each is due, in order. `narrator` is put on the
+    first status message."""
+    builder = _Builder(speed, narrator)
     timeline = _Timeline(speed, feed, builder)
     frame_gap = speed * SECONDS_PER_MINUTE / WIRE_FPS + FRAME_GUARD_S
     next_frame_t = 0.0
@@ -662,6 +667,7 @@ async def run_live(
     store: MatchStore | None = None,
     agents: MatchRun | DownRun | None = None,
     until_s: float | None = None,
+    narrator: str | None = None,
 ) -> AsyncGenerator[StreamMessage, None]:
     """The match as stream messages, each sent when its turn on the timeline comes.
 
@@ -693,7 +699,9 @@ async def run_live(
         daemon=True,
     )
     worker.start()
-    plan = schedule(_Feed(queue), speed, control)
+    if narrator is None and isinstance(agents, MatchRun):
+        narrator = agents.narrator_id
+    plan = schedule(_Feed(queue), speed, control, narrator)
     track = _AgentTrack(agents, after_seq + 1) if agents is not None else None
     unsubscribe_audits = agents.subscribe(track.audited) if agents and track else None
     unsubscribe_corrections = (

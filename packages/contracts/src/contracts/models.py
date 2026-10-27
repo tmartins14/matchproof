@@ -764,11 +764,12 @@ class FailTop(BaseModel):
     share: Annotated[float, Field(ge=0.0, le=1.0)]
 
 
-class LiveFeed(BaseModel):
+class Live(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     candidate: str
+    pts: int
     p90_ms: Annotated[int, Field(ge=0)]
 
 
@@ -778,6 +779,15 @@ class Budget(BaseModel):
     )
     candidate: str
     usd_per_match: Annotated[float, Field(ge=0.0)]
+
+
+class MostAccurate(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidate: str
+    clean_pct: float
+    p90_ms: Annotated[int, Field(ge=0)]
 
 
 class NotCleared(RootModel[list[str]]):
@@ -797,18 +807,24 @@ class Picks(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    live_feed: Annotated[LiveFeed | None, Field(description='Cleared, lowest p90_ms.')]
+    live: Annotated[Live | None, Field(description='Live-ready, highest Pts.')]
     budget: Annotated[
         Budget | None,
         Field(
-            description='Cleared, lowest numeric usd_per_match; an unpriced candidate is never the budget pick.'
+            description='Live-ready, lowest numeric usd_per_match; an unpriced candidate is never the budget pick.'
+        ),
+    ]
+    most_accurate: Annotated[
+        MostAccurate | None,
+        Field(
+            description='Cleared with at least 70 answered moments, highest clean_pct; shown with its p90 even when not live-ready.'
         ),
     ]
     not_cleared: NotCleared | None
     sole: Annotated[
         Sole | None,
         Field(
-            description='Set when exactly one measured candidate is cleared: the page shows one card, Only narrator cleared for air.'
+            description='Set when exactly one measured candidate is cleared and fewer than two are live-ready: the page shows one card, Only narrator cleared for air.'
         ),
     ]
 
@@ -1011,6 +1027,12 @@ class Status(BaseModel):
     ] = None
     message: Annotated[
         str | None, Field(description='Viewer-facing text; follows docs/VOICE.md.')
+    ] = None
+    narrator: Annotated[
+        str | None,
+        Field(
+            description='The Narrator candidate id this match is narrated by. Only on the first status of a stream that asked for one with ?narrator=.'
+        ),
     ] = None
     score: Annotated[
         Score | None,
@@ -1436,6 +1458,16 @@ class TrialsWeb(BaseModel):
         Field(
             description='Over measured candidates only; each is null when nothing qualifies.'
         ),
+    ]
+    live_ready: Annotated[
+        dict[str, bool],
+        Field(
+            description='Per candidate: cleared AND measured AND p90_ms <= live_p90_ms.'
+        ),
+    ]
+    live_p90_ms: Annotated[
+        int,
+        Field(description='The live gate, LIVE_P90_MS in evals/trials_web.py.', ge=0),
     ]
     points: Annotated[
         Points,

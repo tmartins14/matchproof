@@ -45,4 +45,5 @@ export async function getSource(matchId: string, sourceId: string): Promise<Sour
   return result.ok ? result.value : undefined;
 }
 
-export const streamUrl = (matchId: string, speed: number): string => `${API_URL}/matches/${encodeURIComponent(matchId)}/stream?speed=${speed}`;
+export const streamUrl = (matchId: string, speed: number, narrator?: string): string =>
+  `${API_URL}/matches/${encodeURIComponent(matchId)}/stream?speed=${speed}${narrator ? `&narrator=${encodeURIComponent(narrator)}` : ""}`;

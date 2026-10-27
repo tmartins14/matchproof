@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MatchBrief } from "@/contracts/types";
-import { copy as copies, fill, type Lang } from "@/desk/copy";
+import { copy as copies, fill, type Copy, type Lang } from "@/desk/copy";
 import type { DeskData, Phase } from "@/desk/deskData";
 import { formatClock } from "@/desk/format";
 import { buildModel } from "@/desk/model";
@@ -21,7 +21,7 @@ import { compareHref, scoredVerdicts, web } from "@/trials/data";
 import { landedOf, recordOf } from "@/trials/record";
 import { Pitch } from "@/viz/Pitch";
 import { PitchLegend } from "@/viz/PitchLegend";
-import { CandidateStrip, ordinal, type TrialsDeskProps } from "./CandidateStrip";
+import { CandidateStrip, ordinal, type RunMode, type TrialsDeskProps } from "./CandidateStrip";
 import { EvidenceRail } from "./EvidenceRail";
 import { HeaderBar } from "./HeaderBar";
 import { KeyMomentFeed } from "./KeyMomentFeed";
@@ -40,7 +40,10 @@ interface DeskProps {
   data: DeskData;
   initial: ReviewState;
   /** The live controls; absent when the desk shows the static fixture. */
-  live?: Omit<LiveMatch, "data">;
+  live?: Omit<LiveMatch, "data" | "kickoff"> & {
+    /** `mode` is the viewer's choice on the Trials desk; absent elsewhere */
+    kickoff: (brief: MatchBrief, speed: Speed, mode?: RunMode) => Promise<MatchBrief | undefined>;
+  };
   /** Set on the Trials desk: the narrator and fixture strip, cached replay and the RECORD tile. */
   trials?: TrialsDeskProps;
 }
@@ -50,6 +53,13 @@ const STREAMING: Phase[] = ["connecting", "live", "focus", "freeze", "half_time"
 function withTactics(brief: MatchBrief, t: Tactics): MatchBrief {
   const side = (team: MatchBrief["home"], s: Tactics["home"]): MatchBrief["home"] => ({ ...team, formation: s.formation, press: s.dials[0], directness: s.dials[1], line_height: s.dials[2] });
   return { ...brief, home: side(brief.home, t.home), away: side(brief.away, t.away) };
+}
+
+/** `DESK · running <id> (<rank>)`, and `· LIVE` once the stream's status message has named the narrator. */
+function deskLabelOf(c: Copy, trials: TrialsDeskProps): string {
+  const model = trials.streamNarrator ?? trials.narrator;
+  const label = fill(c.trials.desk.label, { model, rank: ordinal(rankOf(model)) });
+  return trials.streamNarrator ? `${label} · ${c.trials.desk.live}` : label;
 }
 
 export function Desk({ data, initial, live, trials }: DeskProps) {
@@ -165,6 +175,15 @@ export function Desk({ data, initial, live, trials }: DeskProps) {
     setFetched({});
   }
 
+  const kickoff = (mode?: RunMode): void => {
+    if (!live) return;
+    unpin();
+    const text = briefText ?? brief.brief_text;
+    void live.kickoff(text ? { ...brief, brief_text: text } : brief, speed, mode).then((played) => {
+      if (played) setBrief(played);
+    });
+  };
+
   const actions: SetupActions | undefined = live
     ? {
         locked: streaming,
@@ -206,13 +225,7 @@ export function Desk({ data, initial, live, trials }: DeskProps) {
             setPackMatch(false);
           });
         },
-        onKickoff: () => {
-          unpin();
-          const text = briefText ?? brief.brief_text;
-          void live.kickoff(text ? { ...brief, brief_text: text } : brief, speed).then((played) => {
-            if (played) setBrief(played);
-          });
-        },
+        onKickoff: () => kickoff(),
         onNewMatch: () => {
           unpin();
           live.reset(brief);
@@ -225,9 +238,9 @@ export function Desk({ data, initial, live, trials }: DeskProps) {
   return (
     <div className="mp-above">
       <div className="mp-shell mp-above">
-      <HeaderBar copy={c} deskLabel={trials ? fill(c.trials.desk.label, { model: trials.narrator, rank: ordinal(rankOf(trials.narrator)) }) : undefined} replayText={trials?.playingCached ? fill(c.trials.desk.replay, { pack: web.pack }) : undefined} cachedChip={trials?.playingCached ? fill(c.trials.desk.cachedChip, { pack: web.pack }) : undefined} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
+      <HeaderBar copy={c} deskLabel={trials ? deskLabelOf(c, trials) : undefined} replayText={trials?.playingCached ? fill(c.trials.desk.replay, { pack: web.pack }) : undefined} cachedChip={trials?.playingCached ? fill(c.trials.desk.cachedChip, { pack: web.pack }) : undefined} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
       {trials ? (
-        <CandidateStrip {...trials} copy={c} locked={streaming} finished={phase === "full_time" || phase === "error"} onKickoff={actions?.onKickoff ?? (() => undefined)} onNewMatch={actions?.onNewMatch ?? (() => undefined)} />
+        <CandidateStrip {...trials} copy={c} locked={streaming} finished={phase === "full_time" || phase === "error"} onRun={kickoff} onNewMatch={actions?.onNewMatch ?? (() => undefined)} />
       ) : null}
       <MatchSetupBar
         copy={c}

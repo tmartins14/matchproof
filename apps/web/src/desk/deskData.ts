@@ -60,6 +60,8 @@ export interface DeskData {
   /** cruising speed from the stream's statuses */
   speed: number | undefined;
   notices: ViewerNotice[];
+  /** the Narrator the server says this match runs on (first status of a stream that asked for one) */
+  narrator: string | undefined;
   /** lookups the accumulator keeps; claim id to its slot in `claims`, fact ids already stored */
   claimSlot: Map<string, number>;
   factIds: Set<string>;
@@ -94,6 +96,7 @@ export function emptyDesk(brief: MatchBrief, source: DeskData["source"]): DeskDa
     freezeEventId: undefined,
     speed: undefined,
     notices: [],
+    narrator: undefined,
     claimSlot: new Map(),
     factIds: new Set(),
     awaitingFreezeFrame: false,

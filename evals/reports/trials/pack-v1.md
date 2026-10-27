@@ -1,11 +1,11 @@
 # Narrator Trials, pack-v1
 
-Run 2026-10-27T03:15:16Z at 369f14f. Judge gpt-5-mini, auditor judge-grok (grok-4.7). Referee cost: 1.6600 USD.
+Run 2026-10-27T04:40:31Z at 45bc65a. Judge gpt-5-mini, auditor judge-grok (grok-4.7). Referee cost: 2.0914 USD.
 
 | # | Candidate | Pts | Clean | Stands | Amended | Overturned | Held | p90 | On-air p90 | USD/match | Auditor agrees | Split | |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | gpt-4.1 | 217 | 80.0% | 68 | 16 | 1 | 0 | 2812 ms | 5554 ms | 0.0804 | 89% | 0/1 | Cleared for air |
-| 2 | grok-4.7 | 207 | 95.8% | 68 | 3 | 0 | 14 | 50805 ms | 60052 ms | 0.0585 | 100% | 0/0 | Cleared for air; audited by its own model |
+| 1 | grok-4.7 | 246 | 96.4% | 81 | 3 | 0 | 1 | 70184 ms | 76049 ms | 0.0697 | 99% | 0/0 | Cleared for air; audited by its own model |
+| 2 | gpt-4.1 | 217 | 80.0% | 68 | 16 | 1 | 0 | 2812 ms | 5554 ms | 0.0804 | 89% | 0/1 | Cleared for air |
 | 3 | gpt-5.4-mini | 169 | 61.2% | 52 | 28 | 5 | 0 | 1940 ms | 7155 ms | 0.0483 | 86% | 1/2 | Cleared for air |
 | 4 | gpt-5-mini | 119 | 43.5% | 37 | 38 | 10 | 0 | 2894 ms | 7521 ms | 0.0164 | 79% | 2/5 | Cleared for air |
 | 5 | gpt-5-nano | -140 | 7.1% | 6 | 19 | 59 | 1 | 2485 ms | 7728 ms | prices not set | 59% | 3/21 | Not cleared for air |
@@ -13,20 +13,6 @@ Run 2026-10-27T03:15:16Z at 369f14f. Judge gpt-5-mini, auditor judge-grok (grok-
 
 ## Errors
 
-- grok-4.7 fx-01: bt-001664-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-01: bt-002101-high_turnover_chance: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-01: bt-001962-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-02: bt-001815-set_piece_goal: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-03: bt-000390-open_play_goal: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-03: bt-000449-high_turnover_chance: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-03: bt-000390-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-05: bt-000250-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-05: bt-000536-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-05: bt-001246-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-05: bt-001542-territorial_spell: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-06: bt-000266-territorial_spell: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-06: bt-001730-set_piece_goal: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-06: bt-002020-momentum_swing: Narrator: LlmError (APITimeoutError)
 - gpt-5-nano fx-01: bt-001374-card: ValueError(put_claims rejected claims: [{'index': 1, 'claim_id': 'cl-001374-card-02', 'accepted': False, 'errors': ['Unknown fact id fx-1301.']}])
 - gpt-5-nano fx-02: bt-000481-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000481-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-freeze_frame-ev-000481-ball_won_distance.']}])
 - gpt-5-nano fx-03: bt-000390-open_play_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000390-open_play_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-000390-seconds.']}])
@@ -108,6 +94,7 @@ fact_ids.2
 - phi-4-mini fx-06: bt-002020-momentum_swing: Narrator: LlmError (APITimeoutError)
 - phi-4-mini fx-06: bt-002174-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002174-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-corner.']}, {'index': 1, 'claim_id': 'cl-002174-territorial_spell-02', 'accepted': False, 'errors': ['Unknown fact id fx-draws-defenders.', 'Unknown fact id fx-xg.']}])
 - gpt-5.4-mini fx-01: bt-002178-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002178-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-002178-seconds.']}])
+- grok-4.7 fx-05: bt-000536-momentum_swing: Narrator: LlmError (APITimeoutError)
 
 ## Overturned
 

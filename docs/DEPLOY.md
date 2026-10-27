@@ -156,14 +156,9 @@ azd provision
 
 The apex `tylermartins.com` needs a CAA record authorizing DigiCert (`0 issue "digicert.com"`) next to any existing CAA records, or `hostname set` is rejected.
 
-**Drift (Oct 27):** the live Container App has `WEB_ORIGINS` set by `az containerapp update`, not by `azd provision`, because the provision preview also touched Foundry and other resources. The command used:
+**Oct 27:** `WEB_ORIGINS` was first set on the live Container App with `az containerapp update --set-env-vars` (the provision preview also touched Foundry and other resources), then reconciled by `azd provision` from `CUSTOM_WEB_ORIGIN`. The live value is now both origins, and `scripts/smoke_prod.sh` passes against each.
 
-```bash
-az containerapp update -n ca-api-oou4h3al -g rg-matchproof-dev \
-  --set-env-vars "WEB_ORIGINS=https://gray-sand-08c45ef0f.2.azurestaticapps.net,https://matchproof.tylermartins.com"
-```
-
-`CUSTOM_WEB_ORIGIN` is already set in the azd env, so the next `azd provision` reconciles `WEB_ORIGINS` to the same two origins from `infra/main.bicep`.
+**Always run `azd deploy api` after `azd provision`.** `infra/modules/containerapp.bicep` sets the image to the `containerapps-helloworld` placeholder, so provision replaces the running API image with it and the new revision takes 100% of traffic. Oct 27 provision did this; `azd deploy api` restored the real image. Check `az containerapp revision list -n <api> -g <rg> --query "[?properties.active].properties.template.containers[0].image"` before relying on the API.
 
 ## Smoke test
 

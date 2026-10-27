@@ -9,6 +9,7 @@ interface SegmentedControlProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   disabled?: boolean;
+  title?: string;
 }
 
 export type SegmentCut = "cutStart" | "cutEnd" | "cut";
@@ -22,9 +23,9 @@ export function segmentCut(index: number, count: number): SegmentCut {
 
 const CUT_CLASS: Record<SegmentCut, string> = { cutStart: "mp-cut-start", cutEnd: "mp-cut-end", cut: "mp-cut" };
 
-export function SegmentedControl<T extends string>({ label, options, value, onChange, disabled }: SegmentedControlProps<T>) {
+export function SegmentedControl<T extends string>({ label, options, value, onChange, disabled, title }: SegmentedControlProps<T>) {
   return (
-    <div className="mp-seg" role="group" aria-label={label}>
+    <div className="mp-seg" role="group" aria-label={label} title={title}>
       {options.map((option, index) => {
         const cut = segmentCut(index, options.length);
         return (

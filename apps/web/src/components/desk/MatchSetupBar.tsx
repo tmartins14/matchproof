@@ -88,7 +88,7 @@ export function MatchSetupBar(props: MatchSetupBarProps) {
             {s.randomize}
           </Button>
           {actions ? (
-            <SegmentedControl label={s.speed} value={String(actions.speed) as "1" | "3" | "6"} disabled={locked} onChange={(v) => actions.onSpeed(Number(v) as 1 | 3 | 6)} options={[{ value: "1", label: "1×" }, { value: "3", label: "3×" }, { value: "6", label: "6×" }]} />
+            <SegmentedControl label={s.speed} value={String(actions.speed) as "1" | "3" | "6"} disabled={locked} onChange={(v) => actions.onSpeed(Number(v) as 1 | 3 | 6)} title={s.speedTip} options={[{ value: "1", label: s.speedSlow }, { value: "3", label: s.speedNormal }, { value: "6", label: s.speedFast }]} />
           ) : null}
           {cachedOnly ? <span className="tr-sub">{copy.trials.desk.cachedSpeed}</span> : null}
           {actions?.inStrip ? null : actions?.finished ? (

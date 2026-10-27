@@ -27,7 +27,7 @@ test("kicking off plays the recorded match to full time", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/desk");
   await expect(page.getByRole("button", { name: "Watch cached replay" })).toBeDisabled();
-  await page.getByRole("button", { name: "6×" }).click();
+  await page.getByRole("button", { name: "Fast · 6 min/s" }).click();
   await page.getByRole("button", { name: "Kick off live" }).click();
 
   const scorebug = page.getByRole("group", { name: "Score" });

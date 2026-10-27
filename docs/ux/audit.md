@@ -36,11 +36,11 @@ Severity: blocker = cannot complete a task or broken/misleading content; major =
 | F06 | major | fixed | Non-STANDS cards list the facts the claim cited, so "not named by any cited fact" can be checked against the fact list. The reason wording itself is the referee's and is unchanged. |
 | F07 | major | fixed | The export now carries one reason line per claim (`claim_reason`); the Table's note is that line cut to length and Compare shows the same line (before, Compare printed the first reason under the bucket label of another). |
 | F08 | major | fixed | The hero says what a trap is; the Referee card says gpt-5-mini also judges; a key under the Table explains Clean, Referees split and Fail profile. |
-| F09 | minor | open | Desk label says RUNNING before a run starts. |
+| F09 | minor | fixed | The Desk reads "DESK · READY · <model>" until Run is pressed and "RUNNING" only during a run; the speed control is labelled "Match pace" (Slow · 1 min/s, Normal · 3 min/s, Fast · 6 min/s) with a tooltip. |
 | F10 | major | fixed | HELD is the one word everywhere; the Fixtures note maps S, A, O, H and says the grid shows the 14 trap moments. |
 | F11 | minor | open | Amended redline reads badly as copied text. |
 | F12 | minor | fixed | Text links are 44 px tall (checked at 390 on the sample). |
-| F13 | minor | open | Unknown routes show the host's default 404 page. |
+| F13 | minor | fixed | Unknown routes show a branded 404 with the top bar and a link home (`not-found.tsx`; `staticwebapp.config.json` rewrites 404 to `/404.html`). |
 
 Also in Part C, at the user's request: the Desk's angled-stripe backdrop now sits behind every page, below the top bar.
 
@@ -98,4 +98,4 @@ The clipped count went up for one reason, and it is not text: every page now sit
 
 Deployed screenshots (Table, an AMENDED Compare moment and the Desk, at 1440 and 390): `deployed/`.
 
-Open for Tyler: F09, F11, F13 (all minor).
+Open for Tyler: F11 (minor).

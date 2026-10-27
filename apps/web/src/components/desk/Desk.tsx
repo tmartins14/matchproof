@@ -55,10 +55,10 @@ function withTactics(brief: MatchBrief, t: Tactics): MatchBrief {
   return { ...brief, home: side(brief.home, t.home), away: side(brief.away, t.away) };
 }
 
-/** `DESK · running <id> (<rank>)`, and `· LIVE` once the stream's status message has named the narrator. */
-function deskLabelOf(c: Copy, trials: TrialsDeskProps): string {
+/** `DESK · RUNNING <id> (<rank>)` during a run, `DESK · READY · <id> (<rank>)` otherwise, and `· LIVE` once the stream's status message has named the narrator. */
+function deskLabelOf(c: Copy, trials: TrialsDeskProps, running: boolean): string {
   const model = trials.streamNarrator ?? trials.narrator;
-  const label = fill(c.trials.desk.label, { model, rank: ordinal(rankOf(model)) });
+  const label = fill(running ? c.trials.desk.label : c.trials.desk.labelReady, { model, rank: ordinal(rankOf(model)) });
   return trials.streamNarrator ? `${label} · ${c.trials.desk.live}` : label;
 }
 
@@ -238,7 +238,7 @@ export function Desk({ data, initial, live, trials }: DeskProps) {
   return (
     <div className="mp-above">
       <div className="mp-shell mp-above">
-      <HeaderBar copy={c} deskLabel={trials ? deskLabelOf(c, trials) : undefined} replayText={trials?.playingCached ? fill(c.trials.desk.replay, { pack: web.pack }) : undefined} cachedChip={trials?.playingCached ? fill(c.trials.desk.cachedChip, { pack: web.pack }) : undefined} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
+      <HeaderBar copy={c} deskLabel={trials ? deskLabelOf(c, trials, streaming) : undefined} replayText={trials?.playingCached ? fill(c.trials.desk.replay, { pack: web.pack }) : undefined} cachedChip={trials?.playingCached ? fill(c.trials.desk.cachedChip, { pack: web.pack }) : undefined} homeShort={brief.home.short} awayShort={brief.away.short} score={score} clock={formatClock(model.clock)} status={headerStatus} mode={mode} lang={lang} onMode={setMode} onLang={setLang} />
       {trials ? (
         <CandidateStrip {...trials} copy={c} locked={streaming} finished={phase === "full_time" || phase === "error"} onRun={kickoff} onNewMatch={actions?.onNewMatch ?? (() => undefined)} />
       ) : null}

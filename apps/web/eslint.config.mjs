@@ -15,7 +15,7 @@ const config = [
   },
   {
     // Next.js requires default exports for pages, layouts and config.
-    files: ["src/app/**/{page,layout}.tsx", "next.config.ts", "eslint.config.mjs", "playwright.config.ts", "vitest.config.mts"],
+    files: ["src/app/**/{page,layout,not-found}.tsx", "next.config.ts", "eslint.config.mjs", "playwright.config.ts", "vitest.config.mts"],
     rules: { "no-restricted-exports": "off" },
   },
 ];

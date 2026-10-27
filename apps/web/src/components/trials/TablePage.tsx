@@ -164,8 +164,8 @@ export function TablePage() {
         <Referee />
         <Scoring />
       </div>
-      <LeagueTable />
       <Picks />
+      <LeagueTable />
       <Footer />
       <NextUp />
     </Shell>

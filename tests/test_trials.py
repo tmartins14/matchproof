@@ -505,7 +505,7 @@ def test_trial_settings_known_and_unknown() -> None:
         "json_schema",
         "minimal",
     )
-    assert trial_settings(models, "grok-4.7").deployment == "judge-grok"
+    assert trial_settings(models, "grok-4.7").deployment == "narrator-grok"
     with pytest.raises(LlmError) as err:
         trial_settings(models, "not-a-model")
     assert err.value.cause_name == "UnknownCandidate"
@@ -536,6 +536,7 @@ def merge_pair() -> tuple[dict[str, Any], dict[str, Any]]:
     target = json.loads(
         (ROOT / "evals" / "reports" / "trials" / "pack-v1.json").read_text("utf-8")
     )
+    target.pop("merges", None)  # the file may already carry merges of its own
     donor = next(r for r in target["summary"] if r["candidate"] == "gpt-5-mini")
     entry = next(c for c in target["candidates"] if c["id"] == "gpt-5-mini")
     row = {**copy.deepcopy(donor), "candidate": "newcomer", "pts": 500}

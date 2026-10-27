@@ -451,6 +451,14 @@ pack: string
 run_at: string
 git_sha: string
 /**
+ * Runs of single candidates merged into this file after the first run (`--merge-into`), oldest first. Absent when the file is one run.
+ */
+merges?: {
+candidates: string[]
+run_at: string
+git_sha: string
+}[]
+/**
  * The fixed referee: the Checker's code and judge, then the auditor on settled claims. Its cost is reported once here, not per candidate.
  */
 referee: {
@@ -700,10 +708,15 @@ HELD: number
 }
 }
 /**
- * The Table's headline parts. Null when there is no sole cleared narrator.
+ * The Table's headline parts. Null when no measured narrator is cleared. One cleared narrator is `sole` (and `fewest` is null); two or more are listed in `cleared` in rank order, `sole` is null and `fewest` is the one that fell for the fewest traps.
  */
 hero: (null | {
-sole: HeroPart
+/**
+ * Every measured narrator that is cleared, in rank order.
+ */
+cleared: string[]
+sole: (null | HeroPart)
+fewest: (null | HeroPart)
 /**
  * The measured narrator that is not cleared with the most overturned trap moments.
  */

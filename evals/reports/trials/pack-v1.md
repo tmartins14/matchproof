@@ -1,30 +1,18 @@
 # Narrator Trials, pack-v1
 
-Run 2026-10-26T22:17:16Z at b932427. Judge gpt-5-mini, auditor judge-grok (grok-4.7). Referee cost: 0.9352 USD.
+Run 2026-10-27T04:40:31Z at 45bc65a. Judge gpt-5-mini, auditor judge-grok (grok-4.7). Referee cost: 2.0914 USD.
 
 | # | Candidate | Pts | Clean | Stands | Amended | Overturned | Held | p90 | On-air p90 | USD/match | Auditor agrees | Split | |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | grok-4.7 | 207 | 95.8% | 68 | 3 | 0 | 14 | 50805 ms | 60052 ms | 0.0585 | 100% | 0/0 | Cleared for air; audited by its own model |
-| 2 | gpt-5-mini | 119 | 43.5% | 37 | 38 | 10 | 0 | 2894 ms | 7521 ms | 0.0164 | 79% | 2/5 | Cleared for air |
-| 3 | gpt-5-nano | -140 | 7.1% | 6 | 19 | 59 | 1 | 2485 ms | 7728 ms | prices not set | 59% | 3/21 | Not cleared for air |
-| 4 | phi-4-mini | -189 | 0.0% | 0 | 0 | 63 | 22 | 7203 ms | 21750 ms | 0.0044 | 67% | 0/1 | Not cleared for air |
+| 1 | grok-4.7 | 246 | 96.4% | 81 | 3 | 0 | 1 | 70184 ms | 76049 ms | 0.0697 | 99% | 0/0 | Cleared for air; audited by its own model |
+| 2 | gpt-4.1 | 217 | 80.0% | 68 | 16 | 1 | 0 | 2812 ms | 5554 ms | 0.0804 | 89% | 0/1 | Cleared for air |
+| 3 | gpt-5.4-mini | 169 | 61.2% | 52 | 28 | 5 | 0 | 1940 ms | 7155 ms | 0.0483 | 86% | 1/2 | Cleared for air |
+| 4 | gpt-5-mini | 119 | 43.5% | 37 | 38 | 10 | 0 | 2894 ms | 7521 ms | 0.0164 | 79% | 2/5 | Cleared for air |
+| 5 | gpt-5-nano | -140 | 7.1% | 6 | 19 | 59 | 1 | 2485 ms | 7728 ms | prices not set | 59% | 3/21 | Not cleared for air |
+| 6 | phi-4-mini | -189 | 0.0% | 0 | 0 | 63 | 22 | 7203 ms | 21750 ms | 0.0044 | 67% | 0/1 | Not cleared for air |
 
 ## Errors
 
-- grok-4.7 fx-01: bt-001664-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-01: bt-002101-high_turnover_chance: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-01: bt-001962-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-02: bt-001815-set_piece_goal: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-03: bt-000390-open_play_goal: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-03: bt-000449-high_turnover_chance: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-03: bt-000390-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-05: bt-000250-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-05: bt-000536-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-05: bt-001246-momentum_swing: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-05: bt-001542-territorial_spell: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-06: bt-000266-territorial_spell: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-06: bt-001730-set_piece_goal: Narrator: LlmError (APITimeoutError)
-- grok-4.7 fx-06: bt-002020-momentum_swing: Narrator: LlmError (APITimeoutError)
 - gpt-5-nano fx-01: bt-001374-card: ValueError(put_claims rejected claims: [{'index': 1, 'claim_id': 'cl-001374-card-02', 'accepted': False, 'errors': ['Unknown fact id fx-1301.']}])
 - gpt-5-nano fx-02: bt-000481-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000481-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-freeze_frame-ev-000481-ball_won_distance.']}])
 - gpt-5-nano fx-03: bt-000390-open_play_goal: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-000390-open_play_goal-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-000390-seconds.']}])
@@ -105,6 +93,8 @@ fact_ids.2
 - phi-4-mini fx-06: bt-001730-momentum_swing: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-001730-momentum_swing-01', 'accepted': False, 'errors': ['Unknown fact id fx-0501.']}, {'index': 1, 'claim_id': 'cl-001730-momentum_swing-02', 'accepted': False, 'errors': ['Unknown fact id fx-0601.', 'Unknown fact id fx-0602.']}])
 - phi-4-mini fx-06: bt-002020-momentum_swing: Narrator: LlmError (APITimeoutError)
 - phi-4-mini fx-06: bt-002174-territorial_spell: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002174-territorial_spell-01', 'accepted': False, 'errors': ['Unknown fact id fx-corner.']}, {'index': 1, 'claim_id': 'cl-002174-territorial_spell-02', 'accepted': False, 'errors': ['Unknown fact id fx-draws-defenders.', 'Unknown fact id fx-xg.']}])
+- gpt-5.4-mini fx-01: bt-002178-high_turnover_chance: ValueError(put_claims rejected claims: [{'index': 0, 'claim_id': 'cl-002178-high_turnover_chance-01', 'accepted': False, 'errors': ['Unknown fact id fx-shot-ev-002178-seconds.']}])
+- grok-4.7 fx-05: bt-000536-momentum_swing: Narrator: LlmError (APITimeoutError)
 
 ## Overturned
 
@@ -275,3 +265,20 @@ fact_ids.2
 - **phi-4-mini** fx-06 91′: Ashford lead by 1 goal, reeling from Rivermouth [citation] Unknown fact id fx-0501.; Unknown fact id fx-0601.; Unknown fact id fx-0602.
 - **phi-4-mini** fx-06 97′: Varga sends in a tight shot from 9 meters out for Rivermouth, a 0.17 xG chance. [numbers] The number "9" matches no display rendering of the cited facts.
 - **phi-4-mini** fx-06 98′: Ashford drill for a dangerous set-piece, [citation] Unknown fact id fx-corner.; Unknown fact id fx-draws-defenders.; Unknown fact id fx-xg.
+- **gpt-5.4-mini** fx-01 24′ (not scored): Rivermouth break from 29 m out and Pryce's shot is blocked. Ashford Vale have no answer to the quick move. [names] The player "Pryce" is not named by any cited fact.
+- **gpt-5.4-mini** fx-01 42′ (not scored) [split]: He strikes in 42′ with no one close, 18 m from his nearest defender. [attribution] Judge (wrong_entity): Facts show the shooter was for Ashford Vale but sentence uses 'He' ambiguous—context 'He' must match team; also 'strikes' is allowed but 'in 42′' is fine; primary issue is ambiguous/ wrong entity
+- **gpt-5.4-mini** fx-01 48′ (not scored): Whitcombe is away from 39 metres and has 1 defender for company, but he cannot hit the target. [names] The player "Whitcombe" is not named by any cited fact.
+- **gpt-5.4-mini** fx-01 98′: Dunmore shoots inside 2 seconds and Ashford Vale make Rivermouth work at the end. It is saved. [citation] Unknown fact id fx-shot-ev-002178-seconds.
+- **gpt-5.4-mini** fx-02 41′ (not scored): Rivermouth work the press at 60 per cent and get 45 touches in the Ashford Vale half, but Ashford Vale still sit on 86 touches up there. [attribution] Second reviewer (wrong_entity): "Up there" places Ashford Vale's 86 touches in the Ashford Vale half, but that count is touches in the opposition half.; Judge, asked again (wrong_entity): '86 touches up there' implies Ashford Vale had 86 touches in their own half, but the fact is touches in the opposition half.
+- **gpt-5.4-mini** fx-02 95′: Rivermouth win it 38 metres from goal and Oyelaran fires 8 seconds later. Ashford get bodies back, but the shot is saved. [overclaim] Second reviewer (overclaim): No fact supports Ashford getting bodies back; only the ball win, timing, shooter and save are cited.; Judge, asked again (overclaim): No fact supports 'Ashford get bodies back' — that describes their state or action beyond the cited ball win, shot timing, shooter and save facts.
+- **gpt-5.4-mini** fx-03 32′ (not scored): Ashford Vale are down to 38% possession since Rivermouth's goal. [numbers] The number "17′" matches no display rendering of the cited facts.
+- **gpt-5.4-mini** fx-03 68′ [split]: Ashford Vale level it at 2–2. Wexley scores at 68′. [overclaim] Judge (overclaim): Uses incorrect verb form and subject-verb agreement: 'level it' should be 'level it at' or 'levelled it' — wording error beyond the facts.
+- **gpt-5.4-mini** fx-05 34′ (not scored): Rivermouth threaten again from a turnover, and Okafor-Lind's shot is saved. 0.1 xG. [names] The player "Okafor-Lind" is not named by any cited fact.
+- **gpt-5.4-mini** fx-05 39′: Rivermouth keep Ashford Vale pinned back with 63% of the play in the Ashford half and 3 shots. [overclaim] Judge (overclaim): 'are on top' asserts a state of control not supported by the cited possession and shots figures.
+- **gpt-5.4-mini** fx-05 52′: Rivermouth win it 5 m from goal and Okafor-Lind shoots straight away. It's saved, but that's a let-off for Ashford Vale. [overclaim] Second reviewer (overclaim): Calling the save a let-off for Ashford Vale adds a judgment of fortune that no fact states; the facts only show a close-range shot that was saved.; Judge, asked again (overclaim): Calling it "a let-off for Ashford Vale" judges the save as fortunate for Ashford Vale, which the facts (distance, shot, saved) do not establish.
+- **gpt-5.4-mini** fx-05 52′ (not scored): Rivermouth win it 5 m from goal and Okafor-Lind shoots straight away. It's saved. [names] The player "Okafor-Lind" is not named by any cited fact.
+- **gpt-5.4-mini** fx-05 72′ (not scored): Ashford Vale have the ball more, with 61 per cent of possession in the latest spell. [overclaim] Judge (overclaim): Saying they 'are still carrying a threat' asserts a state (posing a threat) not given by possession and turnovers alone.
+- **gpt-5.4-mini** fx-06 84′ (not scored): Bellamy-Cruz finds the chance in 8 seconds, but Rivermouth cannot turn it into a goal. [names] The player "Bellamy-Cruz" is not named by any cited fact.
+- **gpt-4.1** fx-01 74′: Whitcombe scores for Rivermouth from 77 metres out. Rivermouth lead 1–0, 74′. [overclaim] Judge (unsupported_cause): Calling the play a 'break' (a counter-attack) implies a cause/sequence not stated by the facts; only the distance the ball was won, shooter, minute and score are given.
+- **gpt-4.1** fx-01 89′ (not scored): Throgmorton has just 1 v 4 in the box and puts it wide for Ashford Vale. [overclaim] Second reviewer (overclaim): The facts give 1 v 4 near the ball, not that the chance is in the box.; Judge, asked again (overclaim): Facts say 1 v 4 near the ball, not that the chance was 'in the box' — that location is an extra claim.
+- **gpt-4.1** fx-01 99′ (not scored): Rivermouth have had 56% of the ball since their second goal. [overclaim] Second reviewer (outside_knowledge): The fact only covers possession since Rivermouth's goal at 87′, not that it was their second goal.; Judge, asked again (wrong_time): The fact covers possession since Rivermouth's goal at 87′ but the sentence specifies 'their second goal' which the fact does not state.

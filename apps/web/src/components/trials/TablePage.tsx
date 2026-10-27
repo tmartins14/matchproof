@@ -12,8 +12,15 @@ function Hero() {
       <div className="tr-hd">{t.hero.kicker}</div>
       {h ? (
         <h1 className="tr-h1">
-          <span className="tr-h1-line">{fill(t.hero.cleared, { id: h.sole.candidate, o: h.sole.overturned, n: h.sole.total })}</span>
-          {h.worst ? <span className="tr-h1-line tr-h1-line--sub">{fill(t.hero.worst, { id: h.worst.candidate, o: h.worst.overturned, n: h.worst.total })}</span> : null}
+          {h.sole ? (
+            <span className="tr-h1-line">{fill(t.hero.cleared, { id: h.sole.candidate, o: h.sole.overturned, n: h.sole.total })}</span>
+          ) : (
+            <>
+              <span className="tr-h1-line">{fill(t.hero.clearedMany, { ids: h.cleared.join(", ") })}</span>
+              {h.fewest ? <span className="tr-h1-line tr-h1-line--sub">{fill(t.hero.fewest, { id: h.fewest.candidate, o: h.fewest.overturned, n: h.fewest.total })}</span> : null}
+            </>
+          )}
+          {h.worst ? <span className="tr-h1-line tr-h1-line--sub">{fill(h.sole ? t.hero.worst : t.hero.worstMany, { id: h.worst.candidate, o: h.worst.overturned, n: h.worst.total })}</span> : null}
         </h1>
       ) : (
         <>

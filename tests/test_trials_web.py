@@ -505,6 +505,13 @@ def summary_row(
     }
 
 
+def hero_record(overturned: dict[str, int]) -> dict[str, Any]:
+    return {
+        k: {"STANDS": 14 - o, "AMENDED": 0, "OVERTURNED": o, "HELD": 0}
+        for k, o in overturned.items()
+    }
+
+
 def test_hero_names_the_sole_cleared_and_the_worst_uncleared() -> None:
     summary = [
         summary_row("a", cleared=True, pts=100),
@@ -512,14 +519,11 @@ def test_hero_names_the_sole_cleared_and_the_worst_uncleared() -> None:
         summary_row("c", cleared=False, pts=-50),
         summary_row("d", cleared=False, pts=-90, held=9),  # unmeasured: never the worst
     ]
-    record = {
-        k: {"STANDS": 14 - o, "AMENDED": 0, "OVERTURNED": o, "HELD": 0}
-        for k, o in {"a": 3, "b": 8, "c": 8, "d": 14}.items()
-    }
-    picks = {"sole": {"candidate": "a"}}
-    got = hero_of(summary, picks, record)
+    got = hero_of(summary, hero_record({"a": 3, "b": 8, "c": 8, "d": 14}))
     assert got == {
+        "cleared": ["a"],
         "sole": {"candidate": "a", "overturned": 3, "total": 14},
+        "fewest": None,
         "worst": {
             "candidate": "c",
             "overturned": 8,
@@ -528,8 +532,32 @@ def test_hero_names_the_sole_cleared_and_the_worst_uncleared() -> None:
     }
 
 
-def test_hero_is_null_without_a_sole_cleared_narrator() -> None:
-    assert hero_of([], {"sole": None}, {}) is None
+def test_hero_is_null_with_nobody_cleared() -> None:
+    assert hero_of([], {}) is None
+    summary = [summary_row("a", cleared=False, pts=-5)]
+    assert hero_of(summary, hero_record({"a": 9})) is None
+    unmeasured = [summary_row("a", cleared=True, pts=300, held=20)]
+    assert hero_of(unmeasured, hero_record({"a": 0})) is None
+
+
+def test_hero_lists_three_cleared_in_rank_order_and_the_one_with_fewest_traps() -> None:
+    summary = [
+        summary_row("a", cleared=True, pts=300),
+        summary_row("b", cleared=True, pts=200),
+        summary_row("c", cleared=True, pts=100),
+        summary_row("d", cleared=False, pts=-5),
+    ]
+    got = hero_of(summary, hero_record({"a": 4, "b": 1, "c": 1, "d": 9}))
+    assert got == {
+        "cleared": ["a", "b", "c"],
+        "sole": None,
+        "fewest": {
+            "candidate": "b",
+            "overturned": 1,
+            "total": 14,
+        },  # a tie goes to the higher rank
+        "worst": {"candidate": "d", "overturned": 9, "total": 14},
+    }
 
 
 def test_trap_verdicts_cover_every_trap_of_every_fixture(web: dict[str, Any]) -> None:

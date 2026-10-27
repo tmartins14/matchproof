@@ -160,11 +160,13 @@ def trap_total(record: Json) -> int:
     return int(sum(record.values()))
 
 
-def hero_of(summary: list[Json], picks: Json, trap_record: Json) -> Json | None:
-    """The Table's headline parts: the sole narrator cleared for air and the worst measured one that is
-    not, each with its overturned and total trap moments. Null when no one narrator is cleared."""
-    sole = picks["sole"]
-    if sole is None:
+def hero_of(summary: list[Json], trap_record: Json) -> Json | None:
+    """The Table's headline parts, from measured rows only. With one cleared narrator: it is `sole`.
+    With two or more: they are `cleared` in rank order and `fewest` is the one that fell for the fewest
+    traps (rank order breaks a tie). `worst` is the measured narrator that is not cleared with the most
+    overturned trap moments. Null when no narrator is cleared."""
+    cleared = [r["candidate"] for r in summary if is_measured(r) and r["cleared"]]
+    if not cleared:
         return None
 
     def part(candidate: str) -> Json:
@@ -185,8 +187,15 @@ def hero_of(summary: list[Json], picks: Json, trap_record: Json) -> Json | None:
         key=lambda r: (trap_record[r["candidate"]]["OVERTURNED"], -r["pts"]),
         default=None,
     )
+    many = len(cleared) > 1
     return {
-        "sole": part(sole["candidate"]),
+        "cleared": cleared,
+        "sole": None if many else part(cleared[0]),
+        "fewest": (
+            part(min(cleared, key=lambda c: trap_record[c]["OVERTURNED"]))
+            if many
+            else None
+        ),
         "worst": part(worst["candidate"]) if worst else None,
     }
 
@@ -512,7 +521,6 @@ def build_web(
         "picks": picks_of(summary),
         "hero": hero_of(
             summary,
-            picks_of(summary),
             {
                 r["candidate"]: trap_record_of(results["claims"], r["candidate"], traps)
                 for r in summary

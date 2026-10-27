@@ -1,11 +1,16 @@
 import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import web from "../fixtures/trials/web-pack-v1.json";
 
 const OUT = resolve(__dirname, "../../../docs/screenshots/ux");
 const DESK = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
 const BEAT = "bt-001374-card"; // fx-01's red card, a trap moment
+// What the export says, so these checks follow the data rather than a fixed set of narrators.
+const CLEARED: string[] = web.hero?.cleared ?? [];
+const MEASURED = web.order.filter((id) => id in web.ranks);
+const UNMEASURED = web.order.filter((id) => !(id in web.ranks));
 const COMPARE = `/compare/fx-01/${BEAT}?focus=gpt-5-nano`;
 
 test.beforeAll(() => mkdirSync(OUT, { recursive: true }));
@@ -21,23 +26,29 @@ const overflow = (page: Page): Promise<number> => page.evaluate(() => document.d
 test("the Table loads on a direct visit and draws the export", async ({ page }) => {
   await open(page, "/");
   await expect(page).toHaveTitle("Matchproof Narrator Trials");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Cleared for air: gpt-5-mini, overturned on \d+ of 14 traps\./);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(/gpt-5-nano: \d+ of 14\. Not cleared\./);
+  const h1 = page.getByRole("heading", { level: 1 });
+  if (CLEARED.length === 1) await expect(h1).toContainText(new RegExp(`Cleared for air: ${CLEARED[0]}, overturned on \\d+ of 14 traps\\.`));
+  else {
+    await expect(h1).toContainText(`Cleared for air: ${CLEARED.join(", ")}.`);
+    await expect(h1).toContainText(/Fewest traps fallen for: \S+, \d+ of 14\./);
+  }
+  await expect(h1).toContainText(/\S+: \d+ of 14(\. Not cleared\.|, not cleared\.)/);
   await expect(page.getByText("How to read this")).toHaveCount(0);
   await expect(page.getByText("Click a narrator to see its worst moment beside the others. Use on Desk puts a cleared narrator on air.")).toBeVisible();
   await expect(page.getByText("85 scored moments each")).toBeVisible();
-  await expect(page.getByRole("row")).toHaveCount(1 + 4 + 1); // head, four candidates, the divider
-  await expect(page.getByText("Not ranked: missed more than 1 in 10 moments")).toBeVisible();
-  await expect(page.getByText(/Most accurate when it answered, but missed \d+ of 85 moments and takes \d+\.\d s per claim\. Also the auditor\./)).toBeVisible();
+  await expect(page.getByRole("row")).toHaveCount(1 + web.order.length + (UNMEASURED.length > 0 ? 1 : 0)); // head, every candidate, the divider
+  if (UNMEASURED.length > 0) await expect(page.getByText("Not ranked: missed more than 1 in 10 moments")).toBeVisible();
+  // A self-audited narrator says so on its row; when it is unranked the note also gives its misses and speed.
+  if (UNMEASURED.includes("grok-4.7")) await expect(page.getByText(/Most accurate when it answered, but missed \d+ of 85 moments and takes \d+\.\d s per claim\. Also the auditor\./)).toBeVisible();
+  else await expect(page.getByText("Also the auditor.", { exact: true })).toBeVisible();
   const heads = await page.getByRole("columnheader").allTextContents();
   expect(heads.filter(Boolean)).toEqual(["#", "Narrator", "Stands", "Amended", "Overturned", "Pts", "Clean", "Traps", "p90", "$ / match", "Fail profile"]);
-  await expect(page.getByText("Only narrator cleared for air")).toBeVisible();
-  await expect(page.getByText(/\d+ of \d+ overturned/)).toHaveCount(4);
+  await expect(page.getByText(/\d+ of \d+ overturned/)).toHaveCount(web.order.length);
   // Use on Desk only on cleared, measured rows, and it does not open Compare.
   const buttons = page.getByRole("link", { name: "Use on Desk" });
-  await expect(buttons).toHaveCount(1);
-  await buttons.click();
-  await expect(page).toHaveURL(/\/desk\?narrator=gpt-5-mini&fixture=fx-\d\d$/);
+  await expect(buttons).toHaveCount(MEASURED.filter((id) => CLEARED.includes(id)).length);
+  await buttons.first().click();
+  await expect(page).toHaveURL(new RegExp(`/desk\\?narrator=${CLEARED[0]}&fixture=fx-\\d\\d$`));
 });
 
 test("a row opens Compare at the candidate's worst moment, by mouse and keyboard", async ({ page }) => {
@@ -52,9 +63,9 @@ test("a row opens Compare at the candidate's worst moment, by mouse and keyboard
 
 test("Compare loads on a direct visit, focuses the card and steps through moments", async ({ page }) => {
   await open(page, COMPARE);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Same moment. 4 narrators. One referee.");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(`Same moment. ${web.order.length} narrators. One referee.`);
   await expect(page.locator("#card-gpt-5-nano")).toHaveClass(/tr-ncard--focus/);
-  await expect(page.getByRole("article")).toHaveCount(4);
+  await expect(page.getByRole("article")).toHaveCount(web.order.length);
   const url = page.url();
   await page.keyboard.press("ArrowRight");
   await expect(page).not.toHaveURL(url);
@@ -134,6 +145,8 @@ test("the top bar is pixel-identical on every page apart from the active nav ite
     for (const path of ["/", "/fixtures", COMPARE, "/desk"]) {
       await open(page, path, size);
       await page.evaluate(() => window.scrollTo(0, 0));
+      await page.mouse.move(2, 700); // no hover or focus on the bar
+      await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
       // Only the lit item and step may differ, so draw them as the unlit ones.
       await page.addStyleTag({ content: '.tr-nav-link[aria-current]{background:var(--mp-raised)!important;color:var(--mp-text)!important}.tr-step[aria-current]{color:var(--mp-muted)!important;border-bottom-color:transparent!important}' });
       shots.push(await page.locator("header.tr-bar").screenshot({ animations: "disabled" }));

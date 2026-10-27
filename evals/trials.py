@@ -802,7 +802,9 @@ def _money(cost: Any) -> str:
 # ---- the run -----------------------------------------------------------------------------------
 
 
-def candidate_entry(entry: dict[str, Any], auditor_deployment: str) -> dict[str, Any]:
+def candidate_entry(
+    entry: dict[str, Any], auditor_deployment: str, auditor_model: str = ""
+) -> dict[str, Any]:
     price = load_prices().get(entry["deployment"])
     return {
         "id": entry["id"],
@@ -812,7 +814,9 @@ def candidate_entry(entry: dict[str, Any], auditor_deployment: str) -> dict[str,
         "price_in": price.input_per_million if price else None,
         "price_out": price.output_per_million if price else None,
         "currency": price.currency if price else None,
-        "self_audited": entry["deployment"] == auditor_deployment,
+        # The same model as the auditor, on the auditor's own deployment or another one.
+        "self_audited": entry["deployment"] == auditor_deployment
+        or (bool(auditor_model) and entry["model"].split()[0] == auditor_model),
     }
 
 
@@ -826,6 +830,7 @@ async def run_trials(
 ) -> dict[str, Any]:
     models = load_models()
     auditor_deployment = str(models["auditor"]["deployment"])
+    auditor_model = str(models.get("auditor_model", ""))
     entries = {e["id"]: e for e in models["trial_candidates"]}
     unknown = [c for c in candidates if c not in entries]
     if unknown:
@@ -895,7 +900,9 @@ async def run_trials(
             for e in entries.values()
             if e["deployment"] == auditor_deployment
         ),
-        auditor_deployment,
+        f"{auditor_deployment} ({auditor_model})"
+        if auditor_model
+        else auditor_deployment,
     )
     return {
         "pack": pack,
@@ -913,12 +920,70 @@ async def run_trials(
         },
         "fixtures": meta,
         "candidates": [
-            candidate_entry(entries[c], auditor_deployment) for c in candidates
+            candidate_entry(entries[c], auditor_deployment, auditor_model)
+            for c in candidates
         ],
         "claims": claims,
         "errors": errors,
         "summary": rank(summary),
     }
+
+
+class MergeError(ValueError):
+    """A run cannot be merged into the target results file."""
+
+
+def add_costs(a: Any, b: Any) -> Any:
+    """Two referee costs added; `prices not set` if either one is."""
+    if isinstance(a, str) or isinstance(b, str):
+        return NOT_SET
+    if a["currency"] != b["currency"]:
+        return NOT_SET
+    roles = {*a["by_role"], *b["by_role"]}
+    return {
+        "currency": a["currency"],
+        "total": round(a["total"] + b["total"], 6),
+        "by_role": {
+            r: round(a["by_role"].get(r, 0) + b["by_role"].get(r, 0), 6) for r in roles
+        },
+    }
+
+
+def merge_results(target: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
+    """`target` with the candidates `new` ran replacing (or joining) theirs: their claims, errors,
+    candidate entries and summary rows come from `new`; every other candidate is untouched. The
+    ranking is recomputed over every row, the referee cost of `new` is added, and the merge is
+    recorded. Refuses when the pack or the referee differ, since the numbers would not be comparable."""
+    if new["pack"] != target["pack"] or new["fixtures"] != target["fixtures"]:
+        raise MergeError("the pack definition differs from the target file's")
+    keys = ("checker", "judge", "auditor", "judge_prompt", "audited")
+    if any(new["referee"][k] != target["referee"][k] for k in keys):
+        raise MergeError(
+            "the referee (judge, auditor, judge prompt or audit setting) differs from the target file's"
+        )
+    ids = [c["id"] for c in new["candidates"]]
+    keep = [c for c in target["candidates"] if c["id"] not in ids]
+    rows = [r for r in target["summary"] if r["candidate"] not in ids]
+    merged = {
+        **target,
+        "run_at": new["run_at"],
+        "git_sha": new["git_sha"],
+        "referee": {
+            **target["referee"],
+            "cost": add_costs(target["referee"]["cost"], new["referee"]["cost"]),
+        },
+        "candidates": [*keep, *new["candidates"]],
+        "claims": [c for c in target["claims"] if c["candidate"] not in ids]
+        + new["claims"],
+        "errors": [e for e in target["errors"] if e["candidate"] not in ids]
+        + new["errors"],
+        "summary": rank([*rows, *new["summary"]]),
+        "merges": [
+            *target.get("merges", []),
+            {"candidates": ids, "run_at": new["run_at"], "git_sha": new["git_sha"]},
+        ],
+    }
+    return merged
 
 
 def upload(paths: list[Path]) -> None:
@@ -954,6 +1019,11 @@ def main() -> None:
     parser.add_argument("--parallel", type=int, default=DEFAULT_PARALLEL)
     parser.add_argument("--no-audit", action="store_true")
     parser.add_argument(
+        "--merge-into",
+        type=Path,
+        help="run only --candidates and merge them into this results file, leaving the others as they are",
+    )
+    parser.add_argument(
         "--upload", action="store_true", help="copy the results to Blob trials/"
     )
     parser.add_argument(
@@ -977,7 +1047,11 @@ def main() -> None:
         wanted = args.fixtures.split(",")
         fixtures = [f for f in fixtures if f.id in wanted]
     full = not args.candidates and not args.fixtures and not args.no_audit
-    if (args.upload or args.publish) and not full:
+    if args.merge_into and (not args.candidates or args.fixtures or args.no_audit):
+        raise SystemExit(
+            "--merge-into needs --candidates, the whole pack and the audit (no --fixtures, no --no-audit)."
+        )
+    if (args.upload or args.publish) and not (full or args.merge_into):
         raise SystemExit(
             "--upload and --publish need the full pack, every candidate, with the audit."
         )
@@ -988,10 +1062,20 @@ def main() -> None:
             candidates, fixtures, pack, parallel=args.parallel, audit=not args.no_audit
         )
     )
+    if args.merge_into:
+        try:
+            results = merge_results(
+                json.loads(args.merge_into.read_text("utf-8")), results
+            )
+        except MergeError as exc:
+            raise SystemExit(f"not merged: {exc}") from exc
     TrialsResults.model_validate(results)  # the contract, before anything is written
     TRIALS_DIR.mkdir(parents=True, exist_ok=True)
     stem = pack if full else f"{pack}-{'dry' if args.no_audit else 'smoke'}"
     json_path, md_path = TRIALS_DIR / f"{stem}.json", TRIALS_DIR / f"{stem}.md"
+    if args.merge_into:
+        json_path = args.merge_into
+        md_path = args.merge_into.with_suffix(".md")
     json_path.write_text(
         json.dumps(results, indent=2, ensure_ascii=False) + "\n", "utf-8"
     )

@@ -1,6 +1,6 @@
 /* Narrator Trials pages. Tokens only (ADR 0006): every colour is a --mp- variable. */
 .tr-page { min-height: 100vh; }
-.tr-bar { box-sizing: border-box; height: var(--tr-bar-h, 72px); overflow: hidden; display: flex; flex-wrap: nowrap; align-items: center; gap: 12px 24px; padding: 0 20px; background: var(--mp-surface); border-bottom: 4px solid var(--mp-lime); }
+.tr-bar { will-change: transform; box-sizing: border-box; height: var(--tr-bar-h, 72px); overflow: hidden; display: flex; flex-wrap: nowrap; align-items: center; gap: 12px 24px; padding: 0 20px; background: var(--mp-surface); border-bottom: 4px solid var(--mp-lime); }
 .tr-nav { display: flex; flex-wrap: wrap; gap: 4px; }
 .tr-nav-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; font-family: var(--mp-display); font-weight: 700; font-size: 17px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mp-text); background: var(--mp-raised); text-decoration: none; clip-path: var(--mp-cutTab); }
 .tr-nav-link[aria-current="page"] { background: var(--mp-lime); color: var(--mp-limeInk); }

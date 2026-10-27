@@ -15,6 +15,7 @@ from intel.voice_lint import lint
 from evals.trials import (
     POINTS,
     CauseRecorder,
+    MergeError,
     check_pack,
     claim_row,
     differing_span,
@@ -23,6 +24,7 @@ from evals.trials import (
     load_pack,
     lost_beat,
     markdown,
+    merge_results,
     prompt_hash,
     rank,
     reason_bucket,
@@ -503,7 +505,7 @@ def test_trial_settings_known_and_unknown() -> None:
         "json_schema",
         "minimal",
     )
-    assert trial_settings(models, "grok-4.7").deployment == "judge-grok"
+    assert trial_settings(models, "grok-4.7").deployment == "narrator-grok"
     with pytest.raises(LlmError) as err:
         trial_settings(models, "not-a-model")
     assert err.value.cause_name == "UnknownCandidate"
@@ -524,3 +526,116 @@ def test_example_and_markdown_render() -> None:
     text = markdown(example)
     assert "| 1 | gpt-5-mini | 3 |" in text
     assert "Cleared for air" in text
+
+
+def merge_pair() -> tuple[dict[str, Any], dict[str, Any]]:
+    """The real results file as the target, and a one-candidate run of the same pack and referee."""
+    import copy
+    import json
+
+    target = json.loads(
+        (ROOT / "evals" / "reports" / "trials" / "pack-v1.json").read_text("utf-8")
+    )
+    target.pop("merges", None)  # the file may already carry merges of its own
+    donor = next(r for r in target["summary"] if r["candidate"] == "gpt-5-mini")
+    entry = next(c for c in target["candidates"] if c["id"] == "gpt-5-mini")
+    row = {**copy.deepcopy(donor), "candidate": "newcomer", "pts": 500}
+    claims = [
+        {**copy.deepcopy(c), "candidate": "newcomer"}
+        for c in target["claims"]
+        if c["candidate"] == "gpt-5-mini"
+    ]
+    new = {
+        "pack": target["pack"],
+        "run_at": "2026-10-27T03:00:00Z",
+        "git_sha": "abc1234",
+        "referee": {
+            **copy.deepcopy(target["referee"]),
+            "cost": {"currency": "USD", "total": 0.1, "by_role": {"judge": 0.1}},
+        },
+        "fixtures": copy.deepcopy(target["fixtures"]),
+        "candidates": [{**copy.deepcopy(entry), "id": "newcomer"}],
+        "claims": claims,
+        "errors": [{"candidate": "newcomer", "fixture": "fx-01", "error": "x"}],
+        "summary": [row],
+    }
+    return target, new
+
+
+def test_a_merge_changes_only_the_named_candidates() -> None:
+    target, new = merge_pair()
+    before = {r["candidate"]: r for r in target["summary"]}
+    merged = merge_results(target, new)
+    after = {r["candidate"]: r for r in merged["summary"]}
+    assert set(after) == {*before, "newcomer"}
+    for name, r in before.items():
+        assert after[name] == r  # numbers do not move
+    assert [c for c in merged["claims"] if c["candidate"] != "newcomer"] == target[
+        "claims"
+    ]
+    assert [e for e in merged["errors"] if e["candidate"] != "newcomer"] == target[
+        "errors"
+    ]
+    assert {c["id"] for c in merged["candidates"]} == {
+        c["id"] for c in target["candidates"]
+    } | {"newcomer"}
+    TrialsResults.model_validate(merged)
+
+
+def test_a_merge_replaces_a_candidate_that_is_already_in_the_file() -> None:
+    target, new = merge_pair()
+    merged = merge_results(target, new)
+    again = {
+        **new,
+        "run_at": "2026-10-27T04:00:00Z",
+        "summary": [{**new["summary"][0], "pts": -5}],
+    }
+    twice = merge_results(merged, again)
+    rows = [r for r in twice["summary"] if r["candidate"] == "newcomer"]
+    assert [r["pts"] for r in rows] == [-5]
+    assert len([c for c in twice["candidates"] if c["id"] == "newcomer"]) == 1
+    assert [m["run_at"] for m in twice["merges"]] == [
+        "2026-10-27T03:00:00Z",
+        "2026-10-27T04:00:00Z",
+    ]
+
+
+def test_a_merge_recomputes_the_ranks_and_adds_the_cost() -> None:
+    target, new = merge_pair()
+    merged = merge_results(target, new)
+    assert merged["summary"][0]["candidate"] == "newcomer"  # 500 pts beats everyone
+    assert [r["pts"] for r in merged["summary"]] == sorted(
+        (r["pts"] for r in merged["summary"]), reverse=True
+    )
+    assert merged["referee"]["cost"]["total"] == pytest.approx(
+        target["referee"]["cost"]["total"] + 0.1
+    )
+    assert merged["referee"]["cost"]["by_role"]["judge"] == pytest.approx(
+        target["referee"]["cost"]["by_role"]["judge"] + 0.1
+    )
+    assert merged["merges"] == [
+        {
+            "candidates": ["newcomer"],
+            "run_at": "2026-10-27T03:00:00Z",
+            "git_sha": "abc1234",
+        }
+    ]
+
+
+def test_a_merge_refuses_a_different_referee_or_pack() -> None:
+    target, new = merge_pair()
+    for key, value in (
+        ("judge", "gpt-4.1"),
+        ("auditor", "other"),
+        ("judge_prompt", "judge.v4.md"),
+        ("audited", False),
+    ):
+        bad = {**new, "referee": {**new["referee"], key: value}}
+        with pytest.raises(MergeError, match="referee"):
+            merge_results(target, bad)
+    moved = {
+        **new,
+        "fixtures": [{**new["fixtures"][0], "seed": 999}, *new["fixtures"][1:]],
+    }
+    with pytest.raises(MergeError, match="pack"):
+        merge_results(target, moved)

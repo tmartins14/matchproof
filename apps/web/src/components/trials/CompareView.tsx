@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { copy, fill } from "@/desk/copy";
 import type { PitchView } from "@/desk/pitchModel";
-import { beatsOf, fixtureById, momentOf, web } from "@/trials/data";
+import { beatsOf, firstTrapBeat, fixtureById, momentOf, web } from "@/trials/data";
 import { fixtureNumber } from "@/trials/format";
 import { Pitch } from "@/viz/Pitch";
 import { NarratorCard } from "./NarratorCard";
@@ -60,6 +60,14 @@ export function CompareView({ fixture, beat }: { fixture: string; beat: string }
     );
   }
   const query = focus ? `&focus=${focus}` : "";
+  const keep = focus ? `?focus=${focus}` : "";
+  const trapLabel = new Map(f.trap_beats.map((tb, i) => [tb.beat, (f.traps[i]?.label ?? "").replace(/\s+\S+$/, "")]));
+  const momentText = (id: string): string => {
+    const m = momentOf(fixture, id);
+    const clock = m?.clock ?? "";
+    const trap = trapLabel.get(id);
+    return trap !== undefined ? fill(t.trapOption, { clock, label: trap }) : fill(t.momentOption, { clock, label: (m?.kind ?? "").replace(/_/g, " ") });
+  };
   const step = (to: string | undefined, label: string, glyph: string) =>
     to ? (
       <Link className="tr-btn tr-btn--sm" href={`/compare/${fixture}/${to}${focus ? `?focus=${focus}` : ""}`} aria-label={label}>
@@ -74,7 +82,38 @@ export function CompareView({ fixture, beat }: { fixture: string; beat: string }
   return (
     <Shell>
       <div className="tr-crumb">
-        <span className="tr-mono">{fill(t.crumb, { fixture: fixtureNumber(fixture), home: f.home, away: f.away })}</span>
+        <div className="tr-crumb-field">
+          <label htmlFor="cmp-fixture" className="tr-hd">
+            {t.fixtureSelect}
+          </label>
+          <select
+            id="cmp-fixture"
+            className="mp-select"
+            value={fixture}
+            onChange={(e) => {
+              const first = firstTrapBeat(e.target.value) ?? beatsOf(e.target.value)[0];
+              if (first) router.push(`/compare/${e.target.value}/${first}${keep}`);
+            }}
+          >
+            {web.fixtures.map((x) => (
+              <option key={x.id} value={x.id}>
+                {fill(t.fixtureOption, { n: fixtureNumber(x.id), home: x.home, away: x.away, brief: x.brief })}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="tr-crumb-field">
+          <label htmlFor="cmp-moment" className="tr-hd">
+            {t.momentSelect}
+          </label>
+          <select id="cmp-moment" className="mp-select" value={beat} onChange={(e) => router.push(`/compare/${fixture}/${e.target.value}${keep}`)}>
+            {beats.map((id) => (
+              <option key={id} value={id}>
+                {momentText(id)}
+              </option>
+            ))}
+          </select>
+        </div>
         <span className="tr-chip tr-chip--light">{fill(t.chip, { clock: moment.clock, label: moment.kind.replace(/_/g, " ") })}</span>
         <span className="tr-steps-nav">
           {step(prev, t.prev, "←")}

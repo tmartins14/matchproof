@@ -2,15 +2,15 @@
 
 Live site: https://gray-sand-08c45ef0f.2.azurestaticapps.net/
 
-## 3-minute walkthrough
+## 2-minute walkthrough (1:59)
 
-1. **Table.** Open https://gray-sand-08c45ef0f.2.azurestaticapps.net/ . Six narrator models, one exam, ranked by points; the cards above the table name the Live pick, Budget pick and Most accurate.
-2. **Click a narrator.** Click `gpt-5-mini` in the table to see where it fell for traps (https://gray-sand-08c45ef0f.2.azurestaticapps.net/fixtures shows the whole grid).
-3. **Compare at its worst moment.** https://gray-sand-08c45ef0f.2.azurestaticapps.net/compare/fx-01/bt-001374-card?focus=gpt-5-mini : a card moment where `gpt-5-mini` named a player without citing the fact that names him. Read the verdict, the cited facts and how the other narrators handled the same moment.
-4. **Use on Desk.** Click Use on Desk (or open https://gray-sand-08c45ef0f.2.azurestaticapps.net/desk?narrator=gpt-5-mini&fixture=fx-01 ). The bar reads READY until you press Run.
-5. **Run live.** Pick Run live (offered for live-ready narrators). The model narrates the match as it plays; the pace control sets the match clock, and key moments always play in real time.
-6. **A verdict lands.** Each claim shows CHECKING, then STANDS, AMENDED or OVERTURNED, with its evidence in the rail.
-7. **See how the others called it.** From a verdict, follow the link back to Compare for that moment (`/compare/<fixture>/<beat>`).
+1. **Table** (0:00): https://gray-sand-08c45ef0f.2.azurestaticapps.net/ . Six narrators, one exam, ranked by points.
+2. **Click a narrator** (0:15): click `gpt-5-mini` to see where it fell for traps (https://gray-sand-08c45ef0f.2.azurestaticapps.net/fixtures shows the whole grid).
+3. **Compare at its worst moment** (0:30): https://gray-sand-08c45ef0f.2.azurestaticapps.net/compare/fx-01/bt-001374-card?focus=gpt-5-mini . It named a player without citing the fact that names him; the other narrators' calls sit alongside.
+4. **Use on Desk** (0:55): https://gray-sand-08c45ef0f.2.azurestaticapps.net/desk?narrator=gpt-5-mini&fixture=fx-01 . The bar reads READY until you press Run.
+5. **Run live** (1:05): press Run live. Key moments always play in real time.
+6. **A verdict lands** (1:20): CHECKING, then STANDS, AMENDED or OVERTURNED, with the evidence in the rail.
+7. **See how the others called it** (1:40): follow the link back to Compare for that moment (https://gray-sand-08c45ef0f.2.azurestaticapps.net/compare/fx-01/bt-001374-card). End at 1:59.
 
 ## Testing instructions
 

@@ -37,3 +37,14 @@ Values (all in `positions.py`): speed cap 9.5 m/s reported (8.8 m/s inside, for 
 Assumptions and costs:
 - Speed and acceleration are measured on running. An event actor is still placed on its event location (ADR 0005), which is a placement, not a step; those are counted separately (`snap_jumps`). They rose from 1050 to 3690 over 24.1 M player steps (0.004% to 0.015%, the existing test allows 0.1%) because capped acceleration reaches fewer of the engine's event locations in time. Removing them needs the engine to place events where a player can be, which is Part C.
 - Back-line spread rose from 1.48 m to 1.78 m. Not a B gate (it is C's), reported for the record.
+
+# More narrators (prompt 19)
+
+Shortlist deployed on `ais-oou4h3al` as Global Standard, capacity 50 each. Versions as `az cognitiveservices account list-models` reports them.
+
+| gate | time (ET) | result |
+| --- | --- | --- |
+| A `--merge-into` | 22:15 | done: `evals/trials.py`, `merges` in the results schema and example, 5 tests (only named candidates change, ranks recomputed, cost added, referee and pack guards refuse, result validates) |
+| D hero with several cleared | 22:40 | done: `hero` now carries `cleared` (rank order), `sole`, `fewest`, `worst`; tests for 0, 1 and 3 cleared |
+| B1 gpt-5.4-mini (2026-03-17) | 22:30 | smoke pass with the starting settings (json_schema, reasoning_effort minimal; 3.2 s) |
+| B2 gpt-4.1 (2025-04-14) | 22:34 | smoke pass with the starting settings (json_schema, temperature 0; 2.6 s) |

@@ -37,11 +37,13 @@ composer:
 # judge-grok was accurate on the v2 bake-off (38 of 38) but too slow for the inline check (p50 7.8 s).
 auditor:
   deployment: judge-grok
-  model: grok-4.7  # for the Trials label and the self-audited flag; the deployment above is what is called
   max_output_tokens: 800
   timeout_s: 45
   response_format: json_schema
   temperature: 0
+
+# The auditor's model name, for the Trials label and the self-audited flag (the deployment above is what is called).
+auditor_model: grok-4.7
 
 # The judge prompt file in agents/prompts/. v1 is kept for the record.
 judge_prompt: judge.v3.md

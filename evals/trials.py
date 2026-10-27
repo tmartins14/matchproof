@@ -830,7 +830,7 @@ async def run_trials(
 ) -> dict[str, Any]:
     models = load_models()
     auditor_deployment = str(models["auditor"]["deployment"])
-    auditor_model = str(models["auditor"].get("model", ""))
+    auditor_model = str(models.get("auditor_model", ""))
     entries = {e["id"]: e for e in models["trial_candidates"]}
     unknown = [c for c in candidates if c not in entries]
     if unknown:

@@ -36,6 +36,10 @@ param customWebOrigin string = ''
 @minValue(0)
 param apiMinReplicas int = 1
 
+@description('Model tokens the API may spend per day before it stops auditing and then narrating (DAILY_TOKEN_CAP).')
+@minValue(1)
+param dailyTokenCap int = 1500000
+
 var tags = { 'azd-env-name': environmentName }
 var token = take(uniqueString(subscription().id, environmentName), 8)
 
@@ -129,6 +133,7 @@ module app 'modules/containerapp.bicep' = {
     modelDeploymentName: foundry.outputs.deploymentName
     webOrigins: join(filter(['https://${web.outputs.hostname}', customWebOrigin], origin => !empty(origin)), ',')
     minReplicas: apiMinReplicas
+    dailyTokenCap: dailyTokenCap
   }
 }
 

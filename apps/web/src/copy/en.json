@@ -46,7 +46,11 @@
     "readBrief": "Read brief",
     "reading": "Reading…",
     "newMatch": "New match",
-    "speed": "Speed",
+    "speed": "Match pace",
+    "speedTip": "Key moments always play in real time.",
+    "speedSlow": "Slow · 1 min/s",
+    "speedNormal": "Normal · 3 min/s",
+    "speedFast": "Fast · 6 min/s",
     "cachedSoon": "Available soon",
     "connecting": "Connecting…",
     "connectionLost": "Connection lost.",
@@ -309,6 +313,11 @@
       "first": "Matchproof",
       "second": "Narrator Trials"
     },
+    "notFound": {
+      "title": "No such page",
+      "body": "That address isn't part of Narrator Trials.",
+      "home": "Back to the Table"
+    },
     "nav": {
       "label": "Narrator Trials",
       "table": "Table",
@@ -495,7 +504,8 @@
       "cited": "Facts this claim cited:"
     },
     "desk": {
-      "label": "DESK · running {model} ({rank})",
+      "label": "DESK · RUNNING {model} ({rank})",
+      "labelReady": "DESK · READY · {model} ({rank})",
       "narrator": "Narrator",
       "narratorHelp": "Only narrators cleared for air in {pack}.",
       "live": "LIVE",

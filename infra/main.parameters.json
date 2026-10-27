@@ -11,6 +11,7 @@
     "budgetAmount": { "value": "${BUDGET_AMOUNT=75}" },
     "budgetEmail": { "value": "${BUDGET_EMAIL}" },
     "customWebOrigin": { "value": "${CUSTOM_WEB_ORIGIN=}" },
-    "apiMinReplicas": { "value": "${API_MIN_REPLICAS=1}" }
+    "apiMinReplicas": { "value": "${API_MIN_REPLICAS=1}" },
+    "dailyTokenCap": { "value": "${DAILY_TOKEN_CAP=1500000}" }
   }
 }

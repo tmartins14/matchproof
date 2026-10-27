@@ -15,6 +15,7 @@ param webOrigins string
 @description('Replicas kept warm; 1 avoids the cold-start stall while judging.')
 @minValue(0)
 param minReplicas int
+param dailyTokenCap int
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2025-02-01' existing = {
   name: logAnalyticsName
@@ -82,6 +83,7 @@ resource api 'Microsoft.App/containerApps@2025-07-01' = {
             { name: 'OTEL_SERVICE_NAME', value: 'matchproof-api' }
             { name: 'MCP_ALLOWED_HOSTS', value: apiHost }
             { name: 'WEB_ORIGINS', value: webOrigins }
+            { name: 'DAILY_TOKEN_CAP', value: string(dailyTokenCap) }
           ]
         }
       ]

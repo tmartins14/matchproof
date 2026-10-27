@@ -1,0 +1,16 @@
+flowchart LR
+  pack["Fixture pack<br/>pack-v1, 6 seeded matches"] --> gen["Generator<br/>(Python)"]
+  gen --> facts["Facts + source IDs<br/>(Python)"]
+  facts --> narrator["Narrator<br/>candidate model<br/>Azure AI Foundry"]
+  narrator --> checker["Checker<br/>(code)"]
+  checker --> judge["Judge<br/>gpt-5-mini"]
+  judge --> auditor["Auditor<br/>grok-4.7, consensus"]
+  auditor --> verdicts["Verdicts<br/>STANDS / AMENDED / OVERTURNED / HELD"]
+  verdicts --> results["Results JSON<br/>pack-v1 export"]
+  results --> web["Web<br/>Table, Compare, Fixtures, Desk<br/>Static Web Apps"]
+  api["API<br/>Container Apps"] -. live runs .-> web
+  facts -. MCP .-> api
+  agents["Microsoft Agent Framework"] -. orchestrates .- narrator
+  agents -. orchestrates .- judge
+  api -. archives matches .-> blob["Azure Blob Storage"]
+  ai["Application Insights"] -. traces .- api

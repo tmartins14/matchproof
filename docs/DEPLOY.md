@@ -154,6 +154,17 @@ azd provision
 
 `scripts/check_domain.sh` reports whether the CNAME resolves and the hostname is validated (`Ready`).
 
+The apex `tylermartins.com` needs a CAA record authorizing DigiCert (`0 issue "digicert.com"`) next to any existing CAA records, or `hostname set` is rejected.
+
+**Drift (Oct 27):** the live Container App has `WEB_ORIGINS` set by `az containerapp update`, not by `azd provision`, because the provision preview also touched Foundry and other resources. The command used:
+
+```bash
+az containerapp update -n ca-api-oou4h3al -g rg-matchproof-dev \
+  --set-env-vars "WEB_ORIGINS=https://gray-sand-08c45ef0f.2.azurestaticapps.net,https://matchproof.tylermartins.com"
+```
+
+`CUSTOM_WEB_ORIGIN` is already set in the azd env, so the next `azd provision` reconciles `WEB_ORIGINS` to the same two origins from `infra/main.bicep`.
+
 ## Smoke test
 
 ```bash

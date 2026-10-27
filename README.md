@@ -4,7 +4,7 @@
 
 Narrator Trials puts candidate narrator models through the same exam: six seeded matches, each with traps planted in it (a red card on the hour, a stoppage-time penalty, a lead that changes hands late). Every narrator writes a claim for every key moment, and one fixed referee checks every claim against computed facts. The result is a league table, a side-by-side view of how each narrator handled the same moment, and a live desk where you can put a cleared narrator on air.
 
-- **Live:** https://gray-sand-08c45ef0f.2.azurestaticapps.net/ (Table at `/`, Fixtures at `/fixtures`, Compare at `/compare`, Desk at `/desk`)
+- **Live:** https://matchproof.tylermartins.com/ (Backup: https://gray-sand-08c45ef0f.2.azurestaticapps.net/) (Table at `/`, Fixtures at `/fixtures`, Compare at `/compare`, Desk at `/desk`)
 - **Headline:** across the 14 trap moments in `pack-v1`, four of six narrators are cleared for air and ranked: `grok-4.7` (0 overturned, 246 pts), `gpt-4.1` (0 overturned, 217), `gpt-5.4-mini` (0 overturned, 169) and `gpt-5-mini` (3 overturned, 119). `gpt-5-nano` is ranked and not cleared (8 overturned, -140); `phi-4-mini` is unranked (22 of 85 moments unanswered).
 - Demo video: TBD
 - Judges: [2-minute walkthrough, testing instructions and what to look for](docs/DEMO.md).

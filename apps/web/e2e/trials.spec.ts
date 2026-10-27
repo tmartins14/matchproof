@@ -37,8 +37,10 @@ test("the Table loads on a direct visit and draws the export", async ({ page }) 
   await expect(page.getByText("Click a narrator to see its worst moment beside the others. Use on Desk puts a cleared narrator on air.")).toBeVisible();
   await expect(page.getByText("85 scored moments each")).toBeVisible();
   await expect(page.getByRole("row")).toHaveCount(1 + web.order.length + (UNMEASURED.length > 0 ? 1 : 0)); // head, every candidate, the divider
-  await expect(page.getByText("Not ranked: missed more than 1 in 10 moments")).toBeVisible();
-  await expect(page.getByText(/Most accurate when it answered, but missed \d+ of 85 moments and takes \d+\.\d s per claim\. Also the auditor\./)).toBeVisible();
+  if (UNMEASURED.length > 0) await expect(page.getByText("Not ranked: missed more than 1 in 10 moments")).toBeVisible();
+  // A self-audited narrator says so on its row; when it is unranked the note also gives its misses and speed.
+  if (UNMEASURED.includes("grok-4.7")) await expect(page.getByText(/Most accurate when it answered, but missed \d+ of 85 moments and takes \d+\.\d s per claim\. Also the auditor\./)).toBeVisible();
+  else await expect(page.getByText("Also the auditor.", { exact: true })).toBeVisible();
   const heads = await page.getByRole("columnheader").allTextContents();
   expect(heads.filter(Boolean)).toEqual(["#", "Narrator", "Stands", "Amended", "Overturned", "Pts", "Clean", "Traps", "p90", "$ / match", "Fail profile"]);
   await expect(page.getByText(/\d+ of \d+ overturned/)).toHaveCount(web.order.length);

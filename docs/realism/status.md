@@ -48,3 +48,10 @@ Shortlist deployed on `ais-oou4h3al` as Global Standard, capacity 50 each. Versi
 | D hero with several cleared | 22:40 | done: `hero` now carries `cleared` (rank order), `sole`, `fewest`, `worst`; tests for 0, 1 and 3 cleared |
 | B1 gpt-5.4-mini (2026-03-17) | 22:30 | smoke pass with the starting settings (json_schema, reasoning_effort minimal; 3.2 s) |
 | B2 gpt-4.1 (2025-04-14) | 22:34 | smoke pass with the starting settings (json_schema, temperature 0; 2.6 s) |
+| B1 gpt-5.4-mini run | 22:36 to 23:15 | merged (with gpt-4.1, 2332 s together): 169 pts, 0 of 14 traps overturned (3 amended), 1 lost (1 rejected), p90 1.9 s, $0.0483 a match; cleared and measured; counts |
+| B2 gpt-4.1 run | 22:36 to 23:15 | merged: 217 pts, 0 of 14 traps overturned, 0 lost, p90 2.8 s, $0.0804 a match; cleared and measured; counts |
+| goal | 23:15 | two models count; gpt-5.4 and gpt-4.1-mini not started, as the prompt says |
+| C1 narrator-grok | 23:16 | created at capacity 30 (Succeeded); smoke 5.7 s; `auditor_model` added to `models.yaml` so the Trials label and the self-audited flag stay `judge-grok (grok-4.7)` and true |
+| C3 grok run | 23:18 to 00:41 | first attempt crashed before any call (a `model` key in the auditor config); second merged (4937 s): 246 pts, 0 of 14 traps overturned, 1 unanswered (`APITimeoutError` at 120 s), p90 70.2 s, $0.0697 a match; cleared and measured |
+| F fallback | n/a | not needed: three shortlist models count |
+| E export, checks, deploy | 00:30 to 00:44 | export regenerated; gpt-5-mini, gpt-5-nano and phi-4-mini rows and claims identical to before the prompt; every candidate has 85 scored rows; merge guard passed for both merges; vitest 81, e2e trials 14, axe on four pages clean; `azd deploy web` and `scripts/smoke_prod.sh` 5 of 5 |

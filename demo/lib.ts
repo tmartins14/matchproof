@@ -4,13 +4,12 @@ import { readFileSync } from 'node:fs';
 export function segmentTexts(): Record<number, string> {
   const ssml = readFileSync(new URL('./vo/script.ssml', import.meta.url), 'utf8');
   const out: Record<number, string> = {};
-  for (const m of ssml.matchAll(/<voice [^>]*id="seg(\d)"[^>]*>([\s\S]*?)<\/voice>/g)) {
-    const body = (m[2] ?? '')
+  for (const m of ssml.matchAll(/<!-- seg(\d) -->([\s\S]*?)(?=<!-- seg\d -->|<\/voice>)/g)) {
+    out[Number(m[1])] = (m[2] ?? '')
       .replace(/<sub alias="([^"]*)">[^<]*<\/sub>/g, '$1')
       .replace(/<[^>]+>/g, '')
       .replace(/\s+/g, ' ')
       .trim();
-    out[Number(m[1])] = body;
   }
   return out;
 }

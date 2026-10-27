@@ -116,10 +116,21 @@ async function open(s: Seg, path: string): Promise<void> {
 type Cuts = Array<[number, number]>;
 interface Result { cuts: Cuts; notes?: Record<string, unknown> }
 
+/** Seconds of video before seg1's voiceover: 0.5 s dissolve from the brag plus 0.4 s. Must match build.sh. */
+const SEG1_LEAD = 0.9;
+
 async function seg1(s: Seg): Promise<Result> {
-  await open(s, '/desk?narrator=gpt-4.1&fixture=fx-01');
+  // Load without a mouse event so no cursor shows, then hold still on the Desk while the brag dissolves in.
+  await s.page.goto(`${BASE}/desk?narrator=gpt-4.1&fixture=fx-01`, { waitUntil: 'networkidle' });
+  await s.page.evaluate(() => document.fonts.ready);
+  await sleep(300);
+  s.s0 = mark(s);
+  await sleep(SEG1_LEAD * 1000 + 200);
+  await s.page.mouse.move(s.pos.x, s.pos.y);
   await glide(s, 1500, 260);
   await click(s, s.page.getByRole('button', { name: 'Replay pack run' }));
+  await sleep(400);
+  const preEnd = mark(s);
   const stamp = s.page.locator('.mp-bar-stamp .mp-stamp').first();
   await stamp.waitFor({ timeout: 90_000 });
   const checkingAt = mark(s);
@@ -133,8 +144,9 @@ async function seg1(s: Seg): Promise<Result> {
   await claim.evaluate((el) => el.classList.add('mp-demo-zoom'));
   await sleep(4000);
   await claim.evaluate((el) => el.classList.remove('mp-demo-zoom'));
-  const start = Math.max(0, standsAt - (s.d - 3.4));
-  return { cuts: [[start, start + s.d + 0.5]], notes: { checkingAt, standsAt } };
+  const post = s.d + SEG1_LEAD - (preEnd - s.s0);
+  const start = standsAt - (post - 3.4);
+  return { cuts: [[s.s0, preEnd], [start, start + post + 0.5]], notes: { checkingAt, standsAt } };
 }
 
 async function seg2(s: Seg): Promise<Result> {

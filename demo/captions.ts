@@ -1,10 +1,10 @@
 // Writes out/matchproof-demo.srt from the voiceover text and real segment timings.
-// Usage: tsx captions.ts <brag seconds> <seg1 s> <seg2 s> <seg3 s> <seg4 s> <seg5 s>
+// Usage: tsx captions.ts <seg1 voiceover start s> <seg1 s> <seg2 s> <seg3 s> <seg4 s> <seg5 s>
 import { writeFileSync } from 'node:fs';
 import { segmentTexts } from './lib.ts';
 
-const [brag, ...durs] = process.argv.slice(2).map(Number);
-if (brag === undefined || durs.length !== 5) throw new Error('need brag duration and five segment durations');
+const [start, ...durs] = process.argv.slice(2).map(Number);
+if (start === undefined || durs.length !== 5) throw new Error('need seg1 voiceover start and five segment durations');
 const texts = segmentTexts();
 
 const stamp = (t: number): string => {
@@ -37,7 +37,7 @@ function wrap(line: string): string {
   return `${line.slice(0, best).trim()}\n${line.slice(best).trim()}`;
 }
 
-let offset = brag;
+let offset = start;
 let index = 1;
 let srt = '';
 durs.forEach((d, i) => {

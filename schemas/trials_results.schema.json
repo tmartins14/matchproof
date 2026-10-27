@@ -10,6 +10,20 @@
     "pack": { "type": "string", "examples": ["pack-v1"] },
     "run_at": { "type": "string", "format": "date-time" },
     "git_sha": { "type": "string" },
+    "merges": {
+      "type": "array",
+      "description": "Runs of single candidates merged into this file after the first run (`--merge-into`), oldest first. Absent when the file is one run.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidates", "run_at", "git_sha"],
+        "properties": {
+          "candidates": { "type": "array", "items": { "type": "string" } },
+          "run_at": { "type": "string", "format": "date-time" },
+          "git_sha": { "type": "string" }
+        }
+      }
+    },
     "referee": {
       "type": "object",
       "additionalProperties": false,

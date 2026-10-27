@@ -527,6 +527,15 @@ class Type1(StrEnum):
     verdict = 'verdict'
 
 
+class Merge(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    candidates: list[str]
+    run_at: AwareDatetime
+    git_sha: str
+
+
 class FinalScoreItem(RootModel[int]):
     root: Annotated[int, Field(ge=0)]
 
@@ -1302,6 +1311,12 @@ class TrialsResults(BaseModel):
     pack: Annotated[str, Field(examples=['pack-v1'])]
     run_at: AwareDatetime
     git_sha: str
+    merges: Annotated[
+        list[Merge] | None,
+        Field(
+            description='Runs of single candidates merged into this file after the first run (`--merge-into`), oldest first. Absent when the file is one run.'
+        ),
+    ] = None
     referee: Annotated[
         Referee,
         Field(

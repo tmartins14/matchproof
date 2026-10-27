@@ -451,6 +451,14 @@ pack: string
 run_at: string
 git_sha: string
 /**
+ * Runs of single candidates merged into this file after the first run (`--merge-into`), oldest first. Absent when the file is one run.
+ */
+merges?: {
+candidates: string[]
+run_at: string
+git_sha: string
+}[]
+/**
  * The fixed referee: the Checker's code and judge, then the auditor on settled claims. Its cost is reported once here, not per candidate.
  */
 referee: {

@@ -53,3 +53,17 @@ judge-mai:
   currency: null
   source: null
   as_of: null
+
+gpt-5.4-mini:
+  input_per_million: 0.75
+  output_per_million: 4.50
+  currency: USD
+  source: "https://prices.azure.com/api/retail/prices (Azure OpenAI GPT5, meters 5.4 mini Inp Gl and 5.4 mini Opt Gl, eastus2)"
+  as_of: "2026-10-26"
+
+gpt-4.1:
+  input_per_million: 2.00
+  output_per_million: 8.00
+  currency: USD
+  source: "https://prices.azure.com/api/retail/prices (Azure OpenAI, meters gpt 4.1 Inp glbl and gpt 4.1 Outp glbl, eastus2)"
+  as_of: "2026-10-26"

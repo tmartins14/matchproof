@@ -18,6 +18,7 @@ from evals.trials_web import (
     note_of,
     picks_of,
     ranks_of,
+    reason_line_of,
     shrink_to_limit,
     trap_label,
     trap_record_of,
@@ -465,6 +466,29 @@ def test_claim_diff_rebuilds_the_draft_and_the_aired_text_of_every_amended_claim
             "".join(o["text"] for o in ops if o["op"] != "delete")
             == claims[int(i)]["text"]
         )
+
+
+def test_the_tables_note_is_the_compare_reason_cut_to_length() -> None:
+    web = json.loads(
+        (ROOT / "apps" / "web" / "fixtures" / "trials" / "web-pack-v1.json").read_text(
+            "utf-8"
+        )
+    )
+    claims, reasons = web["results"]["claims"], web["claim_reason"]
+    assert set(reasons) == {
+        str(i) for i, c in enumerate(claims) if reason_line_of(c) is not None
+    }
+    for name, w in web["worst"].items():
+        if w is None:
+            continue
+        i = next(
+            i
+            for i, c in enumerate(claims)
+            if (c["candidate"], c["fixture"], c["beat"], c["scored"])
+            == (name, w["fixture"], w["beat"], True)
+        )
+        if str(i) in reasons:
+            assert reasons[str(i)].startswith(w["note"].rstrip("…"))
 
 
 def summary_row(

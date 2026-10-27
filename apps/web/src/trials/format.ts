@@ -24,13 +24,6 @@ export const verdictKey = (v: ClaimRow["verdict"]): VerdictKey => KEY[v];
 /** "Judge (overclaim): x" and "Second reviewer (wrong_entity): x" read as "x". */
 export const plainReason = (reason: string): string => reason.replace(/^(?:Judge|Second reviewer) \([^)]*\):\s*/, "");
 
-/** "<bucket>: <reason>" for the first reason of a claim, or undefined when it has none. */
-export function reasonLine(row: Pick<ClaimRow, "reason_bucket" | "reasons">): string | undefined {
-  const first = row.reasons[0];
-  if (!first) return undefined;
-  return row.reason_bucket ? `${row.reason_bucket}: ${plainReason(first)}` : plainReason(first);
-}
-
 /** Pairs each fail-profile bucket with its share, biggest first, for the bar and its legend. */
 export function failParts(profile: Record<string, number>): { bucket: string; share: number }[] {
   return Object.entries(profile)

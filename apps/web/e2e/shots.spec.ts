@@ -52,7 +52,7 @@ test("key-moments column crops", async ({ page }) => {
 
 async function controlsShot(page: Page, size: { width: number; height: number }, name: string): Promise<void> {
   await open(page, "", size);
-  const header = await page.locator("header.mp-header").boundingBox();
+  const header = await page.locator(".mp-header").boundingBox();
   const setup = await page.locator("section.mp-setup").boundingBox();
   if (!header || !setup) throw new Error("no header or setup bar");
   const bottom = setup.y + setup.height;

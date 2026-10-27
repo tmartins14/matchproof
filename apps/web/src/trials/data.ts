@@ -35,6 +35,8 @@ export const beatsOf = (fixture: string): string[] => Object.keys(web.moments[fi
 /** The candidate's scored claim on a beat. */
 export const scoredClaim = (candidate: string, fixture: string, beat: string): ClaimRow | undefined =>
   web.results.claims.find((c) => c.candidate === candidate && c.fixture === fixture && c.beat === beat && c.scored);
+/** The reason line of a claim row (`bucket: reason`), the same string the Table's note is cut from; undefined when it has none. */
+export const reasonOf = (row: ClaimRow): string | undefined => web.claim_reason[String(web.results.claims.indexOf(row))];
 /** The word-level diff of an AMENDED claim, draft to aired text, as the export wrote it; undefined for any other row. */
 export const diffOf = (row: ClaimRow): TrialsWeb["claim_diff"][string] | undefined => web.claim_diff[String(web.results.claims.indexOf(row))];
 export const clockOfWorst = (w: Worst): string => momentOf(w.fixture, w.beat)?.clock ?? "";

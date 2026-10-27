@@ -76,7 +76,7 @@ test("the Desk still loads at /desk and ?source=fixture", async ({ page }) => {
 
 test("a Fixtures cell shows one stamp per trap and each opens Compare at that trap", async ({ page }) => {
   await open(page, "/fixtures");
-  await expect(page.getByText("Each cell shows how that narrator called this fixture's traps.")).toBeVisible();
+  await expect(page.getByText(/Each cell shows how that narrator called this fixture's \d+ traps/)).toBeVisible();
   const stamps = page.getByRole("link", { name: /61′: RED CARD 61′, .* Compare gpt-5-mini on fixture 01/ });
   await expect(stamps).toHaveCount(1);
   await stamps.click();
@@ -118,6 +118,16 @@ test("Compare reaches every match: the Fixture select goes to its first trap, th
   await expect(page).toHaveURL(new RegExp(`/compare/fx-03/${other}\\?focus=gpt-5-nano$`));
 });
 
+test("every page has the Desk's angled-stripe backdrop, below the top bar", async ({ page }) => {
+  for (const path of ["/", "/fixtures", COMPARE, "/desk"]) {
+    await open(page, path);
+    await expect(page.locator(".mp-backdrop")).toHaveCount(1);
+    const bar = await page.locator("header.tr-bar").boundingBox();
+    const back = await page.locator(".mp-backdrop").boundingBox();
+    expect(back?.y, path).toBeGreaterThanOrEqual((bar?.y ?? 0) + (bar?.height ?? 0) - 1);
+  }
+});
+
 test("the top bar is pixel-identical on every page apart from the active nav item and stepper step", async ({ page }) => {
   for (const [name, size] of [["1440", DESK], ["390", PHONE]] as const) {
     const shots: Buffer[] = [];
@@ -139,7 +149,7 @@ test("the top bar is pixel-identical on every page apart from the active nav ite
     for (const b of boxes) expect(b, `top bar box at ${name}`).toEqual(boxes[0]);
   }
   await open(page, "/desk");
-  const strip = await page.locator("header.mp-header--strip").boundingBox();
+  const strip = await page.locator(".mp-header--strip").boundingBox();
   const bar = await page.locator("header.tr-bar").boundingBox();
   expect(strip?.y).toBe((bar?.y ?? 0) + (bar?.height ?? 0));
   // No Desk backdrop behind the bar, and one bar on the page.

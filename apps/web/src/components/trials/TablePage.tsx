@@ -21,6 +21,7 @@ function Hero() {
           <p className="tr-body">{t.hero.how}</p>
         </>
       )}
+      <p className="tr-body">{t.hero.trapDef}</p>
     </section>
   );
 }
@@ -36,6 +37,9 @@ function Referee() {
       <div className="tr-line">{fill(t.judge, { name: r.judge })}</div>
       <div className="tr-line">{fill(t.auditor, { name: r.auditor })}</div>
       <div className="tr-body">{t.fixed}</div>
+      {web.results.candidates.some((c) => c.id === r.judge) ? (
+        <div className="tr-body tr-note">{fill(t.selfJudged, { name: r.judge })}</div>
+      ) : null}
       {self.map((id) => (
         <div key={id} className="tr-body tr-note">
           {fill(t.selfAudited, { name: id })}

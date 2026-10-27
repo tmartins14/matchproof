@@ -25,7 +25,7 @@ interface HeaderBarProps {
 export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mode, lang, onMode, onLang, deskLabel, cachedChip, replayText }: HeaderBarProps) {
   const h = copy.header;
   return (
-    <header className="mp-header mp-header--strip mp-above">
+    <section className="mp-header mp-header--strip mp-above" aria-label={h.controls}>
       {deskLabel ? <span className="tr-hd tr-desk-label">{deskLabel}</span> : null}
       <Scorebug
         label={h.score}
@@ -59,6 +59,6 @@ export function HeaderBar({ copy, homeShort, awayShort, score, clock, status, mo
           ]}
         />
       </div>
-    </header>
+    </section>
   );
 }

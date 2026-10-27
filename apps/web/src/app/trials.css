@@ -30,10 +30,10 @@
 
 /* League table */
 .tr-table-wrap { overflow-x: auto; background: var(--mp-surface); border-top: 3px solid var(--mp-text); }
-.tr-table { min-width: 1190px; }
+.tr-table { min-width: 1200px; }
 .tr-caption { padding: 8px 16px 0; }
 .tr-caption--hint { padding-top: 2px; padding-bottom: 8px; }
-.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(220px, 1.4fr) 64px 76px 124px 56px 64px 104px 70px 96px minmax(130px, 0.9fr) 128px; column-gap: 8px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
+.tr-row { position: relative; display: grid; grid-template-columns: 36px minmax(190px, 1.4fr) 64px 76px 120px 56px 64px 100px 70px 96px minmax(110px, 0.9fr) 120px; column-gap: 6px; align-items: center; padding: 0 16px 0 10px; min-height: 68px; border-left: 6px solid var(--mp-surface); border-bottom: 1px solid var(--mp-line2); }
 .tr-row:hover { background: var(--mp-raised); }
 .tr-head { min-height: 44px; background: var(--mp-input); }
 .tr-head:hover { background: var(--mp-input); }
@@ -125,17 +125,6 @@
 .tr-link { font-family: var(--mp-display); font-weight: 700; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mp-lime); text-decoration: none; }
 
 @media (max-width: 720px) {
-  /* The table becomes one card per narrator: name first, then the numbers with their labels. */
-  .tr-table { min-width: 0; }
-  .tr-row { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 14px 12px; }
-  .tr-row > [role="cell"] { flex: 0 0 auto; }
-  .tr-row > .tr-who { flex: 1 1 calc(100% - 52px); }
-  .tr-row > .tr-failcell { flex: 1 1 100%; }
-  .tr-row > .tr-act { flex: 1 1 100%; text-align: left; }
-  .tr-row > [data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; font-family: var(--mp-display); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mp-muted); font-style: normal; }
-  .tr-row.tr-head { display: none; }
-  .tr-num, .tr-cost, .tr-trap { text-align: left; }
-  .tr-divider { flex-wrap: wrap; }
   .tr-bar, .tr-main { padding-left: 16px; padding-right: 16px; }
   .tr-run { margin-left: 0; }
   .tr-h1 { font-size: 30px; }
@@ -193,9 +182,11 @@ html { scrollbar-gutter: stable; }
 .mp-header--strip { min-height: 64px; padding-top: 0; padding-bottom: 0; background: var(--mp-surface); }
 /* The strip's fill runs edge to edge while its controls stay in the 1440 column. */
 .mp-header--strip { box-shadow: 0 0 0 100vmax var(--mp-surface); clip-path: inset(0 -100vmax); }
+@media (max-width: 1360px) {
+  .tr-bar .tr-run { display: none; }
+}
 @media (max-width: 1100px) {
   .tr-bar { --tr-bar-h: 148px; flex-wrap: wrap; align-content: center; gap: 8px 16px; }
-  .tr-bar .tr-run { display: none; }
   .tr-bar .tr-steps { font-size: 13px; gap: 14px; }
 }
 @media (max-width: 720px) {
@@ -205,3 +196,40 @@ html { scrollbar-gutter: stable; }
   .tr-bar .tr-nav { flex-wrap: nowrap; gap: 2px; }
   .tr-bar .tr-nav-link { padding: 0 11px; font-size: 14px; }
 }
+
+/* Below 1240 px the table becomes one card per narrator: name first, then the numbers with their labels. */
+@media (max-width: 1239px) {
+  .tr-table { min-width: 0; }
+  .tr-row { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 14px 12px; }
+  .tr-row > [role="cell"] { flex: 0 0 auto; }
+  .tr-row > .tr-who { flex: 1 1 calc(100% - 52px); }
+  .tr-row > .tr-failcell { flex: 1 1 100%; }
+  .tr-row > .tr-act { flex: 1 1 100%; text-align: left; }
+  .tr-row > [data-label]::before { content: attr(data-label); display: block; margin-bottom: 2px; font-family: var(--mp-display); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mp-muted); font-style: normal; }
+  .tr-row.tr-head { display: none; }
+  .tr-num, .tr-cost, .tr-trap { text-align: left; }
+  .tr-row > .tr-who { flex: 1 1 calc(100% - 52px); }
+  .tr-divider { flex-wrap: wrap; }
+}
+
+/* Fixtures: one card per fixture below 900 px, each narrator's stamps under its name. */
+@media (max-width: 899px) {
+  .tr-fx { min-width: 0; }
+  .tr-fx-row.tr-head { display: none; }
+  .tr-fx-row { display: flex; flex-wrap: wrap; gap: 8px 12px; padding: 12px; }
+  .tr-fx-row > .tr-who { flex: 1 1 100%; }
+  .tr-fx-row > .tr-fx-cell { flex: 1 1 140px; flex-direction: column; align-items: flex-start; }
+  .tr-fx-row > .tr-fx-cell::before { content: attr(data-label); font-family: var(--mp-display); font-weight: 600; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mp-muted); }
+  .tr-fx-stamps { justify-content: flex-start; }
+}
+
+/* Long ids and refusal messages wrap instead of widening the page. */
+.tr-claim, .tr-reason, .tr-draft, .tr-cited, .tr-fact, .tr-mono, .tr-ev { overflow-wrap: anywhere; }
+
+/* 44 px tap targets for the text links. */
+.tr-link, .tr-who-link { display: inline-flex; align-items: center; min-height: 44px; }
+/* Legend text sits on a solid fill, not on the backdrop stripe. */
+.mp-legend > span { background: var(--mp-surface); padding: 0 6px; }
+
+/* Bare text on a page sits on a solid fill, never straight on the backdrop stripes (contrast). */
+.tr-steps-nav, .tr-brief, .tr-caption, .tr-gridnote, .tr-narrators-head, .tr-nextup, .tr-picks > .tr-sub { background: var(--mp-bg); }

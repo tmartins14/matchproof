@@ -865,6 +865,12 @@ fact_id: string
 }[]
 }
 /**
+ * The one reason line of each claim row that has a reason, keyed by its index in results.claims: `<bucket>: <reason>`, the reviewer's prefix stripped and citation reasons in plain English. The Table's worst-moment note is this line cut to length, so the Table and Compare give the same explanation.
+ */
+claim_reason: {
+[k: string]: string
+}
+/**
  * For each AMENDED claim row that aired, keyed by its index in results.claims: the draft turned into the aired text, word by word (difflib). `equal` text is in both, `delete` only in the draft, `insert` only in the aired text. Joining equal and delete gives draft_text; joining equal and insert gives text.
  */
 claim_diff: {

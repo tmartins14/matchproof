@@ -889,6 +889,11 @@ class ClaimNumber(BaseModel):
     fact_id: FactId
 
 
+ClaimReasonAdditionalProperty = TypeAliasType(
+    "ClaimReasonAdditionalProperty", Annotated[str, Field(min_length=1)]
+)
+
+
 class Op(Enum):
     equal = 'equal'
     delete = 'delete'
@@ -1438,6 +1443,12 @@ class TrialsWeb(BaseModel):
         dict[str, list[ClaimNumber]],
         Field(
             description="Every number in each claim row's wording tied to the cited fact it matches, keyed by the row's index in results.claims. Worked out by the deterministic reconciler (no model) on the wording the Desk shows: the draft for an OVERTURNED or HELD row, the text otherwise. Fills claim.numbers on a cached replay."
+        ),
+    ]
+    claim_reason: Annotated[
+        dict[str, ClaimReasonAdditionalProperty],
+        Field(
+            description="The one reason line of each claim row that has a reason, keyed by its index in results.claims: `<bucket>: <reason>`, the reviewer's prefix stripped and citation reasons in plain English. The Table's worst-moment note is this line cut to length, so the Table and Compare give the same explanation."
         ),
     ]
     claim_diff: Annotated[

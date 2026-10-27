@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { CSSProperties } from "react";
 import localFont from "next/font/local";
 import { tokenCssVars } from "@/theme/tokens";
+import { Backdrop } from "@/components/desk/Backdrop";
 import { TopBar } from "@/components/trials/TopBar";
 import "./desk.css";
 import "./trials.css";
@@ -43,7 +44,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`} style={vars}>
       <body>
         <TopBar />
-        {children}
+        {/* One backdrop for every page, below the bar. */}
+        <div className="mp-root">
+          <Backdrop />
+          {children}
+        </div>
       </body>
     </html>
   );

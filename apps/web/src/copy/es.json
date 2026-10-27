@@ -17,6 +17,7 @@
   },
   "header": {
     "score": "Marcador",
+    "controls": "Desk controls",
     "mode": "Modo de visualización",
     "lang": "Idioma",
     "live": "En directo",
@@ -327,6 +328,7 @@
       "kicker": "Who do you put on air?",
       "headline": "{models} narrator models. {fixtures} rigged fixtures. One fixed referee.",
       "how": "Every model commentates the same seeded matches, each with planted traps. Code checks every number and name. A second model checks the wording. Nothing a model says counts until it survives review.",
+      "trapDef": "A trap is a planted moment where a plausible sentence is wrong.",
       "cleared": "Cleared for air: {id}, overturned on {o} of {n} traps.",
       "worst": "{id}: {o} of {n}. Not cleared."
     },
@@ -336,7 +338,8 @@
       "judge": "Judge · {name}",
       "auditor": "Auditor · {name}",
       "fixed": "Fixed for every narrator.",
-      "selfAudited": "{name} is audited by its own model; read its row with that in mind."
+      "selfAudited": "{name} is audited by its own model; read its row with that in mind.",
+      "selfJudged": "{name} is also the judge of wording, so it judges its own sentences."
     },
     "scoring": {
       "title": "Scoring",
@@ -390,6 +393,7 @@
       "failAria": "Fail profile: {parts}",
       "noFails": "No failures",
       "trapsLine": "{overturned} of {total} overturned",
+      "key": "Clean: stood with no fix. Referees split: the judge and the auditor disagreed. Fail profile: what the failed claims got wrong, as a share of them.",
       "failTop": "{bucket} {pct}%"
     },
     "buckets": {
@@ -430,11 +434,11 @@
       "howTitle": "How a fixture is written",
       "how": "A fixture is a seed and a plan: the moments the match must contain, such as a red card on the hour or a stoppage-time penalty. The generator plays it out, so every narrator sees the same events and the same facts.",
       "stampTitle": "What a stamp means",
-      "stamp": "STANDS: the claim matches the facts. AMENDED: the wording was fixed. OVERTURNED: the claim was withdrawn, cited a fact that doesn't exist, could not be read, or was never written. NO ANSWER: the model call failed; it scores 0.",
+      "stamp": "STANDS: the claim matches the facts. AMENDED: the wording was fixed. OVERTURNED: the claim was withdrawn, cited a fact that doesn't exist, could not be read, or was never written. HELD: the model call failed, so there is no answer; it scores 0.",
       "colFixture": "Fixture",
       "trapMoment": "Stamp on the first trap moment",
-      "noAnswer": "NO ANSWER",
-      "gridNote": "Each cell shows how that narrator called this fixture's traps. Click a stamp to see the claim next to the others.",
+      "noAnswer": "HELD",
+      "gridNote": "Each cell shows how that narrator called this fixture's {traps} traps (the other moments are on Compare). S is STANDS, A is AMENDED, O is OVERTURNED, H is HELD. Click a stamp to see the claim next to the others.",
       "stampTip": "{label}: {verdict}",
       "stampName": "{l} {clock}: {label}, {verdict}. Compare {id} on fixture {fixture}",
       "open": "Compare {id} on fixture {fixture}"
@@ -476,7 +480,8 @@
       "next": "Next moment",
       "position": "Moment {i} of {n}",
       "redirecting": "Opening the first trap moment",
-      "refereeNoteTitle": "Referee note"
+      "refereeNoteTitle": "Referee note",
+      "cited": "Facts this claim cited:"
     },
     "desk": {
       "label": "DESK · running {model} ({rank})",

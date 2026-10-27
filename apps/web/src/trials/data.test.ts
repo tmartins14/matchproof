@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { beatsOf, candidateById, clockOfWorst, diffOf, failTopOf, firstTrapBeat, momentOf, rankOf, scoredClaim, summaryOf, tableOrder, trapRecordOf, web, worstOf } from "./data";
-import { compactTokens, failParts, fixtureNumber, plainReason, reasonLine, seconds, verdictKey } from "./format";
+import { beatsOf, candidateById, clockOfWorst, diffOf, reasonOf, failTopOf, firstTrapBeat, momentOf, rankOf, scoredClaim, summaryOf, tableOrder, trapRecordOf, web, worstOf } from "./data";
+import { compactTokens, failParts, fixtureNumber, plainReason, seconds, verdictKey } from "./format";
 
 describe("trials data", () => {
   it("draws ranks and order from the export, unmeasured rows last and unranked", () => {
@@ -67,6 +67,16 @@ describe("trials format", () => {
     }
   });
 
+  it("gives the Table's worst-moment note and the Compare card the same reason", () => {
+    for (const [id, w] of Object.entries(web.worst)) {
+      if (!w) continue;
+      const row = scoredClaim(id, w.fixture, w.beat);
+      expect(row).toBeDefined();
+      const line = reasonOf(row!);
+      if (line) expect(line.startsWith(w.note.replace(/…$/, ""))).toBe(true);
+    }
+  });
+
   it("orders the fail profile biggest first", () => {
     expect(failParts({ numbers: 0.2, overclaim: 0.8 }).map((p) => p.bucket)).toEqual(["overclaim", "numbers"]);
   });
@@ -92,7 +102,5 @@ describe("trials format, reasons", () => {
     expect(plainReason("Judge (overclaim): 'push' is intent.")).toBe("'push' is intent.");
     expect(plainReason("Second reviewer (wrong_entity): other side.")).toBe("other side.");
     expect(plainReason("The number 6 matches nothing.")).toBe("The number 6 matches nothing.");
-    expect(reasonLine({ reason_bucket: "overclaim", reasons: ["Judge (motive): x."] })).toBe("overclaim: x.");
-    expect(reasonLine({ reason_bucket: null, reasons: [] })).toBeUndefined();
   });
 });

@@ -76,3 +76,26 @@ Hesitations: "traps" and "overturned" mean nothing yet; I read "3 of 14" before 
 | broken internal links (393 URLs) | 0 | 0 | 0 | 0 | 0 |
 
 Notes on the counts. Clipped text: the 9 baseline are `div.mp-pitch` freeze-frame captions on compare pages (pitch overflow hidden, caption slightly beyond the box, visually fine) and the Desk root container; the 88 extra at 1280 are the top bar (F01). Overlap: a first pass flagged 670 to 862 pairs, all of them adjacent line boxes of inline insert/delete redlines; after requiring overlap above 35% of line height there were 0, and none were visible in screenshots, so no real text overlap was found. Axe serious/critical are all the Desk contrast issue (F05); axe moderate are the Desk duplicate banner and landmark rules.
+
+## 4. After Part C (redeployed site, full run)
+
+Same script, same 88 pages (`docs/ux/audit-checks.mjs`, raw output `audit-after.json`), against the site redeployed from `main` at `335710a`. Before figures are section 3.
+
+| check (totals across 88 pages) | width | before | after |
+|---|---|---|---|
+| pages with horizontal page scroll | 1024 | 1 | 0 |
+| inner scroll containers hiding content | 1440 / 1280 / 1024 / 768 / 390 | 0 / 1 / 1 / 2 / 1 | 0 / 0 / 0 / 0 / 0 |
+| overlapping text boxes | all | 0 | 0 |
+| tap targets under 44x44 | 390 | 89 | 0 |
+| axe serious/critical (nodes) | 1440 / 1280 / 1024 / 768 / 390 | 0 / 1 / 2 / 4 / 0 | 0 / 0 / 0 / 0 / 0 |
+| axe moderate (nodes) | all | 2 | 0 |
+| console errors, failed requests, HTTP >= 400 | all | 0 | 0 |
+| broken internal links | all | 0 | 0 |
+| top bar box identical on every page | all | yes | yes (1425x72 at 1440 and 1280-wide 1265x72; 148 high at 1024 and below) |
+| clipped text elements | each width | 9 (97 at 1280) | 96 |
+
+The clipped count went up for one reason, and it is not text: every page now sits in `div.mp-root`, the wrapper that clips the shared backdrop's stripes at the page edge (88 pages), plus the same 8 freeze-frame captions that overhang their box by 2 px as before. At 1280 the 88 clipped top-bar elements from F01 are gone.
+
+Deployed screenshots (Table, an AMENDED Compare moment and the Desk, at 1440 and 390): `deployed/`.
+
+Open for Tyler: F09, F11, F13 (all minor).

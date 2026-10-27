@@ -67,6 +67,15 @@ function Row({ row, leader }: { row: SummaryRow; leader: boolean }) {
       <div role="cell" className="tr-num" data-label={t.table.cols.p90}>
         {seconds(row.p90_ms)} s
       </div>
+      <div role="cell" className="tr-num tr-live" data-label={t.table.cols.liveReady}>
+        {web.live_ready[id] ? (
+          <span title={t.table.liveReadyTip} aria-label={t.table.liveReadyTip}>
+            ✓
+          </span>
+        ) : (
+          ""
+        )}
+      </div>
       <div role="cell" className="tr-cost" data-label={t.table.cols.cost}>
         <div>{price}</div>
         <div className="tr-sub">{fill(t.table.tokens, { n: compactTokens(row.tokens_per_match) })}</div>
@@ -102,6 +111,7 @@ export function LeagueTable() {
     ["clean", t.table.cols.clean],
     ["traps", t.table.cols.traps],
     ["p90", t.table.cols.p90],
+    ["liveReady", t.table.cols.liveReady],
     ["cost", t.table.cols.cost],
     ["fail", t.table.cols.fail],
     ["", ""],
@@ -118,7 +128,7 @@ export function LeagueTable() {
               key={i}
               role="columnheader"
               title={key ? t.table.tips[key as keyof typeof t.table.tips] : undefined}
-              className={`tr-hd${i >= 2 && i <= 9 ? " tr-hd--c" : ""}`}
+              className={`tr-hd${i >= 2 && i <= 10 ? " tr-hd--c" : ""}`}
             >
               {label}
             </div>

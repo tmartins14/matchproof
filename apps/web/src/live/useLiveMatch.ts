@@ -19,7 +19,7 @@ export interface LiveMatch {
   data: DeskData;
   problem: Problem | undefined;
   /** Posts the brief, opens the stream and returns the brief under the id the server gave it. */
-  kickoff: (brief: MatchBrief, speed: Speed) => Promise<MatchBrief | undefined>;
+  kickoff: (brief: MatchBrief, speed: Speed, narrator?: string) => Promise<MatchBrief | undefined>;
   /** Closes the stream and clears the desk; the caller keeps the brief. */
   reset: (brief: MatchBrief) => void;
   randomize: () => Promise<Result<{ match_id: string; brief: MatchBrief }>>;
@@ -84,7 +84,7 @@ export function useLiveMatch(initial: MatchBrief): LiveMatch {
   );
 
   const kickoff = useCallback(
-    async (brief: MatchBrief, speed: Speed): Promise<MatchBrief | undefined> => {
+    async (brief: MatchBrief, speed: Speed, narrator?: string): Promise<MatchBrief | undefined> => {
       stop();
       received.current = 0;
       publish({ ...emptyDesk(brief, "live"), phase: "connecting", speed });
@@ -96,7 +96,7 @@ export function useLiveMatch(initial: MatchBrief): LiveMatch {
       }
       const played = { ...brief, match_id: made.value.match_id };
       publish({ ...emptyDesk(played, "live"), phase: "connecting", speed });
-      close.current = openStream(streamUrl(played.match_id, speed), {
+      close.current = openStream(streamUrl(played.match_id, speed, narrator), {
         onMessage: enqueue,
         onRefused: (reason) => {
           stop();

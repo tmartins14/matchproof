@@ -2,6 +2,8 @@ import type { Beat, Claim, Event, Fact, PositionFrame, Status, StreamMessage } f
 import type { DeskData, Phase, RunningMetric } from "@/desk/deskData";
 
 const TICKER_LEN = 5;
+/** The notice the API sends when the daily token cap pauses narration (PAUSED_TEXT in api/live.py). */
+export const PAUSED_NOTICE = "Narration is paused for today.";
 const RUNNING = /^(possession_share|shots|shots_on_target|xg)\((home|away), to (\d+)′\)$/;
 const MOMENTUM = /^momentum\(min-(\d{2})\)$/;
 
@@ -51,6 +53,7 @@ function addClaim(d: DeskData, incoming: Claim): void {
 function addStatus(d: DeskData, status: Status, nextId: number): DeskData {
   const out: DeskData = { ...d };
   if (status.speed !== undefined) out.speed = status.speed;
+  if (status.narrator !== undefined) out.narrator = status.narrator;
   if (status.state === "score") {
     if (status.score) out.score = status.score;
     return out;

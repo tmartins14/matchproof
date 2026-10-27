@@ -50,6 +50,8 @@ export const cachedRowsOf = (candidate: string, fixture: string): CachedRow[] =>
 /** The narrators the Desk offers: measured and cleared for air, in Table order. Nobody else is listed. */
 export const deskCandidates: string[] = tableOrder.filter((id) => isMeasured(id) && summaryOf(id)?.cleared === true);
 export const liveNarrator: string | null = web.live_narrator;
+/** Cleared, measured and fast enough for a live feed (p90 within the gate), as the export worked out. */
+export const isLiveReady = (id: string): boolean => web.live_ready[id] === true;
 export const fixtureIds: string[] = web.fixtures.map((f) => f.id);
 /** The trap chips of a fixture, in trap order: what the trap is and its clock, such as `RED CARD 61′`. */
 export const trapLabels = (fixture: string): string[] => (fixtureById(fixture)?.traps ?? []).map((t) => t.label);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { failureOf } from "./api";
+import { failureOf, streamUrl } from "./api";
 import { asSse, recordedStream } from "./recorded";
 import { messageOf, splitBlocks } from "./stream";
 
@@ -23,5 +23,12 @@ describe("reading the stream", () => {
     expect(failureOf(503)).toBe("busy");
     expect(failureOf(409)).toBe("finished");
     expect(failureOf(500)).toBe("unreachable");
+  });
+});
+
+describe("streamUrl narrator", () => {
+  it("adds ?narrator= only when a narrator is given", () => {
+    expect(streamUrl("m-1", 3)).not.toContain("narrator");
+    expect(streamUrl("m-1", 3, "gpt-4.1")).toMatch(/stream\?speed=3&narrator=gpt-4\.1$/);
   });
 });

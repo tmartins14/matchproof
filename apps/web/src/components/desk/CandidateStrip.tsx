@@ -1,14 +1,23 @@
 import type { Copy } from "@/desk/copy";
 import { fill } from "@/desk/copy";
-import { deskCandidates, liveNarrator, rankOf, trapLabels, web } from "@/trials/data";
+import { deskCandidates, isLiveReady, rankOf, trapLabels, web } from "@/trials/data";
 import { fixtureNumber } from "@/trials/format";
+
+/** How a narrator is run: streamed live through the API, or replayed from the pack run. */
+export type RunMode = "live" | "cached";
 
 /** What the Desk needs to know about the Trials choice; the strip and the desk both read it. */
 export interface TrialsDeskProps {
   narrator: string;
   fixture: string;
-  /** the selected narrator is not the live one: its claims replay from the pack run */
+  /** the selected narrator is live-ready: it can be run live as well as replayed */
+  liveReady: boolean;
+  /** the selected narrator is not live-ready: its claims replay from the pack run only */
   cachedMode: boolean;
+  /** a live run is the one on the desk */
+  playingLive: boolean;
+  /** the narrator named by the live stream's first status message */
+  streamNarrator: string | undefined;
   /** the desk is showing a cached replay (selected, or the fallback after live failed) */
   playingCached: boolean;
   /** live kickoff failed with busy, unreachable or rate_limit */
@@ -23,7 +32,7 @@ interface StripProps extends TrialsDeskProps {
   /** a match is connecting or playing */
   locked: boolean;
   finished: boolean;
-  onKickoff: () => void;
+  onRun: (mode: RunMode) => void;
   onNewMatch: () => void;
 }
 
@@ -33,7 +42,7 @@ export const ordinal = (rank: number | undefined): string => (rank === undefined
 export function CandidateStrip(props: StripProps) {
   const t = props.copy.trials.desk;
   const pack = web.pack;
-  const cachedOnly = liveNarrator === null || !deskCandidates.includes(liveNarrator);
+  const cachedOnly = !deskCandidates.some(isLiveReady);
   const referee = web.results.referee;
   return (
     <section className="mp-above tr-cand" aria-label={t.narrator}>
@@ -44,7 +53,7 @@ export function CandidateStrip(props: StripProps) {
         <select id="tr-narrator" className="mp-select" value={props.narrator} disabled={props.locked || deskCandidates.length === 0} onChange={(e) => props.onNarrator(e.target.value)}>
           {deskCandidates.map((id) => (
             <option key={id} value={id}>
-              {`${id} · ${ordinal(rankOf(id))} · ${id === liveNarrator ? t.live : fill(t.cachedOption, { pack })}`}
+              {`${id} · ${ordinal(rankOf(id))} · ${isLiveReady(id) ? t.live : fill(t.cachedOption, { pack })}`}
             </option>
           ))}
         </select>
@@ -75,12 +84,31 @@ export function CandidateStrip(props: StripProps) {
         </span>
       </div>
       <div className="tr-cand-go">
-        <span className="mp-lift">
-          <button type="button" className="mp-btn mp-btn--primary" onClick={props.finished ? props.onNewMatch : props.onKickoff} disabled={!props.finished && (props.locked || props.narrator === "")}>
-            <i className="mp-btn-dot" aria-hidden="true" />
-            {props.finished ? props.copy.setup.newMatch : props.cachedMode ? t.runCached : t.runLive}
-          </button>
-        </span>
+        {props.finished ? (
+          <span className="mp-lift">
+            <button type="button" className="mp-btn mp-btn--primary" onClick={props.onNewMatch}>
+              <i className="mp-btn-dot" aria-hidden="true" />
+              {props.copy.setup.newMatch}
+            </button>
+          </span>
+        ) : (
+          <>
+            {props.liveReady ? (
+              <span className="mp-lift">
+                <button type="button" className="mp-btn mp-btn--primary" onClick={() => props.onRun("live")} disabled={props.locked || props.narrator === ""}>
+                  <i className="mp-btn-dot" aria-hidden="true" />
+                  {t.runLive}
+                </button>
+              </span>
+            ) : null}
+            <span className="mp-lift">
+              <button type="button" className={props.liveReady ? "mp-btn" : "mp-btn mp-btn--primary"} onClick={() => props.onRun("cached")} disabled={props.locked || props.narrator === ""}>
+                {props.liveReady ? null : <i className="mp-btn-dot" aria-hidden="true" />}
+                {t.runCached}
+              </button>
+            </span>
+          </>
+        )}
       </div>
       {props.fallback ? (
         <div role="status" className="tr-cand-fallback">

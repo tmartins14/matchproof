@@ -76,14 +76,15 @@ function Scoring() {
         </div>
       ))}
       <div className="tr-body">{t.trials.scoring.held}</div>
+      <div className="tr-body">{t.trials.scoring.gate}</div>
     </section>
   );
 }
 
 function Picks() {
   const t = copy.en.trials.picks;
-  const { live_feed: live, budget, not_cleared: out, sole } = web.picks;
-  if (!live && !budget && !out) return null;
+  const { live, budget, most_accurate: accurate, not_cleared: out, sole } = web.picks;
+  if (!live && !budget && !accurate && !out) return null;
   return (
     <section className="tr-picks" aria-label="Picks">
       {sole ? (
@@ -97,13 +98,19 @@ function Picks() {
       {!sole && live ? (
         <div className="tr-card">
           <div className="tr-hd">{t.live}</div>
-          <div className="tr-line">{fill(t.liveLine, { id: live.candidate, s: seconds(live.p90_ms) })}</div>
+          <div className="tr-line">{fill(t.liveLine, { id: live.candidate, pts: live.pts, s: seconds(live.p90_ms) })}</div>
         </div>
       ) : null}
       {!sole && budget ? (
         <div className="tr-card">
           <div className="tr-hd">{t.budget}</div>
           <div className="tr-line">{fill(t.budgetLine, { id: budget.candidate, usd: budget.usd_per_match.toFixed(4) })}</div>
+        </div>
+      ) : null}
+      {accurate ? (
+        <div className="tr-card">
+          <div className="tr-hd">{t.accurate}</div>
+          <div className="tr-line">{fill(t.accurateLine, { id: accurate.candidate, pct: accurate.clean_pct, s: seconds(accurate.p90_ms) })}</div>
         </div>
       ) : null}
       {out ? (
@@ -157,8 +164,8 @@ export function TablePage() {
         <Referee />
         <Scoring />
       </div>
-      <LeagueTable />
       <Picks />
+      <LeagueTable />
       <Footer />
       <NextUp />
     </Shell>

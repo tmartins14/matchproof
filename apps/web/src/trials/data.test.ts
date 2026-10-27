@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { beatsOf, candidateById, clockOfWorst, diffOf, reasonOf, failTopOf, firstTrapBeat, momentOf, rankOf, scoredClaim, summaryOf, tableOrder, trapRecordOf, web, worstOf } from "./data";
+import { beatsOf, candidateById, clockOfWorst, diffOf, isLiveReady, reasonOf, failTopOf, firstTrapBeat, momentOf, rankOf, scoredClaim, summaryOf, tableOrder, trapRecordOf, web, worstOf } from "./data";
 import { compactTokens, failParts, fixtureNumber, plainReason, seconds, verdictKey } from "./format";
 
 describe("trials data", () => {
@@ -102,5 +102,23 @@ describe("trials format, reasons", () => {
     expect(plainReason("Judge (overclaim): 'push' is intent.")).toBe("'push' is intent.");
     expect(plainReason("Second reviewer (wrong_entity): other side.")).toBe("other side.");
     expect(plainReason("The number 6 matches nothing.")).toBe("The number 6 matches nothing.");
+  });
+});
+
+describe("trials data, live-ready", () => {
+  it("marks live-ready only cleared measured candidates within the gate", () => {
+    for (const r of web.results.summary) {
+      const expected = r.cleared && web.measured[r.candidate] && r.p90_ms <= web.live_p90_ms;
+      expect(isLiveReady(r.candidate)).toBe(expected);
+    }
+  });
+
+  it("picks the live and budget cards from live-ready candidates only", () => {
+    for (const pick of [web.picks.live, web.picks.budget]) if (pick) expect(isLiveReady(pick.candidate)).toBe(true);
+  });
+
+  it("drops the sole card when two or more are live-ready", () => {
+    const ready = web.results.summary.filter((r) => isLiveReady(r.candidate));
+    if (ready.length >= 2) expect(web.picks.sole).toBeNull();
   });
 });

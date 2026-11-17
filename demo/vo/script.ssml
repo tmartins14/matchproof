@@ -1,0 +1,9 @@
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-GB">
+  <voice name="en-GB-Ryan:DragonHDLatestNeural">
+    <!-- seg1 -->Broadcasters want AI commentary. But a fluent sentence can still be wrong, and <phoneme alphabet="ipa" ph="laɪv">live</phoneme>, there's no undo. So before any model gets the mic, it has to pass this test.<break time="700ms"/>
+    <!-- seg2 -->Six narrators call the same seeded synthetic matches, each with planted traps. One fixed referee scores every claim. Grok 4.7 tops the table, but takes seventy seconds a claim. GPT-4.1 fell for none of the fourteen traps, in under three seconds. That's the <phoneme alphabet="ipa" ph="laɪv">live</phoneme> pick. GPT-5-nano fell for eight. Not cleared.<break time="700ms"/>
+    <!-- seg3 -->Click any narrator to see its worst moment beside the others. Same frame, same facts. Here, five narrators named the right scorer. But nano couldn't point to the fact that names him, so it never aired. True isn't enough. It has to be provable. And when the referee fixes wording, you see exactly what changed.<break time="700ms"/>
+    <!-- seg4 -->Then deploy. Use on Desk puts a cleared narrator on a <phoneme alphabet="ipa" ph="laɪv">live</phoneme> match. Every claim shows checking, then stands, amended or overturned — code, a judge model and a second-vendor auditor, orchestrated as an agent workflow.<break time="700ms"/>
+    <!-- seg5 -->The narrator is replaceable. The exam and the referee are the asset — that's what makes it deployable in an enterprise. That's Matchproof. Built on Microsoft Foundry, Agent Framework and Azure.
+  </voice>
+</speak>

@@ -66,6 +66,7 @@ The pack is `evals/trials/pack_v1.yaml`, the candidates are `trial_candidates` i
 - **Table headline:** see Headline above (from `evals/reports/trials/pack-v1.json`): four of six narrators cleared, `grok-4.7` first on 246 pts.
 - **Live-ready narrators:** `gpt-5.4-mini`, `gpt-4.1`, `gpt-5-mini` (cleared, measured, p90 at most 6 s); `grok-4.7` is cleared but replay-only (p90 70 s).
 - **Tests and CI:** `make lint typecheck test` and the web e2e specs pass; CI is green on `main`.
+- **Demo video:** `demo/` builds `demo/out/matchproof-demo.mp4` (about 1:42, brag clip dissolving into five recorded segments, Azure AI Speech Dragon HD voiceover (en-GB-Ryan), SRT and soft subtitles); outputs are not committed. See `demo/build.sh`.
 - Full build history: [PROGRESS.md](PROGRESS.md).
 
 ## Roadmap
